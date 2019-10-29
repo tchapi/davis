@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'dashboard' %}
+
+{% block body %}
+
+<h1>Dashboard</h1>
+
+
+Users : {{ users|length }}
+Calendars : {{ calendars|length }}
+Address books : {{ addressbooks|length }}
+
+Auth realm : {{ authRealm }}
+Invite from address : {{ invite_from_address }}
+Cal dav : {{ calDAVEnabled }}
+Card dav : {{ cardDAVEnabled }}
+
+{% endblock %}

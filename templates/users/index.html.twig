@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'resources' %}
+
+{% block body %}
+
+<h1>Users</h1>
+
+<a href="{{ path('user_create') }}" class="btn btn-primary">New user</a>
+
+{% for principal in principals %}
+    <li>{{ principal.displayName }} ({{ principal.email }}) {{ principal.username }} <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-secondary">Calendars</a> <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-secondary">Address books</a> <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-light">Edit</a> <a href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-danger">Delete</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

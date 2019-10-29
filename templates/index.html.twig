@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Davis{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-reboot.min.css">
+        <style type="text/css">
+          .hero {
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+          }
+          .badge-success {
+            color: #fff;
+            background-color: #28a745;
+          }
+          .badge-warning {
+            color: #fff;
+            background-color: #ffc107;
+          }
+          .badge {
+              display: inline-block;
+              padding: .25em .4em;
+              font-size: 75%;
+              font-weight: 700;
+              line-height: 1;
+              text-align: center;
+              white-space: nowrap;
+              vertical-align: baseline;
+              border-radius: .25rem;
+              transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+          }
+          .admin {
+            margin-top: 30px;
+          }
+        </style>
+    </head>
+    <body>
+      <div class="hero">
+        <h3>Davis is running.</h3>
+        <div>CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">enabled</span>{% else %}<span class="badge badge-warning">disabled</span>{% endif %}</div>
+        <div>CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">enabled</span>{% else %}<span class="badge badge-warning">disabled</span>{% endif %}</div>
+        <a href="{{ path('dashboard') }}" class="admin">Administration interface</a>
+      </div>
+    </body>
+</html>

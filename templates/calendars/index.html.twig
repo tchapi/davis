@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'resources' %}
+
+{% block body %}
+
+<h1>Calendars for {{ principal.displayName }}</h1>
+
+<a href="{{ path('users') }}">Users</a>
+<ul>
+{% for calendar in calendars %}
+    <li>{{ calendar.displayName }} {{ calendar.description }}</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

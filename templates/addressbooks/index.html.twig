@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'resources' %}
+
+{% block body %}
+
+<h1>Address books for {{ principal.displayName }}</h1>
+
+<a href="{{ path('users') }}">Users</a>
+<ul>
+{% for addressbook in addressbooks %}
+    <li>{{ addressbook.displayName }} {{ addressbook.description }}</li>
+{% endfor %}
+</ul>
+
+{% endblock %}
