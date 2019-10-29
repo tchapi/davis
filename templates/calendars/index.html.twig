@@ -11,7 +11,7 @@
 {% for calendar in calendars %}
     <div class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1 mr-auto">{{ calendar.displayName }}</h5>
+            <h5 class="mb-1 mr-auto">{{ calendar.displayName }} <span class="badge badge-pill" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span></h5>
             <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-primary ml-1">✎ Edit</a>
             <!-- <a href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-danger ml-1">⚠ Delete</a> -->
         </div>

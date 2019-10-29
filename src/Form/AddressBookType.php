@@ -14,8 +14,8 @@ class AddressBookType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('uri', TextType::class, ['disabled' => !$options['new'], 'help' => "Allowed characters are digits, lowercase letters and the dash symbol '-'."])
-            ->add('displayName')
+            ->add('uri', TextType::class, ['disabled' => !$options['new'], 'help' => "This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'."])
+            ->add('displayName', TextType::class, ['help' => 'This name will be displayed in your CardDAV client'])
             ->add('description')
             ->add('save', SubmitType::class);
     }

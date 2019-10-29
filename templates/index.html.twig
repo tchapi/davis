@@ -36,10 +36,17 @@
           .admin {
             margin-top: 30px;
           }
+          h3 {
+            margin-bottom: 30px;
+          }
+          img {
+            margin-bottom: 10px;
+          }
         </style>
     </head>
     <body>
       <div class="hero">
+        <img src="/images/logo.png" width="60px">
         <h3>Davis is running.</h3>
         <div>CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">enabled</span>{% else %}<span class="badge badge-warning">disabled</span>{% endif %}</div>
         <div>CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">enabled</span>{% else %}<span class="badge badge-warning">disabled</span>{% endif %}</div>
