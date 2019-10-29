@@ -18,7 +18,7 @@ class AddressBookChange
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="binary", length=255)
      */
     private $uri;
 
@@ -45,6 +45,10 @@ class AddressBookChange
 
     public function getUri(): ?string
     {
+        if (is_resource($this->uri)) {
+            $this->uri = stream_get_contents($this->uri);
+        }
+
         return $this->uri;
     }
 

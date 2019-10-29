@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'resources' %}
+
+{% block body %}
+
+{% if addressbook.id %}
+<h1 class="display-4">Editing Address Book {{ addressbook.displayName }}</h1>
+{% else %}
+<h1 class="display-4">New Address Book <small class="text-muted">for {{ principal.displayName }}</small></h1>
+{% endif %}
+
+{{ form(form) }}
+
+{% endblock %}

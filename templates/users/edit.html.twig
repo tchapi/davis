@@ -3,6 +3,12 @@
 
 {% block body %}
 
+{% if username %}
+<h1 class="display-4">Editing user {{ username }}</h1>
+{% else %}
+<h1 class="display-4">New user</h1>
+{% endif %}
+
 {{ form(form) }}
 
 {% endblock %}

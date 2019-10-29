@@ -42,6 +42,11 @@ class AddressBook
      */
     private $synctoken;
 
+    public function __construct()
+    {
+        $this->synctoken = 1;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -49,6 +54,10 @@ class AddressBook
 
     public function getPrincipalUri(): ?string
     {
+        if (is_resource($this->principalUri)) {
+            $this->principalUri = stream_get_contents($this->principalUri);
+        }
+
         return $this->principalUri;
     }
 
@@ -73,6 +82,10 @@ class AddressBook
 
     public function getUri(): ?string
     {
+        if (is_resource($this->uri)) {
+            $this->uri = stream_get_contents($this->uri);
+        }
+
         return $this->uri;
     }
 

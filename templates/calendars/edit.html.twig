@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'resources' %}
+
+{% block body %}
+
+{% if calendar.id %}
+<h1 class="display-4">Editing calendar {{ calendar.displayName }} <small class="text-muted">for {{ principal.displayName }}</small></h1>
+{% else %}
+<h1 class="display-4">New calendar <small class="text-muted">for {{ principal.displayName }}</small></h1>
+{% endif %}
+
+{{ form(form) }}
+
+{% endblock %}

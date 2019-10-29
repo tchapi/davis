@@ -3,16 +3,53 @@
 
 {% block body %}
 
-<h1>Dashboard</h1>
+<h1 class="display-4">Dashboard</h1>
 
+<h3>Configured environment</h3>
 
-Users : {{ users|length }}
-Calendars : {{ calendars|length }}
-Address books : {{ addressbooks|length }}
+<ul class="list-group">
+  <li class="list-group-item list-group-item-secondary">Auth Realm : <code>{{ authRealm }}</code></li>
+  <li class="list-group-item list-group-item-secondary">Invite from address : <code>{{ invite_from_address|default('Not set') }}</code></li>
+  {% if calDAVEnabled %}
+  <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">CalDAV
+    <span class="badge badge-success badge-pill">enabled</span></li>
+  {% else %}
+  <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CalDAV
+    <span class="badge badge-danger badge-pill">enabled</span></li>
+  {% endif %}
 
-Auth realm : {{ authRealm }}
-Invite from address : {{ invite_from_address }}
-Cal dav : {{ calDAVEnabled }}
-Card dav : {{ cardDAVEnabled }}
+  {% if cardDAVEnabled %}
+  <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">CardDAV
+    <span class="badge badge-success badge-pill">enabled</span></li>
+  {% else %}
+  <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CardDAV
+    <span class="badge badge-danger badge-pill">disabled</span></li>
+  {% endif %}
+</ul>
+
+<h3>Objects</h3>
+
+<ul class="list-group">
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Users
+    <span class="badge badge-primary badge-pill">{{ users|length }}</span>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Calendars
+    <span class="badge badge-primary badge-pill">{{ calendars|length }}</span>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    ↳ Events
+    <span class="badge badge-secondary badge-pill">{{ events|length }}</span>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Address books
+    <span class="badge badge-primary badge-pill">{{ addressbooks|length }}</span>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    ↳ Contacts
+    <span class="badge badge-secondary badge-pill">{{ contacts|length }}</span>
+  </li>
+</ul>
 
 {% endblock %}

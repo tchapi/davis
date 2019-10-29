@@ -20,12 +20,12 @@ class Principal
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="binary", length=255)
      */
     private $uri;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="binary", length=255, nullable=true)
      */
     private $email;
 
@@ -41,6 +41,10 @@ class Principal
 
     public function getUri(): ?string
     {
+        if (is_resource($this->uri)) {
+            $this->uri = stream_get_contents($this->uri);
+        }
+
         return $this->uri;
     }
 
@@ -53,11 +57,15 @@ class Principal
 
     public function getUsername(): ?string
     {
-        return str_replace(self::PREFIX, '', $this->uri);
+        return str_replace(self::PREFIX, '', $this->getUri());
     }
 
     public function getEmail(): ?string
     {
+        if (is_resource($this->email)) {
+            $this->email = stream_get_contents($this->email);
+        }
+
         return $this->email;
     }
 

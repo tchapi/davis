@@ -3,9 +3,10 @@
 
 {% block body %}
 
-<h1>Calendars for {{ principal.displayName }}</h1>
+<h1 class="display-4">Calendars <small class="text-muted">for {{ principal.displayName }}</small></h1>
 
 <a href="{{ path('users') }}">Users</a>
+<a href="{{ path('calendar_create', {username: username}) }}" class="btn btn-primary">New calendar</a>
 <ul>
 {% for calendar in calendars %}
     <li>{{ calendar.displayName }} {{ calendar.description }}</li>

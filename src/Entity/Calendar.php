@@ -10,6 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Calendar
 {
+    const COMPONENT_EVENT = 'VEVENT';
+    const COMPONENT_TODOS = 'VTODO';
+    const COMPONENT_NOTES = 'VJOURNAL';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -26,6 +30,12 @@ class Calendar
      * @ORM\Column(type="binary", length=255, nullable=true)
      */
     private $components;
+
+    public function __construct()
+    {
+        $this->synctoken = 1;
+        $this->components = 'VEVENT,VTODO';
+    }
 
     public function getId(): ?int
     {

@@ -3,9 +3,10 @@
 
 {% block body %}
 
-<h1>Address books for {{ principal.displayName }}</h1>
+<h1 class="display-4">Address books <small class="text-muted">for {{ principal.displayName }}</small></h1>
 
 <a href="{{ path('users') }}">Users</a>
+<a href="{{ path('addressbook_create', {username: username}) }}" class="btn btn-primary">New address book</a>
 <ul>
 {% for addressbook in addressbooks %}
     <li>{{ addressbook.displayName }} {{ addressbook.description }}</li>

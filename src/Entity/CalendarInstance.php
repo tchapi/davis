@@ -10,6 +10,15 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class CalendarInstance
 {
+    const INVITE_STATUS_NORESPONSE = 1;
+    const INVITE_STATUS_ACCEPTED = 2;
+    const INVITE_STATUS_DECLINED = 3;
+    const INVITE_STATUS_INVALID = 4;
+
+    const ACCESS_OWNER = 1;
+    const ACCESS_READ = 2;
+    const ACCESS_READWRITE = 3;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -18,7 +27,7 @@ class CalendarInstance
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", cascade={"persist"})
      * @ORM\JoinColumn(name="calendarid", nullable=false)
      */
     private $calendar;
@@ -83,6 +92,14 @@ class CalendarInstance
      */
     private $shareInviteStatus;
 
+    public function __construct()
+    {
+        $this->shareInviteStatus = self::INVITE_STATUS_ACCEPTED;
+        $this->transparent = 0;
+        $this->calendarOrder = 0;
+        $this->access = self::ACCESS_OWNER;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,7 +119,7 @@ class CalendarInstance
 
     public function getPrincipalUri(): ?string
     {
-        return $this->principalUri;
+        return stream_get_contents($this->principalUri);
     }
 
     public function setPrincipalUri(?string $principalUri): self
@@ -138,6 +155,10 @@ class CalendarInstance
 
     public function getUri(): ?string
     {
+        if (is_resource($this->uri)) {
+            $this->uri = stream_get_contents($this->uri);
+        }
+
         return $this->uri;
     }
 
@@ -174,6 +195,10 @@ class CalendarInstance
 
     public function getCalendarColor(): ?string
     {
+        if (is_resource($this->calendarColor)) {
+            $this->calendarColor = stream_get_contents($this->calendarColor);
+        }
+
         return $this->calendarColor;
     }
 
@@ -210,6 +235,10 @@ class CalendarInstance
 
     public function getShareHref(): ?string
     {
+        if (is_resource($this->shareHref)) {
+            $this->shareHref = stream_get_contents($this->shareHref);
+        }
+
         return $this->shareHref;
     }
 

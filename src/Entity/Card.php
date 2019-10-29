@@ -79,6 +79,10 @@ class Card
 
     public function getUri(): ?string
     {
+        if (is_resource($this->uri)) {
+            $this->uri = stream_get_contents($this->uri);
+        }
+
         return $this->uri;
     }
 
@@ -103,6 +107,10 @@ class Card
 
     public function getEtag(): ?string
     {
+        if (is_resource($this->etag)) {
+            $this->etag = stream_get_contents($this->etag);
+        }
+
         return $this->etag;
     }
 

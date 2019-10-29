@@ -87,6 +87,10 @@ class CalendarObject
 
     public function getUri(): ?string
     {
+        if (is_resource($this->uri)) {
+            $this->uri = stream_get_contents($this->uri);
+        }
+
         return $this->uri;
     }
 
@@ -123,6 +127,10 @@ class CalendarObject
 
     public function getEtag(): ?string
     {
+        if (is_resource($this->etag)) {
+            $this->etag = stream_get_contents($this->etag);
+        }
+
         return $this->etag;
     }
 
@@ -147,6 +155,10 @@ class CalendarObject
 
     public function getComponentType(): ?string
     {
+        if (is_resource($this->componentType)) {
+            $this->componentType = stream_get_contents($this->componentType);
+        }
+
         return $this->componentType;
     }
 
@@ -183,6 +195,10 @@ class CalendarObject
 
     public function getUid(): ?string
     {
+        if (is_resource($this->uid)) {
+            $this->uid = stream_get_contents($this->uid);
+        }
+
         return $this->uid;
     }
 
