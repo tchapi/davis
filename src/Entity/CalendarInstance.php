@@ -119,7 +119,11 @@ class CalendarInstance
 
     public function getPrincipalUri(): ?string
     {
-        return stream_get_contents($this->principalUri);
+        if (is_resource($this->principalUri)) {
+            $this->principalUri = stream_get_contents($this->principalUri);
+        }
+
+        return $this->principalUri;
     }
 
     public function setPrincipalUri(?string $principalUri): self

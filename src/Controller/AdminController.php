@@ -47,6 +47,9 @@ class AdminController extends AbstractController
             'addressbooks' => $addressbooks,
             'events' => $events,
             'contacts' => $contacts,
+            'timezone' => date_default_timezone_get(),
+            'version' => \App\Version::VERSION,
+            'sabredav_version' => \Sabre\DAV\Version::VERSION,
         ]);
     }
 
@@ -209,6 +212,7 @@ class AdminController extends AbstractController
         return $this->render('calendars/edit.html.twig', [
             'form' => $form->createView(),
             'principal' => $principal,
+            'username' => $username,
             'calendar' => $calendarInstance,
         ]);
     }
@@ -266,6 +270,7 @@ class AdminController extends AbstractController
         return $this->render('addressbooks/edit.html.twig', [
             'form' => $form->createView(),
             'principal' => $principal,
+            'username' => $username,
             'addressbook' => $addressbook,
         ]);
     }

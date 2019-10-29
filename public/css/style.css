@@ -2,10 +2,8 @@ body {
     padding-top: calc(56px + 30px);
 }
 
+/* Add a simple line below display headings */
 .display-4 {
+    font-size: 3rem;
     border-bottom: 1px solid #CCC;
-}
-
-h3 {
-    margin-top: 1em;
 }

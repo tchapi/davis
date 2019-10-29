@@ -17,7 +17,7 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username', TextType::class, ['disabled' => !$options['new'], 'help' => "May be an email, but not forcibly."])
+            ->add('username', TextType::class, ['disabled' => !$options['new'], 'help' => 'May be an email, but not forcibly.'])
             ->add('displayName', TextType::class, [
                 'mapped' => false,
             ])

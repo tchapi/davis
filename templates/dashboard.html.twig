@@ -5,51 +5,55 @@
 
 <h1 class="display-4">Dashboard</h1>
 
-<h3>Configured environment</h3>
+<div class="row">
+  <div class="col-md">
+    <h3 class="mb-3 mt-4">Configured environment</h3>
 
-<ul class="list-group">
-  <li class="list-group-item list-group-item-secondary">Auth Realm : <code>{{ authRealm }}</code></li>
-  <li class="list-group-item list-group-item-secondary">Invite from address : <code>{{ invite_from_address|default('Not set') }}</code></li>
-  {% if calDAVEnabled %}
-  <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">CalDAV
-    <span class="badge badge-success badge-pill">enabled</span></li>
-  {% else %}
-  <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CalDAV
-    <span class="badge badge-danger badge-pill">enabled</span></li>
-  {% endif %}
+    <ul class="list-group">
+      <li class="list-group-item list-group-item-secondary">Version : <code>{{ version }}</code> (SabreDAV <code>{{ sabredav_version }}</code>)</li>
+      <li class="list-group-item list-group-item-secondary">Auth Realm : <code>{{ authRealm }}</code></li>
+      <li class="list-group-item list-group-item-secondary">Invite from address : <code>{{ invite_from_address|default('Not set') }}</code></li>
+      <li class="list-group-item list-group-item-secondary">Server timezone : <code>{{ timezone }}</code> <a class="small ml-2" target="_blank" href="https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone">How to change it ?</a></li>
 
-  {% if cardDAVEnabled %}
-  <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">CardDAV
-    <span class="badge badge-success badge-pill">enabled</span></li>
-  {% else %}
-  <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CardDAV
-    <span class="badge badge-danger badge-pill">disabled</span></li>
-  {% endif %}
-</ul>
+      {% if calDAVEnabled %}
+      <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">CalDAV
+        <span class="badge badge-success badge-pill">enabled</span></li>
+      {% else %}
+      <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CalDAV
+        <span class="badge badge-danger badge-pill">enabled</span></li>
+      {% endif %}
 
-<h3>Objects</h3>
+      {% if cardDAVEnabled %}
+      <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">CardDAV
+        <span class="badge badge-success badge-pill">enabled</span></li>
+      {% else %}
+      <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CardDAV
+        <span class="badge badge-danger badge-pill">disabled</span></li>
+      {% endif %}
+    </ul>
+  </div>
 
-<ul class="list-group">
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    Users
-    <span class="badge badge-primary badge-pill">{{ users|length }}</span>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    Calendars
-    <span class="badge badge-primary badge-pill">{{ calendars|length }}</span>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    ↳ Events
-    <span class="badge badge-secondary badge-pill">{{ events|length }}</span>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    Address books
-    <span class="badge badge-primary badge-pill">{{ addressbooks|length }}</span>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    ↳ Contacts
-    <span class="badge badge-secondary badge-pill">{{ contacts|length }}</span>
-  </li>
-</ul>
+  <div class="col-md">
+    <h3 class="mb-3 mt-4">Objects</h3>
+
+    <ul class="list-group mb-5">
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        Users <span class="badge badge-primary badge-pill">{{ users|length }}</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        Calendars <span class="badge badge-primary badge-pill">{{ calendars|length }}</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        ↳ Events <span class="badge badge-secondary badge-pill">{{ events|length }}</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        Address books <span class="badge badge-primary badge-pill">{{ addressbooks|length }}</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        ↳ Contacts <span class="badge badge-secondary badge-pill">{{ contacts|length }}</span>
+      </li>
+    </ul>
+  </div>
+</div>
 
 {% endblock %}

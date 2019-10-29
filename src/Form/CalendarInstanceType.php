@@ -5,8 +5,8 @@ namespace App\Form;
 use App\Entity\CalendarInstance;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,11 +21,11 @@ class CalendarInstanceType extends AbstractType
             ->add('calendarColor')
             ->add('todos', CheckboxType::class, [
                 'mapped' => false,
-                'help' => "If checked, todos will be enabled on this calendar.",
+                'help' => 'If checked, todos will be enabled on this calendar.',
             ])
             ->add('notes', CheckboxType::class, [
-                'mapped' => false, 
-                'help' => "If checked, notes will be enabled on this calendar.",
+                'mapped' => false,
+                'help' => 'If checked, notes will be enabled on this calendar.',
             ])
             ->add('save', SubmitType::class);
     }

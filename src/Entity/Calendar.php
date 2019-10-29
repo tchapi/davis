@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,10 +33,16 @@ class Calendar
      */
     private $components;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\CalendarObject", mappedBy="calendar")
+     */
+    private $objects;
+
     public function __construct()
     {
         $this->synctoken = 1;
         $this->components = 'VEVENT,VTODO';
+        $this->objects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -56,12 +64,47 @@ class Calendar
 
     public function getComponents(): ?string
     {
+        if (is_resource($this->components)) {
+            $this->components = stream_get_contents($this->components);
+        }
+
         return $this->components;
     }
 
     public function setComponents(?string $components): self
     {
         $this->components = $components;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CalendarObject[]
+     */
+    public function getObjects(): Collection
+    {
+        return $this->objects;
+    }
+
+    public function addObject(CalendarObject $object): self
+    {
+        if (!$this->objects->contains($object)) {
+            $this->objects[] = $object;
+            $object->setCalendar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeObject(CalendarObject $object): self
+    {
+        if ($this->objects->contains($object)) {
+            $this->objects->removeElement($object);
+            // set the owning side to null (unless already changed)
+            if ($object->getCalendar() === $this) {
+                $object->setCalendar(null);
+            }
+        }
 
         return $this;
     }
