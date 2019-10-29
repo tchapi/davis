@@ -109,11 +109,11 @@ class DAVController extends AbstractController
 
         // CalDAV plugins
         if ($this->calDAVEnabled) {
+            $server->addPlugin(new \Sabre\DAV\Sharing\Plugin());
             $server->addPlugin(new \Sabre\CalDAV\Plugin());
             $server->addPlugin(new \Sabre\CalDAV\Schedule\Plugin());
             $server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
-            $server->addPlugin(new \Sabre\DAV\Sharing\Plugin());
             if ($this->inviteAddress) {
                 $server->addPlugin(new \Sabre\CalDAV\Schedule\IMipPlugin($this->inviteAddress));
             }
