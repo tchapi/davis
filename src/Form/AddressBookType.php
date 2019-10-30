@@ -17,7 +17,9 @@ class AddressBookType extends AbstractType
             ->add('uri', TextType::class, ['disabled' => !$options['new'], 'help' => "This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'."])
             ->add('displayName', TextType::class, ['help' => 'This name will be displayed in your CardDAV client'])
             ->add('description')
-            ->add('save', SubmitType::class);
+            ->add('save', SubmitType::class, [
+                'label' => 'save',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

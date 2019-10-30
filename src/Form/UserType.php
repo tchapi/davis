@@ -17,22 +17,30 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username', TextType::class, ['disabled' => !$options['new'], 'help' => 'May be an email, but not forcibly.'])
+            ->add('username', TextType::class, [
+                'disabled' => !$options['new'],
+                'label' => 'form.username',
+                'help' => 'form.username.help',
+            ])
             ->add('displayName', TextType::class, [
+                'label' => 'form.displayName',
                 'mapped' => false,
             ])
             ->add('email', EmailType::class, [
+                'label' => 'form.email',
                 'mapped' => false,
             ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'invalid_message' => 'The password fields must match.',
-                'options' => ['attr' => ['class' => 'password-field']],
-                'required' => true,
-                'first_options' => ['label' => 'Password'],
-                'second_options' => ['label' => 'Repeat Password'],
+                'invalid_message' => 'form.password.match',
+                'options' => ['attr' => ['class' => 'password-field', 'placeholder' => 'form.password.empty']],
+                'required' => $options['new'],
+                'first_options' => ['label' => 'form.password'],
+                'second_options' => ['label' => 'form.password.repeat'],
             ])
-            ->add('save', SubmitType::class);
+            ->add('save', SubmitType::class, [
+                'label' => 'save',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
