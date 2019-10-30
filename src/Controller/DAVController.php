@@ -42,7 +42,7 @@ class DAVController extends AbstractController
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
         $this->inviteAddress = $inviteAddress ?? null;
-        $this->authRealm = $authRealm ?? 'SabreDAV';
+        $this->authRealm = $authRealm ?? User::DEFAULT_AUTH_REALM;
     }
 
     /**

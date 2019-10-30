@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class User
 {
+    const DEFAULT_AUTH_REALM = 'SabreDAV';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -57,7 +59,9 @@ class User
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    // $password _can_ be NULL here, in the case when we edit a user
+    // and do not change its password
+    public function setPassword(?string $password): self
     {
         $this->password = $password;
 
