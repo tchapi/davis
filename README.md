@@ -1,7 +1,7 @@
 Davis
 ---
 
-A simple, fully translatable admin interface for `sabre/dav` based on Symfony 4.
+A simple, fully translatable admin interface for `sabre/dav` based on [Symfony 4](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), largely inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
 # Requirements
 

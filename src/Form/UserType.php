@@ -18,8 +18,8 @@ class UserType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                'disabled' => !$options['new'],
                 'label' => 'form.username',
+                'disabled' => !$options['new'],
                 'help' => 'form.username.help',
             ])
             ->add('displayName', TextType::class, [

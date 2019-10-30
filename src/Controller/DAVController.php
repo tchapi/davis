@@ -60,18 +60,13 @@ class DAVController extends AbstractController
     {
         $pdo = $this->get('doctrine')->getEntityManager()->getConnection()->getWrappedConnection();
 
-        // $pdo = new \PDO('sqlite:data/db.sqlite');
-        // $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         /**
-         * The backends. Yes we do really need all of them.
-         *
-         * This allows any developer to subclass just any of them and hook into their
-         * own backend systems.
+         * The backends.
          */
         $authBackend = new \Sabre\DAV\Auth\Backend\PDO($pdo);
         $authBackend->setRealm($this->authRealm);
         $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($pdo);
+
         /**
          * The directory tree.
          *
