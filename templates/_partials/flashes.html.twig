@@ -1,0 +1,18 @@
+<div aria-live="polite" aria-atomic="true" class="flashes">
+  <div class="inner">
+    {% for label, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+          <div class="toast-header">
+            <span class="badge badge-pill badge-{{ label }} mr-2">&nbsp;</span>
+            <strong class="mr-auto">{{ ("label." ~ label)|trans }}</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="{{ "close"|trans }}">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="toast-body">{{ message }}</div>
+        </div>
+      {% endfor %}
+   {% endfor %}
+  </div>
+</div>

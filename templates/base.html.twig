@@ -7,24 +7,8 @@
         <link rel="stylesheet" type="text/css" href="/css/style.css">
     </head>
     <body>
-        <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-          <a class="navbar-brand" href="#">
-            <img src="/images/logo.png" width="30" height="30" alt=""> Davis
-          </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-              <li class="nav-item{% if menu == "dashboard" %} active{% endif %}">
-                <a class="nav-link" href="{{ path('dashboard') }}">Dashboard</a>
-              </li>
-              <li class="nav-item{% if menu == "resources" %} active{% endif %}">
-                <a class="nav-link" href="{{ path('users') }}">Users and resources</a>
-              </li>
-            </ul>
-          </div>
-        </nav>
+        {% include '_partials/navigation.html.twig' %}
+        {% include '_partials/flashes.html.twig' %}
         <div class="container">
             {% block body %}{% endblock %}
         </div>
