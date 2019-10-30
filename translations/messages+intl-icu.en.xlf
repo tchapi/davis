@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="wfWj5hl" resname="davis.running">
+        <source>davis.running</source>
+        <target> Davis is running.</target>
+      </trans-unit>
+      <trans-unit id="_5z3Vga" resname="enabled">
+        <source>enabled</source>
+        <target>enabled</target>
+      </trans-unit>
+      <trans-unit id="F_s8AWj" resname="disabled">
+        <source>disabled</source>
+        <target>disabled</target>
+      </trans-unit>
+      <trans-unit id="jgKGNDB" resname="label.success">
+        <source>label.success</source>
+        <target>Success</target>
+      </trans-unit>
+      <trans-unit id="RxX3ZeK" resname="label.warning">
+        <source>label.warning</source>
+        <target>Warning</target>
+      </trans-unit>
+      <trans-unit id="nEf.ThC" resname="label.error">
+        <source>label.error</source>
+        <target>Error</target>
+      </trans-unit>
+      <trans-unit id="K0Yls7G" resname="admin.interface">
+        <source>admin.interface</source>
+        <target>Administration interface</target>
+      </trans-unit>
+      <trans-unit id="MQ.yABS" resname="close">
+        <source>close</source>
+        <target>Close</target>
+      </trans-unit>
+      <trans-unit id="FX3KkuQ" resname="save">
+        <source>save</source>
+        <target>Save</target>
+      </trans-unit>
+      <trans-unit id="fTiRMPg" resname="toggle.navigation">
+        <source>toggle.navigation</source>
+        <target>Toggle navigation</target>
+      </trans-unit>
+      <trans-unit id="PMgigwp" resname="title.dashboard">
+        <source>title.dashboard</source>
+        <target>Dashboard</target>
+      </trans-unit>
+      <trans-unit id="1btv_DO" resname="title.users_and_resources">
+        <source>title.users_and_resources</source>
+        <target>Users and Resources</target>
+      </trans-unit>
+      <trans-unit id="F6FEXlX" resname="users.back">
+        <source>users.back</source>
+        <target>Back to Users</target>
+      </trans-unit>
+      <trans-unit id="K_UNihD" resname="addressbooks.new">
+        <source>addressbooks.new</source>
+        <target>New Address Book</target>
+      </trans-unit>
+      <trans-unit id="M_4.DKU" resname="calendars.new">
+        <source>calendars.new</source>
+        <target>New Calendar</target>
+      </trans-unit>
+      <trans-unit id="eH1zFg7" resname="calendars.uri">
+        <source>calendars.uri</source>
+        <target>Calendar URI</target>
+      </trans-unit>
+      <trans-unit id="IVokRw3" resname="users.new">
+        <source>users.new</source>
+        <target>New User</target>
+      </trans-unit>
+      <trans-unit id="0RNTrsD" resname="dashboard.env">
+        <source>dashboard.env</source>
+        <target>Configured environment</target>
+      </trans-unit>
+      <trans-unit id="0ssMhM8" resname="dashboard.objects">
+        <source>dashboard.objects</source>
+        <target>Objects</target>
+      </trans-unit>
+      <trans-unit id="wK69TgJ" resname="dashboard.version">
+        <source>dashboard.version</source>
+        <target>Version</target>
+      </trans-unit>
+      <trans-unit id="q.9wpuM" resname="dashboard.auth_realm">
+        <source>dashboard.auth_realm</source>
+        <target>Auth Realm</target>
+      </trans-unit>
+      <trans-unit id="w84LMcB" resname="dashboard.invite_from_address">
+        <source>dashboard.invite_from_address</source>
+        <target>Invite From Address</target>
+      </trans-unit>
+      <trans-unit id="Ppc629a" resname="dashboard.server_timezone">
+        <source>dashboard.server_timezone</source>
+        <target>Server Timezone</target>
+      </trans-unit>
+      <trans-unit id="vsty3iK" resname="dashboard.how_to_change_it">
+        <source>dashboard.how_to_change_it</source>
+        <target>How to change it ?</target>
+      </trans-unit>
+      <trans-unit id="rJf3tq1" resname="dashboard.users">
+        <source>dashboard.users</source>
+        <target>Users</target>
+      </trans-unit>
+      <trans-unit id="rSWt7Pl" resname="dashboard.calendars">
+        <source>dashboard.calendars</source>
+        <target>Calendars</target>
+      </trans-unit>
+      <trans-unit id="tiyHD2m" resname="dashboard.events">
+        <source>dashboard.events</source>
+        <target>Events</target>
+      </trans-unit>
+      <trans-unit id="PASzhyd" resname="dashboard.address_books">
+        <source>dashboard.address_books</source>
+        <target>Address Books</target>
+      </trans-unit>
+      <trans-unit id="6rQrria" resname="dashboard.contacts">
+        <source>dashboard.contacts</source>
+        <target>Contacts</target>
+      </trans-unit>
+      <trans-unit id="fPG1VTI" resname="addressbooks.edit">
+        <source>addressbooks.edit</source>
+        <target>Editing Address Book «{name}»</target>
+      </trans-unit>
+      <trans-unit id="JiEhxTc" resname="edit">
+        <source>edit</source>
+        <target>Edit</target>
+      </trans-unit>
+      <trans-unit id="YZdZVQP" resname="delete">
+        <source>delete</source>
+        <target>Delete</target>
+      </trans-unit>
+      <trans-unit id="TUhziVy" resname="calendars.edit">
+        <source>calendars.edit</source>
+        <target>Editing Calendar «{name}»</target>
+      </trans-unit>
+      <trans-unit id="fboZZMC" resname="calendars.events">
+        <source>calendars.events</source>
+        <target>{count, plural, =0 {No event} one {One event} other {# events}}</target>
+      </trans-unit>
+      <trans-unit id="zjEaC2X" resname="users.edit">
+        <source>users.edit</source>
+        <target>Editing Users «{username}»</target>
+      </trans-unit>
+      <trans-unit id="8NgrcqA" resname="addressbooks.for">
+        <source>addressbooks.for</source>
+        <target>Address books for {who}</target>
+      </trans-unit>
+      <trans-unit id="wl0lzxt" resname="addressbooks.uri">
+        <source>addressbooks.uri</source>
+        <target>Address book URI</target>
+      </trans-unit>
+      <trans-unit id="Clglf_L" resname="addressbooks.contacts">
+        <source>addressbooks.contacts</source>
+        <target>{count, plural, =0 {No contact} one {One contact} other {# contacts}}</target>
+      </trans-unit>
+      <trans-unit id="pF3C6cO" resname="calendars.for">
+        <source>calendars.for</source>
+        <target>Calendars for {who}</target>
+      </trans-unit>
+      <trans-unit id="bJtU2u_" resname="users.username">
+        <source>users.username</source>
+        <target>Username</target>
+      </trans-unit>
+      <trans-unit id="NMBKo9a" resname="users.uri">
+        <source>users.uri</source>
+        <target>Principal URI</target>
+      </trans-unit>
+      <trans-unit id="rzn9R3M" resname="users.calendars">
+        <source>users.calendars</source>
+        <target>Calendars</target>
+      </trans-unit>
+      <trans-unit id="lmhuwVZ" resname="users.addressbooks">
+        <source>users.addressbooks</source>
+        <target>Address Books</target>
+      </trans-unit>
+      <trans-unit id="kFt0ON2" resname="default.calendar.title">
+        <source>default.calendar.title</source>
+        <target>Default Calendar</target>
+      </trans-unit>
+      <trans-unit id="jNfNiCU" resname="default.calendar.description">
+        <source>default.calendar.description</source>
+        <target>Default Calendar for {user}</target>
+      </trans-unit>
+      <trans-unit id="pPBa2Y1" resname="default.addressbook.title">
+        <source>default.addressbook.title</source>
+        <target>Default Address Book</target>
+      </trans-unit>
+      <trans-unit id="fruFVYl" resname="default.addressbook.description">
+        <source>default.addressbook.description</source>
+        <target>Default Address Book for {user}</target>
+      </trans-unit>
+      <trans-unit id="sES4d8a" resname="user.saved">
+        <source>user.saved</source>
+        <target>User saved successfully</target>
+      </trans-unit>
+      <trans-unit id="8v0Uq.O" resname="user.deleted">
+        <source>user.deleted</source>
+        <target>User deleted successfully</target>
+      </trans-unit>
+      <trans-unit id="RcNQmAl" resname="calendar.saved">
+        <source>calendar.saved</source>
+        <target>Calendar saved successfully</target>
+      </trans-unit>
+      <trans-unit id="wEU.noE" resname="calendar.deleted">
+        <source>calendar.deleted</source>
+        <target>Calendar deleted successfully</target>
+      </trans-unit>
+      <trans-unit id="Iq2tnfk" resname="addressbooks.saved">
+        <source>addressbooks.saved</source>
+        <target>Address Book saved successfully</target>
+      </trans-unit>
+      <trans-unit id="vfRnbYa" resname="addressbooks.deleted">
+        <source>addressbooks.deleted</source>
+        <target>Address Book deleted successfully</target>
+      </trans-unit>
+      <trans-unit id="60dZ6KW" resname="addressbooks.back">
+        <source>addressbooks.back</source>
+        <target>Back to Address Books for {user}</target>
+      </trans-unit>
+      <trans-unit id="N1DviIS" resname="calendars.back">
+        <source>calendars.back</source>
+        <target>Back to Calendars for {user}</target>
+      </trans-unit>
+      <trans-unit id="6QHea80" resname="form.password.empty">
+        <source>form.password.empty</source>
+        <target>Leave empty if you don't want to change it</target>
+      </trans-unit>
+      <trans-unit id="_EJMqRe" resname="form.password.match">
+        <source>form.password.match</source>
+        <target>The password fields must match.</target>
+      </trans-unit>
+      <trans-unit id="yjqmSBK" resname="form.password">
+        <source>form.password</source>
+        <target>Password</target>
+      </trans-unit>
+      <trans-unit id="ILWuW.c" resname="form.password.repeat">
+        <source>form.password.repeat</source>
+        <target>Repeat Password</target>
+      </trans-unit>
+      <trans-unit id="3IGOm9D" resname="form.email">
+        <source>form.email</source>
+        <target>Email</target>
+      </trans-unit>
+      <trans-unit id="k660.eC" resname="form.displayName">
+        <source>form.displayName</source>
+        <target>Display name</target>
+      </trans-unit>
+      <trans-unit id="B0VCgO_" resname="form.username">
+        <source>form.username</source>
+        <target>Username</target>
+      </trans-unit>
+      <trans-unit id="7g17wm7" resname="form.username.help">
+        <source>form.username.help</source>
+        <target>May be an email, but not forcibly.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
