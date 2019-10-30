@@ -8,18 +8,18 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Migration: Create all necessary sabre/dav tables
+ * Migration: Create all necessary sabre/dav tables.
  */
 final class Version20191030113307 extends AbstractMigration
 {
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return 'Create all necessary sabre/dav tables';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('CREATE TABLE cards (id INT AUTO_INCREMENT NOT NULL, addressbookid INT NOT NULL, carddata LONGBLOB DEFAULT NULL, uri VARBINARY(255) DEFAULT NULL, lastmodified INT DEFAULT NULL, etag VARBINARY(32) DEFAULT NULL, size INT NOT NULL, INDEX IDX_4C258FD8B26C2E9 (addressbookid), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
         $this->addSql('CREATE TABLE principals (id INT AUTO_INCREMENT NOT NULL, uri VARBINARY(255) NOT NULL, email VARBINARY(255) DEFAULT NULL, displayname VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
@@ -41,9 +41,9 @@ final class Version20191030113307 extends AbstractMigration
         $this->addSql('ALTER TABLE addressbookchanges ADD CONSTRAINT FK_EB122CD58B26C2E9 FOREIGN KEY (addressbookid) REFERENCES addressbooks (id)');
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE cards DROP FOREIGN KEY FK_4C258FD8B26C2E9');
         $this->addSql('ALTER TABLE addressbookchanges DROP FOREIGN KEY FK_EB122CD58B26C2E9');

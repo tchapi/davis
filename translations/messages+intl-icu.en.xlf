@@ -7,7 +7,7 @@
     <body>
       <trans-unit id="wfWj5hl" resname="davis.running">
         <source>davis.running</source>
-        <target> Davis is running.</target>
+        <target>Davis is running.</target>
       </trans-unit>
       <trans-unit id="_5z3Vga" resname="enabled">
         <source>enabled</source>

@@ -33,7 +33,7 @@ class UserType extends AbstractType
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'form.password.match',
-                'options' => ['attr' => ['class' => 'password-field', 'placeholder' => 'form.password.empty']],
+                'options' => ['attr' => ['class' => 'password-field', 'placeholder' => $options['new'] ? '' : 'form.password.empty']],
                 'required' => $options['new'],
                 'first_options' => ['label' => 'form.password'],
                 'second_options' => ['label' => 'form.password.repeat'],
