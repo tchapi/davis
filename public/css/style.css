@@ -7,3 +7,18 @@ body {
     font-size: 3rem;
     border-bottom: 1px solid #CCC;
 }
+
+.flashes {
+    position: fixed;
+    top: 20px;
+    right: 0;
+    z-index: 1050;
+}
+.flashes .inner {
+    position: absolute;
+    top: 0;
+    right: 20px;
+}
+.flashes .toast {
+    min-width: 270px;
+}
