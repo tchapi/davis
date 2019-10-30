@@ -30,6 +30,7 @@ body {
     min-width: 270px;
 }
 
+/* Little color swatch to show calendar color */
 #calendar_instance_calendarColor_help::after {
     content: "";
     width: 30px;

@@ -30,6 +30,14 @@
       <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CardDAV
         <span class="badge badge-danger badge-pill">{{ "disabled"|trans }}</span></li>
       {% endif %}
+
+      {% if webDAVEnabled %}
+      <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">WebDAV
+        <span class="badge badge-success badge-pill">{{ "enabled"|trans }}</span></li>
+      {% else %}
+      <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">WebDAV
+        <span class="badge badge-danger badge-pill">{{ "disabled"|trans }}</span></li>
+      {% endif %}
     </ul>
   </div>
 

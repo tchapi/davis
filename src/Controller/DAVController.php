@@ -24,6 +24,13 @@ class DAVController extends AbstractController
     protected $cardDAVEnabled;
 
     /**
+     * is WebDAV enabled?
+     *
+     * @var bool
+     */
+    protected $webDAVEnabled;
+
+    /**
      * Mail address to send mails from.
      *
      * @var string
@@ -37,12 +44,30 @@ class DAVController extends AbstractController
      */
     protected $authRealm;
 
-    public function __construct($calDAVEnabled = true, $cardDAVEnabled = true, ?string $inviteAddress, ?string $authRealm)
+    /**
+     * WebDAV Public directory.
+     *
+     * @var string
+     */
+    protected $publicDir;
+
+    /**
+     * WebDAV Temporary directory.
+     *
+     * @var string
+     */
+    protected $tmpDir;
+
+    public function __construct(bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authRealm, ?string $publicDir, ?string $tmpDir)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
+        $this->webDAVEnabled = $webDAVEnabled;
         $this->inviteAddress = $inviteAddress ?? null;
         $this->authRealm = $authRealm ?? User::DEFAULT_AUTH_REALM;
+
+        $this->publicDir = $publicDir;
+        $this->tmpDir = $tmpDir;
     }
 
     /**
@@ -86,6 +111,9 @@ class DAVController extends AbstractController
             $carddavBackend = new \Sabre\CardDAV\Backend\PDO($pdo);
             $nodes[] = new \Sabre\CardDAV\AddressBookRoot($principalBackend, $carddavBackend);
         }
+        if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
+            $nodes[] = new \Sabre\DAV\FS\Directory($this->publicDir);
+        }
 
         // The object tree needs in turn to be passed to the server class
         $server = new \Sabre\DAV\Server($nodes);
@@ -119,6 +147,14 @@ class DAVController extends AbstractController
         if ($this->cardDAVEnabled) {
             $server->addPlugin(new \Sabre\CardDAV\Plugin());
             $server->addPlugin(new \Sabre\CardDAV\VCFExportPlugin());
+        }
+
+        // WebDAV plugins
+        if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
+            $lockBackend = new \Sabre\DAV\Locks\Backend\File($this->tmpDir.'/locksdb');
+            $server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
+            //$server->addPlugin(new \Sabre\DAV\Browser\GuessContentType()); // Waiting for https://github.com/sabre-io/dav/pull/1203
+            $server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->tmpDir));
         }
 
         $server->start();

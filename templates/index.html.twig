@@ -14,14 +14,16 @@
             flex-direction: column;
           }
           .badge-success {
-            color: #fff;
             background-color: #28a745;
           }
           .badge-warning {
-            color: #fff;
             background-color: #ffc107;
           }
+          .badge-danger {
+            background-color: #dc3545;
+          }
           .badge {
+            color: #fff;
               display: inline-block;
               padding: .25em .4em;
               font-size: 75%;
@@ -48,8 +50,9 @@
       <div class="hero">
         <img src="/images/logo.png" width="60px">
         <h3>{{ "davis.running"|trans }}</h3>
-        <div>CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-warning">{{ "disabled"|trans }}</span>{% endif %}</div>
-        <div>CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-warning">{{ "disabled"|trans }}</span>{% endif %}</div>
+        <div>CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
+        <div>CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
+        <div>WebDAV : {% if webDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
         <a href="{{ path('dashboard') }}" class="admin">{{ "admin.interface"|trans }}</a>
       </div>
     </body>
