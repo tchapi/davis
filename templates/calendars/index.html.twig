@@ -3,20 +3,20 @@
 
 {% block body %}
 
-<a href="{{ path('users') }}" class="btn btn-link">« Back to Users</a>
+<a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
 
-<h1 class="display-4 d-flex justify-content-between">Calendars for {{ principal.displayName }} <a href="{{ path('calendar_create', {username: username}) }}" class="btn btn-success mb-auto mt-auto">+ New calendar</a></h1>
+<h1 class="display-4 d-flex justify-content-between">{{ "calendars.for"|trans({'who': principal.displayName}) }} <a href="{{ path('calendar_create', {username: username}) }}" class="btn btn-success mb-auto mt-auto">+ {{ "calendars.new"|trans }}</a></h1>
 
 <div class="list-group mt-5">
 {% for calendar in calendars %}
     <div class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 mr-auto">{{ calendar.displayName }} <span class="badge badge-pill" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span></h5>
-            <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-primary ml-1">✎ Edit</a>
-            <!-- <a href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-danger ml-1">⚠ Delete</a> -->
+            <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-primary ml-1">✎ {{ "edit"|trans }}</a>
+            <a href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" class="btn btn-danger ml-1">⚠ {{ "delete"|trans }}</a>
         </div>
         <p class="mb-1">{{ calendar.description }}</p>
-        <small>Calendar URI : <code>{{ calendar.uri }}</code> — {{ calendar.calendar.objects|length }} event(s)</small>
+        <small>{{ "calendars.uri"|trans }} : <code>{{ calendar.uri }}</code> — {{ "calendars.events"|trans({'%count%': calendar.calendar.objects|length}) }}</small>
     </div>
 {% endfor %}
 </div>

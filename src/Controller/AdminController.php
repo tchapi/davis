@@ -6,8 +6,10 @@ use App\Entity\AddressBook;
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarObject;
+use App\Entity\CalendarSubscription;
 use App\Entity\Card;
 use App\Entity\Principal;
+use App\Entity\SchedulingObject;
 use App\Entity\User;
 use App\Form\AddressBookType;
 use App\Form\CalendarInstanceType;
@@ -15,6 +17,7 @@ use App\Form\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AdminController extends AbstractController
 {
@@ -69,13 +72,14 @@ class AdminController extends AbstractController
      * @Route("/users/new", name="user_create")
      * @Route("/users/edit/{username}", name="user_edit")
      */
-    public function userCreate(Request $request, ?string $username)
+    public function userCreate(Request $request, ?string $username, TranslatorInterface $trans)
     {
         if ($username) {
             $user = $this->get('doctrine')->getRepository(User::class)->findOneByUsername($username);
             if (!$user) {
-                throw new \Exception('User not found');
+                throw $this->createNotFoundException('User not found');
             }
+            $oldHash = $user->getPassword();
             $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
         } else {
             $user = new User();
@@ -94,8 +98,13 @@ class AdminController extends AbstractController
             $email = $form->get('email')->getData();
 
             // Create password for user
-            $hash = md5($user->getUsername().':'.$this->authRealm.':'.$user->getPassword());
-            $user->setPassword($hash);
+            if ($username && is_null($user->getPassword())) {
+                // The user is not new and does not want to change its password
+                $user->setPassword($oldHash);
+            } else {
+                $hash = md5($user->getUsername().':'.$this->authRealm.':'.$user->getPassword());
+                $user->setPassword($hash);
+            }
 
             $entityManager = $this->get('doctrine')->getManager();
 
@@ -106,14 +115,14 @@ class AdminController extends AbstractController
                 $calendarInstance = new CalendarInstance();
                 $calendar = new Calendar();
                 $calendarInstance->setPrincipalUri(Principal::PREFIX.$user->getUsername())
-                         ->setDisplayName('Default Calendar')
-                         ->setDescription('Default Calendar for '.$displayName)
+                         ->setDisplayName($trans->trans('default.calendar.title'))
+                         ->setDescription($trans->trans('default.calendar.description', ['users' => $displayName]))
                          ->setCalendar($calendar);
 
                 $addressbook = new AddressBook();
                 $addressbook->setPrincipalUri(Principal::PREFIX.$user->getUsername())
-                         ->setDisplayName('Default Address Book')
-                         ->setDescription('Default Address book for '.$displayName);
+                         ->setDisplayName($trans->trans('default.addressbook.title'))
+                         ->setDescription($trans->trans('default.addressbook.description', ['users' => $displayName]));
                 $entityManager->persist($calendarInstance);
                 $entityManager->persist($addressbook);
                 $entityManager->persist($principal);
@@ -124,6 +133,8 @@ class AdminController extends AbstractController
 
             $entityManager->persist($user);
             $entityManager->flush();
+
+            $this->addFlash('success', $trans->trans('user.saved'));
 
             return $this->redirectToRoute('users');
         }
@@ -137,9 +148,55 @@ class AdminController extends AbstractController
     /**
      * @Route("/users/delete/{username}", name="user_delete")
      */
-    public function userDelete(?string $username)
+    public function userDelete(string $username, TranslatorInterface $trans)
     {
-        //TODO
+        $user = $this->get('doctrine')->getRepository(User::class)->findOneByUsername($username);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager->remove($user);
+
+        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $entityManager->remove($principal);
+
+        // Remove calendars and addressbooks
+        $calendars = $this->get('doctrine')->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        foreach ($calendars ?? [] as $instance) {
+            foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
+                $entityManager->remove($object);
+            }
+            foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
+                $entityManager->remove($change);
+            }
+            $entityManager->remove($instance->getCalendar());
+            $entityManager->remove($instance);
+        }
+        $calendarsSubscriptions = $this->get('doctrine')->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        foreach ($calendarsSubscriptions ?? [] as $subscription) {
+            $entityManager->remove($subscription);
+        }
+        $schedulingObjects = $this->get('doctrine')->getRepository(SchedulingObject::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        foreach ($schedulingObjects ?? [] as $object) {
+            $entityManager->remove($object);
+        }
+
+        $addressbooks = $this->get('doctrine')->getRepository(AddressBook::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        foreach ($addressbooks ?? [] as $addressbook) {
+            foreach ($addressbook->getCards() ?? [] as $card) {
+                $entityManager->remove($card);
+            }
+            foreach ($addressbook->getChanges() ?? [] as $change) {
+                $entityManager->remove($change);
+            }
+            $entityManager->remove($addressbook);
+        }
+
+        $entityManager->flush();
+        $this->addFlash('success', $trans->trans('user.deleted'));
+
+        return $this->redirectToRoute('users');
     }
 
     /**
@@ -161,18 +218,18 @@ class AdminController extends AbstractController
      * @Route("/calendars/{username}/new", name="calendar_create")
      * @Route("/calendars/{username}/edit/{id}", name="calendar_edit")
      */
-    public function calendarCreate(Request $request, string $username, ?int $id)
+    public function calendarCreate(Request $request, string $username, ?int $id, TranslatorInterface $trans)
     {
         $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
         if (!$principal) {
-            throw new \Exception('User not found');
+            throw $this->createNotFoundException('User not found');
         }
 
         if ($id) {
             $calendarInstance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
             if (!$calendarInstance) {
-                throw new \Exception('Calendar not found');
+                throw $this->createNotFoundException('Calendar not found');
             }
         } else {
             $calendarInstance = new CalendarInstance();
@@ -206,6 +263,8 @@ class AdminController extends AbstractController
             $entityManager->persist($calendarInstance);
             $entityManager->flush();
 
+            $this->addFlash('success', $trans->trans('calendar.saved'));
+
             return $this->redirectToRoute('calendars', ['username' => $username]);
         }
 
@@ -215,6 +274,43 @@ class AdminController extends AbstractController
             'username' => $username,
             'calendar' => $calendarInstance,
         ]);
+    }
+
+    /**
+     * @Route("/calendars/{username}/delete/{id}", name="calendar_delete")
+     */
+    public function calendarDelete(string $username, string $id, TranslatorInterface $trans)
+    {
+        $instance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+        if (!$instance) {
+            throw $this->createNotFoundException('Calendar not found');
+        }
+
+        $entityManager = $this->get('doctrine')->getManager();
+
+        $calendarsSubscriptions = $this->get('doctrine')->getRepository(CalendarSubscription::class)->findByPrincipalUri($instance->getPrincipalUri());
+        foreach ($calendarsSubscriptions ?? [] as $subscription) {
+            $entityManager->remove($subscription);
+        }
+
+        $schedulingObjects = $this->get('doctrine')->getRepository(SchedulingObject::class)->findByPrincipalUri($instance->getPrincipalUri());
+        foreach ($schedulingObjects ?? [] as $object) {
+            $entityManager->remove($object);
+        }
+
+        foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
+            $entityManager->remove($object);
+        }
+        foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
+            $entityManager->remove($change);
+        }
+        $entityManager->remove($instance->getCalendar());
+        $entityManager->remove($instance);
+
+        $entityManager->flush();
+        $this->addFlash('success', $trans->trans('calendar.deleted'));
+
+        return $this->redirectToRoute('calendars', ['username' => $username]);
     }
 
     /**
@@ -236,18 +332,18 @@ class AdminController extends AbstractController
      * @Route("/adressbooks/{username}/new", name="addressbook_create")
      * @Route("/adressbooks/{username}/edit/{id}", name="addressbook_edit")
      */
-    public function addressbookCreate(Request $request, string $username, ?int $id)
+    public function addressbookCreate(Request $request, string $username, ?int $id, TranslatorInterface $trans)
     {
         $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
         if (!$principal) {
-            throw new \Exception('User not found');
+            throw $this->createNotFoundException('User not found');
         }
 
         if ($id) {
             $addressbook = $this->get('doctrine')->getRepository(AddressBook::class)->findOneById($id);
             if (!$addressbook) {
-                throw new \Exception('Address book not found');
+                throw $this->createNotFoundException('Address book not found');
             }
         } else {
             $addressbook = new AddressBook();
@@ -264,6 +360,8 @@ class AdminController extends AbstractController
             $entityManager->persist($addressbook);
             $entityManager->flush();
 
+            $this->addFlash('success', $trans->trans('addressbooks.saved'));
+
             return $this->redirectToRoute('address_books', ['username' => $username]);
         }
 
@@ -273,5 +371,31 @@ class AdminController extends AbstractController
             'username' => $username,
             'addressbook' => $addressbook,
         ]);
+    }
+
+    /**
+     * @Route("/addressbooks/{username}/delete/{id}", name="addressbook_delete")
+     */
+    public function addressbookDelete(string $username, string $id, TranslatorInterface $trans)
+    {
+        $addressbook = $this->get('doctrine')->getRepository(AddressBook::class)->findOneById($id);
+        if (!$addressbook) {
+            throw $this->createNotFoundException('Address Book not found');
+        }
+
+        $entityManager = $this->get('doctrine')->getManager();
+
+        foreach ($addressbook->getCards() ?? [] as $card) {
+            $entityManager->remove($card);
+        }
+        foreach ($addressbook->getChanges() ?? [] as $change) {
+            $entityManager->remove($change);
+        }
+        $entityManager->remove($addressbook);
+
+        $entityManager->flush();
+        $this->addFlash('success', $trans->trans('addressbooks.deleted'));
+
+        return $this->redirectToRoute('address_books', ['username' => $username]);
     }
 }

@@ -3,12 +3,12 @@
 
 {% block body %}
 
-<a href="{{ path('address_books', {username: username}) }}" class="btn btn-link">« Back to Address Books for {{ principal.displayName }}</a>
+<a href="{{ path('address_books', {username: username}) }}" class="btn btn-link">« {{ "addressbooks.back"|trans({'user': principal.displayName }) }}</a>
 
 {% if addressbook.id %}
-<h1 class="display-4 mb-5">Editing «{{ addressbook.displayName }}»</h1>
+<h1 class="display-4 mb-5">{{ "addressbooks.edit"|trans({'name': addressbook.displayName }) }}</h1>
 {% else %}
-<h1 class="display-4 mb-5">New Address Book <small class="text-muted">for {{ principal.displayName }}</small></h1>
+<h1 class="display-4 mb-5">{{ "addressbooks.new"|trans }} <small class="text-muted">for {{ principal.displayName }}</small></h1>
 {% endif %}
 
 {{ form(form) }}

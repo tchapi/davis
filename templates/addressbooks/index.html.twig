@@ -3,20 +3,20 @@
 
 {% block body %}
 
-<a href="{{ path('users') }}" class="btn btn-link">« Back to Users</a>
+<a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
 
-<h1 class="display-4 d-flex justify-content-between">Address books for {{ principal.displayName }} <a href="{{ path('addressbook_create', {username: username}) }}" class="btn btn-success mb-auto mt-auto">+ New address book</a></h1>
+<h1 class="display-4 d-flex justify-content-between">{{ "addressbooks.for"|trans({'who': principal.displayName}) }} <a href="{{ path('addressbook_create', {username: username}) }}" class="btn btn-success mb-auto mt-auto">+ {{ "addressbooks.new"|trans }}</a></h1>
 
 <div class="list-group mt-5">
 {% for addressbook in addressbooks %}
     <div class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 mr-auto">{{ addressbook.displayName }}</h5>
-            <a href="{{ path('addressbook_edit',{username: username, id: addressbook.id})}}" class="btn btn-primary ml-1">✎ Edit</a>
-            <!-- <a href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-danger ml-1">⚠ Delete</a> -->
+            <a href="{{ path('addressbook_edit',{username: username, id: addressbook.id})}}" class="btn btn-primary ml-1">✎ {{ "edit"|trans }}</a>
+            <a href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" class="btn btn-danger ml-1">⚠ {{ "delete"|trans }}</a>
         </div>
         <p class="mb-1">{{ addressbook.description }}</p>
-        <small>Calendar URI : <code>{{ addressbook.uri }}</code> — {{ addressbook.cards|length }} contact(s)</small>
+        <small>{{ "addressbooks.uri"|trans }} : <code>{{ addressbook.uri }}</code> — {{ "addressbooks.contacts"|trans({'%count%': addressbook.cards|length}) }}{{ addressbook.cards|length }}</small>
     </div>
 {% endfor %}
 </div>

@@ -47,10 +47,10 @@
     <body>
       <div class="hero">
         <img src="/images/logo.png" width="60px">
-        <h3>Davis is running.</h3>
-        <div>CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">enabled</span>{% else %}<span class="badge badge-warning">disabled</span>{% endif %}</div>
-        <div>CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">enabled</span>{% else %}<span class="badge badge-warning">disabled</span>{% endif %}</div>
-        <a href="{{ path('dashboard') }}" class="admin">Administration interface</a>
+        <h3>{{ "davis.running"|trans }}</h3>
+        <div>CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-warning">{{ "disabled"|trans }}</span>{% endif %}</div>
+        <div>CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-warning">{{ "disabled"|trans }}</span>{% endif %}</div>
+        <a href="{{ path('dashboard') }}" class="admin">{{ "admin.interface"|trans }}</a>
       </div>
     </body>
 </html>

@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<h1 class="display-4 d-flex justify-content-between">Users<a href="{{ path('user_create') }}" class="btn btn-success mb-auto mt-auto">+ New user</a></h1>
+<h1 class="display-4 d-flex justify-content-between">{{ "title.users_and_resources"|trans }}<a href="{{ path('user_create') }}" class="btn btn-success mb-auto mt-auto">+ {{ "users.new"|trans }}</a></h1>
 
 <div class="list-group mt-5">
 {% for principal in principals %}
@@ -11,13 +11,13 @@
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 mr-auto">{{ principal.displayName }} <a href="mailto:{{ principal.email }}">&lsaquo;{{ principal.email }}&rsaquo;</a></h5>
 
-            <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-light">🗓 Calendars</a>
-            <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-light ml-1">📖 Address books</a>
-            <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-primary ml-1">✎ Edit</a>
-            <a href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-danger ml-1">⚠ Delete</a>
+            <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-light">🗓 {{ "users.calendars"|trans }}</a>
+            <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-light ml-1">📖 {{ "users.addressbooks"|trans }}</a>
+            <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-primary ml-1">✎ {{ "edit"|trans }}</a>
+            <a href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-danger ml-1">⚠ {{ "delete"|trans }}</a>
         </div>
-        <p class="mb-1">Username : <code>{{ principal.username }}</code></p>
-        <small>Principal URI : <code>{{ principal.uri }}</code></small>
+        <p class="mb-1">{{ "users.username"|trans }} : <code>{{ principal.username }}</code></p>
+        <small>{{ "users.uri"|trans }} : <code>{{ principal.uri }}</code></small>
     </div>
 {% endfor %}
 </div>
