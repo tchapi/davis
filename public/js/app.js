@@ -15,4 +15,10 @@ $(document).ready(function() {
         // Show the modal
         $('#delete').modal('show');
     })
+
+    // Color swatch : update it live (not working in IE ¯\_(ツ)_/¯ but it's just a nice to have)
+    $('#calendar_instance_calendarColor').keyup(function() {
+        document.body.style.setProperty('--calendar-color', $(this).val());
+    })
+    document.body.style.setProperty('--calendar-color', $('#calendar_instance_calendarColor').val());
 })

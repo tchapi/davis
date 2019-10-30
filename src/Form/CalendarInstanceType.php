@@ -39,11 +39,13 @@ class CalendarInstanceType extends AbstractType
                 'label' => 'form.todos',
                 'mapped' => false,
                 'help' => 'form.todos.help',
+                'required' => false,
             ])
             ->add('notes', CheckboxType::class, [
                 'label' => 'form.notes',
                 'mapped' => false,
                 'help' => 'form.notes.help',
+                'required' => false,
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'save',

@@ -16,7 +16,7 @@
             <a data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" href="#" class="btn btn-danger ml-1 delete-modal">⚠ {{ "delete"|trans }}</a>
         </div>
         <p class="mb-1">{{ addressbook.description }}</p>
-        <small>{{ "addressbooks.uri"|trans }} : <code>{{ addressbook.uri }}</code> — {{ "addressbooks.contacts"|trans({'%count%': addressbook.cards|length}) }}{{ addressbook.cards|length }}</small>
+        <small>{{ "addressbooks.uri"|trans }} : <code>{{ addressbook.uri }}</code> — {{ "addressbooks.contacts"|trans({'%count%': addressbook.cards|length}) }}</small>
     </div>
 {% endfor %}
 </div>

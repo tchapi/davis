@@ -29,3 +29,14 @@ body {
 .flashes .toast {
     min-width: 270px;
 }
+
+#calendar_instance_calendarColor_help::after {
+    content: "";
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 4px;
+    right: 19px;
+    background: var(--calendar-color);
+    border-radius: 2px;
+}
