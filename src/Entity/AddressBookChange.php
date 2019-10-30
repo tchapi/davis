@@ -29,7 +29,7 @@ class AddressBookChange
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\AddressBook", inversedBy="addressBookChanges")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="addressbookid", nullable=false)
      */
     private $addressBook;
 

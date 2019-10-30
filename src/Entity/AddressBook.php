@@ -49,10 +49,16 @@ class AddressBook
      */
     private $cards;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\AddressBookChange", mappedBy="addressBook")
+     */
+    private $changes;
+
     public function __construct()
     {
         $this->synctoken = 1;
         $this->cards = new ArrayCollection();
+        $this->changes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -153,6 +159,37 @@ class AddressBook
             // set the owning side to null (unless already changed)
             if ($card->getAddressBook() === $this) {
                 $card->setAddressBook(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AddressBookChange[]
+     */
+    public function getChanges(): Collection
+    {
+        return $this->changes;
+    }
+
+    public function addChange(AddressBookChange $change): self
+    {
+        if (!$this->changes->contains($change)) {
+            $this->changes[] = $change;
+            $change->setCalendar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChange(AddressBookChange $change): self
+    {
+        if ($this->changes->contains($change)) {
+            $this->changes->removeElement($change);
+            // set the owning side to null (unless already changed)
+            if ($change->getCalendar() === $this) {
+                $change->setCalendar(null);
             }
         }
 

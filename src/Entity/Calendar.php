@@ -38,11 +38,17 @@ class Calendar
      */
     private $objects;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\CalendarChange", mappedBy="calendar")
+     */
+    private $changes;
+
     public function __construct()
     {
         $this->synctoken = 1;
         $this->components = 'VEVENT,VTODO';
         $this->objects = new ArrayCollection();
+        $this->changes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -103,6 +109,37 @@ class Calendar
             // set the owning side to null (unless already changed)
             if ($object->getCalendar() === $this) {
                 $object->setCalendar(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CalendarChange[]
+     */
+    public function getChanges(): Collection
+    {
+        return $this->changes;
+    }
+
+    public function addChange(CalendarChange $change): self
+    {
+        if (!$this->changes->contains($change)) {
+            $this->changes[] = $change;
+            $change->setCalendar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChange(CalendarChange $change): self
+    {
+        if ($this->changes->contains($change)) {
+            $this->changes->removeElement($change);
+            // set the owning side to null (unless already changed)
+            if ($change->getCalendar() === $this) {
+                $change->setCalendar(null);
             }
         }
 
