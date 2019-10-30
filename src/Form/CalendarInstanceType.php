@@ -6,6 +6,7 @@ use App\Entity\CalendarInstance;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,21 +16,34 @@ class CalendarInstanceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('uri', TextType::class, ['disabled' => !$options['new'], 'help' => "This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.", 'required' => true])
-            ->add('displayName', TextType::class, ['help' => 'This name will be displayed in your CalDAV client'])
-            ->add('description')
+            ->add('uri', TextType::class, [
+                'label' => 'form.uri',
+                'disabled' => !$options['new'],
+                'help' => 'form.uri.help.caldav',
+                'required' => true,
+            ])
+            ->add('displayName', TextType::class, [
+                'label' => 'form.displayName',
+                'help' => 'form.name.help.caldav',
+            ])
+            ->add('description', TextareaType::class, [
+                'label' => 'form.description',
+            ])
             ->add('calendarColor', TextType::class, [
+                'label' => 'form.color',
                 'required' => false,
-                'help' => "This is the color that will be displayed in your CalDAV client. It must be supplied in the format '#RRGGBBAA' (alpha channel is optional) with hexadecimal values. This value is optional.",
+                'help' => 'form.color.help',
                 'attr' => ['placeholder' => '#RRGGBBAA'],
             ])
             ->add('todos', CheckboxType::class, [
+                'label' => 'form.todos',
                 'mapped' => false,
-                'help' => 'If checked, todos will be enabled on this calendar.',
+                'help' => 'form.todos.help',
             ])
             ->add('notes', CheckboxType::class, [
+                'label' => 'form.notes',
                 'mapped' => false,
-                'help' => 'If checked, notes will be enabled on this calendar.',
+                'help' => 'form.notes.help',
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'save',

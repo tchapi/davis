@@ -257,6 +257,54 @@
         <source>form.username.help</source>
         <target>May be an email, but not forcibly.</target>
       </trans-unit>
+      <trans-unit id="h0fN2H5" resname="form.notes">
+        <source>form.notes</source>
+        <target>Notes</target>
+      </trans-unit>
+      <trans-unit id="_aV0396" resname="form.todos">
+        <source>form.todos</source>
+        <target>Todos</target>
+      </trans-unit>
+      <trans-unit id="fPpJrM7" resname="form.uri">
+        <source>form.uri</source>
+        <target>URI</target>
+      </trans-unit>
+      <trans-unit id="h2JZhLm" resname="form.description">
+        <source>form.description</source>
+        <target>Description</target>
+      </trans-unit>
+      <trans-unit id="cdCL.j8" resname="form.color">
+        <source>form.color</source>
+        <target>Calendar color</target>
+      </trans-unit>
+      <trans-unit id="CvlrLaA" resname="form.name.help.carddav">
+        <source>form.name.help.carddav</source>
+        <target>This name will be displayed in your CardDAV client</target>
+      </trans-unit>
+      <trans-unit id="3Q5ZFQE" resname="form.name.help.caldav">
+        <source>form.name.help.caldav</source>
+        <target>This name will be displayed in your CalDAV client</target>
+      </trans-unit>
+      <trans-unit id="6AbgcWQ" resname="form.uri.help.carddav">
+        <source>form.uri.help.carddav</source>
+        <target>This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+      </trans-unit>
+      <trans-unit id="JIbKo6n" resname="form.uri.help.caldav">
+        <source>form.uri.help.caldav</source>
+        <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+      </trans-unit>
+      <trans-unit id="x5Dmxhi" resname="form.color.help">
+        <source>form.color.help</source>
+        <target>This is the color that will be displayed in your CalDAV client. It must be supplied in the format '#RRGGBBAA' (alpha channel is optional) with hexadecimal values. This value is optional.</target>
+      </trans-unit>
+      <trans-unit id="KBkKkDQ" resname="form.todos.help">
+        <source>form.todos.help</source>
+        <target>If checked, todos will be enabled on this calendar.</target>
+      </trans-unit>
+      <trans-unit id="kyPtCLt" resname="form.notes.help">
+        <source>form.notes.help</source>
+        <target>If checked, notes will be enabled on this calendar.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
