@@ -13,12 +13,14 @@
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 mr-auto">{{ calendar.displayName }} <span class="badge badge-pill" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span></h5>
             <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-primary ml-1">✎ {{ "edit"|trans }}</a>
-            <a href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" class="btn btn-danger ml-1">⚠ {{ "delete"|trans }}</a>
+            <a href="#" data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" class="btn btn-danger ml-1 delete-modal">⚠ {{ "delete"|trans }}</a>
         </div>
         <p class="mb-1">{{ calendar.description }}</p>
         <small>{{ "calendars.uri"|trans }} : <code>{{ calendar.uri }}</code> — {{ "calendars.events"|trans({'%count%': calendar.calendar.objects|length}) }}</small>
     </div>
 {% endfor %}
 </div>
+
+{% include '_partials/delete_modal.html.twig' with {flavour: 'calendars'} %}
 
 {% endblock %}

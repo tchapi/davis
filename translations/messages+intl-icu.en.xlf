@@ -305,6 +305,38 @@
         <source>form.notes.help</source>
         <target>If checked, notes will be enabled on this calendar.</target>
       </trans-unit>
+      <trans-unit id="lyKuD8d" resname="addressbooks.modal.title">
+        <source>addressbooks.modal.title</source>
+        <target>Delete this Address Book ?</target>
+      </trans-unit>
+      <trans-unit id="S4fu0sv" resname="addressbooks.modal.text">
+        <source>addressbooks.modal.text</source>
+        <target>Are you sure you want to delete this address book ? All the contacts in it will be deleted too.</target>
+      </trans-unit>
+      <trans-unit id="PqEAkt1" resname="calendars.modal.title">
+        <source>calendars.modal.title</source>
+        <target>Delete this Calendar ?</target>
+      </trans-unit>
+      <trans-unit id="ADFTXZ_" resname="calendars.modal.text">
+        <source>calendars.modal.text</source>
+        <target>Are you sure you want to delete this calendar ? All the events, todos and notes in it will be deleted too.</target>
+      </trans-unit>
+      <trans-unit id="uqnapzJ" resname="users.modal.title">
+        <source>users.modal.title</source>
+        <target>Delete this User ?</target>
+      </trans-unit>
+      <trans-unit id="iBrZ25M" resname="users.modal.text">
+        <source>users.modal.text</source>
+        <target>Are you sure you want to delete this user ? All the associated calendars and address books will be deleted too.</target>
+      </trans-unit>
+      <trans-unit id="I3TZF5S" resname="cancel">
+        <source>cancel</source>
+        <target>Cancel</target>
+      </trans-unit>
+      <trans-unit id="inmIkP6" resname="yes">
+        <source>yes</source>
+        <target>Yes</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

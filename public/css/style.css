@@ -8,6 +8,7 @@ body {
     border-bottom: 1px solid #CCC;
 }
 
+/* Flashes (messages) styles */
 .flashes {
     position: fixed;
     top: 20px;
