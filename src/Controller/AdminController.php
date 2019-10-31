@@ -104,12 +104,14 @@ class AdminController extends AbstractController
                 $calendarInstance = new CalendarInstance();
                 $calendar = new Calendar();
                 $calendarInstance->setPrincipalUri(Principal::PREFIX.$user->getUsername())
+                         ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
                          ->setDisplayName($trans->trans('default.calendar.title'))
                          ->setDescription($trans->trans('default.calendar.description', ['users' => $displayName]))
                          ->setCalendar($calendar);
 
                 $addressbook = new AddressBook();
                 $addressbook->setPrincipalUri(Principal::PREFIX.$user->getUsername())
+                         ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
                          ->setDisplayName($trans->trans('default.addressbook.title'))
                          ->setDescription($trans->trans('default.addressbook.description', ['users' => $displayName]));
                 $entityManager->persist($calendarInstance);

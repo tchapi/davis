@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="principals")
  * @ORM\Entity(repositoryClass="App\Repository\PrincipalRepository")
+ * @UniqueEntity("uri")
  */
 class Principal
 {
@@ -20,12 +23,18 @@ class Principal
     private $id;
 
     /**
-     * @ORM\Column(type="binary", length=255)
+     * @ORM\Column(type="binary", length=255, unique=true)
+     * @Assert\NotBlank
+     * @Assert\Unique
      */
     private $uri;
 
     /**
      * @ORM\Column(type="binary", length=255, nullable=true)
+     * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email."
+     * )
+     * @Assert\NotBlank
      */
     private $email;
 

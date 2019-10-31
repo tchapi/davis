@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @UniqueEntity("username")
  */
 class User
 {
@@ -20,12 +23,14 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="binary", length=255)
+     * @ORM\Column(type="binary", length=255, unique=true)
+     * @Assert\NotBlank
      */
     private $username;
 
     /**
      * @ORM\Column(name="digesta1", type="binary", length=255)
+     * @Assert\NotBlank
      */
     private $password;
 

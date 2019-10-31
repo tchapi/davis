@@ -28,6 +28,7 @@ class CalendarInstanceType extends AbstractType
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'form.description',
+                'required' => false,
             ])
             ->add('calendarColor', TextType::class, [
                 'label' => 'form.color',

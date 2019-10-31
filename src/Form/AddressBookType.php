@@ -26,6 +26,7 @@ class AddressBookType extends AbstractType
             ])
             ->add('description', TextAreaType::class, [
                 'label' => 'form.description',
+                'required' => false,
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'save',

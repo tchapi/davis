@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="calendarinstances")
@@ -49,6 +50,7 @@ class CalendarInstance
 
     /**
      * @ORM\Column(type="binary", length=255, nullable=true)
+     * @Assert\Regex("/[0-9a-z\-]+/")
      */
     private $uri;
 
