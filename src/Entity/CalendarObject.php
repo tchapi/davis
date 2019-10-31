@@ -28,7 +28,7 @@ class CalendarObject
     private $uri;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", inversedBy="objects")
      * @ORM\JoinColumn(name="calendarid", nullable=false)
      */
     private $calendar;

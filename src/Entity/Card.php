@@ -18,7 +18,7 @@ class Card
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\AddressBook")
+     * @ORM\ManyToOne(targetEntity="App\Entity\AddressBook", inversedBy="cards")
      * @ORM\JoinColumn(name="addressbookid", nullable=false)
      */
     private $addressBook;
