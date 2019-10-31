@@ -66,6 +66,7 @@ class CalendarInstance
 
     /**
      * @ORM\Column(name="calendarcolor", type="binary", length=10, nullable=true)
+     * @Assert\Regex("/\#[0-9]{6}/")
      */
     private $calendarColor;
 
