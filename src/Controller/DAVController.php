@@ -3,12 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Services\BasicAuth;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DAVController extends AbstractController
 {
+    const AUTH_DIGEST = 'Digest';
+    const AUTH_BASIC = 'Basic';
+
     /**
      * Is CalDAV enabled?
      *
@@ -58,12 +62,14 @@ class DAVController extends AbstractController
      */
     protected $tmpDir;
 
-    public function __construct(bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authRealm, ?string $publicDir, ?string $tmpDir)
+    public function __construct(bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authMethod, ?string $authRealm, ?string $publicDir, ?string $tmpDir)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
         $this->webDAVEnabled = $webDAVEnabled;
         $this->inviteAddress = $inviteAddress ?? null;
+
+        $this->authMethod = $authMethod;
         $this->authRealm = $authRealm ?? User::DEFAULT_AUTH_REALM;
 
         $this->publicDir = $publicDir;
@@ -81,15 +87,25 @@ class DAVController extends AbstractController
     /**
      * @Route("/dav/{path}", name="dav", requirements={"path":".*"})
      */
-    public function dav()
+    public function dav(BasicAuth $basicAuthBackend)
     {
         $pdo = $this->get('doctrine')->getEntityManager()->getConnection()->getWrappedConnection();
 
-        /**
+        /*
          * The backends.
          */
-        $authBackend = new \Sabre\DAV\Auth\Backend\PDO($pdo);
+        switch ($this->authMethod) {
+            case self::AUTH_DIGEST:
+                $authBackend = new \Sabre\DAV\Auth\Backend\PDO($pdo);
+                break;
+            case self::AUTH_BASIC:
+            default:
+                $authBackend = $basicAuthBackend;
+                break;
+        }
+
         $authBackend->setRealm($this->authRealm);
+
         $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($pdo);
 
         /**

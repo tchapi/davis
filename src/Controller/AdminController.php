@@ -14,6 +14,7 @@ use App\Entity\User;
 use App\Form\AddressBookType;
 use App\Form\CalendarInstanceType;
 use App\Form\UserType;
+use App\Services\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,18 +22,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class AdminController extends AbstractController
 {
-    /**
-     * HTTP authentication realm.
-     *
-     * @var string
-     */
-    protected $authRealm;
-
-    public function __construct(?string $authRealm)
-    {
-        $this->authRealm = $authRealm ?? 'SabreDAV';
-    }
-
     /**
      * @Route("/dashboard", name="dashboard")
      */
@@ -72,7 +61,7 @@ class AdminController extends AbstractController
      * @Route("/users/new", name="user_create")
      * @Route("/users/edit/{username}", name="user_edit")
      */
-    public function userCreate(Request $request, ?string $username, TranslatorInterface $trans)
+    public function userCreate(Utils $utils, Request $request, ?string $username, TranslatorInterface $trans)
     {
         if ($username) {
             $user = $this->get('doctrine')->getRepository(User::class)->findOneByUsername($username);
@@ -102,7 +91,7 @@ class AdminController extends AbstractController
                 // The user is not new and does not want to change its password
                 $user->setPassword($oldHash);
             } else {
-                $hash = md5($user->getUsername().':'.$this->authRealm.':'.$user->getPassword());
+                $hash = $utils->hashPassword($user->getUsername(), $user->getPassword());
                 $user->setPassword($hash);
             }
 

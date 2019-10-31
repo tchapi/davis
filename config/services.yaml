@@ -17,12 +17,15 @@ services:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
+    App\Services\Utils:
+        arguments:
+            $authRealm: "%env(AUTH_REALM)%"
+
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
-
 
     App\Controller\DAVController:
         arguments:
@@ -30,10 +33,12 @@ services:
             $cardDAVEnabled: "%env(bool:CARDDAV_ENABLED)%"
             $webDAVEnabled: "%env(bool:WEBDAV_ENABLED)%"
             $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
+            $authMethod: "%env(AUTH_METHOD)%"
             $authRealm: "%env(AUTH_REALM)%"
             $publicDir: "%env(PUBLIC_DIR)%"
             $tmpDir: "%env(TMP_DIR)%"
 
-    App\Controller\AdminController:
+    App\Security\LoginFormAuthenticator:
         arguments:
-            $authRealm: "%env(AUTH_REALM)%"
+            $adminLogin: "%env(ADMIN_LOGIN)%"
+            $adminPassword: "%env(ADMIN_PASSWORD)%"

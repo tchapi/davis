@@ -15,6 +15,18 @@
           <a class="nav-link" href="{{ path('users') }}">{{ "title.users_and_resources"|trans }}</a>
         </li>
       </ul>
+      {% if app.user %}
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{ app.user.username }}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a>
+          </div>
+        </li>
+      </ul>
+      {% endif %}
     </div>
   </div>
 </nav>
