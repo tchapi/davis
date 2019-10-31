@@ -2,30 +2,31 @@
 {% set menu = null %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
+{% if app.user %}
+    <div class="mb-3">
+        {{ "login.already"|trans({username: app.user.username}) }}, <a href="{{ path('app_logout') }}">{{ "logout"|trans }}</a>
+    </div>
+{% else %}
+    <form method="post">
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        <h1 class="h3 mb-3 font-weight-normal">{{ "login.signin"|trans }}</h1>
+
+        <div class="form-group">
+            <label for="inputUsername" class="sr-only">{{ "login.username"|trans }}</label>
+            <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" placeholder="{{ "login.username"|trans }}" required autofocus>
         </div>
-    {% endif %}
+        <div class="form-group">
+            <label for="inputPassword" class="sr-only">{{ "login.password"|trans }}</label>
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="{{ "login.password"|trans }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">{{ "login.submit"|trans }}</button>
 
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+    </form>
+{% endif %}
 
-    <div class="form-group">
-        <label for="inputUsername" class="sr-only">Login</label>
-        <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-    <div class="form-group">
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-</form>
 {% endblock %}

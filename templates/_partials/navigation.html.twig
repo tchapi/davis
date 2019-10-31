@@ -22,7 +22,7 @@
             {{ app.user.username }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a>
+            <a class="dropdown-item" href="{{ path('app_logout') }}">{{ "logout"|trans }}</a>
           </div>
         </li>
       </ul>

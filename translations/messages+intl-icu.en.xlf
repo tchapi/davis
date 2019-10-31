@@ -337,6 +337,30 @@
         <source>yes</source>
         <target>Yes</target>
       </trans-unit>
+      <trans-unit id="DBucN94" resname="login.signin">
+        <source>login.signin</source>
+        <target>Please sign in</target>
+      </trans-unit>
+      <trans-unit id="wsaupPh" resname="login.username">
+        <source>login.username</source>
+        <target>Username</target>
+      </trans-unit>
+      <trans-unit id="guXTUCg" resname="login.password">
+        <source>login.password</source>
+        <target>Password</target>
+      </trans-unit>
+      <trans-unit id="jlMj..y" resname="login.submit">
+        <source>login.submit</source>
+        <target>Submit</target>
+      </trans-unit>
+      <trans-unit id="ACcM9j_" resname="logout">
+        <source>logout</source>
+        <target>Logout</target>
+      </trans-unit>
+      <trans-unit id="2FwYtBA" resname="login.already">
+        <source>login.already</source>
+        <target>You are already logged in as {username}</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
