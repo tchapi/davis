@@ -147,7 +147,7 @@
       </trans-unit>
       <trans-unit id="zjEaC2X" resname="users.edit">
         <source>users.edit</source>
-        <target>Editing Users «{username}»</target>
+        <target>Editing User «{username}»</target>
       </trans-unit>
       <trans-unit id="8NgrcqA" resname="addressbooks.for">
         <source>addressbooks.for</source>
