@@ -5,7 +5,7 @@
 
 <a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
 
-<h1 class="display-4 d-flex justify-content-between">{{ "calendars.for"|trans({'who': principal.displayName}) }} <a href="{{ path('calendar_create', {username: username}) }}" class="btn btn-success mb-auto mt-auto">+ {{ "calendars.new"|trans }}</a></h1>
+<h1 class="display-4 font-weight-lighter d-flex justify-content-between">{{ "calendars.for"|trans({'who': principal.displayName}) }} <a href="{{ path('calendar_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.new"|trans }}</a></h1>
 
 <div class="list-group mt-5">
 {% for calendar in calendars %}

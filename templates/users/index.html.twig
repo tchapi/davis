@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<h1 class="display-4 d-flex justify-content-between">{{ "title.users_and_resources"|trans }}<a href="{{ path('user_create') }}" class="btn btn-success mb-auto mt-auto">+ {{ "users.new"|trans }}</a></h1>
+<h1 class="display-4 d-flex font-weight-lighter justify-content-between">{{ "title.users_and_resources"|trans }}<a href="{{ path('user_create') }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "users.new"|trans }}</a></h1>
 
 <div class="list-group mt-5">
 {% for principal in principals %}
@@ -25,7 +25,7 @@
             <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">📖&nbsp;</span>{{ "users.addressbooks"|trans }}</a>
             <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-outline-primary flex-fill flex-shrink-1"><span class="d-none d-sm-inline">✎&nbsp;</span>{{ "edit"|trans }}</a>
             <a href="#" data-href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-outline-danger flex-fill flex-shrink-1 delete-modal"><span class="d-none d-sm-inline">⚠&nbsp;</span>{{ "delete"|trans }}</a>
-          </div>
+        </div>
     </div>
 {% endfor %}
 </div>

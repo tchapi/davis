@@ -77,6 +77,10 @@
         <source>dashboard.env</source>
         <target>Configured environment</target>
       </trans-unit>
+      <trans-unit id="2SVRWUo" resname="dashboard.capabilities">
+        <source>dashboard.capabilities</source>
+        <target>Capabilities</target>
+      </trans-unit>
       <trans-unit id="0ssMhM8" resname="dashboard.objects">
         <source>dashboard.objects</source>
         <target>Objects</target>
