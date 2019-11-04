@@ -30,7 +30,6 @@ class User
 
     /**
      * @ORM\Column(name="digesta1", type="binary", length=255)
-     * @Assert\NotBlank
      */
     private $password;
 
