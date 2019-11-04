@@ -9,14 +9,20 @@
 
 <div class="list-group mt-5">
 {% for calendar in calendars %}
-    <div class="list-group-item list-group-item-action">
+    <div class="list-group-item list-group-item-action p-3">
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 mr-auto">{{ calendar.displayName }} <span class="badge badge-pill" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span></h5>
-            <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-primary ml-1">✎ {{ "edit"|trans }}</a>
-            <a href="#" data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" class="btn btn-danger ml-1 delete-modal">⚠ {{ "delete"|trans }}</a>
+            <div class="mr-0 text-right d-md-block d-none">
+                <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-sm btn-primary ml-1">✎ {{ "edit"|trans }}</a>
+                <a href="#" data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" class="btn btn-sm btn-danger ml-1 delete-modal">⚠ {{ "delete"|trans }}</a>
+            </div>
         </div>
         <p class="mb-1">{{ calendar.description }}</p>
         <small>{{ "calendars.uri"|trans }} : <code>{{ calendar.uri }}</code> — {{ "calendars.events"|trans({'%count%': calendar.calendar.objects|length}) }}</small>
+        <div class="btn-group btn-group-sm mt-3 d-flex d-md-none" role="group">
+            <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
+            <a href="#" data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" class="btn btn-outline-danger delete-modal">⚠ {{ "delete"|trans }}</a>
+        </div>
     </div>
 {% endfor %}
 </div>
