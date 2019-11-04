@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    env_file: .env
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - davis
+    volumes:
+      - davis_www:/var/www/davis
+    ports:
+      - 80:80
+      - 443:443
+
+  mysql:
+    image: mariadb:latest
+    container_name: mysql
+    env_file: .env
+
+  davis:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      args:
+        email: ${INVITE_FROM_ADDRESS}
+        mail_host: ${MAIL_HOST}
+        calendar_domain: ${HOSTNAME}
+        mail_username: ${MAIL_USERNAME}
+        mail_password: ${MAIL_PASSWORD}
+    image: davis:master
+    container_name: davis
+    env_file: .env
+    depends_on:
+      - mysql
+    volumes:
+      - davis_www:/var/www/davis
+
+volumes:
+  davis_www:
+    name: davis_www
