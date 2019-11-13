@@ -27,6 +27,8 @@
             <a href="#" data-href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-outline-danger flex-fill flex-shrink-1 delete-modal"><span class="d-none d-sm-inline">⚠&nbsp;</span>{{ "delete"|trans }}</a>
         </div>
     </div>
+{% else %}
+    <div class="my-5 py-5 d-flex justify-content-center align-items-center text-muted">{{ "no.users.yet"|trans }}</div>
 {% endfor %}
 </div>
 

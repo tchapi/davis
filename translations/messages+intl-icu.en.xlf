@@ -365,6 +365,10 @@
         <source>login.already</source>
         <target>You are already logged in as {username}</target>
       </trans-unit>
+      <trans-unit id="nMyjxoa" resname="no.users.yet">
+        <source>no.users.yet</source>
+        <target>No users yet.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
