@@ -3,9 +3,13 @@ Davis
 
 A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 4](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), largely inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
+![Dashboard page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/dashboard.png)
+
+![User creation page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/user.png)
+
 # Requirements
 
-PHP > 7.1.3, MySQL (or MariaDB).
+PHP > 7.3.0, MySQL (or MariaDB).
 
 # Installation
 
@@ -170,11 +174,23 @@ If you use Nginx, you can add this to your configuration:
 
 # Dockerized installation
 
-A Dockerfile is available for you to compile the container.
+A `Dockerfile` is available for you to compile the container.
 
 We use `ssmtp` as a delivery service for a configured mailhost instead of using local delivery (_that should work out of the box_). You can ignore this or remove it from the Dockerfile if you want.
 
-A `docker-compose.yml` file is also included as a minimal example setup.
+A `docker-compose.yml` file is also included as a minimal example setup with a MariaDB database and Nginx as a reverse proxy.
+
+You can start the containers with :
+
+    cd deploy && docker-compose up -d
+
+**⚠ Do not forget to create the database the first time you run the container** :
+
+    docker exec -it davis bash -c "APP_ENV=prod bin/console migrate --no-interaction"
+
+Then, head up to <YOUR_DOCKER_IP> to see the status display :
+
+![Status page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/status.png)
 
 # Development
 

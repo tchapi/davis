@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM php:7.3-fpm
 
 # Mail : configuration for ssmtp
 ARG email
@@ -24,11 +24,14 @@ RUN echo "root=${email}\nmailhub=${mail_host}\nrewriteDomain= \
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         unzip \
+        # There are for php-intl
+        zlib1g-dev libicu-dev g++ \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Configure PHP extensions
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install intl \
     && docker-php-source delete
 
 # Davis installation
@@ -40,10 +43,9 @@ RUN mv /var/www/1.0.0 /var/www/davis
 
 WORKDIR /var/www/davis
 
-# Install dependencies, and migrate the database if needed
+# Install dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
-RUN bin/console migrate --no-interaction
+RUN APP_ENV=prod composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
 
 RUN chown -Rf www-data:www-data .
-RUN chmod -Rf g+w .
+RUN chmod -Rf g+w var
