@@ -9,7 +9,7 @@ A simple, fully translatable admin interface and frontend for `sabre/dav` based 
 
 # Requirements
 
-PHP > 7.3.0, MySQL (or MariaDB).
+PHP > 7.3.0 (with `pdo_mysql` and `intl` extensions), MySQL (or MariaDB).
 
 # Installation
 
@@ -188,9 +188,11 @@ You can start the containers with :
 
     docker exec -it davis bash -c "APP_ENV=prod bin/console migrate --no-interaction"
 
-Then, head up to <YOUR_DOCKER_IP> to see the status display :
+Then, head up to `http://<YOUR_DOCKER_IP>` to see the status display :
 
 ![Status page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/status.png)
+
+> Note that there is no user, no principals, etc created by default.
 
 # Development
 

@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   nginx:
-    image: nginx:alpine
+    image: nginx:1.17.5-alpine
     container_name: nginx
     env_file: .env
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
@@ -18,7 +18,7 @@ services:
       - 80:80
 
   mysql:
-    image: mariadb:latest
+    image: mariadb:10.4.10
     container_name: mysql
     env_file: .env
 
