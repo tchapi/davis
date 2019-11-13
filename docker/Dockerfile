@@ -37,17 +37,13 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-source delete
 
 # Davis installation
-
-RUN cd /tmp/ && curl --silent -LO https://github.com/tchapi/davis/archive/v1.0.0.zip \
- && unzip /tmp/1.0.0.zip -d /var/www/ \
- && rm -f /tmp/1.0.0.zip
-RUN mv /var/www/1.0.0 /var/www/davis
+RUN cd /var/www/ && curl --silent -o v1.0.0.tar.gz -L https://github.com/tchapi/davis/archive/v1.0.0.tar.gz \
+ && tar xvzf v1.0.0.tar.gz \
+ && mv /var/www/davis-1.0.0 /var/www/davis \
+ && rm v1.0.0.tar.gz
 
 WORKDIR /var/www/davis
 
 # Install dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN APP_ENV=prod composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
-
-RUN chown -Rf www-data:www-data .
-RUN chmod -Rf g+w var
