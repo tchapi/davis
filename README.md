@@ -182,7 +182,7 @@ A `docker-compose.yml` file is also included as a minimal example setup with a M
 
 You can start the containers with :
 
-    cd deploy && docker-compose up -d
+    cd docker && docker-compose up -d
 
 **⚠ Do not forget to create the database the first time you run the container** :
 
