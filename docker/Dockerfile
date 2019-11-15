@@ -2,6 +2,8 @@ FROM php:7.3-fpm
 
 LABEL maintainer="tchap@tchap.me"
 
+ARG version
+
 # Mail : configuration for ssmtp
 ARG email
 ARG mail_host
@@ -37,10 +39,10 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-source delete
 
 # Davis installation
-RUN cd /var/www/ && curl --silent -o v1.0.0.tar.gz -L https://github.com/tchapi/davis/archive/v1.0.0.tar.gz \
- && tar xvzf v1.0.0.tar.gz \
- && mv /var/www/davis-1.0.0 /var/www/davis \
- && rm v1.0.0.tar.gz
+RUN cd /var/www/ && curl --silent -o ${version}.tar.gz -L https://github.com/tchapi/davis/archive/v${version}.tar.gz \
+ && tar xvzf ${version}.tar.gz \
+ && mv /var/www/davis-${version} /var/www/davis \
+ && rm ${version}.tar.gz
 
 WORKDIR /var/www/davis
 

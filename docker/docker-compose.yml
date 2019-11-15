@@ -27,9 +27,10 @@ services:
       context: ./
       dockerfile: ./Dockerfile
       args:
+        version: "1.1.0"
         email: ${INVITE_FROM_ADDRESS}
         mail_host: ${MAIL_HOST}
-        calendar_domain: ${HOSTNAME}
+        hostname: ${HOSTNAME}
         mail_username: ${MAIL_USERNAME}
         mail_password: ${MAIL_PASSWORD}
     image: davis:master
