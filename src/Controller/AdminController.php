@@ -319,6 +319,7 @@ class AdminController extends AbstractController
 
         $allPrincipalsExcept = $this->get('doctrine')->getRepository(Principal::class)->findAllExceptPrincipal($calendar->getPrincipalUri());
 
+        // Get delegates. They are not linked to the principal in itself, but to its proxies
         $principalProxyRead = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
         $principalProxyWrite = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
 
@@ -326,6 +327,8 @@ class AdminController extends AbstractController
             'calendar' => $calendar,
             'principal' => $principal,
             'delegation' => $principalProxyRead && $principalProxyWrite,
+            'principalProxyRead' => $principalProxyRead,
+            'principalProxyWrite' => $principalProxyWrite,
             'allPrincipals' => $allPrincipalsExcept,
         ]);
     }
@@ -341,16 +344,28 @@ class AdminController extends AbstractController
             throw $this->createNotFoundException('Calendar not found');
         }
 
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri());
-
-        if (!$principal) {
-            throw $this->createNotFoundException('Principal linked to this calendar not found');
-        }
-
         $newMemberToAdd = $this->get('doctrine')->getRepository(Principal::class)->findOneById($request->get('principalId'));
 
         if (!$newMemberToAdd) {
             throw $this->createNotFoundException('Member not found');
+        }
+
+        // Depending on write access or not, attach to the correct principal
+        if ('true' === $request->get('write')) {
+            // Let's check that there wasn't a read proxy first
+            $principalProxyRead = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri().Principal::READ_PROXY_SUFFIX);
+            if (!$principalProxyRead) {
+                throw $this->createNotFoundException('Principal linked to this calendar not found');
+            }
+            $principalProxyRead->removeDelegee($newMemberToAdd);
+            // And then add the Write access
+            $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri().Principal::WRITE_PROXY_SUFFIX);
+        } else {
+            $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri().Principal::READ_PROXY_SUFFIX);
+        }
+
+        if (!$principal) {
+            throw $this->createNotFoundException('Principal linked to this calendar not found');
         }
 
         $principal->addDelegee($newMemberToAdd);
@@ -361,19 +376,13 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/calendars/delegates/{id}/remove/{delegateId}", name="calendar_delegate_remove", requirements={"id":"\d+", "delegateId":"\d+"})
+     * @Route("/calendars/delegates/{id}/remove/{principalProxyId}/{delegateId}", name="calendar_delegate_remove", requirements={"id":"\d+", "principalProxyId":"\d+", "delegateId":"\d+"})
      */
-    public function calendarDelegateRemove(Request $request, int $id, int $delegateId)
+    public function calendarDelegateRemove(Request $request, int $id, int $principalProxyId, int $delegateId)
     {
-        $calendar = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+        $principalProxy = $this->get('doctrine')->getRepository(Principal::class)->findOneById($principalProxyId);
 
-        if (!$calendar) {
-            throw $this->createNotFoundException('Calendar not found');
-        }
-
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri());
-
-        if (!$principal) {
+        if (!$principalProxy) {
             throw $this->createNotFoundException('Principal linked to this calendar not found');
         }
 
@@ -383,7 +392,7 @@ class AdminController extends AbstractController
             throw $this->createNotFoundException('Member not found');
         }
 
-        $principal->removeDelegee($memberToRemove);
+        $principalProxy->removeDelegee($memberToRemove);
         $entityManager = $this->get('doctrine')->getManager();
         $entityManager->flush();
 

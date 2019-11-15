@@ -25,6 +25,6 @@ $(document).ready(function() {
     // Modal to add delegate, catch the click to add the query parameter
     $('a.add-delegate').click(function(e) {
         e.preventDefault()
-        window.location = $(this).attr('data-href') + "?principalId=" + $("#member").val()
+        window.location = $(this).attr('data-href') + "?principalId=" + $("#member").val() + "&write=" + ($("#write").is(':checked') ? 'true' : 'false')
     })
 })

@@ -401,9 +401,37 @@
         <source>calendars.delegates.member</source>
         <target>Member:</target>
       </trans-unit>
+      <trans-unit id="njKq9lh" resname="calendars.delegates.write.give">
+        <source>calendars.delegates.write.give</source>
+        <target>Give write access ?</target>
+      </trans-unit>
       <trans-unit id="7xX6DUh" resname="users.delegates">
         <source>users.delegates</source>
         <target>Delegates</target>
+      </trans-unit>
+      <trans-unit id="7qza084" resname="delegates.enabled.text">
+        <source>delegates.enabled.text</source>
+        <target>Delegation is enabled for this account.</target>
+      </trans-unit>
+      <trans-unit id="N01ZGSL" resname="delegates.disable.warning">
+        <source>delegates.disable.warning</source>
+        <target>⚠ If you disable it, all your delegates will lose access to this calendar</target>
+      </trans-unit>
+      <trans-unit id="XrBqwfx" resname="delegates.disable">
+        <source>delegates.disable</source>
+        <target>Disable it</target>
+      </trans-unit>
+      <trans-unit id="1gSctFw" resname="delegates.disabled.text">
+        <source>delegates.disabled.text</source>
+        <target>Delegation is not enabled for this account.</target>
+      </trans-unit>
+      <trans-unit id="JVYOYTn" resname="delegates.enable">
+        <source>delegates.enable</source>
+        <target>Enable it</target>
+      </trans-unit>
+      <trans-unit id="1KaOxYk" resname="delegates.write">
+        <source>delegates.write</source>
+        <target>has write access</target>
       </trans-unit>
     </body>
   </file>
