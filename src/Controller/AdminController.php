@@ -207,7 +207,7 @@ class AdminController extends AbstractController
 
     /**
      * @Route("/calendars/{username}/new", name="calendar_create")
-     * @Route("/calendars/{username}/edit/{id}", name="calendar_edit")
+     * @Route("/calendars/{username}/edit/{id}", name="calendar_edit", requirements={"id":"\d+"})
      */
     public function calendarCreate(Request $request, string $username, ?int $id, TranslatorInterface $trans)
     {
@@ -268,7 +268,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/calendars/{username}/delete/{id}", name="calendar_delete")
+     * @Route("/calendars/{username}/delete/{id}", name="calendar_delete", requirements={"id":"\d+"})
      */
     public function calendarDelete(string $username, string $id, TranslatorInterface $trans)
     {
@@ -452,7 +452,7 @@ class AdminController extends AbstractController
 
     /**
      * @Route("/adressbooks/{username}/new", name="addressbook_create")
-     * @Route("/adressbooks/{username}/edit/{id}", name="addressbook_edit")
+     * @Route("/adressbooks/{username}/edit/{id}", name="addressbook_edit", requirements={"id":"\d+"})
      */
     public function addressbookCreate(Request $request, string $username, ?int $id, TranslatorInterface $trans)
     {
@@ -496,7 +496,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/addressbooks/{username}/delete/{id}", name="addressbook_delete")
+     * @Route("/addressbooks/{username}/delete/{id}", name="addressbook_delete", requirements={"id":"\d+"})
      */
     public function addressbookDelete(string $username, string $id, TranslatorInterface $trans)
     {
