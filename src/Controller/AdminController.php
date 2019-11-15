@@ -109,6 +109,17 @@ class AdminController extends AbstractController
                          ->setDescription($trans->trans('default.calendar.description', ['user' => $displayName]))
                          ->setCalendar($calendar);
 
+                // Enable delegation by default
+                $principalProxyRead = new Principal();
+                $principalProxyRead->setUri($principal->getUri().Principal::READ_PROXY_SUFFIX)
+                                   ->setIsMain(false);
+                $entityManager->persist($principalProxyRead);
+
+                $principalProxyWrite = new Principal();
+                $principalProxyWrite->setUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX)
+                                   ->setIsMain(false);
+                $entityManager->persist($principalProxyWrite);
+
                 $addressbook = new AddressBook();
                 $addressbook->setPrincipalUri(Principal::PREFIX.$user->getUsername())
                          ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
