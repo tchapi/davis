@@ -19,32 +19,17 @@ class PrincipalRepository extends ServiceEntityRepository
         parent::__construct($registry, Principal::class);
     }
 
-    // /**
-    //  * @return Principal[] Returns an array of Principal objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Principal[] Returns an array of Principal objects
+     */
+    public function findAllExceptPrincipal(string $principalUri)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+            ->andWhere('p.isMain = :isMain')
+            ->andWhere('p.uri <> :val')
+            ->setParameter('isMain', true)
+            ->setParameter('val', $principalUri)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Principal
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

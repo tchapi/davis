@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'resources' %}
+
+{% block body %}
+
+<a href="{{ path('calendars', {username: principal.username}) }}" class="btn btn-link">« {{ "calendars.back"|trans({'user': principal.displayName}) }}</a>
+
+<h1 class="display-4 font-weight-lighter d-flex justify-content-between">{{ "calendars.delegates.for"|trans({'what': calendar.displayName}) }}{% if delegation %} <a href="#" data-toggle="modal" data-target="#add_delegate" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.delegates.add"|trans }}</a>{% endif %}</h1>
+
+<div class="list-group mt-5">
+
+    {% if delegation %}
+        <div class="alert alert-success d-flex justify-content-between" role="alert">
+          <div>Delegation is enabled for this account.<br><small>⚠ If you disable it, all your delegates will lose access to this calendar</small></div>
+          <a href="{{ path('calendar_delegation_toggle', {id: calendar.id, toggle: 'off'})}}" class="btn btn-sm my-auto btn-outline-danger">Disable it</a>
+        </div>
+    {% else %}
+        <div class="alert alert-warning d-flex justify-content-between" role="alert">
+          Delegation is not enabled for this account. <a href="{{ path('calendar_delegation_toggle', {id: calendar.id, toggle: 'on'})}}" class="btn btn-sm my-auto btn-warning">Enable it</a>
+        </div>
+    {% endif %}
+
+{% for delegate in principal.delegees %}
+    <div class="list-group-item list-group-item-action p-3">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mr-auto">{{ delegate.displayName }} <a href="mailto:{{ delegate.email }}">&lsaquo;{{ delegate.email }}&rsaquo;</a></h5>
+            <div class="mr-0 text-right d-lg-block d-none">
+                <a href="#" data-href="{{ path('calendar_delegate_remove',{id: calendar.id, delegateId: delegate.id})}}" class="btn btn-sm btn-outline-danger ml-1 mb-1 delete-modal">⚠&nbsp;{{ "remove"|trans }}</a>
+            </div>
+        </div>
+        <p class="mb-1">{{ "users.username"|trans }} : <code>{{ delegate.username }}</code></p>
+        <small>{{ "users.uri"|trans }} : <code>{{ delegate.uri }}</code></small>
+        <div class="btn-group btn-group-sm mt-3 d-flex d-lg-none" role="group">
+            <a href="#" data-href="{{ path('calendar_delegate_remove',{id: calendar.id, delegateId: delegate.id})}}" class="btn btn-outline-danger flex-fill flex-shrink-1 delete-modal"><span class="d-none d-sm-inline">⚠&nbsp;</span>{{ "remove"|trans }}</a>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% include '_partials/delete_modal.html.twig' with {flavour: 'delegates'} %}
+{% include '_partials/add_delegate_modal.html.twig' with {principals: allPrincipals} %}
+
+{% endblock %}

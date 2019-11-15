@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -14,6 +16,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Principal
 {
     const PREFIX = 'principals/';
+
+    const READ_PROXY_SUFFIX = '/calendar-proxy-read';
+    const WRITE_PROXY_SUFFIX = '/calendar-proxy-write';
 
     /**
      * @ORM\Id()
@@ -42,6 +47,33 @@ class Principal
      * @ORM\Column(name="displayname", type="string", length=255, nullable=true)
      */
     private $displayName;
+
+    /**
+     * @ORM\Column(type="boolean")
+     * @Assert\NotBlank
+     */
+    private $isMain;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Principal")
+     * @ORM\JoinTable(
+     *  name="groupmembers",
+     *  joinColumns={
+     *      @ORM\JoinColumn(name="principal_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @ORM\JoinColumn(name="member_id", referencedColumnName="id")
+     *  }
+     * )
+     */
+    private $delegees;
+    // TODO add inverse correctly for delegees ?
+
+    public function __construct()
+    {
+        $this->delegees = new ArrayCollection();
+        $this->isMain = true;
+    }
 
     public function getId(): ?int
     {
@@ -93,6 +125,51 @@ class Principal
     public function setDisplayName(?string $displayName): self
     {
         $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Principal[]
+     */
+    public function getDelegees(): Collection
+    {
+        return $this->delegees;
+    }
+
+    public function addDelegee(Principal $delegee): self
+    {
+        if (!$this->delegees->contains($delegee)) {
+            $this->delegees[] = $delegee;
+        }
+
+        return $this;
+    }
+
+    public function removeDelegee(Principal $delegee): self
+    {
+        if ($this->delegees->contains($delegee)) {
+            $this->delegees->removeElement($delegee);
+        }
+
+        return $this;
+    }
+
+    public function removeAllDelegees(): self
+    {
+        $this->delegees->clear();
+
+        return $this;
+    }
+
+    public function getIsMain(): ?bool
+    {
+        return $this->isMain;
+    }
+
+    public function setIsMain(bool $isMain): self
+    {
+        $this->isMain = $isMain;
 
         return $this;
     }

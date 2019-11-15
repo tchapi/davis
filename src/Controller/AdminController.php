@@ -50,7 +50,7 @@ class AdminController extends AbstractController
      */
     public function users()
     {
-        $principals = $this->get('doctrine')->getRepository(Principal::class)->findAll();
+        $principals = $this->get('doctrine')->getRepository(Principal::class)->findByIsMain(true);
 
         return $this->render('users/index.html.twig', [
             'principals' => $principals,
@@ -302,6 +302,137 @@ class AdminController extends AbstractController
         $this->addFlash('success', $trans->trans('calendar.deleted'));
 
         return $this->redirectToRoute('calendars', ['username' => $username]);
+    }
+
+    /**
+     * @Route("/calendars/delegates/{id}", name="calendar_delegates", requirements={"id":"\d+"})
+     */
+    public function calendarDelegates(int $id)
+    {
+        $calendar = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+
+        if (!$calendar) {
+            throw $this->createNotFoundException('Calendar not found');
+        }
+
+        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri());
+
+        $allPrincipalsExcept = $this->get('doctrine')->getRepository(Principal::class)->findAllExceptPrincipal($calendar->getPrincipalUri());
+
+        $principalProxyRead = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
+        $principalProxyWrite = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
+
+        return $this->render('calendars/delegates.html.twig', [
+            'calendar' => $calendar,
+            'principal' => $principal,
+            'delegation' => $principalProxyRead && $principalProxyWrite,
+            'allPrincipals' => $allPrincipalsExcept,
+        ]);
+    }
+
+    /**
+     * @Route("/calendars/delegates/{id}/add", name="calendar_delegate_add", requirements={"id":"\d+"})
+     */
+    public function calendarDelegateAdd(Request $request, int $id)
+    {
+        $calendar = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+
+        if (!$calendar) {
+            throw $this->createNotFoundException('Calendar not found');
+        }
+
+        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri());
+
+        if (!$principal) {
+            throw $this->createNotFoundException('Principal linked to this calendar not found');
+        }
+
+        $newMemberToAdd = $this->get('doctrine')->getRepository(Principal::class)->findOneById($request->get('principalId'));
+
+        if (!$newMemberToAdd) {
+            throw $this->createNotFoundException('Member not found');
+        }
+
+        $principal->addDelegee($newMemberToAdd);
+        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager->flush();
+
+        return $this->redirectToRoute('calendar_delegates', ['id' => $id]);
+    }
+
+    /**
+     * @Route("/calendars/delegates/{id}/remove/{delegateId}", name="calendar_delegate_remove", requirements={"id":"\d+", "delegateId":"\d+"})
+     */
+    public function calendarDelegateRemove(Request $request, int $id, int $delegateId)
+    {
+        $calendar = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+
+        if (!$calendar) {
+            throw $this->createNotFoundException('Calendar not found');
+        }
+
+        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri());
+
+        if (!$principal) {
+            throw $this->createNotFoundException('Principal linked to this calendar not found');
+        }
+
+        $memberToRemove = $this->get('doctrine')->getRepository(Principal::class)->findOneById($delegateId);
+
+        if (!$memberToRemove) {
+            throw $this->createNotFoundException('Member not found');
+        }
+
+        $principal->removeDelegee($memberToRemove);
+        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager->flush();
+
+        return $this->redirectToRoute('calendar_delegates', ['id' => $id]);
+    }
+
+    /**
+     * @Route("/calendars/delegation/{id}/{toggle}", name="calendar_delegation_toggle", requirements={"id":"\d+", "toggle":"(on|off)"})
+     */
+    public function calendarToggleDelegation(int $id, string $toggle)
+    {
+        $calendar = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+
+        if (!$calendar) {
+            throw $this->createNotFoundException('Calendar not found');
+        }
+
+        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($calendar->getPrincipalUri());
+
+        if (!$principal) {
+            throw $this->createNotFoundException('Principal linked to this calendar not found');
+        }
+
+        $entityManager = $this->get('doctrine')->getManager();
+
+        if ('on' === $toggle) {
+            $principalProxyRead = new Principal();
+            $principalProxyRead->setUri($principal->getUri().Principal::READ_PROXY_SUFFIX)
+                               ->setIsMain(false);
+            $entityManager->persist($principalProxyRead);
+
+            $principalProxyWrite = new Principal();
+            $principalProxyWrite->setUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX)
+                               ->setIsMain(false);
+            $entityManager->persist($principalProxyWrite);
+        } else {
+            $principalProxyRead = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
+            $principalProxyRead && $entityManager->remove($principalProxyRead);
+
+            $principalProxyWrite = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
+            $principalProxyWrite && $entityManager->remove($principalProxyWrite);
+
+            // Remove also delegates
+            $principal->removeAllDelegees();
+        }
+
+        $entityManager->flush();
+
+        return $this->redirectToRoute('calendar_delegates', ['id' => $id]);
     }
 
     /**

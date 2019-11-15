@@ -1,0 +1,28 @@
+<div class="modal fade" id="add_delegate" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{ "calendars.delegates.new"|trans }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="member" class="col-form-label">{{ "calendars.delegates.member"|trans }}</label>
+            <select class="form-control" id="member">
+              {% for principal in principals %}
+                <option value="{{ principal.id}}">{{ principal.displayName }} ({{ principal.email }})</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ "cancel"|trans }}</button>
+        <a data-href="{{ path('calendar_delegate_add', {id: calendar.id}) }}" href="#" class="btn btn-primary add-delegate">{{ "add"|trans }}</a>
+      </div>
+    </div>
+  </div>
+</div>

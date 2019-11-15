@@ -21,4 +21,10 @@ $(document).ready(function() {
         document.body.style.setProperty('--calendar-color', $(this).val());
     })
     document.body.style.setProperty('--calendar-color', $('#calendar_instance_calendarColor').val());
+
+    // Modal to add delegate, catch the click to add the query parameter
+    $('a.add-delegate').click(function(e) {
+        e.preventDefault()
+        window.location = $(this).attr('data-href') + "?principalId=" + $("#member").val()
+    })
 })
