@@ -4,9 +4,12 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Services\BasicAuth;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class DAVController extends AbstractController
 {
@@ -62,7 +65,35 @@ class DAVController extends AbstractController
      */
     protected $tmpDir;
 
-    public function __construct(bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authMethod, ?string $authRealm, ?string $publicDir, ?string $tmpDir)
+    /**
+     * PDO Wrapped connection.
+     *
+     * @var \PDO
+     */
+    protected $pdo;
+
+    /**
+     * Base URI of the server.
+     *
+     * @var string
+     */
+    protected $baseUri;
+
+    /**
+     * Basic Auth Backend class.
+     *
+     * @var App\Services\BasicAuth
+     */
+    protected $basicAuthBackend;
+
+    /**
+     * Server.
+     *
+     * @var \Sabre\DAV\Server
+     */
+    protected $server;
+
+    public function __construct(BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authMethod, ?string $authRealm, ?string $publicDir, ?string $tmpDir)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -74,6 +105,13 @@ class DAVController extends AbstractController
 
         $this->publicDir = $publicDir;
         $this->tmpDir = $tmpDir;
+
+        $this->pdo = $entityManager->getConnection()->getWrappedConnection();
+        $this->baseUri = $router->generate('dav', ['path' => '']);
+
+        $this->basicAuthBackend = $basicAuthBackend;
+
+        $this->initServer();
     }
 
     /**
@@ -84,29 +122,24 @@ class DAVController extends AbstractController
         return $this->render('index.html.twig');
     }
 
-    /**
-     * @Route("/dav/{path}", name="dav", requirements={"path":".*"})
-     */
-    public function dav(BasicAuth $basicAuthBackend)
+    private function initServer()
     {
-        $pdo = $this->get('doctrine')->getEntityManager()->getConnection()->getWrappedConnection();
-
         /*
          * The backends.
          */
         switch ($this->authMethod) {
             case self::AUTH_DIGEST:
-                $authBackend = new \Sabre\DAV\Auth\Backend\PDO($pdo);
+                $authBackend = new \Sabre\DAV\Auth\Backend\PDO($this->pdo);
                 break;
             case self::AUTH_BASIC:
             default:
-                $authBackend = $basicAuthBackend;
+                $authBackend = $this->basicAuthBackend;
                 break;
         }
 
         $authBackend->setRealm($this->authRealm);
 
-        $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($pdo);
+        $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($this->pdo);
 
         /**
          * The directory tree.
@@ -120,11 +153,11 @@ class DAVController extends AbstractController
         ];
 
         if ($this->calDAVEnabled) {
-            $calendarBackend = new \Sabre\CalDAV\Backend\PDO($pdo);
+            $calendarBackend = new \Sabre\CalDAV\Backend\PDO($this->pdo);
             $nodes[] = new \Sabre\CalDAV\CalendarRoot($principalBackend, $calendarBackend);
         }
         if ($this->cardDAVEnabled) {
-            $carddavBackend = new \Sabre\CardDAV\Backend\PDO($pdo);
+            $carddavBackend = new \Sabre\CardDAV\Backend\PDO($this->pdo);
             $nodes[] = new \Sabre\CardDAV\AddressBookRoot($principalBackend, $carddavBackend);
         }
         if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
@@ -132,48 +165,52 @@ class DAVController extends AbstractController
         }
 
         // The object tree needs in turn to be passed to the server class
-        $server = new \Sabre\DAV\Server($nodes);
-
-        $route = $this->get('router')->generate('dav', ['path' => '']);
-        $server->setBaseUri($route);
+        $this->server = new \Sabre\DAV\Server($nodes);
+        $this->server->setBaseUri($this->baseUri);
 
         // Plugins
-        $server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, $this->authRealm));
-        $server->addPlugin(new \Sabre\DAV\Browser\Plugin());
-        $server->addPlugin(new \Sabre\DAV\Sync\Plugin());
-        $server->addPlugin(new \Sabre\DAVACL\Plugin());
+        $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, $this->authRealm));
+        $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin());
+        $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
+        $this->server->addPlugin(new \Sabre\DAVACL\Plugin());
 
-        $server->addPlugin(new \Sabre\DAV\PropertyStorage\Plugin(
-            new \Sabre\DAV\PropertyStorage\Backend\PDO($pdo)
+        $this->server->addPlugin(new \Sabre\DAV\PropertyStorage\Plugin(
+            new \Sabre\DAV\PropertyStorage\Backend\PDO($this->pdo)
         ));
 
         // CalDAV plugins
         if ($this->calDAVEnabled) {
-            $server->addPlugin(new \Sabre\DAV\Sharing\Plugin());
-            $server->addPlugin(new \Sabre\CalDAV\Plugin());
-            $server->addPlugin(new \Sabre\CalDAV\Schedule\Plugin());
-            $server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
-            $server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
+            $this->server->addPlugin(new \Sabre\DAV\Sharing\Plugin());
+            $this->server->addPlugin(new \Sabre\CalDAV\Plugin());
+            $this->server->addPlugin(new \Sabre\CalDAV\Schedule\Plugin());
+            $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
+            $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             if ($this->inviteAddress) {
-                $server->addPlugin(new \Sabre\CalDAV\Schedule\IMipPlugin($this->inviteAddress));
+                $this->server->addPlugin(new \Sabre\CalDAV\Schedule\IMipPlugin($this->inviteAddress));
             }
         }
 
         // CardDAV plugins
         if ($this->cardDAVEnabled) {
-            $server->addPlugin(new \Sabre\CardDAV\Plugin());
-            $server->addPlugin(new \Sabre\CardDAV\VCFExportPlugin());
+            $this->server->addPlugin(new \Sabre\CardDAV\Plugin());
+            $this->server->addPlugin(new \Sabre\CardDAV\VCFExportPlugin());
         }
 
         // WebDAV plugins
         if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
             $lockBackend = new \Sabre\DAV\Locks\Backend\File($this->tmpDir.'/locksdb');
-            $server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
-            //$server->addPlugin(new \Sabre\DAV\Browser\GuessContentType()); // Waiting for https://github.com/sabre-io/dav/pull/1203
-            $server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->tmpDir));
+            $this->server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
+            //$this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType()); // Waiting for https://github.com/sabre-io/dav/pull/1203
+            $this->server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->tmpDir));
         }
+    }
 
-        $server->start();
+    /**
+     * @Route("/dav/{path}", name="dav", requirements={"path":".*"})
+     */
+    public function dav(Request $request, string $path)
+    {
+        $this->server->start();
 
         // Needed for Symfony, that expects a response otherwise
         exit;
