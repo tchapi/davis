@@ -1,0 +1,57 @@
+Calendar notification from {{ senderName }}.
+
+-----------------------------------------------------------
+
+{% if action == 'REQUEST' %}
+
+**{{ senderName }}** invited you to “{{ summary }}”.
+
+{% elseif action == 'CANCEL' %}
+
+“{{ summary }}” has been canceled.
+
+{% elseif action == 'ACCEPTED' %}
+
+**{{ senderName }}** accepted your invitation to “{{ summary }}”.
+
+{% elseif action == 'TENTATIVE' %}
+
+**{{ senderName }}** tentatively accepted your invitation to “{{ summary }}”.
+
+{% elseif action == 'DECLINED' %}
+
+**{{ senderName }}** declined your invitation to “{{ summary }}”.
+
+{% endif %}
+
+-----------------------------------------------------------
+
+When?         {{ dateTime|date('l, F jS Y') }}
+{% if not allDay %}
+              {{ dateTime|date('g:ia T') }}
+{% endif %}
+
+{% if action != 'CANCEL' %}
+Attendees:
+{% for attendee in attendees %}
+              {{ attendee.cn }} <{{ attendee.email }}> {% if attendee.role == 'CHAIR' %}(organizer){% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if location %}
+Where?        {{ location|replace({"\n": "\n" ~ '              '}) }}
+{% endif %}
+
+{% if url %}
+URL:          {{ url }}
+{% endif %}
+
+
+{% if description %}
+Notes:        {{ description|replace({"\n": "\n" ~ '              '}) }}
+{% endif %}
+
+-----------------------------------------------------------
+
+Mail sent by {{ app.request.getSchemeAndHttpHost() }}

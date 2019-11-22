@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calendar notification from {{ senderName }}</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" style="margin: 0; padding: 0; background: #fff; color: #111111; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px;">
+<table cellspacing="0" cellpadding="0" width="100%">
+  <thead>
+    <tr>
+      <td colspan="3"> </td>
+    </tr>
+    <tr>
+      <td width="*"> </td>
+      <td width="500">
+        <table width="100%">
+          <tr>
+            <td width="1" style="font-size: 64px; font-weight:bold;">{{ dateTime|date('j') }}</td>
+            <td width="*" style="padding: 10px 0;">
+              <span style=" font-size: 12px; color: #555555">{{ dateTime|date('l') }}</span><br />
+              {{ dateTime|date('F') }}
+            </td>
+            <td width="58" style="text-align: right;">
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td width="*"> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td style="border-top: 1px solid #cccccc"> </td>
+      <td> </td>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td> </td>
+      <td style="text-align: center; padding: 10px 0;">
+        {% if action == 'REQUEST' %}
+          <strong>{{ senderName }}</strong> invited you to
+          <h1 style="margin: 0; color: #2c7ea9; font-weight: 300; line-height: 36px;">{{ summary }}</h1>
+        {% elseif action == 'CANCEL' %}
+          <h1 style="margin: 0; color: #2c7ea9; font-weight: 300; line-height: 36px;">{{ summary }}</h1> has been canceled.
+        {% elseif action == 'ACCEPTED' %}
+          <strong>{{ senderName }}</strong> accepted your invitation to
+          <h1 style="margin: 0; color: #2c7ea9; font-weight: 300; line-height: 36px;">{{ summary }}</h1>
+        {% elseif action == 'TENTATIVE' %}
+          <strong>{{ senderName }}</strong> tentatively accepted your invitation to
+          <h1 style="margin: 0; color: #2c7ea9; font-weight: 300; line-height: 36px;">{{ summary }}</h1>
+        {% elseif action == 'DECLINED' %}
+          <strong>{{ senderName }}</strong> declined your invitation to
+          <h1 style="margin: 0; color: #2c7ea9; font-weight: 300; line-height: 36px;">{{ summary }}</h1>
+        {% endif %}
+      </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td colspan="3"> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td style="border-top: 1px solid #cccccc"> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td>
+        <table border="0" cellpadding="0" cellspacing="10" width="100%">
+          <tr>
+            <td style="vertical-align: bottom; color: #777777;" width="100px">When?</td>
+            <td>
+              <strong>{{ dateTime|date("l, F j\\<\\s\\u\\p\\>S\\<\\/\\s\\u\\p\\> Y")|raw }}</strong>
+            </td>
+          </tr>
+          {% if not allDay %}
+            <tr>
+              <td> </td>
+              <td><strong>{{ dateTime|date('g:ia T') }}</strong></td>
+            </tr>
+          {% endif %}
+          {% if action != 'CANCEL' %}
+            <tr>
+              <td style="vertical-align: top; color: #777777;" width="100px">Attendees:</td>
+              <td>
+              {% for attendee in attendees %}
+                <a href="mailto:{{ attendee.email }}" style="color: #2c7ea9">{{ attendee.cn }}</a>
+                {% if attendee.role == 'CHAIR' %}(organizer){% endif %}
+                <br />
+              {% endfor %}
+            </tr>
+          {% endif %}
+          {% if location %}
+          <tr>
+            <td style="vertical-align: top; color: #777777;" width="100px">Where?</td>
+            <td>{{ location }}</td>
+          </tr>
+          {% endif %}
+          {% if locationImageContentId %}
+          <tr>
+            <td colspan="2">
+                <a href="{{ locationLink }}" title="Navigate on this map">
+                  <img src="{{ locationImageContentId }}" width="100%"/>
+                </a>
+            </td>
+          </tr>
+          {% endif %}
+          {% if url %}
+          <tr>
+            <td style="vertical-align: top; color: #777777;" width="100px">URL:</td>
+            <td>
+              <a href="{{ url }}" style="color: #aaaaaa">{{ url }}</a>
+            </td>
+          </tr>
+          {% endif %}
+          {% if description %}
+          <tr>
+            <td style="vertical-align: top; color: #777777;" width="100px">Notes:</td>
+            <td>{{ description }}</td>
+          </tr>
+          {% endif %}
+        </table>
+      </td>
+      <td> </td>
+    </tr>
+
+    <tr>
+      <td> </td>
+      <td style="border-bottom: 1px solid #cccccc"> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+
+  <tfoot>
+    <tr>
+      <td colspan="3" height="5px"></td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td style="font-size: 11px; line-height: 16px; text-align: center; color: #dddddd;">
+        Mail sent by {{ app.request.getSchemeAndHttpHost() }}
+      </td>
+      <td> </td>
+    </tr>
+  </tfoot>
+</table>
+</body>
+</html>

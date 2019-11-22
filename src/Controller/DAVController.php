@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Plugins\DavisIMipPlugin;
 use App\Services\BasicAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -186,7 +187,7 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             if ($this->inviteAddress) {
-                $this->server->addPlugin(new \Sabre\CalDAV\Schedule\IMipPlugin($this->inviteAddress));
+                $this->server->addPlugin(new DavisIMipPlugin($this->inviteAddress));
             }
         }
 
