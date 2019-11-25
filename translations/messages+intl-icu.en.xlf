@@ -177,6 +177,10 @@
         <source>users.uri</source>
         <target>Principal URI</target>
       </trans-unit>
+      <trans-unit id="Xq.ID4c" resname="users.administrator">
+        <source>users.administrator</source>
+        <target>Administrator</target>
+      </trans-unit>
       <trans-unit id="rzn9R3M" resname="users.calendars">
         <source>users.calendars</source>
         <target>Calendars</target>
@@ -252,6 +256,14 @@
       <trans-unit id="3IGOm9D" resname="form.email">
         <source>form.email</source>
         <target>Email</target>
+      </trans-unit>
+      <trans-unit id="_YeuWGA" resname="form.admin">
+        <source>form.admin</source>
+        <target>Is this user an administrator ?</target>
+      </trans-unit>
+      <trans-unit id="hIz1KP1" resname="form.admin.help">
+        <source>form.admin.help</source>
+        <target>If checked, this user (namely, its principal) will be injected in every single ACL rule with the '{DAV:}all' privileges.</target>
       </trans-unit>
       <trans-unit id="k660.eC" resname="form.displayName">
         <source>form.displayName</source>

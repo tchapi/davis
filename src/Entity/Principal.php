@@ -55,6 +55,12 @@ class Principal
     private $isMain;
 
     /**
+     * @ORM\Column(type="boolean")
+     * @Assert\NotBlank
+     */
+    private $isAdmin;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Principal")
      * @ORM\JoinTable(
      *  name="groupmembers",
@@ -73,6 +79,7 @@ class Principal
     {
         $this->delegees = new ArrayCollection();
         $this->isMain = true;
+        $this->isAdmin = false;
     }
 
     public function getId(): ?int
@@ -170,6 +177,18 @@ class Principal
     public function setIsMain(bool $isMain): self
     {
         $this->isMain = $isMain;
+
+        return $this;
+    }
+
+    public function getIsAdmin(): ?bool
+    {
+        return $this->isAdmin;
+    }
+
+    public function setIsAdmin(bool $isAdmin): self
+    {
+        $this->isAdmin = $isAdmin;
 
         return $this;
     }

@@ -79,12 +79,14 @@ class AdminController extends AbstractController
 
         $form->get('displayName')->setData($principal->getDisplayName());
         $form->get('email')->setData($principal->getEmail());
+        $form->get('isAdmin')->setData($principal->getIsAdmin());
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $displayName = $form->get('displayName')->getData();
             $email = $form->get('email')->getData();
+            $isAdmin = $form->get('isAdmin')->getData();
 
             // Create password for user
             if ($username && is_null($user->getPassword())) {
@@ -131,7 +133,8 @@ class AdminController extends AbstractController
             }
 
             $principal->setDisplayName($displayName)
-                      ->setEmail($email);
+                      ->setEmail($email)
+                      ->setIsAdmin($isAdmin);
 
             $entityManager->persist($user);
             $entityManager->flush();
