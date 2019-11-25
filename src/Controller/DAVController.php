@@ -67,11 +67,11 @@ class DAVController extends AbstractController
     protected $tmpDir;
 
     /**
-     * PDO Wrapped connection.
+     * Doctrine entity manager.
      *
-     * @var \PDO
+     * @var EntityManagerInterface
      */
-    protected $pdo;
+    protected $em;
 
     /**
      * Base URI of the server.
@@ -107,7 +107,7 @@ class DAVController extends AbstractController
         $this->publicDir = $publicDir;
         $this->tmpDir = $tmpDir;
 
-        $this->pdo = $entityManager->getConnection()->getWrappedConnection();
+        $this->em = $entityManager;
         $this->baseUri = $router->generate('dav', ['path' => '']);
 
         $this->basicAuthBackend = $basicAuthBackend;
@@ -125,12 +125,14 @@ class DAVController extends AbstractController
 
     private function initServer()
     {
+        $pdo = $this->em->getConnection()->getWrappedConnection();
+
         /*
          * The backends.
          */
         switch ($this->authMethod) {
             case self::AUTH_DIGEST:
-                $authBackend = new \Sabre\DAV\Auth\Backend\PDO($this->pdo);
+                $authBackend = new \Sabre\DAV\Auth\Backend\PDO($pdo);
                 break;
             case self::AUTH_BASIC:
             default:
@@ -140,7 +142,7 @@ class DAVController extends AbstractController
 
         $authBackend->setRealm($this->authRealm);
 
-        $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($this->pdo);
+        $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($pdo);
 
         /**
          * The directory tree.
@@ -154,11 +156,11 @@ class DAVController extends AbstractController
         ];
 
         if ($this->calDAVEnabled) {
-            $calendarBackend = new \Sabre\CalDAV\Backend\PDO($this->pdo);
+            $calendarBackend = new \Sabre\CalDAV\Backend\PDO($pdo);
             $nodes[] = new \Sabre\CalDAV\CalendarRoot($principalBackend, $calendarBackend);
         }
         if ($this->cardDAVEnabled) {
-            $carddavBackend = new \Sabre\CardDAV\Backend\PDO($this->pdo);
+            $carddavBackend = new \Sabre\CardDAV\Backend\PDO($pdo);
             $nodes[] = new \Sabre\CardDAV\AddressBookRoot($principalBackend, $carddavBackend);
         }
         if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
@@ -176,7 +178,7 @@ class DAVController extends AbstractController
         $this->server->addPlugin(new \Sabre\DAVACL\Plugin());
 
         $this->server->addPlugin(new \Sabre\DAV\PropertyStorage\Plugin(
-            new \Sabre\DAV\PropertyStorage\Backend\PDO($this->pdo)
+            new \Sabre\DAV\PropertyStorage\Backend\PDO($pdo)
         ));
 
         // CalDAV plugins
