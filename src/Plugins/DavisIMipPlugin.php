@@ -28,8 +28,6 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
 
     /**
      * Event handler for the 'schedule' event.
-     *
-     * @param ITip\Message $itip
      */
     public function schedule(ITip\Message $itip)
     {
