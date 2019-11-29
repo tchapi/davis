@@ -1,7 +1,7 @@
 Davis
 ---
 
-A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 4](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), largely inspired by [Baïkal](https://github.com/sabre-io/Baikal).
+A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), largely inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
 ![Dashboard page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/dashboard.png)
 
@@ -206,7 +206,7 @@ If you change or add translations, you need to update the `messages` XLIFF file 
 
 # Libraries used
 
-  - Symfony 4 (Licence : MIT)
+  - Symfony 5 (Licence : MIT)
   - Sabre-io/dav (Licence : BSD-3-Clause)
   - Bootstrap 4 (Licence : MIT)
 
