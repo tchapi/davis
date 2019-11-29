@@ -3,6 +3,7 @@ twig:
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
     form_themes: ['bootstrap_4_horizontal_layout.html.twig']
+    exception_controller: null
     globals:
         invite_from_address: '%env(INVITE_FROM_ADDRESS)%'
         calDAVEnabled: '%env(bool:CALDAV_ENABLED)%'
