@@ -199,7 +199,7 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
         }
 
         $message = (new \Swift_Message($subject))
-            ->setFrom([$this->senderEmail.' '.static::MESSAGE_ORIGIN_INDICATOR => $itip->senderName])
+            ->setFrom([$this->senderEmail => $senderName.' '.static::MESSAGE_ORIGIN_INDICATOR])
             ->setTo([$recipientEmail => $recipientName])
             ->setReplyTo([$senderEmail => $senderName])
             ->setContentType('Content-Type: text/calendar; charset=UTF-8; method='.$itip->method);
