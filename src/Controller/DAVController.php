@@ -240,9 +240,20 @@ class DAVController extends AbstractController
      */
     public function dav(Request $request, string $path)
     {
+        // \Sabre\DAV\Server does not let us use a custom SAPI, and its behaviour
+        // is to directly output headers and content to php://output. Hence, we
+        // let the headers pass (we have not choice) and capture the output in a
+        // buffer.
+        // This allows us to use a Response, and not to break the events triggered
+        // by Symfony after the response is sent, like for instance the TERMINATE
+        // event from the Kernel, that is used to send emails...
+
+        ob_start(); // Does not capture headers!
         $this->server->start();
 
-        // Needed for Symfony, that expects a response otherwise
-        exit;
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        return new Response($output, http_response_code(), []);
     }
 }
