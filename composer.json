@@ -22,6 +22,7 @@
         "symfony/process": "^5.0",
         "symfony/security-bundle": "^5.0",
         "symfony/serializer-pack": "*",
+        "symfony/swiftmailer-bundle": "^3.4",
         "symfony/translation": "^5.0",
         "symfony/twig-bundle": "^5.0",
         "symfony/validator": "^5.0",
