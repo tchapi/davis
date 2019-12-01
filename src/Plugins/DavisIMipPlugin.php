@@ -77,7 +77,7 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
                         $action = 'TENTATIVE';
                         break;
                     default:
-                        $itip->scheduleStatus = '5.0;Email not deliered. We didn\'t understand this PARTSTAT.';
+                        $itip->scheduleStatus = '5.0;Email not delivered. We didn\'t understand this PARTSTAT.';
 
                         return;
                 }

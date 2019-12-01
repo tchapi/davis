@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Add the isAdmin property on the principals
+ * Add the isAdmin property on the principals.
  */
 final class Version20191125093508 extends AbstractMigration
 {
