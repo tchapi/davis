@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment as TwigEnvironment;
 
 class DAVController extends AbstractController
 {
@@ -75,6 +76,20 @@ class DAVController extends AbstractController
     protected $em;
 
     /**
+     * The Twig engine.
+     *
+     * @var Twig\Environment
+     */
+    protected $twig;
+
+    /**
+     * The Swift_Mailer mailer service.
+     *
+     * @var \Swift_Mailer
+     */
+    protected $mailer;
+
+    /**
      * Base URI of the server.
      *
      * @var string
@@ -95,7 +110,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authMethod, ?string $authRealm, ?string $publicDir, ?string $tmpDir)
+    public function __construct(\Swift_Mailer $mailer, TwigEnvironment $twig, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authMethod, ?string $authRealm, ?string $publicDir, ?string $tmpDir)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -109,6 +124,8 @@ class DAVController extends AbstractController
         $this->tmpDir = $tmpDir;
 
         $this->em = $entityManager;
+        $this->twig = $twig;
+        $this->mailer = $mailer;
         $this->baseUri = $router->generate('dav', ['path' => '']);
 
         $this->basicAuthBackend = $basicAuthBackend;
@@ -199,7 +216,7 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             if ($this->inviteAddress) {
-                $this->server->addPlugin(new DavisIMipPlugin($this->inviteAddress));
+                $this->server->addPlugin(new DavisIMipPlugin($this->twig, $this->mailer, $this->inviteAddress));
             }
         }
 

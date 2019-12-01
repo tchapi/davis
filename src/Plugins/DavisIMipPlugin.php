@@ -5,6 +5,7 @@ namespace App\Plugins;
 use Sabre\CalDAV\Schedule\IMipPlugin as SabreBaseIMipPlugin;
 use Sabre\DAV;
 use Sabre\VObject\ITip;
+use Twig\Environment as TwigEnvironment;
 
 /**
  * iMIP handler.
@@ -14,6 +15,20 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
     const MESSAGE_ORIGIN_INDICATOR = '(via Davis)';
 
     /**
+     * The Twig engine.
+     *
+     * @var Twig\Environment
+     */
+    protected $twig;
+
+    /**
+     * The Swift_Mailer mailer service.
+     *
+     * @var \Swift_Mailer
+     */
+    protected $mailer;
+
+    /**
      * Creates the email handler.
      *
      * @param string $senderEmail. The 'senderEmail' is the email that shows up
@@ -21,8 +36,10 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
      *                             generally be some kind of no-reply email
      *                             address you own.
      */
-    public function __construct($senderEmail)
+    public function __construct(TwigEnvironment $twig, \Swift_Mailer $mailer, $senderEmail)
     {
+        $this->twig = $twig;
+        $this->mailer = $mailer;
         $this->senderEmail = $senderEmail;
     }
 
@@ -157,7 +174,7 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $zoom = 16;
                 $width = 500;
                 $height = 220;
-                $locationImage = Swift_Image::fromPath(
+                $locationImage = \Swift_Image::fromPath(
                         'http://api.tiles.mapbox.com/v4'.
                         '/mapbox.streets'.
                         '/pin-m-star+285A98'.
@@ -212,14 +229,14 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
         ];
 
         $message->setBody(
-            $this->renderView(
+            $this->twig->render(
                 'mails/scheduling.html.twig',
                 $params
             ),
             'text/html'
         )
         ->addPart(
-            $this->renderView(
+            $this->twig->render(
                 'mails/scheduling.txt.twig',
                 $params
             ),
@@ -227,18 +244,15 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
         );
 
         if (false === $deliveredLocally) {
-            $bodyAsStream = new Stringbuffer\Read();
-            $bodyAsStream->initializeWith($itip->message->serialize());
-
             // Attach the event file (invite.ics)
-            $attachment = (new Swift_Attachment())
+            $attachment = (new \Swift_Attachment())
                   ->setFilename('invite.ics')
                   ->setContentType('text/calendar; method='.(string) $itip->method.'; charset=UTF-8')
-                  ->setBody($bodyAsStream);
+                  ->setBody($itip->message->serialize());
             $message->attach($attachment);
         }
 
-        $mailer->send($message);
+        $this->mailer->send($message);
 
         if (false === $deliveredLocally) {
             $itip->scheduleStatus = '1.1;Scheduling message is sent via iMip.';
