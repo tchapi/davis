@@ -39,7 +39,7 @@ class CalendarInstance
     private $principalUri;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", options={"default" : 1})
      */
     private $access;
 
@@ -71,7 +71,7 @@ class CalendarInstance
     private $calendarColor;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     private $timezone;
 
@@ -91,7 +91,7 @@ class CalendarInstance
     private $shareDisplayName;
 
     /**
-     * @ORM\Column(name="share_invitestatus", type="integer")
+     * @ORM\Column(name="share_invitestatus", type="integer", options={"default" : 2})
      */
     private $shareInviteStatus;
 
