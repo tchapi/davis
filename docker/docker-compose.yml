@@ -27,13 +27,8 @@ services:
       context: ./
       dockerfile: ./Dockerfile
       args:
-        version: "1.2.0"
-        email: ${INVITE_FROM_ADDRESS}
-        mail_host: ${MAIL_HOST}
-        hostname: ${HOSTNAME}
-        mail_username: ${MAIL_USERNAME}
-        mail_password: ${MAIL_PASSWORD}
-    image: davis:1.2.0
+        version: "1.4.3"
+    image: davis:1.4.3
     container_name: davis
     env_file: .env
     depends_on:
