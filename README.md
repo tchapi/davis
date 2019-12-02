@@ -81,6 +81,21 @@ f. The paths for the WebDAV installation
 TMP_DIR='/tmp'
 PUBLIC_DIR='/public'
 ```
+## Migrating from Baïkal ?
+
+If you're migrating from Baïkal, then you will likely want to do the following :
+
+1. Get a backup of your data (without the `CREATE`  statements, but with complete `INSERT`  statements):
+
+    mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database
+
+2. Create a new database for Davis (let's name it `davis`) and run the migrations :
+
+    bin/console doctrine:migrations:migrate
+
+3. Reimport the data back:
+
+    mysql -uroot -p davis < baikal_to_davis.sql
 
 # Access / Webserver
 
