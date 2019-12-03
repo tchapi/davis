@@ -67,7 +67,7 @@
       </trans-unit>
       <trans-unit id="eH1zFg7" resname="calendars.uri">
         <source>calendars.uri</source>
-        <target>Calendar URI</target>
+        <target>URI</target>
       </trans-unit>
       <trans-unit id="IVokRw3" resname="users.new">
         <source>users.new</source>
@@ -112,6 +112,10 @@
       <trans-unit id="rSWt7Pl" resname="dashboard.calendars">
         <source>dashboard.calendars</source>
         <target>Calendars</target>
+      </trans-unit>
+      <trans-unit id="QUanlG4" resname="dashboard.calendars.help">
+        <source>dashboard.calendars.help</source>
+        <target>(incl. Reminders lists)</target>
       </trans-unit>
       <trans-unit id="tiyHD2m" resname="dashboard.events">
         <source>dashboard.events</source>
@@ -319,7 +323,7 @@
       </trans-unit>
       <trans-unit id="KBkKkDQ" resname="form.todos.help">
         <source>form.todos.help</source>
-        <target>If checked, todos will be enabled on this calendar.</target>
+        <target>If checked, todos will be enabled on this calendar. It will show up in reminders clients (such as macOS Reminders app)</target>
       </trans-unit>
       <trans-unit id="kyPtCLt" resname="form.notes.help">
         <source>form.notes.help</source>

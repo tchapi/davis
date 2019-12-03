@@ -54,7 +54,7 @@
         {{ "dashboard.users"|trans }} <span class="badge badge-primary badge-pill">{{ users|length }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ "dashboard.calendars"|trans }} <span class="badge badge-primary badge-pill">{{ calendars|length }}</span>
+        {{ "dashboard.calendars"|trans }}<span class="small text-muted ml-1 mr-auto">{{ "dashboard.calendars.help"|trans }}</span> <span class="badge badge-primary badge-pill">{{ calendars|length }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
         ↳ {{ "dashboard.events"|trans }} <span class="badge badge-secondary badge-pill">{{ events|length }}</span>
