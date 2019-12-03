@@ -27,8 +27,8 @@ services:
       context: ./
       dockerfile: ./Dockerfile
       args:
-        version: "1.4.3"
-    image: davis:1.4.3
+        version: "1.4.5"
+    image: davis:1.4.5
     container_name: davis
     env_file: .env
     depends_on:
