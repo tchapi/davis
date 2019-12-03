@@ -14,8 +14,8 @@
             <h5 class="mb-1 mr-auto">{{ calendar.displayName }} <span class="badge badge-pill" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span></h5>
             <div class="mr-0 text-right d-md-block d-none">
                 <a href="{{ path('calendar_delegates',{id: calendar.id}) }}" class="btn btn-sm btn-outline-secondary">💁 {{ "users.delegates"|trans }}</a>
-                <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-sm btn-primary ml-1">✎ {{ "edit"|trans }}</a>
-                <a href="#" data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" class="btn btn-sm btn-danger ml-1 delete-modal">⚠ {{ "delete"|trans }}</a>
+                <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ml-1">✎ {{ "edit"|trans }}</a>
+                <a href="#" data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" class="btn btn-sm btn-outline-danger ml-1 delete-modal">⚠ {{ "delete"|trans }}</a>
             </div>
         </div>
         <p class="mb-1">{{ calendar.description }}</p>
