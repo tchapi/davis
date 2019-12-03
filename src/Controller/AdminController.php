@@ -223,7 +223,7 @@ class AdminController extends AbstractController
      * @Route("/calendars/{username}/new", name="calendar_create")
      * @Route("/calendars/{username}/edit/{id}", name="calendar_edit", requirements={"id":"\d+"})
      */
-    public function calendarCreate(Request $request, string $username, ?int $id, TranslatorInterface $trans)
+    public function calendarEdit(Request $request, string $username, ?int $id, TranslatorInterface $trans)
     {
         $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
