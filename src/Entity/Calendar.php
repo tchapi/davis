@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Calendar
 {
-    const COMPONENT_EVENT = 'VEVENT';
+    const COMPONENT_EVENTS = 'VEVENT';
     const COMPONENT_TODOS = 'VTODO';
     const COMPONENT_NOTES = 'VJOURNAL';
 
@@ -46,7 +46,7 @@ class Calendar
     public function __construct()
     {
         $this->synctoken = 1;
-        $this->components = 'VEVENT,VTODO';
+        $this->components = static::COMPONENT_EVENTS;
         $this->objects = new ArrayCollection();
         $this->changes = new ArrayCollection();
     }

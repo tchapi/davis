@@ -40,6 +40,12 @@ class CalendarInstanceType extends AbstractType
                 'help' => 'form.color.help',
                 'attr' => ['placeholder' => '#RRGGBBAA'],
             ])
+            ->add('events', CheckboxType::class, [
+                'label' => 'form.events',
+                'mapped' => false,
+                'help' => 'form.events.help',
+                'required' => false,
+            ])
             ->add('todos', CheckboxType::class, [
                 'label' => 'form.todos',
                 'mapped' => false,

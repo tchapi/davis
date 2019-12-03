@@ -246,6 +246,7 @@ class AdminController extends AbstractController
 
         $components = explode(',', $calendarInstance->getCalendar()->getComponents());
 
+        $form->get('events')->setData(in_array(Calendar::COMPONENT_EVENTS, $components));
         $form->get('todos')->setData(in_array(Calendar::COMPONENT_TODOS, $components));
         $form->get('notes')->setData(in_array(Calendar::COMPONENT_NOTES, $components));
         $form->get('principalUri')->setData(Principal::PREFIX.$username);
@@ -253,7 +254,10 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $components = [Calendar::COMPONENT_EVENT]; // We always need VEVENT
+            $components = [];
+            if ($form->get('events')->getData()) {
+                $components[] = Calendar::COMPONENT_EVENTS;
+            }
             if ($form->get('todos')->getData()) {
                 $components[] = Calendar::COMPONENT_TODOS;
             }

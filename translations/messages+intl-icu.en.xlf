@@ -281,6 +281,10 @@
         <source>form.username.help</source>
         <target>May be an email, but not forcibly.</target>
       </trans-unit>
+      <trans-unit id="2bl0WGs" resname="form.events">
+        <source>form.events</source>
+        <target>Events</target>
+      </trans-unit>
       <trans-unit id="h0fN2H5" resname="form.notes">
         <source>form.notes</source>
         <target>Notes</target>
@@ -320,6 +324,10 @@
       <trans-unit id="x5Dmxhi" resname="form.color.help">
         <source>form.color.help</source>
         <target>This is the color that will be displayed in your CalDAV client. It must be supplied in the format '#RRGGBBAA' (alpha channel is optional) with hexadecimal values. This value is optional.</target>
+      </trans-unit>
+      <trans-unit id="nYaXSuu" resname="form.events.help">
+        <source>form.events.help</source>
+        <target>If checked, events will be enabled on this calendar. It will show up in calendar clients.</target>
       </trans-unit>
       <trans-unit id="KBkKkDQ" resname="form.todos.help">
         <source>form.todos.help</source>
