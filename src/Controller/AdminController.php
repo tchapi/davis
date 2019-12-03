@@ -248,6 +248,7 @@ class AdminController extends AbstractController
 
         $form->get('todos')->setData(in_array(Calendar::COMPONENT_TODOS, $components));
         $form->get('notes')->setData(in_array(Calendar::COMPONENT_NOTES, $components));
+        $form->get('principalUri')->setData(Principal::PREFIX.$username);
 
         $form->handleRequest($request);
 
@@ -260,7 +261,6 @@ class AdminController extends AbstractController
                 $components[] = Calendar::COMPONENT_NOTES;
             }
 
-            $calendarInstance->setPrincipalUri(Principal::PREFIX.$username);
             $calendarInstance->getCalendar()->setComponents(implode(',', $components));
 
             $entityManager = $this->get('doctrine')->getManager();
@@ -495,12 +495,13 @@ class AdminController extends AbstractController
         }
 
         $form = $this->createForm(AddressBookType::class, $addressbook, ['new' => !$id]);
+
+        $form->get('principalUri')->setData(Principal::PREFIX.$username);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->get('doctrine')->getManager();
-
-            $addressbook->setPrincipalUri(Principal::PREFIX.$username);
 
             $entityManager->persist($addressbook);
             $entityManager->flush();

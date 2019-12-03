@@ -3,11 +3,17 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="calendarinstances")
  * @ORM\Entity(repositoryClass="App\Repository\CalendarInstanceRepository")
+ * @UniqueEntity(
+ *     fields={"principalUri", "uri"},
+ *     errorPath="uri",
+ *     message="form.uri.unique"
+ * )
  */
 class CalendarInstance
 {

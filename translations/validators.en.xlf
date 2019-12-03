@@ -381,6 +381,10 @@
         <source>The CSRF token is invalid. Please try to resubmit the form.</source>
         <target>The CSRF token is invalid. Please try to resubmit the form.</target>
       </trans-unit>
+      <trans-unit id="9gDpv.9" resname="form.uri.unique">
+        <source>form.uri.unique</source>
+        <target>This URI is already used with this principal. Please choose another one.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
