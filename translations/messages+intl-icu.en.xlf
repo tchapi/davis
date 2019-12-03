@@ -149,9 +149,21 @@
         <source>calendars.edit</source>
         <target>Editing Calendar «{name}»</target>
       </trans-unit>
-      <trans-unit id="fboZZMC" resname="calendars.events">
-        <source>calendars.events</source>
-        <target>{count, plural, =0 {No event} one {One event} other {# events}}</target>
+      <trans-unit id="EiQLmZz" resname="calendars.entries">
+        <source>calendars.entries</source>
+        <target>{count, plural, =0 {No entry} one {One entry} other {# entries}}</target>
+      </trans-unit>
+      <trans-unit id="H7fee0c" resname="calendars.component.events">
+        <source>calendars.component.events</source>
+        <target>Events</target>
+      </trans-unit>
+      <trans-unit id="iCj9nDa" resname="calendars.component.todos">
+        <source>calendars.component.todos</source>
+        <target>Todos</target>
+      </trans-unit>
+      <trans-unit id="obdwi48" resname="calendars.component.notes">
+        <source>calendars.component.notes</source>
+        <target>Notes</target>
       </trans-unit>
       <trans-unit id="zjEaC2X" resname="users.edit">
         <source>users.edit</source>
