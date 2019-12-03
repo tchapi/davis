@@ -201,7 +201,7 @@ You can start the containers with :
 
 **⚠ Do not forget to create the database the first time you run the container** :
 
-    docker exec -it davis bash -c "APP_ENV=prod bin/console migrate --no-interaction"
+    docker exec -it davis bash -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
 
 Then, head up to `http://<YOUR_DOCKER_IP>` to see the status display :
 
