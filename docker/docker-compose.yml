@@ -5,7 +5,6 @@ services:
   nginx:
     image: nginx:1.17.5-alpine
     container_name: nginx
-    env_file: .env
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     depends_on:
       - davis
@@ -20,17 +19,34 @@ services:
   mysql:
     image: mariadb:10.4.10
     container_name: mysql
-    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
 
   davis:
     build:
       context: ./
       dockerfile: ./Dockerfile
       args:
-        version: "1.4.5"
-    image: davis:1.4.5
+        version: ${DAVIS_VERSION}
+    image: davis:${DAVIS_VERSION}
     container_name: davis
-    env_file: .env
+    environment:
+      - APP_ENV=prod
+      - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
+      - MAILER_URL=smtp://${MAIL_HOST}:${MAIL_PORT}?username=${MAIL_USERNAME}&password=${MAIL_PASSWORD}
+      - ADMIN_LOGIN=${ADMIN_LOGIN}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - AUTH_REALM=${AUTH_REALM}
+      - AUTH_METHOD=${AUTH_METHOD}
+      - CALDAV_ENABLED=${CALDAV_ENABLED}
+      - CARDDAV_ENABLED=${CARDDAV_ENABLED}
+      - WEBDAV_ENABLED=${WEBDAV_ENABLED}
+      - TMP_DIR=${TMP_DIR}
+      - PUBLIC_DIR=${PUBLIC_DIR}
+      - INVITE_FROM_ADDRESS=${INVITE_FROM_ADDRESS}
     depends_on:
       - mysql
     volumes:
