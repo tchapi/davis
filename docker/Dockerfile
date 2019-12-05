@@ -29,6 +29,8 @@ RUN cd /var/www/ && curl --silent -o ${version}.tar.gz -L https://github.com/tch
 
 WORKDIR /var/www/davis
 
+RUN rm -rf docker _screenshots
+
 # Install dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN APP_ENV=prod composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
