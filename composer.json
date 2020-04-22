@@ -6,7 +6,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "friendsofphp/php-cs-fixer": "^2.15",
-        "sabre/dav": "^4.0",
+        "sabre/dav": "^4.1",
         "sensio/framework-extra-bundle": "^5.5",
         "symfony/asset": "^5.0",
         "symfony/console": "^5.0",
