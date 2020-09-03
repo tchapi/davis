@@ -254,6 +254,24 @@ class DAVController extends AbstractController
         $output = ob_get_contents();
         ob_end_clean();
 
-        return new Response($output, http_response_code(), []);
+        // As previously said, headers are already _prepared_ by the server,
+        // so we can't modify them or remove them. But they are not _sent_ yet,
+        // so headers_sent() is false, and Symfony will add its own headers above it.
+        //
+        // The Content-type header is the problem, since Symfony will
+        // output `text/html` for everything since it doesn't know any better.
+        // Thus, we have to get the _real_ Content-type header already prepared,
+        // and force it in the Symfony Response.
+        //
+        // That's what we do here.
+        $response = new Response($output, http_response_code(), []);
+        foreach (headers_list() as $header) {
+            if ('content-type:' === strtolower(substr($header, 0, 13))) {
+                $headerArray = explode(':', $header);
+                $response->headers->set('Content-type', $headerArray[1]);
+            }
+        }
+
+        return $response;
     }
 }
