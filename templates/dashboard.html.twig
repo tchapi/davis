@@ -39,7 +39,7 @@
 
     <ul class="list-group">
       <li class="list-group-item list-group-item-primary">{{ "dashboard.version"|trans }} : <code>{{ version }}</code> (SabreDAV <code>{{ sabredav_version }}</code>)</li>
-      <li class="list-group-item list-group-item-secondary">{{ "dashboard.auth_realm"|trans }} : <code>{{ authRealm }}</code></li>
+      <li class="list-group-item list-group-item-secondary">{{ "dashboard.auth"|trans }} : <code>{{ authMethod }}</code> ({{ "dashboard.auth_realm"|trans }}: <code>{{ authRealm }}</code>)</li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.invite_from_address"|trans }} : <code>{{ invite_from_address|default('Not set') }}</code></li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone }}</code> <a class="small ml-2" target="_blank" href="https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone">{{ "dashboard.how_to_change_it"|trans }}</a></li>
 
