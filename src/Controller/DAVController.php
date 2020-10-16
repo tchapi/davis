@@ -230,7 +230,7 @@ class DAVController extends AbstractController
         if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
             $lockBackend = new \Sabre\DAV\Locks\Backend\File($this->tmpDir.'/locksdb');
             $this->server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
-            //$this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType()); // Waiting for https://github.com/sabre-io/dav/pull/1203
+            $this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());
             $this->server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->tmpDir));
         }
     }
