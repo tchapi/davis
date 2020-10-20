@@ -10,3 +10,4 @@ twig:
         cardDAVEnabled: '%env(bool:CARDDAV_ENABLED)%'
         webDAVEnabled: '%env(bool:WEBDAV_ENABLED)%'
         authRealm: '%env(AUTH_REALM)%'
+        authMethod: '%env(AUTH_METHOD)%'

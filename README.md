@@ -56,8 +56,10 @@ c. The auth Realm and method for HTTP auth
 
 ```
 AUTH_REALM=SabreDAV
-AUTH_METHOD=Digest # can be "Basic" or "Digest"
+AUTH_METHOD=Digest # can be "Basic", "Digest" or "IMAP"
 ```
+
+> In case you use the `IMAP` auth type, you must specify the auth url (the "mailbox" url) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
 
 d. The global flags to enable CalDAV, CardDAV and WebDAV
 
