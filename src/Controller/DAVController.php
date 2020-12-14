@@ -18,6 +18,7 @@ class DAVController extends AbstractController
 {
     const AUTH_DIGEST = 'Digest';
     const AUTH_BASIC = 'Basic';
+    const AUTH_IMAP = 'IMAP';
 
     /**
      * Is CalDAV enabled?
@@ -110,7 +111,14 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(\Swift_Mailer $mailer, TwigEnvironment $twig, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authMethod, ?string $authRealm, ?string $publicDir, ?string $tmpDir)
+    /**
+     * IMAP mailbox URL used for authentication.
+     *
+     * @var string
+     */
+    protected $IMAPAuthUrl;
+
+    public function __construct(\Swift_Mailer $mailer, TwigEnvironment $twig, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authMethod, ?string $authRealm, ?string $publicDir, ?string $tmpDir, ?string $IMAPAuthUrl)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -129,6 +137,8 @@ class DAVController extends AbstractController
         $this->baseUri = $router->generate('dav', ['path' => '']);
 
         $this->basicAuthBackend = $basicAuthBackend;
+
+        $this->IMAPAuthUrl = $IMAPAuthUrl;
 
         $this->initServer();
     }
@@ -151,6 +161,9 @@ class DAVController extends AbstractController
         switch ($this->authMethod) {
             case self::AUTH_DIGEST:
                 $authBackend = new \Sabre\DAV\Auth\Backend\PDO($pdo);
+                break;
+            case self::AUTH_IMAP:
+                $authBackend = new \Sabre\DAV\Auth\Backend\IMAP($this->IMAPAuthUrl);
                 break;
             case self::AUTH_BASIC:
             default:
@@ -230,7 +243,7 @@ class DAVController extends AbstractController
         if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
             $lockBackend = new \Sabre\DAV\Locks\Backend\File($this->tmpDir.'/locksdb');
             $this->server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
-            //$this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType()); // Waiting for https://github.com/sabre-io/dav/pull/1203
+            $this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());
             $this->server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->tmpDir));
         }
     }

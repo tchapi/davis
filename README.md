@@ -21,12 +21,12 @@ PHP > 7.3.0 (with `pdo_mysql` and `intl` extensions), MySQL (or MariaDB).
 composer install
 ```
 
-2. At least put the correct credentials to your database in your `.env.local` file so you can easily migrate your database.
+2. At least put the correct credentials to your database in your `.env.local` file so you can easily create your database.
 
-3. Migrate the database:
+3. Create the database:
 
 ```
-bin/console migrate
+bin/console doctrine:schema:create
 ```
 
 **Davis** can be used with a pre-existing MySQL database (_for instance, one previously managed by Baïkal_). The only missing table would be the `migrations` table, that you can recreate automatically when running the migrations.
@@ -39,7 +39,7 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 
 > If your installation is behind a web server like Apache or Nginx, you can setup the env vars directly in your Apache or Nginx configuration (see below). Skip this part in this case.
 
-a. The database url (_you should already have it configured since you migrated the database previously_)
+a. The database url (_you should already have it configured since you created the database previously_)
     
 ```
 DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name
@@ -56,8 +56,10 @@ c. The auth Realm and method for HTTP auth
 
 ```
 AUTH_REALM=SabreDAV
-AUTH_METHOD=Digest # can be "Basic" or "Digest"
+AUTH_METHOD=Digest # can be "Basic", "Digest" or "IMAP"
 ```
+
+> In case you use the `IMAP` auth type, you must specify the auth url (the "mailbox" url) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
 
 d. The global flags to enable CalDAV, CardDAV and WebDAV
 
@@ -81,6 +83,7 @@ f. The paths for the WebDAV installation
 TMP_DIR='/tmp'
 PUBLIC_DIR='/public'
 ```
+
 ## Migrating from Baïkal ?
 
 If you're migrating from Baïkal, then you will likely want to do the following :
@@ -89,9 +92,9 @@ If you're migrating from Baïkal, then you will likely want to do the following 
 
     `mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database`
 
-2. Create a new database for Davis (let's name it `davis`) and run the migrations :
+2. Create a new database for Davis (let's name it `davis`) and create the schema :
 
-    `bin/console doctrine:migrations:migrate`
+    `bin/console doctrine:schema:create`
 
 3. Reimport the data back:
 
@@ -201,7 +204,7 @@ You can start the containers with :
 
 **⚠ Do not forget to create the database the first time you run the container** :
 
-    docker exec -it davis bash -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
+    docker exec -it davis bash -c "APP_ENV=prod bin/console doctrine:schema:create --no-interaction"
 
 Then, head up to `http://<YOUR_DOCKER_IP>` to see the status display :
 

@@ -89,9 +89,13 @@
         <source>dashboard.version</source>
         <target>Version</target>
       </trans-unit>
+      <trans-unit id="zNewm0r" resname="dashboard.auth">
+        <source>dashboard.auth</source>
+        <target>Auth</target>
+      </trans-unit>
       <trans-unit id="q.9wpuM" resname="dashboard.auth_realm">
         <source>dashboard.auth_realm</source>
-        <target>Auth Realm</target>
+        <target>Realm</target>
       </trans-unit>
       <trans-unit id="w84LMcB" resname="dashboard.invite_from_address">
         <source>dashboard.invite_from_address</source>
