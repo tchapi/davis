@@ -43,18 +43,21 @@ class CalendarInstanceType extends AbstractType
             ->add('events', CheckboxType::class, [
                 'label' => 'form.events',
                 'mapped' => false,
+                'disabled' => $options['shared'],
                 'help' => 'form.events.help',
                 'required' => false,
             ])
             ->add('todos', CheckboxType::class, [
                 'label' => 'form.todos',
                 'mapped' => false,
+                'disabled' => $options['shared'],
                 'help' => 'form.todos.help',
                 'required' => false,
             ])
             ->add('notes', CheckboxType::class, [
                 'label' => 'form.notes',
                 'mapped' => false,
+                'disabled' => $options['shared'],
                 'help' => 'form.notes.help',
                 'required' => false,
             ])
@@ -67,6 +70,7 @@ class CalendarInstanceType extends AbstractType
     {
         $resolver->setDefaults([
             'new' => false,
+            'shared' => false,
             'data_class' => CalendarInstance::class,
         ]);
     }

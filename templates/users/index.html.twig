@@ -12,6 +12,7 @@
             <h5 class="mr-auto">{{ principal.displayName }} <a href="mailto:{{ principal.email }}">&lsaquo;{{ principal.email }}&rsaquo;</a></h5>
 
             <div class="mr-0 text-right d-lg-block d-none">
+                <a href="{{ path('delegates',{username: principal.username}) }}" class="btn btn-sm btn-outline-secondary mb-1">💁&nbsp;{{ "users.delegates"|trans }}</a>
                 <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-sm btn-outline-secondary mb-1">🗓&nbsp;{{ "users.calendars"|trans }}</a>
                 <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-sm btn-outline-secondary ml-1 mb-1">📖&nbsp;{{ "users.addressbooks"|trans }}</a>
                 <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-sm btn-outline-primary ml-1 mb-1">✎&nbsp;{{ "edit"|trans }}</a>
@@ -21,6 +22,7 @@
         <p class="mb-1">{{ "users.username"|trans }} : <code>{{ principal.username }}</code></p>
         <small>{{ "users.uri"|trans }} : <code>{{ principal.uri }}</code>{% if principal.isAdmin %} — <span class="badge badge-primary">{{ "users.administrator"|trans }}</span>{% endif %}</small>
         <div class="btn-group btn-group-sm mt-3 d-flex d-lg-none" role="group">
+            <a href="{{ path('delegates',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">💁&nbsp;</span>{{ "users.delegates"|trans }}</a>
             <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">🗓&nbsp;</span>{{ "users.calendars"|trans }}</a>
             <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">📖&nbsp;</span>{{ "users.addressbooks"|trans }}</a>
             <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-outline-primary flex-fill flex-shrink-1"><span class="d-none d-sm-inline">✎&nbsp;</span>{{ "edit"|trans }}</a>

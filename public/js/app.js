@@ -8,12 +8,13 @@ $(document).ready(function() {
     $('a.delete-modal').click(function() {
         // Grab real target url for deletion
         let targetUrl = $(this).attr('data-href');
+        let modalFlavour = $(this).attr('data-flavour');
 
         // Put it into the modal's OK button
-        $('#delete .target-url').attr('href', targetUrl);
+        $('#delete-' + modalFlavour + ' .target-url').attr('href', targetUrl);
 
         // Show the modal
-        $('#delete').modal('show');
+        $('#delete-' + modalFlavour).modal('show');
     })
 
     // Color swatch : update it live (not working in IE ¯\_(ツ)_/¯ but it's just a nice to have)

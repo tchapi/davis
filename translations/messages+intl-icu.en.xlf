@@ -189,6 +189,10 @@
         <source>calendars.for</source>
         <target>Calendars for {who}</target>
       </trans-unit>
+      <trans-unit id="7_6nDkX" resname="calendars.shared.with">
+        <source>calendars.shared.with</source>
+        <target>Calendars shared with {who}</target>
+      </trans-unit>
       <trans-unit id="bJtU2u_" resname="users.username">
         <source>users.username</source>
         <target>Username</target>
@@ -240,6 +244,10 @@
       <trans-unit id="wEU.noE" resname="calendar.deleted">
         <source>calendar.deleted</source>
         <target>Calendar deleted successfully</target>
+      </trans-unit>
+      <trans-unit id="fxgFe6c" resname="calendar.revoked">
+        <source>calendar.revoked</source>
+        <target>Calendar revoked successfully</target>
       </trans-unit>
       <trans-unit id="Iq2tnfk" resname="addressbooks.saved">
         <source>addressbooks.saved</source>
@@ -369,6 +377,14 @@
         <source>calendars.modal.text</source>
         <target>Are you sure you want to delete this calendar ? All the events, todos and notes in it will be deleted too.</target>
       </trans-unit>
+      <trans-unit id="0YNDPzI" resname="revoke.modal.title">
+        <source>revoke.modal.title</source>
+        <target>Revoke access to this calendar ?</target>
+      </trans-unit>
+      <trans-unit id="X7G6rbZ" resname="revoke.modal.text">
+        <source>revoke.modal.text</source>
+        <target>Are you sure you want to revoke access to this calendar ? The user will lose access to all events, todos and notes. The original calendar will not be deleted.</target>
+      </trans-unit>
       <trans-unit id="uqnapzJ" resname="users.modal.title">
         <source>users.modal.title</source>
         <target>Delete this User ?</target>
@@ -424,6 +440,10 @@
       <trans-unit id="flYIq2E" resname="remove">
         <source>remove</source>
         <target>Remove</target>
+      </trans-unit>
+      <trans-unit id="d3rE6gp" resname="revoke">
+        <source>revoke</source>
+        <target>Revoke</target>
       </trans-unit>
       <trans-unit id="fWFSd1u" resname="calendars.delegates.add">
         <source>calendars.delegates.add</source>

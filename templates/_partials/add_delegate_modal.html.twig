@@ -27,7 +27,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ "cancel"|trans }}</button>
-        <a data-href="{{ path('calendar_delegate_add', {id: calendar.id}) }}" href="#" class="btn btn-primary add-delegate">{{ "add"|trans }}</a>
+        <a data-href="{{ path('user_delegate_add', {username: principal.username}) }}" href="#" class="btn btn-primary add-delegate">{{ "add"|trans }}</a>
       </div>
     </div>
   </div>

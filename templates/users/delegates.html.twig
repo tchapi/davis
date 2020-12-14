@@ -3,16 +3,16 @@
 
 {% block body %}
 
-<a href="{{ path('calendars', {username: principal.username}) }}" class="btn btn-link">« {{ "calendars.back"|trans({'user': principal.displayName}) }}</a>
+<a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
 
-<h1 class="display-4 font-weight-lighter d-flex justify-content-between">{{ "calendars.delegates.for"|trans({'what': calendar.displayName}) }}{% if delegation %} <a href="#" data-toggle="modal" data-target="#add_delegate" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.delegates.add"|trans }}</a>{% endif %}</h1>
+<h1 class="display-4 font-weight-lighter d-flex justify-content-between">{{ "calendars.delegates.for"|trans({'what': principal.displayName}) }}{% if delegation %} <a href="#" data-toggle="modal" data-target="#add_delegate" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.delegates.add"|trans }}</a>{% endif %}</h1>
 
 <div class="list-group">
 
 {% if delegation %}
     <div class="alert alert-success d-flex justify-content-between mb-4 mt-2" role="alert">
       <div>{{ "delegates.enabled.text"|trans }}<br><small>{{ "delegates.disable.warning"|trans }}</small></div>
-      <a href="{{ path('calendar_delegation_toggle', {id: calendar.id, toggle: 'off'})}}" class="btn btn-sm my-auto btn-outline-danger">{{ "delegates.disable"|trans }}</a>
+      <a href="{{ path('user_delegation_toggle', {username: principal.username, toggle: 'off'})}}" class="btn btn-sm my-auto btn-outline-danger">{{ "delegates.disable"|trans }}</a>
     </div>
     {% for delegate in principalProxyRead.delegees %}
         {% include '_partials/delegate_row.html.twig' with {has_write: false} %}
@@ -23,7 +23,7 @@
 
 {% else %}
     <div class="alert alert-warning d-flex justify-content-between mb-4 mt-2" role="alert">
-      {{ "delegates.disabled.text"|trans }}<a href="{{ path('calendar_delegation_toggle', {id: calendar.id, toggle: 'on'})}}" class="btn btn-sm my-auto btn-warning">{{ "delegates.enable"|trans }}</a>
+      {{ "delegates.disabled.text"|trans }}<a href="{{ path('user_delegation_toggle', {username: principal.username, toggle: 'on'})}}" class="btn btn-sm my-auto btn-warning">{{ "delegates.enable"|trans }}</a>
     </div>
 {% endif %}
 
