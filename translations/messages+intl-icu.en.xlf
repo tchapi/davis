@@ -469,6 +469,10 @@
         <source>delegates.write</source>
         <target>has write access</target>
       </trans-unit>
+      <trans-unit id="zAE1QhB" resname="delegates.readonly">
+        <source>delegates.readonly</source>
+        <target>has readonly access</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
