@@ -16,6 +16,7 @@ use App\Form\CalendarInstanceType;
 use App\Form\UserType;
 use App\Services\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -334,18 +335,23 @@ class AdminController extends AbstractController
         // Separate shared calendars
         $calendars = [];
         $shared = [];
-        foreach($allCalendars as $calendar) {
-            if ($calendar->getAccess() === CalendarInstance::ACCESS_OWNER){
+        foreach ($allCalendars as $calendar) {
+            if (CalendarInstance::ACCESS_OWNER === $calendar->getAccess()) {
                 $calendars[] = $calendar;
             } else {
                 $shared[] = $calendar;
             }
         }
+
+        // We need all the other users so we can propose to share calendars with them
+        $allPrincipalsExcept = $this->get('doctrine')->getRepository(Principal::class)->findAllExceptPrincipal(Principal::PREFIX.$username);
+
         return $this->render('calendars/index.html.twig', [
             'calendars' => $calendars,
             'shared' => $shared,
             'principal' => $principal,
             'username' => $username,
+            'allPrincipals' => $allPrincipalsExcept,
         ]);
     }
 
@@ -374,7 +380,7 @@ class AdminController extends AbstractController
 
         $form = $this->createForm(CalendarInstanceType::class, $calendarInstance, [
             'new' => !$id,
-            'shared' => $calendarInstance->getAccess() !== CalendarInstance::ACCESS_OWNER
+            'shared' => CalendarInstance::ACCESS_OWNER !== $calendarInstance->getAccess(),
         ]);
 
         $components = explode(',', $calendarInstance->getCalendar()->getComponents());
@@ -416,6 +422,71 @@ class AdminController extends AbstractController
             'username' => $username,
             'calendar' => $calendarInstance,
         ]);
+    }
+
+    /**
+     * @Route("/calendars/{username}/shares/{calendarid}", name="calendar_shares", requirements={"calendarid":"\d+"})
+     */
+    public function calendarShares(string $username, string $calendarid, TranslatorInterface $trans)
+    {
+        $instances = $this->get('doctrine')->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarid);
+
+        $response = [];
+        foreach ($instances as $instance) {
+            $response[] = [
+                'principalUri' => stream_get_contents($instance[0]['principalUri']),
+                'displayName' => $instance['displayName'],
+                'email' => stream_get_contents($instance['email']),
+                'accessText' => $trans->trans('calendar.share_access.'.$instance[0]['access']),
+                'isWriteAccess' => CalendarInstance::ACCESS_READWRITE === $instance[0]['access'],
+            ];
+        }
+
+        return new JsonResponse($response);
+    }
+
+    /**
+     * @Route("/calendars/{username}/share/{instanceid}", name="calendar_share_add", requirements={"instanceid":"\d+"})
+     */
+    public function calendarShareAdd(Request $request, string $username, string $instanceid, TranslatorInterface $trans)
+    {
+        $instance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($instanceid);
+        if (!$instance) {
+            throw $this->createNotFoundException('Calendar not found');
+        }
+
+        $newShareeToAdd = $this->get('doctrine')->getRepository(Principal::class)->findOneById($request->get('principalId'));
+        if (!$newShareeToAdd) {
+            throw $this->createNotFoundException('Member not found');
+        }
+
+        // Let's check that there wasn't another instance
+        // already existing first, so we can update it:
+        $existingSharedInstance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
+
+        $writeAccess = ('true' === $request->get('write') ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
+
+        $entityManager = $this->get('doctrine')->getManager();
+
+        if ($existingSharedInstance) {
+            $existingSharedInstance->setAccess($writeAccess);
+        } else {
+            $sharedInstance = new CalendarInstance();
+            $sharedInstance->setTransparent(1)
+                     ->setCalendar($instance->getCalendar())
+                     ->setShareHref('mailto:'.$newShareeToAdd->getEmail())
+                     ->setDescription($instance->getDescription())
+                     ->setDisplayName($instance->getDisplayName())
+                     ->setUri(\Sabre\DAV\UUIDUtil::getUUID())
+                     ->setPrincipalUri($newShareeToAdd->getUri())
+                     ->setAccess($writeAccess);
+            $entityManager->persist($sharedInstance);
+        }
+
+        $entityManager->flush();
+        $this->addFlash('success', $trans->trans('calendar.shared'));
+
+        return $this->redirectToRoute('calendars', ['username' => $username]);
     }
 
     /**

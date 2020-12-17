@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CalendarInstance;
+use App\Entity\Principal;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,32 +20,35 @@ class CalendarInstanceRepository extends ServiceEntityRepository
         parent::__construct($registry, CalendarInstance::class);
     }
 
-    // /**
-    //  * @return CalendarInstance[] Returns an array of CalendarInstance objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return CalendarInstance[] Returns an array of CalendarInstance objects
+     */
+    public function findSharedInstancesOfInstance(int $calendarId)
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
+            ->leftJoin(Principal::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.principalUri = p.uri')
+            ->addSelect('p.displayName', 'p.email')
+            ->where('c.calendar = :id')
+            ->setParameter('id', $calendarId)
+            ->andWhere('c.access != :ownerAccess')
+            ->setParameter('ownerAccess', CalendarInstance::ACCESS_OWNER)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getArrayResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?CalendarInstance
+    /**
+     * @return CalendarInstance Returns a CalendarInstance object
+     */
+    public function findSharedInstanceOfInstanceFor(int $calendarId, string $principalUri)
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
+            ->where('c.calendar = :id')
+            ->setParameter('id', $calendarId)
+            ->andWhere('c.access != :ownerAccess')
+            ->setParameter('ownerAccess', CalendarInstance::ACCESS_OWNER)
+            ->andWhere('c.principalUri = :principalUri')
+            ->setParameter('principalUri', $principalUri)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
-    */
 }
