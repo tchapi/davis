@@ -439,6 +439,7 @@ class AdminController extends AbstractController
                 'email' => stream_get_contents($instance['email']),
                 'accessText' => $trans->trans('calendar.share_access.'.$instance[0]['access']),
                 'isWriteAccess' => CalendarInstance::ACCESS_READWRITE === $instance[0]['access'],
+                'revokeUrl' => $this->generateUrl('calendar_revoke', ['username' => $username, 'id' => $instance[0]['id']]),
             ];
         }
 

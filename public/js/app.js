@@ -38,7 +38,7 @@ $(document).ready(function() {
                     const newShare = $($('#template-share').html())
                     newShare.find('span.name').text(element.displayName)
                     newShare.find('span.badge').text(element.accessText)
-                    console.log(element.isWriteAccess)
+                    newShare.find('a.revoke').attr('href', element.revokeUrl)
                     if (element.isWriteAccess) {
                         newShare.find('span.badge').addClass('badge-success').removeClass('badge-info')
                     }
