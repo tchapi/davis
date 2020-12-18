@@ -189,6 +189,10 @@
         <source>calendars.for</source>
         <target>Calendars for {who}</target>
       </trans-unit>
+      <trans-unit id="7_6nDkX" resname="calendars.shared.with">
+        <source>calendars.shared.with</source>
+        <target>Calendars shared with {who}</target>
+      </trans-unit>
       <trans-unit id="bJtU2u_" resname="users.username">
         <source>users.username</source>
         <target>Username</target>
@@ -240,6 +244,22 @@
       <trans-unit id="wEU.noE" resname="calendar.deleted">
         <source>calendar.deleted</source>
         <target>Calendar deleted successfully</target>
+      </trans-unit>
+      <trans-unit id="qCIo2jM" resname="calendar.shared">
+        <source>calendar.shared</source>
+        <target>Calendar shares modified successfully</target>
+      </trans-unit>
+      <trans-unit id="fxgFe6c" resname="calendar.revoked">
+        <source>calendar.revoked</source>
+        <target>Calendar revoked successfully</target>
+      </trans-unit>
+      <trans-unit id="grS2E58" resname="calendars.delegates.member.add">
+        <source>calendars.delegates.member.add</source>
+        <target>Share this calendar with another user:</target>
+      </trans-unit>
+      <trans-unit id="B95edtg" resname="calendars.delegates.member.help">
+        <source>calendars.delegates.member.help</source>
+        <target>Adding a user who already has a shared access to this calendar will only affect its access right</target>
       </trans-unit>
       <trans-unit id="Iq2tnfk" resname="addressbooks.saved">
         <source>addressbooks.saved</source>
@@ -369,6 +389,14 @@
         <source>calendars.modal.text</source>
         <target>Are you sure you want to delete this calendar ? All the events, todos and notes in it will be deleted too.</target>
       </trans-unit>
+      <trans-unit id="0YNDPzI" resname="revoke.modal.title">
+        <source>revoke.modal.title</source>
+        <target>Revoke access to this calendar ?</target>
+      </trans-unit>
+      <trans-unit id="X7G6rbZ" resname="revoke.modal.text">
+        <source>revoke.modal.text</source>
+        <target>Are you sure you want to revoke access to this calendar ? The user will lose access to all events, todos and notes. The original calendar will not be deleted.</target>
+      </trans-unit>
       <trans-unit id="uqnapzJ" resname="users.modal.title">
         <source>users.modal.title</source>
         <target>Delete this User ?</target>
@@ -383,7 +411,11 @@
       </trans-unit>
       <trans-unit id="QhzQj3K" resname="delegates.modal.text">
         <source>delegates.modal.text</source>
-        <target>Are you sure you want to remove this delegate ? This user will no longer have access to the calendars.</target>
+        <target>Are you sure you want to remove this delegate ? This user will no longer have access to the calendars, contacts, etc.</target>
+      </trans-unit>
+      <trans-unit id="bsFHDY4" resname="delegates.member.help">
+        <source>delegates.member.help</source>
+        <target>Adding a user who already is a delegate will only affect its access right</target>
       </trans-unit>
       <trans-unit id="I3TZF5S" resname="cancel">
         <source>cancel</source>
@@ -425,6 +457,14 @@
         <source>remove</source>
         <target>Remove</target>
       </trans-unit>
+      <trans-unit id="d3rE6gp" resname="revoke">
+        <source>revoke</source>
+        <target>Revoke</target>
+      </trans-unit>
+      <trans-unit id="efo4jbl" resname="sharing">
+        <source>sharing</source>
+        <target>Sharing</target>
+      </trans-unit>
       <trans-unit id="fWFSd1u" resname="calendars.delegates.add">
         <source>calendars.delegates.add</source>
         <target>Add a delegate</target>
@@ -436,6 +476,14 @@
       <trans-unit id="X7nEzAm" resname="calendars.delegates.new">
         <source>calendars.delegates.new</source>
         <target>New delegate</target>
+      </trans-unit>
+      <trans-unit id="MLydEYK" resname="calendars.delegates.existing">
+        <source>calendars.delegates.existing</source>
+        <target>This calendar is shared with:</target>
+      </trans-unit>
+      <trans-unit id="BROOTDT" resname="calendars.delegates.none">
+        <source>calendars.delegates.none</source>
+        <target>none</target>
       </trans-unit>
       <trans-unit id="wPVq0sd" resname="calendars.delegates.member">
         <source>calendars.delegates.member</source>
@@ -476,6 +524,14 @@
       <trans-unit id="zAE1QhB" resname="delegates.readonly">
         <source>delegates.readonly</source>
         <target>has readonly access</target>
+      </trans-unit>
+      <trans-unit id="pnQau7c" resname="calendar.share_access.2">
+        <source>calendar.share_access.2</source>
+        <target>readonly</target>
+      </trans-unit>
+      <trans-unit id="BuDoAdU" resname="calendar.share_access.3">
+        <source>calendar.share_access.3</source>
+        <target>read / write</target>
       </trans-unit>
     </body>
   </file>

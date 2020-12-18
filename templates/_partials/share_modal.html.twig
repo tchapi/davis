@@ -1,4 +1,4 @@
-<div class="modal fade" id="add_delegate" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="share" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -8,15 +8,28 @@
         </button>
       </div>
       <div class="modal-body">
-        <form>
+        <h4>{{ "calendars.delegates.existing"|trans }}</h4>
+        <template id="template-share">
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <span class="name"></span>
+                    <span class="badge badge-info badge-pill ml-2"></span>
+                </div>
+                <a href="#" class="btn btn-sm btn-danger revoke">{{ "revoke"|trans }}</a>
+            </div>
+        </template>
+        <span class="d-none none"><em>{{ "calendars.delegates.none"|trans }}</em></span>
+        <ul class="list-group" id="shares">
+        </ul>
+        <form class="mt-2">
           <div class="form-group">
-            <label for="member" class="col-form-label">{{ "calendars.delegates.member"|trans }}</label>
+            <label for="member" class="col-form-label">{{ "calendars.delegates.member.add"|trans }}</label>
             <select class="form-control" id="member">
               {% for principal in principals %}
                 <option value="{{ principal.id}}">{{ principal.displayName }} ({{ principal.email }})</option>
               {% endfor %}
             </select>
-            <small class="form-text text-muted">{{ "delegates.member.help"|trans }}</small>
+            <small class="form-text text-muted">{{ "calendars.delegates.member.help"|trans }}</small>
           </div>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" value="" id="write">
@@ -28,7 +41,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ "cancel"|trans }}</button>
-        <a data-href="{{ path('user_delegate_add', {username: principal.username}) }}" href="#" class="btn btn-primary add-delegate">{{ "add"|trans }}</a>
+        <a href="#" class="btn btn-primary add-sharee">{{ "add"|trans }}</a>
       </div>
     </div>
   </div>
