@@ -118,7 +118,7 @@ class DAVController extends AbstractController
      */
     protected $IMAPAuthUrl;
 
-    public function __construct(\Swift_Mailer $mailer, TwigEnvironment $twig, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress, ?string $authMethod, ?string $authRealm, ?string $publicDir, ?string $tmpDir, ?string $IMAPAuthUrl)
+    public function __construct(\Swift_Mailer $mailer, TwigEnvironment $twig, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $IMAPAuthUrl = null)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
