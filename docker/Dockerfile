@@ -31,7 +31,7 @@ WORKDIR /var/www/davis
 
 RUN rm -rf docker _screenshots
 
-# Install Composer2, then dependencies
+# Install Composer 2, then dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.0.12
 RUN APP_ENV=prod composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
 
