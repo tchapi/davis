@@ -19,7 +19,7 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-source delete
 
 # Set timezone correctly
-COPY configurations/timezone.ini /usr/local/etc/php/conf.d/timezone.ini
+RUN echo 'date.timezone = "Europe/Paris"' > /usr/local/etc/php/conf.d/timezone.ini
 
 # Davis installation
 RUN cd /var/www/ && curl --silent -o ${version}.tar.gz -L https://github.com/tchapi/davis/archive/v${version}.tar.gz \
