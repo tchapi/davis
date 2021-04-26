@@ -9,7 +9,8 @@ A simple, fully translatable admin interface and frontend for `sabre/dav` based 
 
 # Requirements
 
-PHP > 7.3.0 (with `pdo_mysql` and `intl` extensions), MySQL (or MariaDB).
+  - PHP > 7.3.0 (with `pdo_mysql` and `intl` extensions), MySQL (or MariaDB).
+  - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
 
 # Installation
 
