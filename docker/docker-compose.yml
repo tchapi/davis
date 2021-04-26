@@ -27,11 +27,9 @@ services:
 
   davis:
     build:
-      context: ./
-      dockerfile: ./Dockerfile
-      args:
-        version: ${DAVIS_VERSION}
-    image: davis:${DAVIS_VERSION}
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: davis:latest
     container_name: davis
     environment:
       - APP_ENV=prod

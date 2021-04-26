@@ -1,0 +1,10 @@
+_screenshots
+README.md
+LICENSE
+.git
+.gitignore
+phpunit.xml.dist
+.php_cs
+.dockerignore
+var/cache/*
+var/log/*

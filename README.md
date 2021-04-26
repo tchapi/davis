@@ -193,11 +193,17 @@ If you use Nginx, you can add this to your configuration:
 
 # Dockerized installation
 
-A `Dockerfile` is available for you to compile the container.
+A `Dockerfile` is available for you to compile the image.
 
-We use `ssmtp` as a delivery service for a configured mailhost instead of using local delivery (_that should work out of the box_). You can ignore this or remove it from the Dockerfile if you want.
+To build the checked out version, just run:
 
-A `docker-compose.yml` file is also included as a minimal example setup with a MariaDB database and Nginx as a reverse proxy.
+    docker build --pull --file docker/Dockerfile --tag davis:latest .
+
+This will build a `davis:latest` image that you can directly use. Do not forget to pass sensible environment variables to the container since the _dist_ `.env` file will take precedence if no `.env.local` or environment variable is found.
+
+## Full stack
+
+A `docker-compose.yml` file is also included (in the `docker` folder) as a minimal example setup with a MariaDB database and Nginx as a reverse proxy.
 
 You can start the containers with :
 
@@ -211,7 +217,7 @@ Then, head up to `http://<YOUR_DOCKER_IP>` to see the status display :
 
 ![Status page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/status.png)
 
-> Note that there is no user, no principals, etc created by default.
+> Note that there is no user and no principals created by default.
 
 # Development
 
