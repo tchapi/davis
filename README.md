@@ -1,6 +1,8 @@
 Davis
 ---
 
+[![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/tchapi/davis/actions/workflows/main.yml)
+
 A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), largely inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
 ![Dashboard page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/dashboard.png)
