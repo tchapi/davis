@@ -203,6 +203,8 @@ To build the checked out version, just run:
 
 This will build a `davis:latest` image that you can directly use. Do not forget to pass sensible environment variables to the container since the _dist_ `.env` file will take precedence if no `.env.local` or environment variable is found.
 
+> You can also use the release image created on the Github container registry: ghcr.io/tchapi/davis:edge
+
 ## Full stack
 
 A `docker-compose.yml` file is also included (in the `docker` folder) as a minimal example setup with a MariaDB database and Nginx as a reverse proxy.
