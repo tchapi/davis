@@ -5,6 +5,7 @@ doctrine:
         # use sqlite for SQLite
         driver: 'mysql'
         server_version: '5.7'
+        override_url: true
 
         # only needed for MySQL
         charset: utf8mb4

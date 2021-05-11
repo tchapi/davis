@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   nginx:
-    image: nginx:1.17.5-alpine
+    image: nginx:1.20.0-alpine
     container_name: nginx
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     depends_on:
@@ -17,7 +17,7 @@ services:
       - 80:80
 
   mysql:
-    image: mariadb:10.4.10
+    image: mariadb:10.4.18
     container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -27,11 +27,9 @@ services:
 
   davis:
     build:
-      context: ./
-      dockerfile: ./Dockerfile
-      args:
-        version: ${DAVIS_VERSION}
-    image: davis:${DAVIS_VERSION}
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: davis:latest
     container_name: davis
     environment:
       - APP_ENV=prod
