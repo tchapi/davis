@@ -9,10 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Prepare
+        name: Prepare tags
         id: prepare_tags
         run: |
           DOCKER_IMAGE=tchapi/davis
