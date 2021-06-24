@@ -14,14 +14,14 @@
             <h5 class="mb-1 mr-auto">{{ addressbook.displayName }}</h5>
             <div class="mr-0 text-right d-md-block d-none">
                 <a href="{{ path('addressbook_edit',{username: username, id: addressbook.id})}}" class="btn btn-sm btn-outline-primary ml-1">✎ {{ "edit"|trans }}</a>
-                <a data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" href="#" class="btn btn-sm btn-outline-danger ml-1 delete-modal">⚠ {{ "delete"|trans }}</a>
+                <a data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" href="#" class="btn btn-sm btn-outline-danger ml-1 delete-modal" data-flavour="addressbooks">⚠ {{ "delete"|trans }}</a>
             </div>
         </div>
         <p class="mb-1">{{ addressbook.description }}</p>
         <small>{{ "addressbooks.uri"|trans }} : <code>{{ addressbook.uri }}</code> — {{ "addressbooks.contacts"|trans({'%count%': addressbook.cards|length}) }}</small>
         <div class="btn-group btn-group-sm mt-3 d-flex d-md-none" role="group">
             <a href="{{ path('addressbook_edit',{username: username, id: addressbook.id})}}" class="btn btn-sm btn-outline-primary">✎ {{ "edit"|trans }}</a>
-            <a data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" href="#" class="btn btn-sm btn-outline-danger delete-modal">⚠ {{ "delete"|trans }}</a>
+            <a data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" href="#" class="btn btn-sm btn-outline-danger delete-modal" data-flavour="addressbooks">⚠ {{ "delete"|trans }}</a>
         </div>
     </div>
 {% endfor %}

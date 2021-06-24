@@ -16,7 +16,7 @@
                 <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-sm btn-outline-secondary mb-1">🗓&nbsp;{{ "users.calendars"|trans }}</a>
                 <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-sm btn-outline-secondary ml-1 mb-1">📖&nbsp;{{ "users.addressbooks"|trans }}</a>
                 <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-sm btn-outline-primary ml-1 mb-1">✎&nbsp;{{ "edit"|trans }}</a>
-                <a href="#" data-href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-sm btn-outline-danger ml-1 mb-1 delete-modal">⚠&nbsp;{{ "delete"|trans }}</a>
+                <a href="#" data-href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-sm btn-outline-danger ml-1 mb-1 delete-modal" data-flavour="users">⚠&nbsp;{{ "delete"|trans }}</a>
             </div>
         </div>
         <p class="mb-1">{{ "users.username"|trans }} : <code>{{ principal.username }}</code></p>
@@ -26,7 +26,7 @@
             <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">🗓&nbsp;</span>{{ "users.calendars"|trans }}</a>
             <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">📖&nbsp;</span>{{ "users.addressbooks"|trans }}</a>
             <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-outline-primary flex-fill flex-shrink-1"><span class="d-none d-sm-inline">✎&nbsp;</span>{{ "edit"|trans }}</a>
-            <a href="#" data-href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-outline-danger flex-fill flex-shrink-1 delete-modal"><span class="d-none d-sm-inline">⚠&nbsp;</span>{{ "delete"|trans }}</a>
+            <a href="#" data-href="{{ path('user_delete',{username: principal.username})}}" class="btn btn-outline-danger flex-fill flex-shrink-1 delete-modal" data-flavour="users"><span class="d-none d-sm-inline">⚠&nbsp;</span>{{ "delete"|trans }}</a>
         </div>
     </div>
 {% else %}
