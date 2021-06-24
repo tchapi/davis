@@ -22,3 +22,5 @@ security:
         - { path: ^/dav, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/dashboard, roles: ROLE_ADMIN }
         - { path: ^/users, roles: ROLE_ADMIN }
+        - { path: ^/calendars, roles: ROLE_ADMIN }
+        - { path: ^/adressbooks, roles: ROLE_ADMIN }
