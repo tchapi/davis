@@ -10,8 +10,7 @@ framework:
         handler_id: null
         cookie_secure: auto
         cookie_samesite: lax
+        name: 'DAVIS_SESSION'
 
-    #esi: true
-    #fragments: true
     php_errors:
         log: true
