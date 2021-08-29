@@ -45,6 +45,7 @@ services:
       - TMP_DIR=${TMP_DIR}
       - PUBLIC_DIR=${PUBLIC_DIR}
       - INVITE_FROM_ADDRESS=${INVITE_FROM_ADDRESS}
+      - MAPBOX_API_KEY=${MAPBOX_API_KEY}
     depends_on:
       - mysql
     volumes:
