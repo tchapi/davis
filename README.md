@@ -87,6 +87,12 @@ TMP_DIR='/tmp'
 PUBLIC_DIR='/public'
 ```
 
+g. The Mapbox API key so invitation emails display a nice little static map when the event has geolocation data in it
+
+```
+MAPBOX_API_KEY=pk.XXXXXXXX
+```
+
 ## Migrating from Baïkal ?
 
 If you're migrating from Baïkal, then you will likely want to do the following :
