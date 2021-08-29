@@ -118,7 +118,7 @@ class DAVController extends AbstractController
      */
     protected $IMAPAuthUrl;
 
-    public function __construct(\Swift_Mailer $mailer, TwigEnvironment $twig, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $IMAPAuthUrl = null)
+    public function __construct(\Swift_Mailer $mailer, TwigEnvironment $twig, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $IMAPAuthUrl = null, ?string $mapboxApiKey = null)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -139,6 +139,8 @@ class DAVController extends AbstractController
         $this->basicAuthBackend = $basicAuthBackend;
 
         $this->IMAPAuthUrl = $IMAPAuthUrl;
+
+        $this->mapboxApiKey = $mapboxApiKey;
 
         $this->initServer();
     }
@@ -229,7 +231,7 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             if ($this->inviteAddress) {
-                $this->server->addPlugin(new DavisIMipPlugin($this->twig, $this->mailer, $this->inviteAddress));
+                $this->server->addPlugin(new DavisIMipPlugin($this->twig, $this->mailer, $this->inviteAddress, $this->mapboxApiKey));
             }
         }
 

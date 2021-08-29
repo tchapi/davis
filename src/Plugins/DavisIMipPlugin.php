@@ -28,6 +28,8 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
      */
     protected $mailer;
 
+    private $mapboxApiKey;
+
     /**
      * Creates the email handler.
      *
@@ -35,12 +37,15 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
      *                             in the 'From:' address. This should
      *                             generally be some kind of no-reply email
      *                             address you own.
+     * @param string $mapboxApiKey. The key to display the Mapbox static tile
+     *                              in the invitation email.
      */
-    public function __construct(TwigEnvironment $twig, \Swift_Mailer $mailer, $senderEmail)
+    public function __construct(TwigEnvironment $twig, \Swift_Mailer $mailer, $senderEmail, ?string $mapboxApiKey = null)
     {
         $this->twig = $twig;
         $this->mailer = $mailer;
         $this->senderEmail = $senderEmail;
+        $this->mapboxApiKey = $mapboxApiKey;
     }
 
     /**
@@ -171,23 +176,25 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $coordinates
             );
             if (0 !== $match) {
-                $zoom = 16;
-                $width = 500;
-                $height = 220;
-                $locationImage = \Swift_Image::fromPath(
-                        'https://api.mapbox.com/styles/v1'.
-                        '/mapbox/streets-v11/static'.
-                        '/pin-m-star+285A98'.
-                        '('.$coordinates['longitude'].
-                        ','.$coordinates['latitude'].
-                        ')'.
-                        '/'.$coordinates['longitude'].
-                        ','.$coordinates['latitude'].
-                        ','.$zoom.
-                        '/'.$width.'x'.$height.
-                        '?access_token=pk.eyJ1IjoibWFyYzIwMjEiLCJhIjoiY2tzdGFycDJrMDdnajJwczIydGxsZmc3biJ9.HlOfGQSk1TEsODq3gY-q_w')
-                ->setFilename('event_map.png')
-                ->setContentType('image/png');
+                if ($this->mapboxApiKey) {
+                    $zoom = 16;
+                    $width = 500;
+                    $height = 220;
+                    $locationImage = \Swift_Image::fromPath(
+                            'https://api.mapbox.com/styles/v1'.
+                            '/mapbox/streets-v11/static'.
+                            '/pin-m-star+285A98'.
+                            '('.$coordinates['longitude'].
+                            ','.$coordinates['latitude'].
+                            ')'.
+                            '/'.$coordinates['longitude'].
+                            ','.$coordinates['latitude'].
+                            ','.$zoom.
+                            '/'.$width.'x'.$height.
+                            '?access_token='.$this->mapboxApiKey)
+                    ->setFilename('event_map.png')
+                    ->setContentType('image/png');
+                }
                 $locationLink =
                     'http://www.openstreetmap.org'.
                     '/?mlat='.$coordinates['latitude'].

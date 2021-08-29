@@ -38,6 +38,7 @@ services:
             $publicDir: "%env(PUBLIC_DIR)%"
             $tmpDir: "%env(TMP_DIR)%"
             $IMAPAuthUrl: "%env(IMAP_AUTH_URL)%"
+            $mapboxApiKey: "%env(MAPBOX_API_KEY)%"
 
     App\Security\LoginFormAuthenticator:
         arguments:
