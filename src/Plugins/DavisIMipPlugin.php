@@ -28,9 +28,9 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
      */
     protected $mailer;
 
-    private $senderEmail;
+    protected $senderEmail;
 
-    private $mapboxApiKey;
+    protected $mapboxApiKey;
 
     /**
      * Creates the email handler.
