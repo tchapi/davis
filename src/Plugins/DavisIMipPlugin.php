@@ -28,19 +28,21 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
      */
     protected $mailer;
 
+    private $senderEmail;
+
     private $mapboxApiKey;
 
     /**
      * Creates the email handler.
      *
-     * @param string $senderEmail. The 'senderEmail' is the email that shows up
-     *                             in the 'From:' address. This should
-     *                             generally be some kind of no-reply email
-     *                             address you own.
+     * @param string $senderEmail.  The 'senderEmail' is the email that shows up
+     *                              in the 'From:' address. This should
+     *                              generally be some kind of no-reply email
+     *                              address you own.
      * @param string $mapboxApiKey. The key to display the Mapbox static tile
      *                              in the invitation email.
      */
-    public function __construct(TwigEnvironment $twig, \Swift_Mailer $mailer, $senderEmail, ?string $mapboxApiKey = null)
+    public function __construct(TwigEnvironment $twig, \Swift_Mailer $mailer, string $senderEmail, ?string $mapboxApiKey = null)
     {
         $this->twig = $twig;
         $this->mailer = $mailer;
