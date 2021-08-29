@@ -175,8 +175,8 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $width = 500;
                 $height = 220;
                 $locationImage = \Swift_Image::fromPath(
-                        'http://api.tiles.mapbox.com/v4'.
-                        '/mapbox.streets'.
+                        'https://api.mapbox.com/styles/v1'.
+                        '/mapbox/streets-v11/static'.
                         '/pin-m-star+285A98'.
                         '('.$coordinates['longitude'].
                         ','.$coordinates['latitude'].
@@ -184,8 +184,8 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
                         '/'.$coordinates['longitude'].
                         ','.$coordinates['latitude'].
                         ','.$zoom.
-                        '/'.$width.'x'.$height.'.png'.
-                        '?access_token=pk.eyJ1IjoiZHRvYnNjaGFsbCIsImEiOiIzMzdhNTRhNGNjOGFjOGQ4MDM5ZTJhNGZjYjNmNmE5OCJ9.7ZQOdfvoZW0XIbvjN54Wrg')
+                        '/'.$width.'x'.$height.
+                        '?access_token=pk.eyJ1IjoibWFyYzIwMjEiLCJhIjoiY2tzdGFycDJrMDdnajJwczIydGxsZmc3biJ9.HlOfGQSk1TEsODq3gY-q_w')
                 ->setFilename('event_map.png')
                 ->setContentType('image/png');
                 $locationLink =
