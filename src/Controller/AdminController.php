@@ -94,7 +94,7 @@ class AdminController extends AbstractController
                 // The user is not new and does not want to change its password
                 $user->setPassword($oldHash);
             } else {
-                $hash = $utils->hashPassword($user->getUsername(), $user->getPassword());
+                $hash = password_hash($user->getPassword(), PASSWORD_DEFAULT);
                 $user->setPassword($hash);
             }
 
