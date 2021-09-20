@@ -16,7 +16,6 @@ use Twig\Environment as TwigEnvironment;
 
 class DAVController extends AbstractController
 {
-    const AUTH_DIGEST = 'Digest';
     const AUTH_BASIC = 'Basic';
     const AUTH_IMAP = 'IMAP';
 
@@ -161,9 +160,6 @@ class DAVController extends AbstractController
          * The backends.
          */
         switch ($this->authMethod) {
-            case self::AUTH_DIGEST:
-                $authBackend = new \Sabre\DAV\Auth\Backend\PDO($pdo);
-                break;
             case self::AUTH_IMAP:
                 $authBackend = new \Sabre\DAV\Auth\Backend\IMAP($this->IMAPAuthUrl);
                 break;
