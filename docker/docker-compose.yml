@@ -30,6 +30,8 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfile
     image: davis:latest
+    # If you want to use a prebuilt image from Github
+    # image: ghcr.io/tchapi/davis:edge
     container_name: davis
     environment:
       - APP_ENV=prod
