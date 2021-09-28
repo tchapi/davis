@@ -66,7 +66,7 @@ class CalendarInstance
     private $description;
 
     /**
-     * @ORM\Column(name="calendarorder", type="integer")
+     * @ORM\Column(name="calendarorder", type="integer", options={"default" : 0})
      */
     private $calendarOrder;
 
