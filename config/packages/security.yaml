@@ -1,4 +1,5 @@
 security:
+    enable_authenticator_manager: true
     providers:
         admin_user_provider:
             id: App\Security\AdminUserProvider
@@ -7,7 +8,6 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
             lazy: true
             guard:
                 authenticators:
