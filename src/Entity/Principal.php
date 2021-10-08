@@ -15,10 +15,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Principal
 {
-    const PREFIX = 'principals/';
+    public const PREFIX = 'principals/';
 
-    const READ_PROXY_SUFFIX = '/calendar-proxy-read';
-    const WRITE_PROXY_SUFFIX = '/calendar-proxy-write';
+    public const READ_PROXY_SUFFIX = '/calendar-proxy-read';
+    public const WRITE_PROXY_SUFFIX = '/calendar-proxy-write';
 
     /**
      * @ORM\Id()

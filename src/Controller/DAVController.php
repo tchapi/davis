@@ -16,8 +16,8 @@ use Twig\Environment as TwigEnvironment;
 
 class DAVController extends AbstractController
 {
-    const AUTH_BASIC = 'Basic';
-    const AUTH_IMAP = 'IMAP';
+    public const AUTH_BASIC = 'Basic';
+    public const AUTH_IMAP = 'IMAP';
 
     /**
      * Is CalDAV enabled?

@@ -12,7 +12,7 @@ use Twig\Environment as TwigEnvironment;
  */
 class DavisIMipPlugin extends SabreBaseIMipPlugin
 {
-    const MESSAGE_ORIGIN_INDICATOR = '(via Davis)';
+    public const MESSAGE_ORIGIN_INDICATOR = '(via Davis)';
 
     /**
      * The Twig engine.

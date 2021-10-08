@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User
 {
-    const DEFAULT_AUTH_REALM = 'SabreDAV';
+    public const DEFAULT_AUTH_REALM = 'SabreDAV';
 
     /**
      * @ORM\Id()

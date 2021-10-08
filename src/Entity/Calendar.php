@@ -12,9 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Calendar
 {
-    const COMPONENT_EVENTS = 'VEVENT';
-    const COMPONENT_TODOS = 'VTODO';
-    const COMPONENT_NOTES = 'VJOURNAL';
+    public const COMPONENT_EVENTS = 'VEVENT';
+    public const COMPONENT_TODOS = 'VTODO';
+    public const COMPONENT_NOTES = 'VJOURNAL';
 
     /**
      * @ORM\Id()

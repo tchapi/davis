@@ -17,14 +17,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class CalendarInstance
 {
-    const INVITE_STATUS_NORESPONSE = 1;
-    const INVITE_STATUS_ACCEPTED = 2;
-    const INVITE_STATUS_DECLINED = 3;
-    const INVITE_STATUS_INVALID = 4;
+    public const INVITE_STATUS_NORESPONSE = 1;
+    public const INVITE_STATUS_ACCEPTED = 2;
+    public const INVITE_STATUS_DECLINED = 3;
+    public const INVITE_STATUS_INVALID = 4;
 
-    const ACCESS_OWNER = 1;
-    const ACCESS_READ = 2;
-    const ACCESS_READWRITE = 3;
+    public const ACCESS_OWNER = 1;
+    public const ACCESS_READ = 2;
+    public const ACCESS_READWRITE = 3;
 
     /**
      * @ORM\Id()
