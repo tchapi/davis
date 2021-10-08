@@ -58,6 +58,11 @@ class AdminUser implements UserInterface
         return $this->username;
     }
 
+    public function getUserIdentifier()
+    {
+        return $this->username;
+    }
+
     /**
      * Removes sensitive data from the user.
      *
