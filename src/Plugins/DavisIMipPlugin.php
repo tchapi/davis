@@ -12,7 +12,7 @@ use Symfony\Component\Mime\Address;
 /**
  * iMIP handler.
  */
-class DavisIMipPlugin extends SabreBaseIMipPlugin
+final class DavisIMipPlugin extends SabreBaseIMipPlugin
 {
     public const MESSAGE_ORIGIN_INDICATOR = '(via Davis)';
 
