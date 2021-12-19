@@ -5,7 +5,9 @@ namespace App\Plugins;
 use Sabre\CalDAV\Schedule\IMipPlugin as SabreBaseIMipPlugin;
 use Sabre\DAV;
 use Sabre\VObject\ITip;
-use Twig\Environment as TwigEnvironment;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 
 /**
  * iMIP handler.
@@ -14,23 +16,11 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
 {
     public const MESSAGE_ORIGIN_INDICATOR = '(via Davis)';
 
-    /**
-     * The Twig engine.
-     *
-     * @var Twig\Environment
-     */
-    protected $twig;
-
-    /**
-     * The Swift_Mailer mailer service.
-     *
-     * @var \Swift_Mailer
-     */
-    protected $mailer;
+    private MailerInterface $mailer;
 
     protected $senderEmail;
 
-    protected $mapboxApiKey;
+    private string $mapboxApiKey;
 
     /**
      * Creates the email handler.
@@ -42,9 +32,8 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
      * @param string $mapboxApiKey. The key to display the Mapbox static tile
      *                              in the invitation email.
      */
-    public function __construct(TwigEnvironment $twig, \Swift_Mailer $mailer, string $senderEmail, ?string $mapboxApiKey = null)
+    public function __construct(MailerInterface $mailer, string $senderEmail, ?string $mapboxApiKey = null)
     {
-        $this->twig = $twig;
         $this->mailer = $mailer;
         $this->senderEmail = $senderEmail;
         $this->mapboxApiKey = $mapboxApiKey;
@@ -167,7 +156,7 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
         $url = $notEmpty('URL', false);
         $description = $notEmpty('DESCRIPTION', false);
         $location = $notEmpty('LOCATION', false);
-        $locationImage = null;
+        $locationImagePath = null;
         $locationImageContentId = false;
         $locationLink = false;
 
@@ -182,8 +171,7 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
                     $zoom = 16;
                     $width = 500;
                     $height = 220;
-                    $locationImage = \Swift_Image::fromPath(
-                            'https://api.mapbox.com/styles/v1'.
+                    $locationImagePath = 'https://api.mapbox.com/styles/v1'.
                             '/mapbox/streets-v11/static'.
                             '/pin-m-star+285A98'.
                             '('.$coordinates['longitude'].
@@ -193,9 +181,7 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
                             ','.$coordinates['latitude'].
                             ','.$zoom.
                             '/'.$width.'x'.$height.
-                            '?access_token='.$this->mapboxApiKey)
-                    ->setFilename('event_map.png')
-                    ->setContentType('image/png');
+                            '?access_token='.$this->mapboxApiKey;
                 }
                 $locationLink =
                     'http://www.openstreetmap.org'.
@@ -207,58 +193,43 @@ class DavisIMipPlugin extends SabreBaseIMipPlugin
             }
         }
 
-        $message = (new \Swift_Message($subject))
-            ->setFrom([$this->senderEmail => $senderName.' '.static::MESSAGE_ORIGIN_INDICATOR])
-            ->setTo([$recipientEmail => $recipientName])
-            ->setReplyTo([$senderEmail => $senderName])
-            ->setContentType('Content-Type: text/calendar; charset=UTF-8; method='.$itip->method);
+        $message = (new TemplatedEmail())
+            ->from(new Address($this->senderEmail, $senderName.' '.static::MESSAGE_ORIGIN_INDICATOR))
+            ->to(new Address($recipientEmail, $recipientName))
+            ->replyTo(new Address($senderEmail, $senderName))
+            ->subject($subject);
 
         if (DAV\Server::$exposeVersion) {
-            $headers = $message->getHeaders();
-            $headers->addTextHeader('X-Sabre-Version: ', DAV\Version::VERSION);
+            $message->getHeaders()
+                    ->addTextHeader('X-Sabre-Version: ', DAV\Version::VERSION)
+                    ->addTextHeader('X-Auto-Response-Suppress', 'OOF, DR, RN, NRN, AutoReply');
         }
 
-        if (null !== $locationImage) {
-            $locationImageContentId = $message->embed($locationImage);
+        if (null !== $locationImagePath) {
+            $locationImageContentId = 'map_image';
+            $message->embedFromPath($locationImagePath, $locationImageContentId);
         }
 
         // Now that we have everything, we can set the message body
-        $params = [
-            'senderName' => $senderName,
-            'summary' => $summary,
-            'action' => $action,
-            'dateTime' => $dateTime,
-            'allDay' => $allDay,
-            'attendees' => $attendees,
-            'location' => $location,
-            'locationImageContentId' => $locationImageContentId,
-            'locationLink' => $locationLink,
-            'url' => $url,
-            'description' => $description,
-        ];
-
-        $message->setBody(
-            $this->twig->render(
-                'mails/scheduling.html.twig',
-                $params
-            ),
-            'text/html'
-        )
-        ->addPart(
-            $this->twig->render(
-                'mails/scheduling.txt.twig',
-                $params
-            ),
-            'text/plain'
-        );
+        $message->htmlTemplate('mails/scheduling.html.twig')
+                ->textTemplate('mails/scheduling.txt.twig')
+                ->context([
+                    'senderName' => $senderName,
+                    'summary' => $summary,
+                    'action' => $action,
+                    'dateTime' => $dateTime,
+                    'allDay' => $allDay,
+                    'attendees' => $attendees,
+                    'location' => $location,
+                    'locationImageContentId' => $locationImageContentId,
+                    'locationLink' => $locationLink,
+                    'url' => $url,
+                    'description' => $description,
+                ]);
 
         if (false === $deliveredLocally) {
             // Attach the event file (invite.ics)
-            $attachment = (new \Swift_Attachment())
-                  ->setFilename('invite.ics')
-                  ->setContentType('text/calendar; method='.(string) $itip->method.'; charset=UTF-8')
-                  ->setBody($itip->message->serialize());
-            $message->attach($attachment);
+            $message->attach($itip->message->serialize(), 'invite.ics', 'text/calendar; method='.(string) $itip->method.'; charset=UTF-8');
         }
 
         $this->mailer->send($message);

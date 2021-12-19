@@ -10,9 +10,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Twig\Environment as TwigEnvironment;
 
 class DAVController extends AbstractController
 {
@@ -68,26 +68,9 @@ class DAVController extends AbstractController
      */
     protected $tmpDir;
 
-    /**
-     * Doctrine entity manager.
-     *
-     * @var EntityManagerInterface
-     */
-    protected $em;
+    protected EntityManagerInterface $em;
 
-    /**
-     * The Twig engine.
-     *
-     * @var Twig\Environment
-     */
-    protected $twig;
-
-    /**
-     * The Swift_Mailer mailer service.
-     *
-     * @var \Swift_Mailer
-     */
-    protected $mailer;
+    protected MailerInterface $mailer;
 
     /**
      * Base URI of the server.
@@ -117,7 +100,7 @@ class DAVController extends AbstractController
      */
     protected $IMAPAuthUrl;
 
-    public function __construct(\Swift_Mailer $mailer, TwigEnvironment $twig, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $IMAPAuthUrl = null, ?string $mapboxApiKey = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $IMAPAuthUrl = null, ?string $mapboxApiKey = null)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -131,7 +114,6 @@ class DAVController extends AbstractController
         $this->tmpDir = $tmpDir;
 
         $this->em = $entityManager;
-        $this->twig = $twig;
         $this->mailer = $mailer;
         $this->baseUri = $router->generate('dav', ['path' => '']);
 
@@ -227,7 +209,7 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             if ($this->inviteAddress) {
-                $this->server->addPlugin(new DavisIMipPlugin($this->twig, $this->mailer, $this->inviteAddress, $this->mapboxApiKey));
+                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->mapboxApiKey));
             }
         }
 
