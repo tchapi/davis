@@ -206,8 +206,8 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         }
 
         if (null !== $locationImagePath) {
-            $locationImageContentId = 'map_image';
-            $message->embedFromPath($locationImagePath, $locationImageContentId);
+            $locationImageContentId = 'event_map';
+            $message->embedFromPath($locationImagePath, $locationImageContentId, 'image/png');
         }
 
         // Now that we have everything, we can set the message body
