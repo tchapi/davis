@@ -1,0 +1,76 @@
+name: CI
+
+on: ["push", "pull_request"]
+
+env:
+    COMPOSER_ALLOW_SUPERUSER: '1'
+    SYMFONY_DEPRECATIONS_HELPER: max[self]=0
+
+jobs:
+    analyze:
+        name: Analyze
+        runs-on: ubuntu-latest
+        container:
+            image: php:8.0-alpine
+            options: >-
+              --tmpfs /tmp:exec
+              --tmpfs /var/tmp:exec
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Install Composer
+              run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+            - name: Cache Composer dependencies
+              uses: actions/cache@v1
+              with:
+                path: ~/.composer/cache
+                key: composer-php${{ matrix.php }}-highest-
+                restore-keys: |
+                   composer-php${{ matrix.php }}-highest-
+                   composer-
+            - name: Validate Composer
+              run: composer validate
+            - name: Install highest dependencies with Composer
+              run: composer update --no-progress --ansi
+            - name: Analyze
+              run: vendor/bin/php-cs-fixer fix --ansi
+
+    phpunit:
+        name: PHPUnit (PHP ${{ matrix.php }} Deps ${{ matrix.dependencies }})
+        runs-on: ubuntu-latest
+        container:
+            image: php:${{ matrix.php }}-alpine
+            options: >-
+              --tmpfs /tmp:exec
+              --tmpfs /var/tmp:exec
+        strategy:
+            matrix:
+                php:
+                    - '7.3'
+                    - '7.4'
+                    - '8.0'
+                dependencies:
+                    - lowest
+                    - highest
+            fail-fast: false
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Install Composer
+              run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+            - name: Cache Composer dependencies
+              uses: actions/cache@v1
+              with:
+                path: ~/.composer/cache
+                key: composer-php${{ matrix.php }}-${{ matrix.dependencies }}-
+                restore-keys: |
+                    composer-php${{ matrix.php }}-${{ matrix.dependencies }}-
+                    composer-
+            - name: Install lowest dependencies with Composer
+              if: matrix.dependencies == 'lowest'
+              run: composer update --no-progress --prefer-stable --prefer-lowest --ansi
+            - name: Install highest dependencies with Composer
+              if: matrix.dependencies == 'highest'
+              run: composer update --no-progress --ansi
+            - name: Run tests with PHPUnit
+              run: vendor/bin/phpunit --colors=always
