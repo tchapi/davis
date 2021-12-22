@@ -68,9 +68,15 @@ class DAVController extends AbstractController
      */
     protected $tmpDir;
 
-    protected EntityManagerInterface $em;
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $em;
 
-    protected MailerInterface $mailer;
+    /**
+     * @var MailerInterface
+     */
+    protected $mailer;
 
     /**
      * Base URI of the server.
