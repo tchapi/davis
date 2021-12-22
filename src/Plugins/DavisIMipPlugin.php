@@ -16,11 +16,20 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 {
     public const MESSAGE_ORIGIN_INDICATOR = '(via Davis)';
 
-    private MailerInterface $mailer;
+    /**
+     * @var MailerInterface
+     */
+    private $mailer;
 
+    /**
+     * @var string
+     */
     protected $senderEmail;
 
-    private string $mapboxApiKey;
+    /**
+     * @var string
+     */
+    private $mapboxApiKey;
 
     /**
      * Creates the email handler.
