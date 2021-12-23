@@ -117,6 +117,30 @@ The administration interface is available at `/dashboard`. You need to login to 
 
 The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
 
+### Example Caddy 2 configuration
+
+    dav.domain.tld {
+        # General settings
+        encode zstd gzip
+        header {
+            -Server
+            -X-Powered-By
+
+            # enable HSTS
+            Strict-Transport-Security max-age=31536000;
+
+            # disable clients from sniffing the media type
+            X-Content-Type-Options nosniff
+
+            # keep referrer data off of HTTP connections
+            Referrer-Policy no-referrer-when-downgrade
+        }
+
+        root * /var/www/davis/public
+        php_fastcgi 127.0.0.1:8000
+        file_server
+    }
+
 ### Example Apache 2.4 configuration
 
     <VirtualHost *:80>
