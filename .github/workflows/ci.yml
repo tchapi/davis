@@ -68,6 +68,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+            - name: Install pgsql PHP extension
+              run: |
+                docker-php-ext-install pdo pdo_pgsql
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Cache Composer dependencies
