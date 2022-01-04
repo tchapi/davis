@@ -72,10 +72,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Install pgsql PHP extension
+            - name: Install MySQL PHP extension
               run: |
-                apk add $PHPIZE_DEPS libpq-dev
-                docker-php-ext-install pdo pdo_pgsql
+                docker-php-ext-install pdo pdo_mysql
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Cache Composer dependencies
