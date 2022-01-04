@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Plugins\DavisIMipPlugin;
 use App\Services\BasicAuth;
 use Doctrine\ORM\EntityManagerInterface;
+use PDO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -142,7 +143,11 @@ class DAVController extends AbstractController
 
     private function initServer()
     {
+        // Get the PDO Connection of type PDO
         $pdo = $this->em->getConnection()->getWrappedConnection();
+        if (!($pdo instanceof PDO)) {
+            $pdo = $pdo->getWrappedConnection();
+        }
 
         /*
          * The backends.
