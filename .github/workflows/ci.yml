@@ -5,6 +5,9 @@ on: ["push", "pull_request"]
 env:
     COMPOSER_ALLOW_SUPERUSER: '1'
     SYMFONY_DEPRECATIONS_HELPER: max[self]=0
+    ADMIN_LOGIN: admin
+    ADMIN_PASSWORD: test
+    DATABASE_URL: mysql://user:password@mysql:3306/test_db
 
 jobs:
     analyze:
@@ -97,7 +100,3 @@ jobs:
               run: bin/console doctrine:schema:update --force --no-interaction
             - name: Run tests with PHPUnit
               run: vendor/bin/phpunit --process-isolation --colors=always
-              env:
-                ADMIN_LOGIN: admin
-                ADMIN_PASSWORD: test
-                DATABASE_URL: mysql://user:password@mysql:3306/test_db
