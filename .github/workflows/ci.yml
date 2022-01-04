@@ -93,6 +93,8 @@ jobs:
             - name: Install highest dependencies with Composer
               if: matrix.dependencies == 'highest'
               run: composer update --no-progress --ansi
+            - name: Migrate database
+              run: bin/console doctrine:schema:update --force --no-interaction
             - name: Run tests with PHPUnit
               run: vendor/bin/phpunit --process-isolation --colors=always
               env:
