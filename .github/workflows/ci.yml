@@ -73,4 +73,4 @@ jobs:
               if: matrix.dependencies == 'highest'
               run: composer update --no-progress --ansi
             - name: Run tests with PHPUnit
-              run: vendor/bin/phpunit --colors=always
+              run: vendor/bin/phpunit --process-isolation --colors=always

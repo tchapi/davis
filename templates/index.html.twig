@@ -50,9 +50,9 @@
       <div class="hero">
         <img src="/images/logo.png" width="60px">
         <h3>{{ "davis.running"|trans }}</h3>
-        <div>CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
-        <div>CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
-        <div>WebDAV : {% if webDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
+        <div class="caldav">CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
+        <div class="carddav">CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
+        <div class="webdav">WebDAV : {% if webDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
         <a href="{{ path('dashboard') }}" class="admin">{{ "admin.interface"|trans }}</a>
       </div>
     </body>
