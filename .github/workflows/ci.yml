@@ -44,23 +44,27 @@ jobs:
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
         services:
-          postgres:
-            image: postgres:14-alpine
+          mysql:
+            image: mariadb:10.7
             env:
-              POSTGRES_PASSWORD: postgres
+              MYSQL_DATABASE: test_db
+              MYSQL_USER: user
+              MYSQL_PASSWORD: password
+              MYSQL_ROOT_PASSWORD: root
             options: >-
-              --health-cmd pg_isready
+              --health-cmd "mysqladmin ping"
               --health-interval 10s
               --health-timeout 5s
               --health-retries 5
             ports:
-              - 5432:5432
+              - 3306:3306
         strategy:
             matrix:
                 php:
                     - '7.3'
                     - '7.4'
                     - '8.0'
+                    - '8.1'
                 dependencies:
                     - lowest
                     - highest
@@ -93,4 +97,4 @@ jobs:
               env:
                 ADMIN_LOGIN: admin
                 ADMIN_PASSWORD: test
-                DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?serverVersion=14
+                DATABASE_URL: mysql://user:password@mysql:3306/test_db
