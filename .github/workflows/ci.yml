@@ -43,6 +43,18 @@ jobs:
             options: >-
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
+        services:
+          postgres:
+            image: postgres:14-alpine
+            env:
+              POSTGRES_PASSWORD: postgres
+            options: >-
+              --health-cmd pg_isready
+              --health-interval 10s
+              --health-timeout 5s
+              --health-retries 5
+            ports:
+              - 5432:5432
         strategy:
             matrix:
                 php:
@@ -74,3 +86,7 @@ jobs:
               run: composer update --no-progress --ansi
             - name: Run tests with PHPUnit
               run: vendor/bin/phpunit --process-isolation --colors=always
+              env:
+                ADMIN_LOGIN: admin
+                ADMIN_PASSWORD: test
+                DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres?serverVersion=14
