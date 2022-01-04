@@ -93,4 +93,4 @@ jobs:
               env:
                 ADMIN_LOGIN: admin
                 ADMIN_PASSWORD: test
-                DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres?serverVersion=14
+                DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?serverVersion=14
