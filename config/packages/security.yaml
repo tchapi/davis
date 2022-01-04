@@ -18,8 +18,8 @@ security:
                 target: dashboard
 
     access_control:
-        - { path: ^/$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/dav, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/dav, roles: PUBLIC_ACCESS }
         - { path: ^/dashboard, roles: ROLE_ADMIN }
         - { path: ^/users, roles: ROLE_ADMIN }
         - { path: ^/calendars, roles: ROLE_ADMIN }
