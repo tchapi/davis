@@ -19,7 +19,7 @@ class DashboardTest extends WebTestCase
         $this->assertSelectorExists('div.webdav');
     }
 
-    public function testDashboardPage(): void
+    public function testDashboardPageUnlogged(): void
     {
         $client = static::createClient();
         $client->request('GET', '/dashboard');
