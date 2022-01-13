@@ -117,6 +117,8 @@ The administration interface is available at `/dashboard`. You need to login to 
 
 The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
 
+> Note: For shared hosting, the `symfony/apache-pack` is included and provides a standard `.htaccess` file in the public directory so redirections should work out of the box.
+
 ### Example Caddy 2 configuration
 
     dav.domain.tld {
