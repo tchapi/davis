@@ -232,6 +232,9 @@ class DAVController extends AbstractController
 
         // WebDAV plugins
         if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
+            if (!is_dir($this->tmpDir) || !is_dir($this->publicDir)) {
+                throw new \Exception('The WebDAV temp dir and/or public dir are not available. Make sure they are created with the corect permissions.');
+            }
             $lockBackend = new \Sabre\DAV\Locks\Backend\File($this->tmpDir.'/locksdb');
             $this->server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
             $this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());
