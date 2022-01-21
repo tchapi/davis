@@ -165,6 +165,10 @@
         <source>calendars.component.todos</source>
         <target>Todos</target>
       </trans-unit>
+      <trans-unit id="B2WpruE" resname="calendars.setup.title">
+        <source>calendars.setup.title</source>
+        <target>Setup information</target>
+      </trans-unit>
       <trans-unit id="obdwi48" resname="calendars.component.notes">
         <source>calendars.component.notes</source>
         <target>Notes</target>

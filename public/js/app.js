@@ -57,6 +57,9 @@ $(document).ready(function() {
     })
     document.body.style.setProperty('--calendar-color', $('#calendar_instance_calendarColor').val());
 
+    // Initialize popovers
+    $('.popover-dismiss').popover()
+
     // Modal to add a sharee on a calendar, catch the click to add the query parameter
     $('a.add-sharee').click(function(e) {
         e.preventDefault()

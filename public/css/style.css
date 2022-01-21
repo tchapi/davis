@@ -41,3 +41,14 @@ body {
     background: var(--calendar-color);
     border-radius: 2px;
 }
+
+/* Special indicator badge */
+.badge.badge-indicator {
+    height: 16px;
+    width: 16px;
+    padding: 0;
+    border-radius: 50%;
+}
+.popover .popover-body {
+    user-select: text;
+}

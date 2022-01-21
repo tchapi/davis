@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AdminController extends AbstractController
@@ -327,7 +328,7 @@ class AdminController extends AbstractController
     /**
      * @Route("/calendars/{username}", name="calendars")
      */
-    public function calendars(string $username)
+    public function calendars(UrlGeneratorInterface $router, string $username)
     {
         $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
         $allCalendars = $this->get('doctrine')->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
@@ -337,9 +338,15 @@ class AdminController extends AbstractController
         $shared = [];
         foreach ($allCalendars as $calendar) {
             if (CalendarInstance::ACCESS_OWNER === $calendar->getAccess()) {
-                $calendars[] = $calendar;
+                $calendars[] = [
+                    'entity' => $calendar,
+                    'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
+                ];
             } else {
-                $shared[] = $calendar;
+                $shared[] = [
+                    'entity' => $calendar,
+                    'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
+                ];
             }
         }
 
