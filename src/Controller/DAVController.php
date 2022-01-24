@@ -144,9 +144,9 @@ class DAVController extends AbstractController
     private function initServer()
     {
         // Get the PDO Connection of type PDO
-        $pdo = $this->em->getConnection()->getWrappedConnection();
+        $pdo = $this->em->getConnection()->getNativeConnection();
         if (!($pdo instanceof PDO)) {
-            $pdo = $pdo->getWrappedConnection();
+            $pdo = $pdo->getNativeConnection();
         }
 
         /*

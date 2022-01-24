@@ -28,6 +28,11 @@ class AdminUserProvider implements UserProviderInterface
         throw new \Exception('Not implemented, because not needed');
     }
 
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        throw new \Exception('Not implemented, because not needed');
+    }
+
     /**
      * Refreshes the user after being reloaded from the session.
      *
@@ -55,7 +60,7 @@ class AdminUserProvider implements UserProviderInterface
      *
      * @param mixed $class
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return AdminUser::class === $class;
     }

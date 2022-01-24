@@ -15,6 +15,7 @@ use App\Form\AddressBookType;
 use App\Form\CalendarInstanceType;
 use App\Form\UserType;
 use App\Services\Utils;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,13 +28,13 @@ class AdminController extends AbstractController
     /**
      * @Route("/dashboard", name="dashboard")
      */
-    public function dashboard()
+    public function dashboard(ManagerRegistry $doctrine)
     {
-        $users = $this->get('doctrine')->getRepository(User::class)->findAll();
-        $calendars = $this->get('doctrine')->getRepository(CalendarInstance::class)->findAll();
-        $addressbooks = $this->get('doctrine')->getRepository(AddressBook::class)->findAll();
-        $events = $this->get('doctrine')->getRepository(CalendarObject::class)->findAll();
-        $contacts = $this->get('doctrine')->getRepository(Card::class)->findAll();
+        $users = $doctrine->getRepository(User::class)->findAll();
+        $calendars = $doctrine->getRepository(CalendarInstance::class)->findAll();
+        $addressbooks = $doctrine->getRepository(AddressBook::class)->findAll();
+        $events = $doctrine->getRepository(CalendarObject::class)->findAll();
+        $contacts = $doctrine->getRepository(Card::class)->findAll();
 
         return $this->render('dashboard.html.twig', [
             'users' => $users,
@@ -50,9 +51,9 @@ class AdminController extends AbstractController
     /**
      * @Route("/users", name="users")
      */
-    public function users()
+    public function users(ManagerRegistry $doctrine)
     {
-        $principals = $this->get('doctrine')->getRepository(Principal::class)->findByIsMain(true);
+        $principals = $doctrine->getRepository(Principal::class)->findByIsMain(true);
 
         return $this->render('users/index.html.twig', [
             'principals' => $principals,
@@ -63,15 +64,15 @@ class AdminController extends AbstractController
      * @Route("/users/new", name="user_create")
      * @Route("/users/edit/{username}", name="user_edit")
      */
-    public function userCreate(Utils $utils, Request $request, ?string $username, TranslatorInterface $trans)
+    public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?string $username, TranslatorInterface $trans)
     {
         if ($username) {
-            $user = $this->get('doctrine')->getRepository(User::class)->findOneByUsername($username);
+            $user = $doctrine->getRepository(User::class)->findOneByUsername($username);
             if (!$user) {
                 throw $this->createNotFoundException('User not found');
             }
             $oldHash = $user->getPassword();
-            $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+            $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
         } else {
             $user = new User();
             $principal = new Principal();
@@ -99,7 +100,7 @@ class AdminController extends AbstractController
                 $user->setPassword($hash);
             }
 
-            $entityManager = $this->get('doctrine')->getManager();
+            $entityManager = $doctrine->getManager();
 
             // If it's a new user, create default calendar and address book, and principal
             if (null === $user->getId()) {
@@ -155,21 +156,21 @@ class AdminController extends AbstractController
     /**
      * @Route("/users/delete/{username}", name="user_delete")
      */
-    public function userDelete(string $username, TranslatorInterface $trans)
+    public function userDelete(ManagerRegistry $doctrine, string $username, TranslatorInterface $trans)
     {
-        $user = $this->get('doctrine')->getRepository(User::class)->findOneByUsername($username);
+        $user = $doctrine->getRepository(User::class)->findOneByUsername($username);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
 
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager = $doctrine->getManager();
         $entityManager->remove($user);
 
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
         $entityManager->remove($principal);
 
         // Remove calendars and addressbooks
-        $calendars = $this->get('doctrine')->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
         foreach ($calendars ?? [] as $instance) {
             foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
                 $entityManager->remove($object);
@@ -180,16 +181,16 @@ class AdminController extends AbstractController
             $entityManager->remove($instance->getCalendar());
             $entityManager->remove($instance);
         }
-        $calendarsSubscriptions = $this->get('doctrine')->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $calendarsSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
         foreach ($calendarsSubscriptions ?? [] as $subscription) {
             $entityManager->remove($subscription);
         }
-        $schedulingObjects = $this->get('doctrine')->getRepository(SchedulingObject::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri(Principal::PREFIX.$username);
         foreach ($schedulingObjects ?? [] as $object) {
             $entityManager->remove($object);
         }
 
-        $addressbooks = $this->get('doctrine')->getRepository(AddressBook::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri(Principal::PREFIX.$username);
         foreach ($addressbooks ?? [] as $addressbook) {
             foreach ($addressbook->getCards() ?? [] as $card) {
                 $entityManager->remove($card);
@@ -209,15 +210,15 @@ class AdminController extends AbstractController
     /**
      * @Route("/users/delegates/{username}", name="delegates")
      */
-    public function userDelegates(string $username)
+    public function userDelegates(ManagerRegistry $doctrine, string $username)
     {
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
-        $allPrincipalsExcept = $this->get('doctrine')->getRepository(Principal::class)->findAllExceptPrincipal(Principal::PREFIX.$username);
+        $allPrincipalsExcept = $doctrine->getRepository(Principal::class)->findAllExceptPrincipal(Principal::PREFIX.$username);
 
         // Get delegates. They are not linked to the principal in itself, but to its proxies
-        $principalProxyRead = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
-        $principalProxyWrite = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
+        $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
+        $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
 
         return $this->render('users/delegates.html.twig', [
             'principal' => $principal,
@@ -231,15 +232,15 @@ class AdminController extends AbstractController
     /**
      * @Route("/users/delegation/{username}/{toggle}", name="user_delegation_toggle", requirements={"toggle":"(on|off)"})
      */
-    public function userToggleDelegation(string $username, string $toggle)
+    public function userToggleDelegation(ManagerRegistry $doctrine, string $username, string $toggle)
     {
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
         if (!$principal) {
             throw $this->createNotFoundException('Principal not found');
         }
 
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager = $doctrine->getManager();
 
         if ('on' === $toggle) {
             $principalProxyRead = new Principal();
@@ -252,10 +253,10 @@ class AdminController extends AbstractController
                                ->setIsMain(false);
             $entityManager->persist($principalProxyWrite);
         } else {
-            $principalProxyRead = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
+            $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
             $principalProxyRead && $entityManager->remove($principalProxyRead);
 
-            $principalProxyWrite = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
+            $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
             $principalProxyWrite && $entityManager->remove($principalProxyWrite);
 
             // Remove also delegates
@@ -270,9 +271,9 @@ class AdminController extends AbstractController
     /**
      * @Route("/users/delegates/{username}/add", name="user_delegate_add")
      */
-    public function userDelegateAdd(Request $request, string $username)
+    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, string $username)
     {
-        $newMemberToAdd = $this->get('doctrine')->getRepository(Principal::class)->findOneById($request->get('principalId'));
+        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
 
         if (!$newMemberToAdd) {
             throw $this->createNotFoundException('Member not found');
@@ -281,15 +282,15 @@ class AdminController extends AbstractController
         // Depending on write access or not, attach to the correct principal
         if ('true' === $request->get('write')) {
             // Let's check that there wasn't a read proxy first
-            $principalProxyRead = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::READ_PROXY_SUFFIX);
+            $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::READ_PROXY_SUFFIX);
             if (!$principalProxyRead) {
                 throw $this->createNotFoundException('Principal linked to this calendar not found');
             }
             $principalProxyRead->removeDelegee($newMemberToAdd);
             // And then add the Write access
-            $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::WRITE_PROXY_SUFFIX);
+            $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::WRITE_PROXY_SUFFIX);
         } else {
-            $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::READ_PROXY_SUFFIX);
+            $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::READ_PROXY_SUFFIX);
         }
 
         if (!$principal) {
@@ -297,7 +298,7 @@ class AdminController extends AbstractController
         }
 
         $principal->addDelegee($newMemberToAdd);
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager = $doctrine->getManager();
         $entityManager->flush();
 
         return $this->redirectToRoute('delegates', ['username' => $username]);
@@ -306,20 +307,20 @@ class AdminController extends AbstractController
     /**
      * @Route("/users/delegates/{username}/remove/{principalProxyId}/{delegateId}", name="user_delegate_remove", requirements={"principalProxyId":"\d+", "delegateId":"\d+"})
      */
-    public function userDelegateRemove(Request $request, string $username, int $principalProxyId, int $delegateId)
+    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, string $username, int $principalProxyId, int $delegateId)
     {
-        $principalProxy = $this->get('doctrine')->getRepository(Principal::class)->findOneById($principalProxyId);
+        $principalProxy = $doctrine->getRepository(Principal::class)->findOneById($principalProxyId);
         if (!$principalProxy) {
             throw $this->createNotFoundException('Principal linked to this calendar not found');
         }
 
-        $memberToRemove = $this->get('doctrine')->getRepository(Principal::class)->findOneById($delegateId);
+        $memberToRemove = $doctrine->getRepository(Principal::class)->findOneById($delegateId);
         if (!$memberToRemove) {
             throw $this->createNotFoundException('Member not found');
         }
 
         $principalProxy->removeDelegee($memberToRemove);
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager = $doctrine->getManager();
         $entityManager->flush();
 
         return $this->redirectToRoute('delegates', ['username' => $username]);
@@ -328,10 +329,10 @@ class AdminController extends AbstractController
     /**
      * @Route("/calendars/{username}", name="calendars")
      */
-    public function calendars(UrlGeneratorInterface $router, string $username)
+    public function calendars(ManagerRegistry $doctrine, UrlGeneratorInterface $router, string $username)
     {
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
-        $allCalendars = $this->get('doctrine')->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
 
         // Separate shared calendars
         $calendars = [];
@@ -351,7 +352,7 @@ class AdminController extends AbstractController
         }
 
         // We need all the other users so we can propose to share calendars with them
-        $allPrincipalsExcept = $this->get('doctrine')->getRepository(Principal::class)->findAllExceptPrincipal(Principal::PREFIX.$username);
+        $allPrincipalsExcept = $doctrine->getRepository(Principal::class)->findAllExceptPrincipal(Principal::PREFIX.$username);
 
         return $this->render('calendars/index.html.twig', [
             'calendars' => $calendars,
@@ -366,16 +367,16 @@ class AdminController extends AbstractController
      * @Route("/calendars/{username}/new", name="calendar_create")
      * @Route("/calendars/{username}/edit/{id}", name="calendar_edit", requirements={"id":"\d+"})
      */
-    public function calendarEdit(Request $request, string $username, ?int $id, TranslatorInterface $trans)
+    public function calendarEdit(ManagerRegistry $doctrine, Request $request, string $username, ?int $id, TranslatorInterface $trans)
     {
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
         if (!$principal) {
             throw $this->createNotFoundException('User not found');
         }
 
         if ($id) {
-            $calendarInstance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+            $calendarInstance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
             if (!$calendarInstance) {
                 throw $this->createNotFoundException('Calendar not found');
             }
@@ -413,7 +414,7 @@ class AdminController extends AbstractController
 
             $calendarInstance->getCalendar()->setComponents(implode(',', $components));
 
-            $entityManager = $this->get('doctrine')->getManager();
+            $entityManager = $doctrine->getManager();
 
             $entityManager->persist($calendarInstance);
             $entityManager->flush();
@@ -434,9 +435,9 @@ class AdminController extends AbstractController
     /**
      * @Route("/calendars/{username}/shares/{calendarid}", name="calendar_shares", requirements={"calendarid":"\d+"})
      */
-    public function calendarShares(string $username, string $calendarid, TranslatorInterface $trans)
+    public function calendarShares(ManagerRegistry $doctrine, string $username, string $calendarid, TranslatorInterface $trans)
     {
-        $instances = $this->get('doctrine')->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarid);
+        $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarid);
 
         $response = [];
         foreach ($instances as $instance) {
@@ -456,25 +457,25 @@ class AdminController extends AbstractController
     /**
      * @Route("/calendars/{username}/share/{instanceid}", name="calendar_share_add", requirements={"instanceid":"\d+"})
      */
-    public function calendarShareAdd(Request $request, string $username, string $instanceid, TranslatorInterface $trans)
+    public function calendarShareAdd(ManagerRegistry $doctrine, Request $request, string $username, string $instanceid, TranslatorInterface $trans)
     {
-        $instance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($instanceid);
+        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($instanceid);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
         }
 
-        $newShareeToAdd = $this->get('doctrine')->getRepository(Principal::class)->findOneById($request->get('principalId'));
+        $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
         if (!$newShareeToAdd) {
             throw $this->createNotFoundException('Member not found');
         }
 
         // Let's check that there wasn't another instance
         // already existing first, so we can update it:
-        $existingSharedInstance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
+        $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
 
         $writeAccess = ('true' === $request->get('write') ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
 
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager = $doctrine->getManager();
 
         if ($existingSharedInstance) {
             $existingSharedInstance->setAccess($writeAccess);
@@ -500,21 +501,21 @@ class AdminController extends AbstractController
     /**
      * @Route("/calendars/{username}/delete/{id}", name="calendar_delete", requirements={"id":"\d+"})
      */
-    public function calendarDelete(string $username, string $id, TranslatorInterface $trans)
+    public function calendarDelete(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans)
     {
-        $instance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
         }
 
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager = $doctrine->getManager();
 
-        $calendarsSubscriptions = $this->get('doctrine')->getRepository(CalendarSubscription::class)->findByPrincipalUri($instance->getPrincipalUri());
+        $calendarsSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($instance->getPrincipalUri());
         foreach ($calendarsSubscriptions ?? [] as $subscription) {
             $entityManager->remove($subscription);
         }
 
-        $schedulingObjects = $this->get('doctrine')->getRepository(SchedulingObject::class)->findByPrincipalUri($instance->getPrincipalUri());
+        $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri($instance->getPrincipalUri());
         foreach ($schedulingObjects ?? [] as $object) {
             $entityManager->remove($object);
         }
@@ -537,14 +538,14 @@ class AdminController extends AbstractController
     /**
      * @Route("/calendars/{username}/revoke/{id}", name="calendar_revoke", requirements={"id":"\d+"})
      */
-    public function calendarRevoke(string $username, string $id, TranslatorInterface $trans)
+    public function calendarRevoke(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans)
     {
-        $instance = $this->get('doctrine')->getRepository(CalendarInstance::class)->findOneById($id);
+        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
         }
 
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager = $doctrine->getManager();
         $entityManager->remove($instance);
 
         $entityManager->flush();
@@ -556,10 +557,10 @@ class AdminController extends AbstractController
     /**
      * @Route("/adressbooks/{username}", name="address_books")
      */
-    public function addressBooks(string $username)
+    public function addressBooks(ManagerRegistry $doctrine, string $username)
     {
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
-        $addressbooks = $this->get('doctrine')->getRepository(AddressBook::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri(Principal::PREFIX.$username);
 
         return $this->render('addressbooks/index.html.twig', [
             'addressbooks' => $addressbooks,
@@ -572,16 +573,16 @@ class AdminController extends AbstractController
      * @Route("/adressbooks/{username}/new", name="addressbook_create")
      * @Route("/adressbooks/{username}/edit/{id}", name="addressbook_edit", requirements={"id":"\d+"})
      */
-    public function addressbookCreate(Request $request, string $username, ?int $id, TranslatorInterface $trans)
+    public function addressbookCreate(ManagerRegistry $doctrine, Request $request, string $username, ?int $id, TranslatorInterface $trans)
     {
-        $principal = $this->get('doctrine')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
         if (!$principal) {
             throw $this->createNotFoundException('User not found');
         }
 
         if ($id) {
-            $addressbook = $this->get('doctrine')->getRepository(AddressBook::class)->findOneById($id);
+            $addressbook = $doctrine->getRepository(AddressBook::class)->findOneById($id);
             if (!$addressbook) {
                 throw $this->createNotFoundException('Address book not found');
             }
@@ -596,7 +597,7 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->get('doctrine')->getManager();
+            $entityManager = $doctrine->getManager();
 
             $entityManager->persist($addressbook);
             $entityManager->flush();
@@ -617,14 +618,14 @@ class AdminController extends AbstractController
     /**
      * @Route("/addressbooks/{username}/delete/{id}", name="addressbook_delete", requirements={"id":"\d+"})
      */
-    public function addressbookDelete(string $username, string $id, TranslatorInterface $trans)
+    public function addressbookDelete(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans)
     {
-        $addressbook = $this->get('doctrine')->getRepository(AddressBook::class)->findOneById($id);
+        $addressbook = $doctrine->getRepository(AddressBook::class)->findOneById($id);
         if (!$addressbook) {
             throw $this->createNotFoundException('Address Book not found');
         }
 
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager = $doctrine->getManager();
 
         foreach ($addressbook->getCards() ?? [] as $card) {
             $entityManager->remove($card);

@@ -30,7 +30,7 @@ final class BasicAuth extends AbstractBasic
     /**
      * {@inheritdoc}
      */
-    protected function validateUserPass($username, $password)
+    protected function validateUserPass($username, $password): bool
     {
         $user = $this->userRepository->findOneByUsername($username);
 
