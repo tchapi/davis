@@ -12,7 +12,7 @@ class DashboardTest extends WebTestCase
         $client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h3', 'Davis is running.');
+        $this->assertSelectorTextContains('h3', 'Davis v1.9.1');
 
         $this->assertSelectorExists('div.caldav');
         $this->assertSelectorExists('div.carddav');
@@ -84,5 +84,11 @@ class DashboardTest extends WebTestCase
         $this->assertResponseRedirects('/dashboard');
         $crawler = $client->followRedirect();
         $this->assertResponseIsSuccessful();
+
+        $this->assertSelectorTextContains('h1', 'Dashboard');
+        $this->assertSelectorTextContains('h3.capabilities', 'Capabilities');
+        $this->assertSelectorTextContains('h3.objects', 'Objects');
+        $this->assertSelectorTextContains('h3.environment', 'Configured environment');
+        $this->assertSelectorExists('nav.navbar');
     }
 }

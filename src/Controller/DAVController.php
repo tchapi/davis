@@ -138,7 +138,9 @@ class DAVController extends AbstractController
      */
     public function home()
     {
-        return $this->render('index.html.twig');
+        return $this->render('index.html.twig', [
+            'version' => \App\Version::VERSION,
+        ]);
     }
 
     private function initServer()
