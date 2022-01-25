@@ -146,9 +146,12 @@ class DAVController extends AbstractController
     private function initServer()
     {
         // Get the PDO Connection of type PDO
-        $pdo = $this->em->getConnection()->getNativeConnection();
+        // TODO: Once we drop support for PHP < 8.0 and force dbal > 3.3,
+        // We can use getNativeConnection() instead of the deprecated
+        // getWrappedConnection() here.
+        $pdo = $this->em->getConnection()->getWrappedConnection();
         if (!($pdo instanceof PDO)) {
-            $pdo = $pdo->getNativeConnection();
+            $pdo = $pdo->getWrappedConnection();
         }
 
         /*
