@@ -1,17 +1,25 @@
 Davis
 ---
 
-[![Build Status][ci_badge]][ci_link] [![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/tchapi/davis/actions/workflows/main.yml)
+[![Build Status][ci_badge]][ci_link]
+[![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/tchapi/davis/actions/workflows/main.yml)
+[![Latest release][release_badge]][release_link]
 
 A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), largely inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
-![Dashboard page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/dashboard.png)
+Provides user edition, calendar creation and sharing, address book creation and sharing. The interface is simple and straightforward, responsive, and provides a light and a dark mode.
 
-![User creation page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/user.png)
+Easily containerisable (_`Dockerfile` and sample `docker-compose` configuration file provided_).
+
+Created and maintained (with the help of the community) by [@tchapi](https://github.com/tchapi).
+
+![Dashboard page](_screenshots/dashboard.png)
+![User creation page](_screenshots/user.png)
+![Sharing page](_screenshots/sharing.png)
 
 # Requirements
 
-  - PHP > 7.3.0 (with `pdo_mysql` and `intl` extensions), MySQL (or MariaDB).
+  - PHP > 7.3.0 (with `pdo_mysql` and `intl` extensions), MySQL (or MariaDB), compatible up to PHP 8.1
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
 
 # Installation
@@ -251,7 +259,7 @@ You can start the containers with :
 
 Then, head up to `http://<YOUR_DOCKER_IP>` to see the status display :
 
-![Status page](https://raw.githubusercontent.com/tchapi/davis/master/_screenshots/status.png)
+![Status page](_screenshots/status.png)
 
 > Note that there is no user and no principals created by default.
 
@@ -279,3 +287,6 @@ This project is release under the MIT licence. See the LICENCE file
 
 [ci_badge]: https://github.com/tchapi/davis/workflows/CI/badge.svg
 [ci_link]: https://github.com/tchapi/davis/actions?query=workflow%3ACI
+
+[release_badge]: https://img.shields.io/github/v/release/tchapi/davis
+[release_link]: https://github.com/tchapi/davis/releases
