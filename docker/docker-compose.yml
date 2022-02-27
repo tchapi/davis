@@ -24,6 +24,8 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - database:/var/lib/mysql
 
   davis:
     build:
@@ -56,3 +58,5 @@ services:
 volumes:
   davis_www:
     name: davis_www
+  database:
+    name: database
