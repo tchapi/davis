@@ -6,14 +6,20 @@ LABEL org.opencontainers.image.authors="tchap@tchap.me"
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         unzip \
+        # These are for IMAP
+        libc-client-dev libkrb5-dev \
         # There are for php-intl
         zlib1g-dev libicu-dev g++ \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Configure PHP extensions
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install intl \
+    && docker-php-ext-install pdo_mysql
+
+RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
+    && docker-php-ext-install imap
+    
+RUN docker-php-ext-install intl \
     && docker-php-source delete
 
 # Set timezone correctly
