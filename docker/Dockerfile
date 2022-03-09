@@ -23,8 +23,6 @@ RUN echo 'date.timezone = "Europe/Paris"' > /usr/local/etc/php/conf.d/timezone.i
 ADD . /var/www/davis
 WORKDIR /var/www/davis
 
-RUN rm -rf docker
-
 # Install Composer 2, then dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.0.12
 RUN APP_ENV=prod composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
