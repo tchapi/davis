@@ -6,6 +6,7 @@ use App\Entity\Principal;
 use App\Entity\User;
 use App\Plugins\DavisIMipPlugin;
 use App\Services\BasicAuth;
+use App\Services\IMAPAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -89,9 +90,16 @@ class DAVController extends AbstractController
     /**
      * Basic Auth Backend class.
      *
-     * @var App\Services\BasicAuth
+     * @var \App\Services\BasicAuth
      */
     protected $basicAuthBackend;
+
+    /**
+     * IMAP Auth Backend class.
+     *
+     * @var \App\Services\IMAPAuth
+     */
+    protected $IMAPAuthBackend;
 
     /**
      * Server.
@@ -100,14 +108,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    /**
-     * IMAP mailbox URL used for authentication.
-     *
-     * @var string
-     */
-    protected $IMAPAuthUrl;
-
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $IMAPAuthUrl = null, ?string $mapboxApiKey = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $mapboxApiKey = null)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -125,8 +126,7 @@ class DAVController extends AbstractController
         $this->baseUri = $router->generate('dav', ['path' => '']);
 
         $this->basicAuthBackend = $basicAuthBackend;
-
-        $this->IMAPAuthUrl = $IMAPAuthUrl;
+        $this->IMAPAuthBackend = $IMAPAuthBackend;
 
         $this->mapboxApiKey = $mapboxApiKey;
 
@@ -159,7 +159,7 @@ class DAVController extends AbstractController
          */
         switch ($this->authMethod) {
             case self::AUTH_IMAP:
-                $authBackend = new \Sabre\DAV\Auth\Backend\IMAP($this->IMAPAuthUrl);
+                $authBackend = $this->IMAPAuthBackend;
                 break;
             case self::AUTH_BASIC:
             default:

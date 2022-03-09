@@ -21,6 +21,11 @@ services:
         arguments:
             $authRealm: "%env(AUTH_REALM)%"
 
+    App\Services\IMAPAuth:
+        arguments:
+            $IMAPAuthUrl: "%env(IMAP_AUTH_URL)%"
+            $autoCreate: "%env(bool:IMAP_AUTH_USER_AUTOCREATE)%"
+
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
@@ -37,7 +42,6 @@ services:
             $authRealm: "%env(AUTH_REALM)%"
             $publicDir: "%env(PUBLIC_DIR)%"
             $tmpDir: "%env(TMP_DIR)%"
-            $IMAPAuthUrl: "%env(IMAP_AUTH_URL)%"
             $mapboxApiKey: "%env(MAPBOX_API_KEY)%"
 
     App\Security\LoginFormAuthenticator:
