@@ -1,6 +1,6 @@
-FROM php:7.4-fpm
+FROM php:8.1-fpm
 
-LABEL maintainer="tchap@tchap.me"
+LABEL org.opencontainers.image.authors="tchap@tchap.me"
 
 # Run update, and gets basic packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -24,7 +24,7 @@ ADD . /var/www/davis
 WORKDIR /var/www/davis
 
 # Install Composer 2, then dependencies
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.0.12
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN APP_ENV=prod composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
 
 RUN chown -R www-data:www-data var
