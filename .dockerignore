@@ -1,10 +1,16 @@
 _screenshots
+.DS_Store
 README.md
 LICENSE
 .git
 .gitignore
+.github
+docker
+.env.local
+.env.test.local
 phpunit.xml.dist
-.php_cs
+.php-cs*
+.phpunit.*
 .dockerignore
 var/cache/*
 var/log/*
