@@ -154,7 +154,7 @@ final class LDAPAuth extends AbstractBasic
         }
 
         if (isset($ldap) && $ldap) {
-          ldap_close($ldap);
+            ldap_close($ldap);
         }
 
         return $success;

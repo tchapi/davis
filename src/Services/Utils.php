@@ -19,6 +19,20 @@ final class Utils
      */
     private $authRealm;
 
+    /**
+     * The translation service.
+     *
+     * @var \Symfony\Contracts\Translation\TranslatorInterface
+     */
+    private $trans;
+
+    /**
+     * Doctrine registry.
+     *
+     * @var \Doctrine\Persistence\ManagerRegistry
+     */
+    private $doctrine;
+
     public function __construct(ManagerRegistry $doctrine, TranslatorInterface $trans, ?string $authRealm)
     {
         $this->authRealm = $authRealm ?? User::DEFAULT_AUTH_REALM;
