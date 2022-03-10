@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Entity\User;
+
 final class Utils
 {
     /**
