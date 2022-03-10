@@ -121,10 +121,6 @@ final class LDAPAuth extends AbstractBasic
             error_log('LDAP Error: '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
         }
 
-        if (isset($ldap) && $ldap) {
-            ldap_close($ldap);
-        }
-
         if ($success && $this->autoCreate) {
             $user = $this->doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
 
@@ -155,6 +151,10 @@ final class LDAPAuth extends AbstractBasic
                 $em = $this->doctrine->getManager();
                 $em->flush();
             }
+        }
+
+        if (isset($ldap) && $ldap) {
+          ldap_close($ldap);
         }
 
         return $success;
