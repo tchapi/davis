@@ -58,7 +58,7 @@ final class IMAPAuth extends IMAP
         $success = parent::imapOpen($username, $password);
 
         // Auto-create the user if it does not already exist in the database
-        if (!$success && $this->autoCreate) {
+        if ($success && $this->autoCreate) {
             $user = $this->doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
 
             if (!$user) {
