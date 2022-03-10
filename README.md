@@ -11,6 +11,8 @@ Provides user edition, calendar creation and sharing, address book creation and 
 
 Easily containerisable (_`Dockerfile` and sample `docker-compose` configuration file provided_).
 
+Supports **Basic authentication**, as well as **IMAP** and **LDAP** (_via external providers_).
+
 Created and maintained (with the help of the community) by [@tchapi](https://github.com/tchapi).
 
 ![Dashboard page](_screenshots/dashboard.png)

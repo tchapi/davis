@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Plugins\DavisIMipPlugin;
 use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
+use App\Services\LDAPAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +21,7 @@ class DAVController extends AbstractController
 {
     public const AUTH_BASIC = 'Basic';
     public const AUTH_IMAP = 'IMAP';
+    public const AUTH_LDAP = 'LDAP';
 
     /**
      * Is CalDAV enabled?
@@ -108,7 +110,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $mapboxApiKey = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $mapboxApiKey = null)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -127,6 +129,7 @@ class DAVController extends AbstractController
 
         $this->basicAuthBackend = $basicAuthBackend;
         $this->IMAPAuthBackend = $IMAPAuthBackend;
+        $this->LDAPAuthBackend = $LDAPAuthBackend;
 
         $this->mapboxApiKey = $mapboxApiKey;
 
@@ -160,6 +163,9 @@ class DAVController extends AbstractController
         switch ($this->authMethod) {
             case self::AUTH_IMAP:
                 $authBackend = $this->IMAPAuthBackend;
+                break;
+            case self::AUTH_LDAP:
+                $authBackend = $this->LDAPAuthBackend;
                 break;
             case self::AUTH_BASIC:
             default:
