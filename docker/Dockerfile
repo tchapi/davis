@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         unzip \
         # These are for IMAP
         libc-client-dev libkrb5-dev \
+        # This one if for LDAP
+        libldap2-dev \
         # There are for php-intl
         zlib1g-dev libicu-dev g++ \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -15,6 +17,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Configure PHP extensions
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-ext-install pdo_mysql
+
+RUN docker-php-ext-configure ldap \
+    && docker-php-ext-install ldap
 
 RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install imap
