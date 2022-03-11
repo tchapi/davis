@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LDAPAuth extends AbstractBasic
 {
@@ -34,6 +33,13 @@ final class LDAPAuth extends AbstractBasic
      */
     private $LDAPDnPattern;
 
+    /*
+     * LDAP attribute used for mail
+     *
+     * @var string
+     */
+    private $LDAPMailAttribute;
+
     /**
      * Doctrine registry.
      *
@@ -59,10 +65,11 @@ final class LDAPAuth extends AbstractBasic
     /**
      * Creates the backend object.
      */
-    public function __construct(ManagerRegistry $doctrine, TranslatorInterface $trans, Utils $utils, string $LDAPAuthUrl, string $LDAPDnPattern, bool $autoCreate)
+    public function __construct(ManagerRegistry $doctrine, Utils $utils, string $LDAPAuthUrl, string $LDAPDnPattern, string $LDAPMailAttribute, bool $autoCreate)
     {
         $this->LDAPAuthUrl = $LDAPAuthUrl;
         $this->LDAPDnPattern = $LDAPDnPattern;
+        $this->LDAPMailAttribute = $LDAPMailAttribute ?? 'mail';
         $this->autoCreate = $autoCreate;
 
         $this->doctrine = $doctrine;
@@ -131,7 +138,7 @@ final class LDAPAuth extends AbstractBasic
 
                 // Try to extract display name and email for this user.
                 // NB: We suppose display name is `cn` and email is `mail`
-                $search_results = ldap_read($ldap, $dn, '(objectclass=*)', ['cn', 'mail']);
+                $search_results = ldap_read($ldap, $dn, '(objectclass=*)', ['cn', $this->LDAPMailAttribute]);
 
                 if (false !== $search_results) {
                     $entry = ldap_get_entries($ldap, $search_results);
@@ -140,8 +147,8 @@ final class LDAPAuth extends AbstractBasic
                         if (!empty($entry[0]['cn'])) {
                             $displayName = $entry[0]['cn'][0];
                         }
-                        if (!empty($entry[0]['mail'])) {
-                            $email = $entry[0]['mail'][0];
+                        if (!empty($entry[0][$this->LDAPMailAttribute])) {
+                            $email = $entry[0][$this->LDAPMailAttribute][0];
                         }
                     }
                 }

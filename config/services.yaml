@@ -30,6 +30,7 @@ services:
         arguments:
             $LDAPAuthUrl: "%env(LDAP_AUTH_URL)%"
             $LDAPDnPattern: "%env(LDAP_DN_PATTERN)%"
+            $LDAPMailAttribute: "%env(LDAP_MAIL_ATTRIBUTE)%"
             $autoCreate: "%env(bool:LDAP_AUTH_USER_AUTOCREATE)%"
 
     # controllers are imported separately to make sure services can be injected
