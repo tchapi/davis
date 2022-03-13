@@ -138,7 +138,12 @@ final class LDAPAuth extends AbstractBasic
 
                 // Try to extract display name and email for this user.
                 // NB: We suppose display name is `cn` (email is configurable, generally `mail`)
-                $search_results = ldap_read($ldap, $dn, '(objectclass=*)', ['cn', $this->LDAPMailAttribute]);
+                try {
+                    $search_results = ldap_read($ldap, $dn, '(objectclass=*)', ['cn', $this->LDAPMailAttribute]);
+                } catch (\Exception $e) {
+                    $search_results = false;
+                    // Probably a "No such object" error, ignore and use available credentials (username)
+                }
 
                 if (false !== $search_results) {
                     $entry = ldap_get_entries($ldap, $search_results);
