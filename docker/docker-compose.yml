@@ -38,7 +38,7 @@ services:
     environment:
       - APP_ENV=prod
       - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
-      - MAILER_DSN=smtp://${MAIL_HOST}:${MAIL_PORT}?username=${MAIL_USERNAME}&password=${MAIL_PASSWORD}
+      - MAILER_DSN=smtp://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
       - ADMIN_LOGIN=${ADMIN_LOGIN}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - AUTH_REALM=${AUTH_REALM}
