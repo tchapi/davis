@@ -4,6 +4,7 @@ Davis
 [![Build Status][ci_badge]][ci_link]
 [![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/tchapi/davis/actions/workflows/main.yml)
 [![Latest release][release_badge]][release_link]
+[![Sponsor me][sponsor_badge]][sponsor_link]
 
 A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
@@ -314,6 +315,9 @@ This project is release under the MIT licence. See the LICENCE file
 
 [ci_badge]: https://github.com/tchapi/davis/workflows/CI/badge.svg
 [ci_link]: https://github.com/tchapi/davis/actions?query=workflow%3ACI
+
+[sponsor_badge]: https://img.shields.io/badge/sponsor%20me-🙏-blue?logo=paypal
+[sponsor_link]: https://paypal.me/tchap
 
 [release_badge]: https://img.shields.io/github/v/release/tchapi/davis
 [release_link]: https://github.com/tchapi/davis/releases
