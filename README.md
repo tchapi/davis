@@ -285,7 +285,7 @@ You can start the containers with :
 
     docker exec -it davis bash -c "APP_ENV=prod bin/console doctrine:schema:create --no-interaction"
 
-Then, head up to `http://<YOUR_DOCKER_IP>` to see the status display :
+Then, head up to `http://<YOUR_DOCKER_IP>:9000` to see the status display :
 
 ![Status page](_screenshots/status.png)
 
