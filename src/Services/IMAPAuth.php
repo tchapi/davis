@@ -2,14 +2,9 @@
 
 namespace App\Services;
 
-use App\Entity\AddressBook;
-use App\Entity\Calendar;
-use App\Entity\CalendarInstance;
-use App\Entity\Principal;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Sabre\DAV\Auth\Backend\IMAP;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class IMAPAuth extends IMAP
 {
@@ -21,11 +16,11 @@ final class IMAPAuth extends IMAP
     private $doctrine;
 
     /**
-     * The translation service.
+     * Utils class.
      *
-     * @var \Symfony\Contracts\Translation\TranslatorInterface
+     * @var Utils
      */
-    private $trans;
+    private $utils;
 
     /**
      * Should we auto create the user upon successful
@@ -35,13 +30,14 @@ final class IMAPAuth extends IMAP
      */
     private $autoCreate;
 
-    public function __construct(ManagerRegistry $doctrine, TranslatorInterface $trans, string $IMAPAuthUrl, bool $autoCreate)
+    public function __construct(ManagerRegistry $doctrine, Utils $utils, string $IMAPAuthUrl, bool $autoCreate)
     {
         parent::__construct($IMAPAuthUrl);
 
-        $this->doctrine = $doctrine;
-        $this->trans = $trans;
         $this->autoCreate = $autoCreate;
+
+        $this->doctrine = $doctrine;
+        $this->utils = $utils;
     }
 
     /**
@@ -62,57 +58,10 @@ final class IMAPAuth extends IMAP
             $user = $this->doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
 
             if (!$user) {
-                // We only have this
-                $displayName = $username;
-                $email = $username;
+                // We only have a username, so we use it for displayname and email
+                $this->utils->createUserWithDefaultObjects($username, $password, $username, $username);
 
-                $user = new User();
-                $user->setUsername($username);
-
-                // FIXME: Should we need to set the password here ?
-                $hash = password_hash($password, PASSWORD_DEFAULT);
-                $user->setPassword($hash);
-                // ------------------------------------------------
-
-                // Create principal, default calendar and addressbook
-                $principal = new Principal();
-                $principal->setUri(Principal::PREFIX.$username)
-                          ->setDisplayName($displayName)
-                          ->setEmail($email)
-                          ->setIsAdmin(false);
-
-                $calendarInstance = new CalendarInstance();
-                $calendar = new Calendar();
-                $calendarInstance->setPrincipalUri(Principal::PREFIX.$username)
-                         ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
-                         ->setDisplayName($this->trans->trans('default.calendar.title'))
-                         ->setDescription($this->trans->trans('default.calendar.description', ['user' => $displayName]))
-                         ->setCalendar($calendar);
-
-                // Enable delegation by default
-                $principalProxyRead = new Principal();
-                $principalProxyRead->setUri($principal->getUri().Principal::READ_PROXY_SUFFIX)
-                                   ->setIsMain(false);
-
-                $principalProxyWrite = new Principal();
-                $principalProxyWrite->setUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX)
-                                   ->setIsMain(false);
-
-                $addressbook = new AddressBook();
-                $addressbook->setPrincipalUri(Principal::PREFIX.$username)
-                         ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
-                         ->setDisplayName($this->trans->trans('default.addressbook.title'))
-                         ->setDescription($this->trans->trans('default.addressbook.description', ['user' => $displayName]));
-
-                // Persist all items
                 $em = $this->doctrine->getManager();
-                $em->persist($principalProxyRead);
-                $em->persist($principalProxyWrite);
-                $em->persist($calendarInstance);
-                $em->persist($addressbook);
-                $em->persist($principal);
-                $em->persist($user);
-
                 $em->flush();
             }
         }

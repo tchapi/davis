@@ -5,11 +5,13 @@ Davis
 [![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/tchapi/davis/actions/workflows/main.yml)
 [![Latest release][release_badge]][release_link]
 
-A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), largely inspired by [Baïkal](https://github.com/sabre-io/Baikal).
+A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
 Provides user edition, calendar creation and sharing, address book creation and sharing. The interface is simple and straightforward, responsive, and provides a light and a dark mode.
 
 Easily containerisable (_`Dockerfile` and sample `docker-compose` configuration file provided_).
+
+Supports **Basic authentication**, as well as **IMAP** and **LDAP** (_via external providers_).
 
 Created and maintained (with the help of the community) by [@tchapi](https://github.com/tchapi).
 
@@ -21,6 +23,7 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 
   - PHP > 7.3.0 (with `pdo_mysql` and `intl` extensions), MySQL (or MariaDB), compatible up to PHP 8.1
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
+  - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default_)
 
 # Installation
 
@@ -67,10 +70,9 @@ c. The auth Realm and method for HTTP auth
 
 ```
 AUTH_REALM=SabreDAV
-AUTH_METHOD=Basic # can be "Basic" or "IMAP"
+AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 ```
-
-> In case you use the `IMAP` auth type, you must specify the auth url (the "mailbox" url) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
+> See [the following paragraph](#specific-environment-variables-for-imap-and-ldap-authentication-methods) for more information if you choose either IMAP or LDAP.
 
 d. The global flags to enable CalDAV, CardDAV and WebDAV
 
@@ -100,6 +102,31 @@ g. The Mapbox API key so invitation emails display a nice little static map when
 ```
 MAPBOX_API_KEY=pk.XXXXXXXX
 ```
+
+### Specific environment variables for IMAP and LDAP authentication methods
+
+In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
+
+You should also explicitely define whether you want new authenticated to be created upon login:
+
+```
+IMAP_AUTH_URL="{imap.gmail.com:993/imap/ssl/novalidate-cert}"
+IMAP_AUTH_USER_AUTOCREATE=true # false by default
+```
+
+Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated to be created upon login (_like for IMAP_):
+
+```
+LDAP_AUTH_URL="ldap://127.0.0.1"
+LDAP_DN_PATTERN="mail=%u"
+LDAP_MAIL_ATTRIBUTE="mail"
+LDAP_AUTH_USER_AUTOCREATE=true # false by default
+```
+
+> Ex: for [Zimbra LDAP](https://zimbra.github.io/adminguide/latest/#zimbra_ldap_service), you might want to use the `zimbraMailDeliveryAddress` attribute to retrieve the principal user email:
+>    ```
+>    LDAP_MAIL_ATTRIBUTE="zimbraMailDeliveryAddress"
+>    ```
 
 ## Migrating from Baïkal ?
 
