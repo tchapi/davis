@@ -204,7 +204,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 
         $message = (new TemplatedEmail())
             ->from(new Address($this->senderEmail, $senderName.' '.static::MESSAGE_ORIGIN_INDICATOR))
-            ->to(new Address($recipientEmail, $recipientName))
+            ->to(new Address($recipientEmail, $recipientName ?? ''))
             ->replyTo(new Address($senderEmail, $senderName))
             ->subject($subject);
 
