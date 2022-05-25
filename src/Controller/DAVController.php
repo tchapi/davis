@@ -10,6 +10,8 @@ use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use PDO;
+use Psr\Log\LoggerInterface;
+use Sabre\DAV\Exception as SabreDavException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -104,13 +106,20 @@ class DAVController extends AbstractController
     protected $IMAPAuthBackend;
 
     /**
+     * Logger for exceptions.
+     *
+     * @var Psr\Log\LoggerInterface;
+     */
+    protected $logger;
+
+    /**
      * Server.
      *
      * @var \Sabre\DAV\Server
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $mapboxApiKey = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $mapboxApiKey = null)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -124,6 +133,7 @@ class DAVController extends AbstractController
         $this->tmpDir = $tmpDir;
 
         $this->em = $entityManager;
+        $this->logger = $logger;
         $this->mailer = $mailer;
         $this->baseUri = $router->generate('dav', ['path' => '']);
 
@@ -134,6 +144,7 @@ class DAVController extends AbstractController
         $this->mapboxApiKey = $mapboxApiKey;
 
         $this->initServer();
+        $this->initExceptionListener();
     }
 
     /**
@@ -251,6 +262,14 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());
             $this->server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->tmpDir));
         }
+    }
+
+    private function initExceptionListener()
+    {
+        $this->server->on('exception', function (\Throwable $e) {
+            $httpCode = ($e instanceof SabreDavException) ? $e->getHTTPCode() : 500;
+            $this->logger->error('['.$httpCode.']: '.get_class($e).' - '.$e->getMessage(), $e->getTrace());
+        });
     }
 
     /**
