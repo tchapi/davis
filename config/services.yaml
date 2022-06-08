@@ -49,7 +49,6 @@ services:
             $authRealm: "%env(AUTH_REALM)%"
             $publicDir: "%env(PUBLIC_DIR)%"
             $tmpDir: "%env(TMP_DIR)%"
-            $mapboxApiKey: "%env(MAPBOX_API_KEY)%"
 
     App\Security\LoginFormAuthenticator:
         arguments:

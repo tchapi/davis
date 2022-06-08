@@ -98,12 +98,6 @@ TMP_DIR='/tmp'
 PUBLIC_DIR='/public'
 ```
 
-g. The Mapbox API key so invitation emails display a nice little static map when the event has geolocation data in it
-
-```
-MAPBOX_API_KEY=pk.XXXXXXXX
-```
-
 ### Specific environment variables for IMAP and LDAP authentication methods
 
 In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.

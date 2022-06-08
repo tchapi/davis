@@ -1,7 +1,4 @@
 {
-    "composer/package-versions-deprecated": {
-        "version": "1.11.99"
-    },
     "composer/pcre": {
         "version": "1.0.0"
     },
@@ -10,6 +7,12 @@
     },
     "composer/xdebug-handler": {
         "version": "1.4.3"
+    },
+    "dantsu/php-image-editor": {
+        "version": "1.1.1"
+    },
+    "dantsu/php-osm-static-api": {
+        "version": "0.3.0"
     },
     "doctrine/annotations": {
         "version": "1.0",
@@ -126,20 +129,11 @@
     "nikic/php-parser": {
         "version": "v4.9.1"
     },
-    "ocramius/package-versions": {
-        "version": "1.5.1"
-    },
-    "ocramius/proxy-manager": {
-        "version": "2.2.3"
-    },
     "phar-io/manifest": {
         "version": "2.0.1"
     },
     "phar-io/version": {
         "version": "3.1.0"
-    },
-    "php": {
-        "version": "7.3.12"
     },
     "php-cs-fixer/diff": {
         "version": "v1.3.0"
@@ -646,11 +640,5 @@
     },
     "webmozart/assert": {
         "version": "1.9.1"
-    },
-    "zendframework/zend-code": {
-        "version": "3.4.1"
-    },
-    "zendframework/zend-eventmanager": {
-        "version": "3.2.1"
     }
 }

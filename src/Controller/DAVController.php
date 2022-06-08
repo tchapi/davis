@@ -119,7 +119,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $mapboxApiKey = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -140,8 +140,6 @@ class DAVController extends AbstractController
         $this->basicAuthBackend = $basicAuthBackend;
         $this->IMAPAuthBackend = $IMAPAuthBackend;
         $this->LDAPAuthBackend = $LDAPAuthBackend;
-
-        $this->mapboxApiKey = $mapboxApiKey;
 
         $this->initServer();
         $this->initExceptionListener();
@@ -242,7 +240,7 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             if ($this->inviteAddress) {
-                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->mapboxApiKey));
+                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->publicDir));
             }
         }
 

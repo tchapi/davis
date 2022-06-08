@@ -2,6 +2,9 @@
 
 namespace App\Plugins;
 
+use DantSu\OpenStreetMapStaticAPI\LatLng;
+use DantSu\OpenStreetMapStaticAPI\Markers;
+use DantSu\OpenStreetMapStaticAPI\OpenStreetMap;
 use Sabre\CalDAV\Schedule\IMipPlugin as SabreBaseIMipPlugin;
 use Sabre\DAV;
 use Sabre\VObject\ITip;
@@ -29,23 +32,22 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
     /**
      * @var string
      */
-    private $mapboxApiKey;
+    protected $publicDir;
 
     /**
      * Creates the email handler.
      *
-     * @param string $senderEmail.  The 'senderEmail' is the email that shows up
-     *                              in the 'From:' address. This should
-     *                              generally be some kind of no-reply email
-     *                              address you own.
-     * @param string $mapboxApiKey. The key to display the Mapbox static tile
-     *                              in the invitation email.
+     * @param string $senderEmail. The 'senderEmail' is the email that shows up
+     *                             in the 'From:' address. This should
+     *                             generally be some kind of no-reply email
+     *                             address you own.
+     * @param string $publicDir.   The directory where public images are stored.
      */
-    public function __construct(MailerInterface $mailer, string $senderEmail, ?string $mapboxApiKey = null)
+    public function __construct(MailerInterface $mailer, string $senderEmail, string $publicDir)
     {
         $this->mailer = $mailer;
         $this->senderEmail = $senderEmail;
-        $this->mapboxApiKey = $mapboxApiKey;
+        $this->publicDir = $publicDir;
     }
 
     /**
@@ -165,8 +167,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         $url = $notEmpty('URL', false);
         $description = $notEmpty('DESCRIPTION', false);
         $location = $notEmpty('LOCATION', false);
-        $locationImagePath = null;
-        $locationImageContentId = false;
+        $locationImageDataAsBase64 = false;
         $locationLink = false;
 
         if (isset($itip->message->VEVENT->{'X-APPLE-STRUCTURED-LOCATION'})) {
@@ -176,24 +177,24 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $coordinates
             );
             if (0 !== $match) {
-                if ($this->mapboxApiKey) {
-                    $zoom = 16;
-                    $width = 500;
-                    $height = 220;
-                    $locationImagePath = 'https://api.mapbox.com/styles/v1'.
-                            '/mapbox/streets-v11/static'.
-                            '/pin-m-star+285A98'.
-                            '('.$coordinates['longitude'].
-                            ','.$coordinates['latitude'].
-                            ')'.
-                            '/'.$coordinates['longitude'].
-                            ','.$coordinates['latitude'].
-                            ','.$zoom.
-                            '/'.$width.'x'.$height.
-                            '?access_token='.$this->mapboxApiKey;
-                }
+                $zoom = 16;
+                $width = 500;
+                $height = 220;
+
+                $latLng = new LatLng($coordinates['latitude'], $coordinates['longitude']);
+
+                // https://github.com/DantSu/php-osm-static-api
+                $locationImageDataAsBase64 = (new OpenStreetMap($latLng, $zoom, $width, $height))
+                    ->addMarkers(
+                        (new Markers($this->publicDir.'/images/marker.png'))
+                            ->setAnchor(Markers::ANCHOR_CENTER, Markers::ANCHOR_BOTTOM)
+                            ->addMarker(new LatLng($coordinates['latitude'], $coordinates['longitude']))
+                    )
+                    ->getImage()
+                    ->getBase64PNG();
+
                 $locationLink =
-                    'http://www.openstreetmap.org'.
+                    'https://www.openstreetmap.org'.
                     '/?mlat='.$coordinates['latitude'].
                     '&mlon='.$coordinates['longitude'].
                     '#map='.$zoom.
@@ -214,11 +215,6 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                     ->addTextHeader('X-Auto-Response-Suppress', 'OOF, DR, RN, NRN, AutoReply');
         }
 
-        if (null !== $locationImagePath) {
-            $locationImageContentId = 'event_map';
-            $message->embedFromPath($locationImagePath, $locationImageContentId, 'image/png');
-        }
-
         // Now that we have everything, we can set the message body
         $message->htmlTemplate('mails/scheduling.html.twig')
                 ->textTemplate('mails/scheduling.txt.twig')
@@ -230,7 +226,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                     'allDay' => $allDay,
                     'attendees' => $attendees,
                     'location' => $location,
-                    'locationImageContentId' => $locationImageContentId,
+                    'locationImageDataAsBase64' => $locationImageDataAsBase64,
                     'locationLink' => $locationLink,
                     'url' => $url,
                     'description' => $description,
