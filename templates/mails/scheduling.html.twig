@@ -97,11 +97,11 @@
             <td>{{ location }}</td>
           </tr>
           {% endif %}
-          {% if locationImageContentId %}
+          {% if locationImageDataAsBase64 %}
           <tr>
             <td colspan="2">
                 <a href="{{ locationLink }}" title="Navigate on this map">
-                  <img src="cid:{{ locationImageContentId }}" width="100%"/>
+                  <img src="data:image/png;base64,{{ locationImageDataAsBase64 }}" width="100%"/>
                 </a>
             </td>
           </tr>

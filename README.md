@@ -22,7 +22,7 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 
 # Requirements
 
-  - PHP > 7.3.0 (with `pdo_mysql` and `intl` extensions), MySQL (or MariaDB), compatible up to PHP 8.1
+  - PHP > 7.3.0 (with `pdo_mysql`, `gd` and `intl` extensions), MySQL (or MariaDB), compatible up to PHP 8.1
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
   - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default_)
 
@@ -96,12 +96,6 @@ f. The paths for the WebDAV installation
 ```
 TMP_DIR='/tmp'
 PUBLIC_DIR='/public'
-```
-
-g. The Mapbox API key so invitation emails display a nice little static map when the event has geolocation data in it
-
-```
-MAPBOX_API_KEY=pk.XXXXXXXX
 ```
 
 ### Specific environment variables for IMAP and LDAP authentication methods

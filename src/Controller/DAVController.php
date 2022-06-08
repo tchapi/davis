@@ -9,6 +9,7 @@ use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Connection as DoctrineConnection;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Sabre\DAV\Exception as SabreDavException;
@@ -119,7 +120,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null, ?string $mapboxApiKey = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null)
     {
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
@@ -141,8 +142,6 @@ class DAVController extends AbstractController
         $this->IMAPAuthBackend = $IMAPAuthBackend;
         $this->LDAPAuthBackend = $LDAPAuthBackend;
 
-        $this->mapboxApiKey = $mapboxApiKey;
-
         $this->initServer();
         $this->initExceptionListener();
     }
@@ -162,10 +161,14 @@ class DAVController extends AbstractController
         // Get the PDO Connection of type PDO
         // TODO: Once we drop support for PHP < 8.0 and force dbal > 3.3,
         // We can use getNativeConnection() instead of the deprecated
-        // getWrappedConnection() here.
-        $pdo = $this->em->getConnection()->getWrappedConnection();
+        // getWrappedConnection() here, and remove the `if`.
+        if (method_exists(DoctrineConnection::class,'getNativeConnection')) {
+            $pdo = $this->em->getConnection()->getNativeConnection();
+        } else {
+            $pdo = $this->em->getConnection()->getWrappedConnection();
+        }
         if (!($pdo instanceof PDO)) {
-            $pdo = $pdo->getWrappedConnection();
+            $pdo = $pdo->getNativeConnection();
         }
 
         /*
@@ -242,7 +245,7 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             if ($this->inviteAddress) {
-                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->mapboxApiKey));
+                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->publicDir));
             }
         }
 
