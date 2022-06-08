@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "82bc37148a58dd11dad8901235ddaa5b",
+    "content-hash": "a1d1dfbd388fdd3ff36bf85519525aa2",
     "packages": [
         {
             "name": "dantsu/php-image-editor",
@@ -10803,6 +10803,7 @@
         "php": "^7.3.0 || ^8.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-gd": "*",
         "composer-runtime-api": "^2"
     },
     "platform-dev": [],
