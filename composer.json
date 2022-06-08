@@ -7,6 +7,7 @@
         "php": "^7.3.0 || ^8.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-gd": "*",
         "composer-runtime-api": "^2",
         "dantsu/php-osm-static-api": "^0.3.0",
         "doctrine/annotations": "^1.0",
