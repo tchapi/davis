@@ -1,30 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" backupGlobals="false" processIsolation="true" colors="true" bootstrap="config/bootstrap.php">
-  <coverage>
-    <include>
-      <directory>src</directory>
-    </include>
-  </coverage>
-  <php>
-    <ini name="error_reporting" value="-1"/>
-    <server name="APP_ENV" value="test" force="true"/>
-    <server name="SHELL_VERBOSITY" value="-1"/>
-    <server name="SYMFONY_PHPUNIT_REMOVE" value=""/>
-    <server name="SYMFONY_PHPUNIT_VERSION" value="7.5"/>
-    <!-- ###+ symfony/framework-bundle ### -->
-    <env name="APP_ENV" value="dev"/>
-    <env name="APP_SECRET" value="48bfdfefe5bea124be17563bbf82859d"/>
-    <!-- env name="TRUSTED_PROXIES" value="127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" -->
-    <!-- env name="TRUSTED_HOSTS" value="'^(localhost|example\.com)$'" -->
-    <!-- ###- symfony/framework-bundle ### -->
-  </php>
-  <testsuites>
-    <testsuite name="Project Test Suite">
-      <directory>tests</directory>
-    </testsuite>
-  </testsuites>
-  <listeners>
-    <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-  </listeners>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+            backupGlobals="false"
+            colors="true"
+            bootstrap="tests/bootstrap.php"
+            processIsolation="true" 
+            convertDeprecationsToExceptions="false"
+    >
+    <php>
+        <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="-1" />
+        <server name="APP_ENV" value="test" force="true" />
+        <server name="SHELL_VERBOSITY" value="-1" />
+        <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
+        <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
+    </php>
+
+    <testsuites>
+        <testsuite name="Project Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+    </listeners>
 </phpunit>
