@@ -21,6 +21,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+            - name: Install GD PHP extension
+              run: |
+                apk add $PHPIZE_DEPS libpng-dev
+                docker-php-ext-configure gd
+                docker-php-ext-install gd
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Cache Composer dependencies
@@ -75,11 +80,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Install MySQL PHP extension
+            - name: Install MySQL / GD PHP extensions
               run: |
                 apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev
                 docker-php-ext-configure intl
-                docker-php-ext-configure gd --with-gd --with-png-dir
+                docker-php-ext-configure gd
                 docker-php-ext-install pdo pdo_mysql intl gd
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
