@@ -77,9 +77,10 @@ jobs:
               uses: actions/checkout@v2
             - name: Install MySQL PHP extension
               run: |
-                apk add $PHPIZE_DEPS icu-libs icu-dev
+                apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev
                 docker-php-ext-configure intl
-                docker-php-ext-install pdo pdo_mysql intl
+                docker-php-ext-configure gd --with-gd --with-png-dir
+                docker-php-ext-install pdo pdo_mysql intl gd
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Cache Composer dependencies
