@@ -8,8 +8,8 @@ use App\Plugins\DavisIMipPlugin;
 use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\DBAL\Connection as DoctrineConnection;
+use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Sabre\DAV\Exception as SabreDavException;
@@ -164,7 +164,7 @@ class DAVController extends AbstractController
         // TODO: Once we drop support for PHP < 8.0 and force dbal > 3.3,
         // We can use getNativeConnection() instead of the deprecated
         // getWrappedConnection() here, and remove the `if`.
-        if (method_exists(DoctrineConnection::class,'getNativeConnection')) {
+        if (method_exists(DoctrineConnection::class, 'getNativeConnection')) {
             $pdo = $this->em->getConnection()->getNativeConnection();
         } else {
             $pdo = $this->em->getConnection()->getWrappedConnection();
