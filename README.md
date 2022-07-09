@@ -94,8 +94,8 @@ f. The paths for the WebDAV installation
 > I recommend that you use absolute directories so you know exactly where your files reside.
 
 ```
-TMP_DIR='/tmp'
-PUBLIC_DIR='/public'
+WEBDAV_TMP_DIR='/tmp'
+WEBDAV_PUBLIC_DIR='/webdav'
 ```
 
 ### Specific environment variables for IMAP and LDAP authentication methods

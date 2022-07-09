@@ -66,14 +66,14 @@ class DAVController extends AbstractController
      *
      * @var string
      */
-    protected $publicDir;
+    protected $webdavPublicDir;
 
     /**
      * WebDAV Temporary directory.
      *
      * @var string
      */
-    protected $tmpDir;
+    protected $webdavTmpDir;
 
     /**
      * @var EntityManagerInterface
@@ -120,8 +120,10 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $publicDir = null, ?string $tmpDir = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavTmpDir = null)
     {
+        $this->publicDir = $publicDir;
+
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
         $this->webDAVEnabled = $webDAVEnabled;
@@ -130,8 +132,8 @@ class DAVController extends AbstractController
         $this->authMethod = $authMethod;
         $this->authRealm = $authRealm ?? User::DEFAULT_AUTH_REALM;
 
-        $this->publicDir = $publicDir;
-        $this->tmpDir = $tmpDir;
+        $this->webdavPublicDir = $webdavPublicDir;
+        $this->webdavTmpDir = $webdavTmpDir;
 
         $this->em = $entityManager;
         $this->logger = $logger;
@@ -210,8 +212,8 @@ class DAVController extends AbstractController
             $carddavBackend = new \Sabre\CardDAV\Backend\PDO($pdo);
             $nodes[] = new \Sabre\CardDAV\AddressBookRoot($principalBackend, $carddavBackend);
         }
-        if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
-            $nodes[] = new \Sabre\DAV\FS\Directory($this->publicDir);
+        if ($this->webDAVEnabled && $this->webdavTmpDir && $this->webdavPublicDir) {
+            $nodes[] = new \Sabre\DAV\FS\Directory($this->webdavPublicDir);
         }
 
         // The object tree needs in turn to be passed to the server class
@@ -256,14 +258,14 @@ class DAVController extends AbstractController
         }
 
         // WebDAV plugins
-        if ($this->webDAVEnabled && $this->tmpDir && $this->publicDir) {
-            if (!is_dir($this->tmpDir) || !is_dir($this->publicDir)) {
+        if ($this->webDAVEnabled && $this->webdavTmpDir && $this->webdavPublicDir) {
+            if (!is_dir($this->webdavTmpDir) || !is_dir($this->webdavPublicDir)) {
                 throw new \Exception('The WebDAV temp dir and/or public dir are not available. Make sure they are created with the correct permissions.');
             }
-            $lockBackend = new \Sabre\DAV\Locks\Backend\File($this->tmpDir.'/locksdb');
+            $lockBackend = new \Sabre\DAV\Locks\Backend\File($this->webdavTmpDir.'/locksdb');
             $this->server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
             $this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());
-            $this->server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->tmpDir));
+            $this->server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->webdavTmpDir));
         }
     }
 
