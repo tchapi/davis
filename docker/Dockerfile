@@ -14,7 +14,9 @@ RUN apk --no-progress --update add --no-cache \
         # These are for GD (map image in mail)
         freetype \
         libjpeg-turbo \
-        libpng
+        libpng \
+        # This is for PostgreSQL
+        libpq
 
 # Intl support
 RUN apk --update --virtual build-deps-intl add --no-cache icu-dev \
