@@ -277,7 +277,7 @@ You can start the containers with :
 
 **⚠ Do not forget to create the database the first time you run the container** :
 
-    docker exec -it davis bash -c "APP_ENV=prod bin/console doctrine:schema:create --no-interaction"
+    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:schema:create --no-interaction"
 
 Then, head up to `http://<YOUR_DOCKER_IP>:9000` to see the status display :
 

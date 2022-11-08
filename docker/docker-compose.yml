@@ -1,9 +1,10 @@
 version: "3.7"
+name: "davis-docker"
 
 services:
 
   nginx:
-    image: nginx:1.20.0-alpine
+    image: nginx:1.23-alpine
     container_name: nginx
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     depends_on:
@@ -17,7 +18,7 @@ services:
       - 9000:80
 
   mysql:
-    image: mariadb:10.4.18
+    image: mariadb:10.6.10
     container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -37,7 +38,7 @@ services:
     container_name: davis
     environment:
       - APP_ENV=prod
-      - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
+      - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}?serverVersion=mariadb-10.6.10&charset=utf8mb4
       - MAILER_DSN=smtp://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
       - ADMIN_LOGIN=${ADMIN_LOGIN}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
