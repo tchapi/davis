@@ -33,7 +33,7 @@ class Lock
     private $created;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $token;
 
@@ -48,7 +48,7 @@ class Lock
     private $depth;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $uri;
 

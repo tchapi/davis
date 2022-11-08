@@ -40,7 +40,7 @@ class CalendarInstance
     private $calendar;
 
     /**
-     * @ORM\Column(name="principaluri", type="binary", length=255, nullable=true)
+     * @ORM\Column(name="principaluri", type="string", length=255, nullable=true)
      */
     private $principalUri;
 
@@ -55,7 +55,7 @@ class CalendarInstance
     private $displayName;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Regex("/[0-9a-z\-]+/")
      */
     private $uri;
@@ -71,7 +71,7 @@ class CalendarInstance
     private $calendarOrder;
 
     /**
-     * @ORM\Column(name="calendarcolor", type="binary", length=10, nullable=true)
+     * @ORM\Column(name="calendarcolor", type="string", length=10, nullable=true)
      * @Assert\Regex("/\#[0-9A-F]{6}/")
      */
     private $calendarColor;
@@ -87,7 +87,7 @@ class CalendarInstance
     private $transparent;
 
     /**
-     * @ORM\Column(name="share_href", type="binary", length=255, nullable=true)
+     * @ORM\Column(name="share_href", type="string", length=255, nullable=true)
      */
     private $shareHref;
 

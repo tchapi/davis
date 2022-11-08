@@ -28,14 +28,14 @@ class Principal
     private $id;
 
     /**
-     * @ORM\Column(type="binary", length=255, unique=true)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank
      * @Assert\Unique
      */
     private $uri;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."
      * )

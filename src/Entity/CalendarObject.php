@@ -23,7 +23,7 @@ class CalendarObject
     private $calendarData;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $uri;
 
@@ -39,7 +39,7 @@ class CalendarObject
     private $lastModified;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $etag;
 
@@ -49,7 +49,7 @@ class CalendarObject
     private $size;
 
     /**
-     * @ORM\Column(name="componenttype", type="binary", length=255, nullable=true)
+     * @ORM\Column(name="componenttype", type="string", length=255, nullable=true)
      */
     private $componentType;
 
@@ -64,7 +64,7 @@ class CalendarObject
     private $lastOccurence;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $uid;
 
