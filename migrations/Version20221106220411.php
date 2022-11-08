@@ -8,17 +8,19 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Change VARBINARY to VARCHAR to allow better PostgreSQL support
+ * Change VARBINARY to VARCHAR to allow better PostgreSQL support in later migrations
  */
 final class Version20221106220411 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Change VARBINARY to VARCHAR to allow better PostgreSQL support later';
+        return 'Change VARBINARY to VARCHAR to allow better PostgreSQL support in later migrations';
     }
 
     public function up(Schema $schema): void
     {
+        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+
         $this->addSql('ALTER TABLE addressbookchanges CHANGE uri uri VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE addressbooks CHANGE principaluri principaluri VARCHAR(255) NOT NULL, CHANGE uri uri VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE calendarchanges CHANGE uri uri VARCHAR(255) NOT NULL');
@@ -37,6 +39,8 @@ final class Version20221106220411 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
+        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+
         $this->addSql('ALTER TABLE addressbookchanges CHANGE uri uri VARBINARY(255) NOT NULL');
         $this->addSql('ALTER TABLE addressbooks CHANGE principaluri principaluri VARBINARY(255) NOT NULL, CHANGE uri uri VARBINARY(255) NOT NULL');
         $this->addSql('ALTER TABLE calendarchanges CHANGE uri uri VARBINARY(255) NOT NULL');

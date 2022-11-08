@@ -275,9 +275,22 @@ You can start the containers with :
 
     cd docker && docker-compose up -d
 
-**⚠ Do not forget to create the database the first time you run the container** :
+**⚠ Do not forget to run all the migrations the first time you run the container** :
 
-    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:schema:create --no-interaction"
+    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
+
+### Updating
+
+If you update the code, you need to make sure the database structure is in sync.
+
+**Before v2.2.0**, you need to force the update:
+
+    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:schema:update --force --no-interaction"
+
+**For v2.2.0 and after**, you can just migrate again:
+
+    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
+
 
 Then, head up to `http://<YOUR_DOCKER_IP>:9000` to see the status display :
 
