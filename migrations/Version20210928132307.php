@@ -19,14 +19,14 @@ final class Version20210928132307 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
 
         $this->addSql('ALTER TABLE calendarinstances CHANGE calendarorder calendarorder INT DEFAULT 0 NOT NULL');
     }
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
 
         $this->addSql('ALTER TABLE calendarinstances CHANGE calendarorder calendarorder INT NOT NULL');
     }

@@ -19,7 +19,7 @@ final class Version20221106220412 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'postgresql\'.');
+        $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'postgresql\'. Skipping it is fine.');
 
         $this->addSql('CREATE SEQUENCE addressbooks_id_seq INCREMENT BY 1 MINVALUE 1 START 1;');
         $this->addSql('CREATE SEQUENCE calendars_id_seq INCREMENT BY 1 MINVALUE 1 START 1;');
@@ -69,7 +69,7 @@ final class Version20221106220412 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'postgresql\'.');
+        $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'postgresql\'. Skipping it is fine.');
 
         $this->addSql('ALTER TABLE cards DROP CONSTRAINT FK_4C258FD8B26C2E9;');
         $this->addSql('ALTER TABLE calendarinstances DROP CONSTRAINT FK_51856561B8CB7204;');

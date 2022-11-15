@@ -19,7 +19,7 @@ final class Version20221106220411 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
 
         $this->addSql('ALTER TABLE addressbookchanges CHANGE uri uri VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE addressbooks CHANGE principaluri principaluri VARCHAR(255) NOT NULL, CHANGE uri uri VARCHAR(255) NOT NULL');
@@ -39,7 +39,7 @@ final class Version20221106220411 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
 
         $this->addSql('ALTER TABLE addressbookchanges CHANGE uri uri VARBINARY(255) NOT NULL');
         $this->addSql('ALTER TABLE addressbooks CHANGE principaluri principaluri VARBINARY(255) NOT NULL, CHANGE uri uri VARBINARY(255) NOT NULL');
