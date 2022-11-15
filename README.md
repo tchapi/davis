@@ -294,11 +294,18 @@ You can start the containers with :
 
     cd docker && docker-compose up -d
 
+> **Note**
+>
+> The recipe above uses MariaDB but you can also use PostgreSQL with:
+> ```
+> cd docker && docker-compose -f docker-compose-postgresql.yml up -d
+> ```
+
 **⚠ Do not forget to run all the migrations the first time you run the container** :
 
     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
 
-### Updating
+### Updating from a previous version
 
 If you update the code, you need to make sure the database structure is in sync.
 
