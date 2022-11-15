@@ -57,7 +57,7 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 a. The database url (_you should already have it configured since you created the database previously_)
     
 ```
-DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name
+DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4
 ```
 
 b. The admin password for the backend
@@ -210,7 +210,7 @@ The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
         # Env vars (if you did not use .env.local)
         SetEnv APP_ENV prod
         SetEnv APP_SECRET <app-secret-id>
-        SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name"
+        SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4"
         # ... etc
     </VirtualHost>
 
@@ -235,7 +235,7 @@ The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
 
             # Env vars (if you did not use .env.local)            fastcgi_param APP_ENV prod;
             fastcgi_param APP_SECRET <app-secret-id>;
-            fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name";
+            fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4";
             # ... etc ...
 
             fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
