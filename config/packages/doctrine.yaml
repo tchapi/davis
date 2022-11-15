@@ -1,10 +1,9 @@
 doctrine:
     dbal:
-        # configure these for your database server
-        # use postgresql for PostgreSQL
-        # use sqlite for SQLite
-        driver: 'mysql'
-        server_version: '5.7'
+        # The server_version must be configured directly in the
+        # DATABASE_URL to allow different drivers without adding
+        # too many env vars
+        driver: '%env(string:default:default_database_driver:DATABASE_DRIVER)%'
 
         # only needed for MySQL
         charset: utf8mb4
