@@ -297,11 +297,11 @@ You can start the containers with :
 
 If you update the code, you need to make sure the database structure is in sync.
 
-**Before v2.2.0**, you need to force the update:
+**Before v3.0.0**, you need to force the update:
 
     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:schema:update --force --no-interaction"
 
-**For v2.2.0 and after**, you can just migrate again (_provided you correctly followed the migration notes in the v2.2.0 release_):
+**For v3.0.0 and after**, you can just migrate again (_provided you correctly followed the migration notes in the v3.0.0 release_):
 
     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
 
