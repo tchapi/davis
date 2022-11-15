@@ -36,17 +36,17 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 composer install
 ```
 
-2. At least put the correct credentials to your database in your `.env.local` file so you can easily create your database.
+2. At least put the correct credentials to your database in your `.env.local` file so you can easily create the necessary tables.
 
-3. Create the database:
+3. Run the migrations to create all the necessary tables:
 
 ```
-bin/console doctrine:schema:create
+bin/console doctrine:migrations:migrate
 ```
 
-**Davis** can be used with a pre-existing MySQL database (_for instance, one previously managed by Baïkal_). The only missing table would be the `migrations` table, that you can recreate automatically when running the migrations.
+**Davis** can also be used with a pre-existing MySQL database (_for instance, one previously managed by Baïkal_). See the paragraph "Migrating from Baikal" for more info.
 
-> The migrations are not _exactly_ equivalent to those of Baïkal, and allow for a bit more room in columns.
+> The tables are not _exactly_ equivalent to those of Baïkal, and allow for a bit more room in columns for instance (among other things)
 
 ## Configuration
 
@@ -123,21 +123,35 @@ LDAP_AUTH_USER_AUTOCREATE=true # false by default
 >    LDAP_MAIL_ATTRIBUTE="zimbraMailDeliveryAddress"
 >    ```
 
-## Migrating from Baïkal ?
+## Migrating from Baïkal?
 
 If you're migrating from Baïkal, then you will likely want to do the following :
 
 1. Get a backup of your data (without the `CREATE`  statements, but with complete `INSERT`  statements):
 
-    `mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database`
+```
+mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database
+```
 
-2. Create a new database for Davis (let's name it `davis`) and create the schema :
 
-    `bin/console doctrine:schema:create`
+2. Create a new database for Davis (let's name it `davis`) and create the base schema:
+
+```
+bin/console doctrine:migrations:migrate 'DoctrineMigrations\Version20191030113307' --no-interaction
+```
+
 
 3. Reimport the data back:
 
-    `mysql -uroot -p davis < baikal_to_davis.sql`
+```
+mysql -uroot -p davis < baikal_to_davis.sql
+```
+
+4. Run the necessary remaining migrations:
+
+```
+bin/console doctrine:migrations:migrate
+```
 
 # Access / Webserver
 
@@ -287,7 +301,7 @@ If you update the code, you need to make sure the database structure is in sync.
 
     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:schema:update --force --no-interaction"
 
-**For v2.2.0 and after**, you can just migrate again:
+**For v2.2.0 and after**, you can just migrate again (_provided you correctly followed the migration notes in the v2.2.0 release_):
 
     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
 
