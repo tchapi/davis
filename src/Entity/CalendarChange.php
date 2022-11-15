@@ -18,7 +18,7 @@ class CalendarChange
     private $id;
 
     /**
-     * @ORM\Column(type="binary", length=255)
+     * @ORM\Column(type="string", length=255)
      */
     private $uri;
 

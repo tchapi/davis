@@ -23,13 +23,13 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="binary", length=255, unique=true)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank
      */
     private $username;
 
     /**
-     * @ORM\Column(name="digesta1", type="binary", length=255)
+     * @ORM\Column(name="digesta1", type="string", length=255)
      */
     private $password;
 

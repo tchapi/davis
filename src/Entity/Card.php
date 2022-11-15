@@ -29,7 +29,7 @@ class Card
     private $cardData;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $uri;
 
@@ -39,7 +39,7 @@ class Card
     private $lastModified;
 
     /**
-     * @ORM\Column(type="binary", length=32, nullable=true)
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     private $etag;
 

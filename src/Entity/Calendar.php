@@ -29,7 +29,7 @@ class Calendar
     private $synctoken;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $components;
 

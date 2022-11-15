@@ -18,12 +18,12 @@ class CalendarSubscription
     private $id;
 
     /**
-     * @ORM\Column(type="binary", length=255)
+     * @ORM\Column(type="string", length=255)
      */
     private $uri;
 
     /**
-     * @ORM\Column(name="principaluri", type="binary", length=255)
+     * @ORM\Column(name="principaluri", type="string", length=255)
      */
     private $principalUri;
 
@@ -48,7 +48,7 @@ class CalendarSubscription
     private $calendarOrder;
 
     /**
-     * @ORM\Column(name="calendarcolor", type="binary", length=10, nullable=true)
+     * @ORM\Column(name="calendarcolor", type="string", length=10, nullable=true)
      */
     private $calendarColor;
 

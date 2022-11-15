@@ -19,7 +19,7 @@ class SchedulingObject
     private $id;
 
     /**
-     * @ORM\Column(name="principaluri", type="binary", length=255, nullable=true)
+     * @ORM\Column(name="principaluri", type="string", length=255, nullable=true)
      */
     private $principalUri;
 
@@ -29,7 +29,7 @@ class SchedulingObject
     private $calendarData;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Regex("/[0-9a-z\-]+/")
      */
     private $uri;
@@ -40,7 +40,7 @@ class SchedulingObject
     private $lastModified;
 
     /**
-     * @ORM\Column(type="binary", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $etag;
 

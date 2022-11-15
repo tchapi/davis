@@ -27,7 +27,7 @@ class AddressBook
     private $id;
 
     /**
-     * @ORM\Column(name="principaluri", type="binary", length=255)
+     * @ORM\Column(name="principaluri", type="string", length=255)
      */
     private $principalUri;
 
@@ -37,7 +37,7 @@ class AddressBook
     private $displayName;
 
     /**
-     * @ORM\Column(type="binary", length=255)
+     * @ORM\Column(type="string", length=255)
      * @Assert\Regex("/[0-9a-z\-]+/")
      */
     private $uri;
