@@ -22,9 +22,10 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 
 # Requirements
 
-  - PHP > 7.3.0 (with `pdo_mysql`, `gd` and `intl` extensions), MySQL (or MariaDB), compatible up to PHP 8.1
+  - PHP > 7.3.0 (with `pdo_mysql` [or `pdo_pgsql`], `gd` and `intl` extensions), compatible up to PHP 8.1
+  - A compatible database layer, such as MySQL or MariaDB (recommended) or PostgreSQL (not extensively tested yet)
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
-  - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default_)
+  - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default except in the Docker image_)
 
 # Installation
 
@@ -36,7 +37,7 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 composer install
 ```
 
-2. At least put the correct credentials to your database in your `.env.local` file so you can easily create the necessary tables.
+2. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
 
 3. Run the migrations to create all the necessary tables:
 
@@ -54,9 +55,10 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 
 > If your installation is behind a web server like Apache or Nginx, you can setup the env vars directly in your Apache or Nginx configuration (see below). Skip this part in this case.
 
-a. The database url (_you should already have it configured since you created the database previously_)
+a. The database driver and url (_you should already have it configured since you created the database previously_)
     
 ```
+DATABASE_DRIVER=mysql # or postgresql
 DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4
 ```
 
@@ -210,6 +212,7 @@ The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
         # Env vars (if you did not use .env.local)
         SetEnv APP_ENV prod
         SetEnv APP_SECRET <app-secret-id>
+        SetEnv DATABASE_DRIVER "mysql"
         SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4"
         # ... etc
     </VirtualHost>
@@ -233,8 +236,10 @@ The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
             fastcgi_split_path_info ^(.+\.php)(/.*)$;
             include fastcgi_params;
 
-            # Env vars (if you did not use .env.local)            fastcgi_param APP_ENV prod;
+            # Env vars (if you did not use .env.local)
+            fastcgi_param APP_ENV prod;
             fastcgi_param APP_SECRET <app-secret-id>;
+            fastcgi_param DATABASE_DRIVER "mysql"
             fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4";
             # ... etc ...
 
