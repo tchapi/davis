@@ -332,7 +332,7 @@ You can spin off a local PHP webserver with:
 
 If you change or add translations, you need to update the `messages` XLIFF file with:
 
-    bin/console translation:update en --force --domain=messages+intl-icu
+    bin/console translation:extract en --force --domain=messages+intl-icu
 
 # Libraries used
 
