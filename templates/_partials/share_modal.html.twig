@@ -24,15 +24,21 @@
         <form class="mt-2">
           <div class="form-group">
             <label for="member" class="col-form-label">{{ "calendars.delegates.member.add"|trans }}</label>
-            <select class="form-control" id="member">
+            <select class="form-control" id="member" {% if principals|length == 0 %}disabled="disabled"{% endif %}>
               {% for principal in principals %}
                 <option value="{{ principal.id}}">{{ principal.displayName }} ({{ principal.email }})</option>
               {% endfor %}
             </select>
-            <small class="form-text text-muted">{{ "calendars.delegates.member.help"|trans }}</small>
+            <small class="form-text text-muted">
+            {% if principals|length == 0 %}
+              {{ "calendars.delegates.member.none"|trans }}
+            {% else %}
+              {{ "calendars.delegates.member.help"|trans }}
+            {% endif %}
+            </small>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="write">
+            <input class="form-check-input" type="checkbox" value="" id="write" {% if principals|length == 0 %}disabled="disabled"{% endif %}>
             <label class="form-check-label" for="write">
               {{ "calendars.delegates.write.give"|trans }}
             </label>
@@ -41,7 +47,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ "cancel"|trans }}</button>
-        <a href="#" class="btn btn-primary add-sharee">{{ "add"|trans }}</a>
+        <a href="#" class="btn btn-primary add-sharee{% if principals|length == 0 %} disabled"{% endif %}">{{ "add"|trans }}</a>
       </div>
     </div>
   </div>

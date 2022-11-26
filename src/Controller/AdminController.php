@@ -442,9 +442,9 @@ class AdminController extends AbstractController
         $response = [];
         foreach ($instances as $instance) {
             $response[] = [
-                'principalUri' => stream_get_contents($instance[0]['principalUri']),
+                'principalUri' => $instance[0]['principalUri'],
                 'displayName' => $instance['displayName'],
-                'email' => stream_get_contents($instance['email']),
+                'email' => $instance['email'],
                 'accessText' => $trans->trans('calendar.share_access.'.$instance[0]['access']),
                 'isWriteAccess' => CalendarInstance::ACCESS_READWRITE === $instance[0]['access'],
                 'revokeUrl' => $this->generateUrl('calendar_revoke', ['username' => $username, 'id' => $instance[0]['id']]),

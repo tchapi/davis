@@ -5,7 +5,7 @@
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="wfWj5hl" resname="davis">
+      <trans-unit id="RFjpCN2" resname="davis">
         <source>davis</source>
         <target>Davis</target>
       </trans-unit>
@@ -264,6 +264,10 @@
       <trans-unit id="B95edtg" resname="calendars.delegates.member.help">
         <source>calendars.delegates.member.help</source>
         <target>Adding a user who already has a shared access to this calendar will only affect its access right</target>
+      </trans-unit>
+      <trans-unit id="Pk_1mdm" resname="calendars.delegates.member.none">
+        <source>calendars.delegates.member.none</source>
+        <target>There are no other user to share this calendar with</target>
       </trans-unit>
       <trans-unit id="Iq2tnfk" resname="addressbooks.saved">
         <source>addressbooks.saved</source>
