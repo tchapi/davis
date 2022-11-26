@@ -33,7 +33,7 @@ final class Version20221106220411 extends AbstractMigration
         $this->addSql('ALTER TABLE principals CHANGE uri uri VARCHAR(255) NOT NULL, CHANGE email email VARCHAR(255) DEFAULT NULL');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_E797E7FB841CB121 ON principals (uri)');
         $this->addSql('ALTER TABLE schedulingobjects CHANGE principaluri principaluri VARCHAR(255) DEFAULT NULL, CHANGE uri uri VARCHAR(255) DEFAULT NULL, CHANGE etag etag VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE users CHANGE digesta1 digesta1 VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE users CHANGE digesta1 digesta1 VARCHAR(255) NOT NULL, CHANGE username username VARCHAR(255) NOT NULL');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_1483A5E9F85E0677 ON users (username)');
     }
 
@@ -54,6 +54,6 @@ final class Version20221106220411 extends AbstractMigration
         $this->addSql('ALTER TABLE principals CHANGE uri uri VARBINARY(255) NOT NULL, CHANGE email email VARBINARY(255) DEFAULT NULL');
         $this->addSql('ALTER TABLE schedulingobjects CHANGE principaluri principaluri VARBINARY(255) DEFAULT NULL, CHANGE uri uri VARBINARY(255) DEFAULT NULL, CHANGE etag etag VARBINARY(255) DEFAULT NULL');
         $this->addSql('DROP INDEX UNIQ_1483A5E9F85E0677 ON users');
-        $this->addSql('ALTER TABLE users CHANGE digesta1 digesta1 VARBINARY(255) NOT NULL');
+        $this->addSql('ALTER TABLE users CHANGE digesta1 digesta1 VARBINARY(255) NOT NULL, CHANGE username username VARBINARY(255) NOT NULL');
     }
 }
