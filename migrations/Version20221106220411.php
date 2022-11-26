@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Change VARBINARY to VARCHAR to allow better PostgreSQL support in later migrations
+ * Change VARBINARY to VARCHAR to allow better PostgreSQL support in later migrations.
  */
 final class Version20221106220411 extends AbstractMigration
 {

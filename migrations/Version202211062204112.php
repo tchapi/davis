@@ -64,7 +64,6 @@ final class Version20221106220412 extends AbstractMigration
         $this->addSql('ALTER TABLE groupmembers ADD CONSTRAINT FK_6F15EDAC7597D3FE FOREIGN KEY (member_id) REFERENCES principals (id) NOT DEFERRABLE INITIALLY IMMEDIATE;');
         $this->addSql('ALTER TABLE calendarchanges ADD CONSTRAINT FK_737547E2B8CB7204 FOREIGN KEY (calendarid) REFERENCES calendars (id) NOT DEFERRABLE INITIALLY IMMEDIATE;');
         $this->addSql('ALTER TABLE calendarobjects ADD CONSTRAINT FK_E14F332CB8CB7204 FOREIGN KEY (calendarid) REFERENCES calendars (id) NOT DEFERRABLE INITIALLY IMMEDIATE;');
-
     }
 
     public function down(Schema $schema): void
@@ -105,6 +104,5 @@ final class Version20221106220412 extends AbstractMigration
         $this->addSql('DROP TABLE users;');
         $this->addSql('DROP TABLE calendarobjects;');
         $this->addSql('DROP TABLE propertystorage;');
-
     }
 }
