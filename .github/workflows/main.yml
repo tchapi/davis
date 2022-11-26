@@ -47,4 +47,5 @@ jobs:
           labels: |
             org.opencontainers.image.source=${{ github.event.repository.html_url }}
             org.opencontainers.image.created=${{ steps.prepare_tags.outputs.created }}
+            org.opencontainers.image.version=${{ steps.prepare_tags.outputs.version }}
             org.opencontainers.image.revision=${{ github.sha }}
