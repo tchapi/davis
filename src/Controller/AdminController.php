@@ -19,6 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -273,6 +274,10 @@ class AdminController extends AbstractController
      */
     public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, string $username)
     {
+        if (!is_numeric($request->get('principalId'))) {
+            throw new BadRequestHttpException();
+        }
+
         $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
 
         if (!$newMemberToAdd) {
@@ -462,6 +467,10 @@ class AdminController extends AbstractController
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($instanceid);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
+        }
+
+        if (!is_numeric($request->get('principalId'))) {
+            throw new BadRequestHttpException();
         }
 
         $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
