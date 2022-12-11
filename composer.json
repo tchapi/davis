@@ -16,7 +16,6 @@
         "doctrine/orm": "^2.9",
         "phpdocumentor/reflection-docblock": "^5.2",
         "sabre/dav": "^4.1",
-        "sensio/framework-extra-bundle": "^6.2",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "^5.4",
         "symfony/console": "^5.4",
