@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="locks")
- * @ORM\Entity(repositoryClass="App\Repository\LockRepository")
+ * @ORM\Entity()
  */
 class Lock
 {

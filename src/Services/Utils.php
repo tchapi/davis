@@ -42,6 +42,7 @@ final class Utils
 
     /**
      * Hash a password according to the realm.
+     * Important note: It is very insecure and this is used only for the legacy sabre/dav implementation.
      */
     public function hashPassword(string $username, string $password): string
     {

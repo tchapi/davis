@@ -22,7 +22,7 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 
 # Requirements
 
-  - PHP > 7.3.0 (with `pdo_mysql` [or `pdo_pgsql`], `gd` and `intl` extensions), compatible up to PHP 8.1
+  - PHP > 7.3.0 (with `pdo_mysql` [or `pdo_pgsql`], `gd` and `intl` extensions), compatible up to PHP 8.2
   - A compatible database layer, such as MySQL or MariaDB (recommended) or PostgreSQL (not extensively tested yet)
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
   - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default except in the Docker image_)
@@ -333,6 +333,18 @@ You can spin off a local PHP webserver with:
 If you change or add translations, you need to update the `messages` XLIFF file with:
 
     bin/console translation:extract en --force --domain=messages+intl-icu
+
+## Testing
+
+You can use:
+
+    ./bin/phpunit
+
+## Code linting
+
+We use [PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) with:
+
+    PHP_CS_FIXER_IGNORE_ENV=True ./vendor/bin/php-cs-fixer fix
 
 # Libraries used
 

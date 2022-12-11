@@ -14,7 +14,7 @@ jobs:
         name: Analyze
         runs-on: ubuntu-latest
         container:
-            image: php:8.0-alpine
+            image: php:8.2-alpine
             options: >-
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
@@ -41,7 +41,7 @@ jobs:
             - name: Install highest dependencies with Composer
               run: composer update --no-progress --ansi
             - name: Analyze
-              run: vendor/bin/php-cs-fixer fix --ansi
+              run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
 
     phpunit:
         name: PHPUnit (PHP ${{ matrix.php }} Deps ${{ matrix.dependencies }})
@@ -73,6 +73,7 @@ jobs:
                     - '7.4'
                     - '8.0'
                     - '8.1'
+                    - '8.2'
                 dependencies:
                     - lowest
                     - highest

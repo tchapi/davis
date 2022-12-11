@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="schedulingobjects")
- * @ORM\Entity(repositoryClass="App\Repository\SchedulingObjectRepository")
+ * @ORM\Entity()
  */
 class SchedulingObject
 {
