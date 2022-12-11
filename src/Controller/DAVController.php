@@ -55,11 +55,12 @@ class DAVController extends AbstractController
     protected $inviteAddress;
 
     /**
-     * HTTP authentication realm.
+     * Public directory of the Symfony installation.
+     * Needed to retrieve assets (images).
      *
      * @var string
      */
-    protected $authRealm;
+    protected $publicDir;
 
     /**
      * WebDAV Public directory.
@@ -107,6 +108,13 @@ class DAVController extends AbstractController
     protected $IMAPAuthBackend;
 
     /**
+     * LDAP Auth Backend class.
+     *
+     * @var \App\Services\LDAPAuth
+     */
+    protected $LDAPAuthBackend;
+
+    /**
      * Logger for exceptions.
      *
      * @var Psr\Log\LoggerInterface;
@@ -129,9 +137,6 @@ class DAVController extends AbstractController
         $this->webDAVEnabled = $webDAVEnabled;
         $this->inviteAddress = $inviteAddress ?? null;
 
-        $this->authMethod = $authMethod;
-        $this->authRealm = $authRealm ?? User::DEFAULT_AUTH_REALM;
-
         $this->webdavPublicDir = $webdavPublicDir;
         $this->webdavTmpDir = $webdavTmpDir;
 
@@ -144,7 +149,7 @@ class DAVController extends AbstractController
         $this->IMAPAuthBackend = $IMAPAuthBackend;
         $this->LDAPAuthBackend = $LDAPAuthBackend;
 
-        $this->initServer();
+        $this->initServer($authMethod, $authRealm);
         $this->initExceptionListener();
     }
 
@@ -158,7 +163,7 @@ class DAVController extends AbstractController
         ]);
     }
 
-    private function initServer()
+    private function initServer(string $authMethod, string $authRealm = User::DEFAULT_AUTH_REALM)
     {
         // Get the PDO Connection of type PDO
         // TODO: Once we drop support for PHP < 8.0 and force dbal > 3.3,
@@ -176,7 +181,7 @@ class DAVController extends AbstractController
         /*
          * The backends.
          */
-        switch ($this->authMethod) {
+        switch ($authMethod) {
             case self::AUTH_IMAP:
                 $authBackend = $this->IMAPAuthBackend;
                 break;
@@ -189,7 +194,7 @@ class DAVController extends AbstractController
                 break;
         }
 
-        $authBackend->setRealm($this->authRealm);
+        $authBackend->setRealm($authRealm);
 
         $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($pdo);
 
@@ -221,7 +226,7 @@ class DAVController extends AbstractController
         $this->server->setBaseUri($this->baseUri);
 
         // Plugins
-        $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, $this->authRealm));
+        $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, $authRealm));
         $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin());
         $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
 
