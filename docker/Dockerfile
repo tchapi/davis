@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine
+FROM php:8.2-fpm-alpine
 
 LABEL org.opencontainers.image.authors="tchap@tchap.me"
 LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis"
