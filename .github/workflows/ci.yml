@@ -41,7 +41,7 @@ jobs:
             - name: Install highest dependencies with Composer
               run: composer update --no-progress --ansi
             - name: Analyze
-              run: vendor/bin/php-cs-fixer fix --ansi
+              run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
 
     phpunit:
         name: PHPUnit (PHP ${{ matrix.php }} Deps ${{ matrix.dependencies }})
