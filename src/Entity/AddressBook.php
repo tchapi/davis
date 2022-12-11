@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="addressbooks")
- * @ORM\Entity(repositoryClass="App\Repository\AddressBookRepository")
+ * @ORM\Entity()
  * @UniqueEntity(
  *     fields={"principalUri", "uri"},
  *     errorPath="uri",

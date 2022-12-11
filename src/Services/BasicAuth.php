@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Repository\UserRepository;
+use App\Entity\User;
+use Doctrine\Persistence\ManagerRegistry;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 
 final class BasicAuth extends AbstractBasic
@@ -15,16 +16,16 @@ final class BasicAuth extends AbstractBasic
     private $utils;
 
     /**
-     * Doctrine User repository.
+     * Doctrine registry.
      *
-     * @var UserRepository
+     * @var \Doctrine\Persistence\ManagerRegistry
      */
-    private $userRepository;
+    private $doctrine;
 
-    public function __construct(UserRepository $userRepository, Utils $utils)
+    public function __construct(ManagerRegistry $doctrine, Utils $utils)
     {
         $this->utils = $utils;
-        $this->userRepository = $userRepository;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -32,7 +33,7 @@ final class BasicAuth extends AbstractBasic
      */
     protected function validateUserPass($username, $password): bool
     {
-        $user = $this->userRepository->findOneByUsername($username);
+        $user = $this->doctrine->getRepository(User::class)->findOneByUsername($username);
 
         if (!$user) {
             return false;

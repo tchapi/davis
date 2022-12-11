@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="propertystorage")
- * @ORM\Entity(repositoryClass="App\Repository\PropertyStorageRepository")
+ * @ORM\Entity()
  */
 class PropertyStorage
 {
