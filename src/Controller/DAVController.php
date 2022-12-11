@@ -12,7 +12,6 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
 use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Psr\Log\LoggerInterface;
-use Sabre\DAV\Exception as SabreDavException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -277,7 +276,14 @@ class DAVController extends AbstractController
     private function initExceptionListener()
     {
         $this->server->on('exception', function (\Throwable $e) {
-            $httpCode = ($e instanceof SabreDavException) ? $e->getHTTPCode() : 500;
+            // We don't need a trace for simple authentication exceptions
+            if ($e instanceof \Sabre\DAV\Exception\NotAuthenticated) {
+                $this->logger->error('[401]: '.get_class($e)." - No 'Authorization: Basic' header found. Login was needed");
+
+                return;
+            }
+
+            $httpCode = ($e instanceof \Sabre\DAV\Exception) ? $e->getHTTPCode() : 500;
             $this->logger->error('['.$httpCode.']: '.get_class($e).' - '.$e->getMessage(), $e->getTrace());
         });
     }
