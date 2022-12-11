@@ -14,7 +14,7 @@ jobs:
         name: Analyze
         runs-on: ubuntu-latest
         container:
-            image: php:8.0-alpine
+            image: php:8.2-alpine
             options: >-
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
@@ -73,6 +73,7 @@ jobs:
                     - '7.4'
                     - '8.0'
                     - '8.1'
+                    - '8.2'
                 dependencies:
                     - lowest
                     - highest
