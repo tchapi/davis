@@ -334,6 +334,18 @@ If you change or add translations, you need to update the `messages` XLIFF file 
 
     bin/console translation:extract en --force --domain=messages+intl-icu
 
+## Testing
+
+You can use:
+
+    ./bin/phpunit
+
+## Code linting
+
+We use [PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) with:
+
+    PHP_CS_FIXER_IGNORE_ENV=True ./vendor/bin/php-cs-fixer fix
+
 # Libraries used
 
   - Symfony 5 (Licence : MIT)
