@@ -278,7 +278,7 @@ class DAVController extends AbstractController
         $this->server->on('exception', function (\Throwable $e) {
             // We don't need a trace for simple authentication exceptions
             if ($e instanceof \Sabre\DAV\Exception\NotAuthenticated) {
-                $this->logger->error('[401]: '.get_class($e)." - No 'Authorization: Basic' header found. Login was needed");
+                $this->logger->warning('[401]: '.get_class($e)." - No 'Authorization: Basic' header found. Login was needed");
 
                 return;
             }
