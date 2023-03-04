@@ -34,8 +34,8 @@ final class Version20230209142217 extends AbstractMigration
         $this->addSql('ALTER TABLE users ALTER COLUMN id SET DEFAULT nextval(\'users_id_seq\');');
         $this->addSql('ALTER TABLE calendarobjects ALTER COLUMN id SET DEFAULT nextval(\'calendarobjects_id_seq\');');
         $this->addSql('ALTER TABLE propertystorage ALTER COLUMN id SET DEFAULT nextval(\'propertystorage_id_seq\');');
-        $this->addSql('ALTER TABLE addressbooks ALTER COLUMN synctoken TYPE integer USING synctoken::integer;')
-        $this->addSql('ALTER TABLE calendars ALTER COLUMN synctoken TYPE integer USING synctoken::integer;')
+        $this->addSql('ALTER TABLE addressbooks ALTER COLUMN synctoken TYPE integer USING synctoken::integer;');
+        $this->addSql('ALTER TABLE calendars ALTER COLUMN synctoken TYPE integer USING synctoken::integer;');
     }
 
     public function down(Schema $schema): void
@@ -55,8 +55,8 @@ final class Version20230209142217 extends AbstractMigration
         $this->addSql('ALTER TABLE users ALTER COLUMN id DROP DEFAULT;');
         $this->addSql('ALTER TABLE calendarobjects ALTER COLUMN id DROP DEFAULT;');
         $this->addSql('ALTER TABLE propertystorage ALTER COLUMN id DROP DEFAULT;');
-        $this->addSql('ALTER TABLE addressbooks ALTER COLUMN synctoken TYPE varchar(255);')
-        $this->addSql('ALTER TABLE calendars ALTER COLUMN synctoken TYPE varchar(255);')
+        $this->addSql('ALTER TABLE addressbooks ALTER COLUMN synctoken TYPE varchar(255);');
+        $this->addSql('ALTER TABLE calendars ALTER COLUMN synctoken TYPE varchar(255);');
     }
 }
 
