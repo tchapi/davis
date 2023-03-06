@@ -284,7 +284,29 @@ To build the checked out version, just run:
 
 This will build a `davis:latest` image that you can directly use. Do not forget to pass sensible environment variables to the container since the _dist_ `.env` file will take precedence if no `.env.local` or environment variable is found.
 
-> You can also use the release image created on the Github container registry: ghcr.io/tchapi/davis:edge
+## Docker images
+
+For each release, a Docker image is built and published in the [Github package repository](https://github.com/tchapi/davis/pkgs/container/davis).
+
+### Release images
+
+Each release builds and tags an image. Example:
+
+```
+docker pull ghcr.io/tchapi/davis:v3.1.0
+```
+
+### Edge image
+
+The edge image is built from the tip of the master branch:
+
+```
+docker pull ghcr.io/tchapi/davis:edge
+```
+
+> **Warning**
+> 
+> The `edge` image must not be considered stable. Use only release images for production.
 
 ## Full stack
 
