@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "19c337e0bd2b76a5bd1059980c789ccd",
+    "content-hash": "c60759813603c7133dc916daea588719",
     "packages": [
         {
             "name": "dantsu/php-image-editor",
@@ -67,20 +67,20 @@
         },
         {
             "name": "dantsu/php-osm-static-api",
-            "version": "0.3.0",
+            "version": "0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DantSu/php-osm-static-api.git",
-                "reference": "7b1f92d5291dcdbc88a8fd62aefb95912df3cae0"
+                "reference": "54a8b914736fb861348c1daa5325012ea9fd2273"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DantSu/php-osm-static-api/zipball/7b1f92d5291dcdbc88a8fd62aefb95912df3cae0",
-                "reference": "7b1f92d5291dcdbc88a8fd62aefb95912df3cae0",
+                "url": "https://api.github.com/repos/DantSu/php-osm-static-api/zipball/54a8b914736fb861348c1daa5325012ea9fd2273",
+                "reference": "54a8b914736fb861348c1daa5325012ea9fd2273",
                 "shasum": ""
             },
             "require": {
-                "dantsu/php-image-editor": "^1.1",
+                "dantsu/php-image-editor": "^1.3",
                 "php": ">=7.0"
             },
             "type": "library",
@@ -114,7 +114,7 @@
             ],
             "support": {
                 "issues": "https://github.com/DantSu/php-osm-static-api/issues",
-                "source": "https://github.com/DantSu/php-osm-static-api/tree/0.3.0"
+                "source": "https://github.com/DantSu/php-osm-static-api/tree/0.5.0"
             },
             "funding": [
                 {
@@ -122,7 +122,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-05-24T12:47:31+00:00"
+            "time": "2022-11-09T10:22:07+00:00"
         },
         {
             "name": "doctrine/annotations",
