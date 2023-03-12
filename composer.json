@@ -33,6 +33,7 @@
         "symfony/property-info": "^5.4",
         "symfony/proxy-manager-bridge": "^5.4",
         "symfony/security-bundle": "^5.4",
+        "symfony/security-guard": "^5.4",
         "symfony/serializer": "^5.4",
         "symfony/translation": "^5.4",
         "symfony/twig-bundle": "^5.4",
@@ -42,7 +43,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4.0",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.6",
         "symfony/browser-kit": "^5.4",
         "symfony/css-selector": "^5.4",
         "symfony/debug-bundle": "^5.4",
