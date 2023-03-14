@@ -22,8 +22,8 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 
 # Requirements
 
-  - PHP > 7.3.0 (with `pdo_mysql` [or `pdo_pgsql`], `gd` and `intl` extensions), compatible up to PHP 8.2
-  - A compatible database layer, such as MySQL or MariaDB (recommended) or PostgreSQL (not extensively tested yet)
+  - PHP > 7.3.0 (with `pdo_mysql` [or `pdo_pgsql`, `pdo_sqlite`], `gd` and `intl` extensions), compatible up to PHP 8.2
+  - A compatible database layer, such as MySQL or MariaDB (recommended), PostgreSQL (not extensively tested yet) or SQLite (not extensively tested yet)
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
   - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default except in the Docker image_)
 
@@ -58,7 +58,7 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 a. The database driver and url (_you should already have it configured since you created the database previously_)
     
 ```
-DATABASE_DRIVER=mysql # or postgresql
+DATABASE_DRIVER=mysql # or postgresql, or sqlite
 DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4
 ```
 
@@ -322,10 +322,19 @@ You can start the containers with :
 > ```
 > cd docker && docker-compose -f docker-compose-postgresql.yml up -d
 > ```
+>
+> Or SQLite with:
+> ```
+> cd docker && docker-compose -f docker-compose-sqlite.yml up -d
+> ```
 
 **⚠ Do not forget to run all the migrations the first time you run the container** :
 
     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
+
+> **Warning**
+> For SQLite, you must also make sure that the folder the database will reside in AND the database file in itself have the right permissions! You can do for instance:
+> `chown -R www-data: /data` if `/data` is the folder your SQLite database will be in, just after you have run the migrations
 
 ### Updating from a previous version
 

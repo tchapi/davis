@@ -1,0 +1,51 @@
+version: "3.7"
+name: "davis-docker"
+
+services:
+
+  nginx:
+    image: nginx:1.23-alpine
+    container_name: nginx
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - davis
+    volumes:
+      - davis_www:/var/www/davis
+      - type: bind
+        source: ./configurations/davis.conf
+        target: /etc/nginx/conf.d/default.conf
+    ports:
+      - 9000:80
+
+  davis:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: davis:latest
+    # If you want to use a prebuilt image from Github
+    # image: ghcr.io/tchapi/davis:edge
+    container_name: davis
+    environment:
+      - APP_ENV=prod
+      - DATABASE_DRIVER=sqlite
+      - DATABASE_URL=sqlite:////data/davis-database.db # ⚠️ 4 slashes for an absolute path ⚠️ + no quotes (so Symfony can resolve it)
+      - MAILER_DSN=smtp://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
+      - ADMIN_LOGIN=${ADMIN_LOGIN}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - AUTH_REALM=${AUTH_REALM}
+      - AUTH_METHOD=${AUTH_METHOD}
+      - CALDAV_ENABLED=${CALDAV_ENABLED}
+      - CARDDAV_ENABLED=${CARDDAV_ENABLED}
+      - WEBDAV_ENABLED=${WEBDAV_ENABLED}
+      - WEBDAV_TMP_DIR=${WEBDAV_TMP_DIR}
+      - WEBDAV_PUBLIC_DIR=${WEBDAV_PUBLIC_DIR}
+      - INVITE_FROM_ADDRESS=${INVITE_FROM_ADDRESS}
+    volumes:
+      - davis_www:/var/www/davis
+      - davis_data:/data
+
+volumes:
+  davis_www:
+    name: davis_www
+  davis_data:
+    name: davis_data
