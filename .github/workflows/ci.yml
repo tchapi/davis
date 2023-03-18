@@ -1,6 +1,12 @@
 name: CI
 
-on: ["push", "pull_request"]
+on:
+  push:
+    paths-ignore:
+      - 'docker/**'
+  pull_request:
+    paths-ignore:
+      - 'docker/**'
 
 env:
     COMPOSER_ALLOW_SUPERUSER: '1'
