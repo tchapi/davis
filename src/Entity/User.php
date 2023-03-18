@@ -40,10 +40,6 @@ class User
 
     public function getUsername(): ?string
     {
-        if (is_resource($this->username)) {
-            $this->username = stream_get_contents($this->username);
-        }
-
         return $this->username;
     }
 
@@ -56,10 +52,6 @@ class User
 
     public function getPassword(): ?string
     {
-        if (is_resource($this->password)) {
-            $this->password = stream_get_contents($this->password);
-        }
-
         return $this->password;
     }
 

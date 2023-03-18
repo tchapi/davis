@@ -128,10 +128,6 @@ class CalendarInstance
 
     public function getPrincipalUri(): ?string
     {
-        if (is_resource($this->principalUri)) {
-            $this->principalUri = stream_get_contents($this->principalUri);
-        }
-
         return $this->principalUri;
     }
 
@@ -168,10 +164,6 @@ class CalendarInstance
 
     public function getUri(): ?string
     {
-        if (is_resource($this->uri)) {
-            $this->uri = stream_get_contents($this->uri);
-        }
-
         return $this->uri;
     }
 
@@ -208,10 +200,6 @@ class CalendarInstance
 
     public function getCalendarColor(): ?string
     {
-        if (is_resource($this->calendarColor)) {
-            $this->calendarColor = stream_get_contents($this->calendarColor);
-        }
-
         return $this->calendarColor;
     }
 
@@ -248,10 +236,6 @@ class CalendarInstance
 
     public function getShareHref(): ?string
     {
-        if (is_resource($this->shareHref)) {
-            $this->shareHref = stream_get_contents($this->shareHref);
-        }
-
         return $this->shareHref;
     }
 

@@ -89,10 +89,6 @@ class Principal
 
     public function getUri(): ?string
     {
-        if (is_resource($this->uri)) {
-            $this->uri = stream_get_contents($this->uri);
-        }
-
         return $this->uri;
     }
 
@@ -110,10 +106,6 @@ class Principal
 
     public function getEmail(): ?string
     {
-        if (is_resource($this->email)) {
-            $this->email = stream_get_contents($this->email);
-        }
-
         return $this->email;
     }
 

@@ -56,10 +56,6 @@ class SchedulingObject
 
     public function getPrincipalUri(): ?string
     {
-        if (is_resource($this->principalUri)) {
-            $this->principalUri = stream_get_contents($this->principalUri);
-        }
-
         return $this->principalUri;
     }
 
@@ -84,10 +80,6 @@ class SchedulingObject
 
     public function getUri(): ?string
     {
-        if (is_resource($this->uri)) {
-            $this->uri = stream_get_contents($this->uri);
-        }
-
         return $this->uri;
     }
 
@@ -112,10 +104,6 @@ class SchedulingObject
 
     public function getEtag(): ?string
     {
-        if (is_resource($this->etag)) {
-            $this->etag = stream_get_contents($this->etag);
-        }
-
         return $this->etag;
     }
 
