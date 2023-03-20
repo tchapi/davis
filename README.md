@@ -284,6 +284,8 @@ To build the checked out version, just run:
 
 This will build a `davis:latest` image that you can directly use. Do not forget to pass sensible environment variables to the container since the _dist_ `.env` file will take precedence if no `.env.local` or environment variable is found.
 
+You can use `--platform` to specify the platform to build for. Currently, `arm64` (ARMv8) and `amd64` (x86) are supported.
+
 ## Docker images
 
 For each release, a Docker image is built and published in the [Github package repository](https://github.com/tchapi/davis/pkgs/container/davis).
