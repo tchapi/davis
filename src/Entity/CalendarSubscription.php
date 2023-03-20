@@ -79,10 +79,6 @@ class CalendarSubscription
 
     public function getUri(): ?string
     {
-        if (is_resource($this->uri)) {
-            $this->uri = stream_get_contents($this->uri);
-        }
-
         return $this->uri;
     }
 
@@ -95,10 +91,6 @@ class CalendarSubscription
 
     public function getPrincipalUri(): ?string
     {
-        if (is_resource($this->principalUri)) {
-            $this->principalUri = stream_get_contents($this->principalUri);
-        }
-
         return $this->principalUri;
     }
 
@@ -159,10 +151,6 @@ class CalendarSubscription
 
     public function getCalendarColor(): ?string
     {
-        if (is_resource($this->calendarColor)) {
-            $this->calendarColor = stream_get_contents($this->calendarColor);
-        }
-
         return $this->calendarColor;
     }
 

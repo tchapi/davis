@@ -44,10 +44,6 @@ class PropertyStorage
 
     public function getPath(): ?string
     {
-        if (is_resource($this->path)) {
-            $this->path = stream_get_contents($this->path);
-        }
-
         return $this->path;
     }
 
@@ -60,10 +56,6 @@ class PropertyStorage
 
     public function getName(): ?string
     {
-        if (is_resource($this->name)) {
-            $this->name = stream_get_contents($this->name);
-        }
-
         return $this->name;
     }
 

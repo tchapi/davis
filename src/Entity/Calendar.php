@@ -70,10 +70,6 @@ class Calendar
 
     public function getComponents(): ?string
     {
-        if (is_resource($this->components)) {
-            $this->components = stream_get_contents($this->components);
-        }
-
         return $this->components;
     }
 

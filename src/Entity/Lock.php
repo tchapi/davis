@@ -95,10 +95,6 @@ class Lock
 
     public function getToken(): ?string
     {
-        if (is_resource($this->token)) {
-            $this->token = stream_get_contents($this->token);
-        }
-
         return $this->token;
     }
 
@@ -135,10 +131,6 @@ class Lock
 
     public function getUri(): ?string
     {
-        if (is_resource($this->uri)) {
-            $this->uri = stream_get_contents($this->uri);
-        }
-
         return $this->uri;
     }
 
