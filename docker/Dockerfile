@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description="A simple, fully translatable admin i
 
 # Run update, and gets basic packages and packages for runtime
 RUN apk --no-progress --update add --no-cache \
-        curl unzip \
+        curl unzip fcgi \
         # These are for php-intl
         icu-libs \
         # This one is for IMAP (to provide libc-client.so)
@@ -70,8 +70,16 @@ WORKDIR /var/www/davis
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN APP_ENV=prod composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
 
+# PHP-FPM healthcheck
+RUN set -xe && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0/php-fpm-healthcheck \
+    -o /usr/local/bin/php-fpm-healthcheck -s \
+    && chmod +x /usr/local/bin/php-fpm-healthcheck
+
 # Cleanup (only useful when using --squash)
 RUN docker-php-source delete
 RUN rm -rf /usr/local/bin/composer
 
 RUN chown -R www-data:www-data var
+
+HEALTHCHECK --interval=30s --timeout=1s CMD php-fpm-healthcheck || exit 1
