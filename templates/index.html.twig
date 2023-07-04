@@ -49,7 +49,7 @@
     <body>
       <div class="hero">
         <img src="/images/logo.png" width="60px">
-        <h3>{{ "davis"|trans }} v{{ version }}</h3>
+        <h3>{{ "davis"|trans }}</h3>
         <div class="caldav">CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
         <div class="carddav">CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
         <div class="webdav">WebDAV : {% if webDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
