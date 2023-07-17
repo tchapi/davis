@@ -442,7 +442,7 @@ class AdminController extends AbstractController
      */
     public function calendarShares(ManagerRegistry $doctrine, string $username, string $calendarid, TranslatorInterface $trans)
     {
-        $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarid);
+        $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarid, true);
 
         $response = [];
         foreach ($instances as $instance) {
@@ -535,8 +535,18 @@ class AdminController extends AbstractController
         foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
             $entityManager->remove($change);
         }
-        $entityManager->remove($instance->getCalendar());
+
+        // Remove the original calendar instance
         $entityManager->remove($instance);
+
+        // Remove shared instances
+        $sharedInstances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($instance->getCalendar()->getId(), false);
+        foreach ($sharedInstances as $sharedInstance) {
+            $entityManager->remove($sharedInstance);
+        }
+
+        // Finally remove the calendar itself
+        $entityManager->remove($instance->getCalendar());
 
         $entityManager->flush();
         $this->addFlash('success', $trans->trans('calendar.deleted'));
