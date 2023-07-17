@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * PostgreSQL - Add missing defaults to IDs (to use sequences)
+ * PostgreSQL - Add missing defaults to IDs (to use sequences).
  */
 final class Version20230209142217 extends AbstractMigration
 {
@@ -59,4 +59,3 @@ final class Version20230209142217 extends AbstractMigration
         $this->addSql('ALTER TABLE calendars ALTER COLUMN synctoken TYPE varchar(255);');
     }
 }
-

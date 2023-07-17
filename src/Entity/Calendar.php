@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="calendars")
+ *
  * @ORM\Entity()
  */
 class Calendar
@@ -18,7 +19,9 @@ class Calendar
 
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;

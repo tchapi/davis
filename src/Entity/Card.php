@@ -6,19 +6,23 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="cards")
+ *
  * @ORM\Entity()
  */
 class Card
 {
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\AddressBook", inversedBy="cards")
+     *
      * @ORM\JoinColumn(name="addressbookid", nullable=false)
      */
     private $addressBook;

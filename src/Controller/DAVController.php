@@ -173,7 +173,7 @@ class DAVController extends AbstractController
         } else {
             $pdo = $this->em->getConnection()->getWrappedConnection();
         }
-        if (!($pdo instanceof PDO)) {
+        if (!($pdo instanceof \PDO)) {
             $pdo = $pdo->getNativeConnection();
         }
 

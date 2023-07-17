@@ -8,7 +8,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="calendarinstances")
+ *
  * @ORM\Entity(repositoryClass="App\Repository\CalendarInstanceRepository")
+ *
  * @UniqueEntity(
  *     fields={"principalUri", "uri"},
  *     errorPath="uri",
@@ -28,13 +30,16 @@ class CalendarInstance
 
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", cascade={"persist"})
+     *
      * @ORM\JoinColumn(name="calendarid", nullable=false)
      */
     private $calendar;
@@ -56,6 +61,7 @@ class CalendarInstance
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     *
      * @Assert\Regex("/[0-9a-z\-]+/")
      */
     private $uri;
@@ -72,6 +78,7 @@ class CalendarInstance
 
     /**
      * @ORM\Column(name="calendarcolor", type="string", length=10, nullable=true)
+     *
      * @Assert\Regex("/\#[0-9A-F]{6}/")
      */
     private $calendarColor;

@@ -6,13 +6,16 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="propertystorage")
+ *
  * @ORM\Entity()
  */
 class PropertyStorage
 {
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;

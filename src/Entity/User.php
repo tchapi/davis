@@ -8,7 +8,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="users")
+ *
  * @ORM\Entity()
+ *
  * @UniqueEntity("username")
  */
 class User
@@ -17,13 +19,16 @@ class User
 
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     *
      * @Assert\NotBlank
      */
     private $username;

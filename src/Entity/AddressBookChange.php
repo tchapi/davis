@@ -6,13 +6,16 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="addressbookchanges")
+ *
  * @ORM\Entity()
  */
 class AddressBookChange
 {
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -29,6 +32,7 @@ class AddressBookChange
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\AddressBook", inversedBy="changes")
+     *
      * @ORM\JoinColumn(name="addressbookid", nullable=false)
      */
     private $addressBook;

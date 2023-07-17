@@ -6,13 +6,16 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="calendarsubscriptions")
+ *
  * @ORM\Entity()
  */
 class CalendarSubscription
 {
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;

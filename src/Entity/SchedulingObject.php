@@ -7,13 +7,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="schedulingobjects")
+ *
  * @ORM\Entity()
  */
 class SchedulingObject
 {
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -30,6 +33,7 @@ class SchedulingObject
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     *
      * @Assert\Regex("/[0-9a-z\-]+/")
      */
     private $uri;

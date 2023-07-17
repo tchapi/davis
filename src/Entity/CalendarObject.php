@@ -6,13 +6,16 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="calendarobjects")
+ *
  * @ORM\Entity()
  */
 class CalendarObject
 {
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -29,6 +32,7 @@ class CalendarObject
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", inversedBy="objects")
+     *
      * @ORM\JoinColumn(name="calendarid", nullable=false)
      */
     private $calendar;

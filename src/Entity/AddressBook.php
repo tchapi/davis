@@ -10,7 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="addressbooks")
+ *
  * @ORM\Entity()
+ *
  * @UniqueEntity(
  *     fields={"principalUri", "uri"},
  *     errorPath="uri",
@@ -21,7 +23,9 @@ class AddressBook
 {
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -38,6 +42,7 @@ class AddressBook
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
      * @Assert\Regex("/[0-9a-z\-]+/")
      */
     private $uri;

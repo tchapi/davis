@@ -10,7 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="principals")
+ *
  * @ORM\Entity(repositoryClass="App\Repository\PrincipalRepository")
+ *
  * @UniqueEntity("uri")
  */
 class Principal
@@ -22,23 +24,29 @@ class Principal
 
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     *
      * @Assert\NotBlank
+     *
      * @Assert\Unique
      */
     private $uri;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     *
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."
      * )
+     *
      * @Assert\NotBlank
      */
     private $email;
@@ -50,21 +58,25 @@ class Principal
 
     /**
      * @ORM\Column(type="boolean")
+     *
      * @Assert\NotBlank
      */
     private $isMain;
 
     /**
      * @ORM\Column(type="boolean")
+     *
      * @Assert\NotBlank
      */
     private $isAdmin;
 
     /**
      * @ORM\ManyToMany(targetEntity="Principal")
+     *
      * @ORM\JoinTable(
      *  name="groupmembers",
      *  joinColumns={
+     *
      *      @ORM\JoinColumn(name="principal_id", referencedColumnName="id")
      *  },
      *  inverseJoinColumns={
