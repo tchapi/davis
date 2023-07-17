@@ -23,17 +23,25 @@ class CalendarInstanceRepository extends ServiceEntityRepository
     /**
      * @return CalendarInstance[] Returns an array of CalendarInstance objects
      */
-    public function findSharedInstancesOfInstance(int $calendarId)
+    public function findSharedInstancesOfInstance(int $calendarId, bool $withCalendar = false)
     {
-        return $this->createQueryBuilder('c')
+        $query = $this->createQueryBuilder('c')
             ->leftJoin(Principal::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.principalUri = p.uri')
-            ->addSelect('p.displayName', 'p.email')
             ->where('c.calendar = :id')
             ->setParameter('id', $calendarId)
             ->andWhere('c.access != :ownerAccess')
-            ->setParameter('ownerAccess', CalendarInstance::ACCESS_OWNER)
-            ->getQuery()
-            ->getArrayResult();
+            ->setParameter('ownerAccess', CalendarInstance::ACCESS_OWNER);
+
+        if ($withCalendar) {
+            // Returns CalendarInstances as arrays, with displayName and email of the owner
+            return $query->addSelect('p.displayName', 'p.email')
+                ->getQuery()
+                ->getArrayResult();
+        } else {
+            // Returns CalendarInstances as objects
+            return $query->getQuery()
+                ->getResult();
+        }
     }
 
     /**
