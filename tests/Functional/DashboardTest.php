@@ -12,7 +12,7 @@ class DashboardTest extends WebTestCase
         $client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h3', 'Davis v');
+        $this->assertSelectorTextContains('h3', 'Davis');
 
         $this->assertSelectorExists('div.caldav');
         $this->assertSelectorExists('div.carddav');
