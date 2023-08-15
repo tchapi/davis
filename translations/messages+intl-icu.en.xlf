@@ -359,11 +359,11 @@
       </trans-unit>
       <trans-unit id="6AbgcWQ" resname="form.uri.help.carddav">
         <source>form.uri.help.carddav</source>
-        <target>This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+        <target>This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
       </trans-unit>
       <trans-unit id="JIbKo6n" resname="form.uri.help.caldav">
         <source>form.uri.help.caldav</source>
-        <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+        <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
       </trans-unit>
       <trans-unit id="x5Dmxhi" resname="form.color.help">
         <source>form.color.help</source>
