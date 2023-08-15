@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Principal;
 use App\Entity\User;
 use App\Plugins\DavisIMipPlugin;
+use App\Plugins\PublicAwareDAVACLPlugin;
 use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
@@ -229,8 +230,9 @@ class DAVController extends AbstractController
         $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin());
         $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
 
-        $aclPlugin = new \Sabre\DAVACL\Plugin();
+        $aclPlugin = new PublicAwareDAVACLPlugin();
         $aclPlugin->hideNodesFromListings = true;
+
         // Fetch admins, if any
         $admins = $this->em->getRepository(Principal::class)->findBy(['isAdmin' => true]);
         foreach ($admins as $principal) {
