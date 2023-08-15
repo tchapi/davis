@@ -30,7 +30,7 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
             if (CalendarInstance::ACCESS_PUBLIC === $node->getShareAccess()) {
                 $acl[] = [
                     'principal' => '{DAV:}unauthenticated',
-                    'privilege' => '{DAV:}all',
+                    'privilege' => '{DAV:}read',
                     'protected' => false,
                 ];
             }
