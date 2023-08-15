@@ -365,6 +365,10 @@
         <source>form.color</source>
         <target>Calendar color</target>
       </trans-unit>
+      <trans-unit id="HDHYNe5" resname="form.public">
+        <source>form.public</source>
+        <target>Public</target>
+      </trans-unit>
       <trans-unit id="CvlrLaA" resname="form.name.help.carddav">
         <source>form.name.help.carddav</source>
         <target>This name will be displayed in your CardDAV client</target>
@@ -380,6 +384,10 @@
       <trans-unit id="JIbKo6n" resname="form.uri.help.caldav">
         <source>form.uri.help.caldav</source>
         <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+      </trans-unit>
+      <trans-unit id="jMtzjiV" resname="form.public.help.caldav">
+        <source>form.public.help.caldav</source>
+        <target>If the calendar is public, it will be available for anyone with the link</target>
       </trans-unit>
       <trans-unit id="x5Dmxhi" resname="form.color.help">
         <source>form.color.help</source>
@@ -448,6 +456,10 @@
       <trans-unit id="inmIkP6" resname="yes">
         <source>yes</source>
         <target>Yes</target>
+      </trans-unit>
+      <trans-unit id="k5Apjz_" resname="no">
+        <source>no</source>
+        <target>No</target>
       </trans-unit>
       <trans-unit id="DBucN94" resname="login.signin">
         <source>login.signin</source>
@@ -560,6 +572,10 @@
       <trans-unit id="BuDoAdU" resname="calendar.share_access.3">
         <source>calendar.share_access.3</source>
         <target>read / write</target>
+      </trans-unit>
+      <trans-unit id="wv1eCvz" resname="calendar.share_access.10">
+        <source>calendar.share_access.10</source>
+        <target>public</target>
       </trans-unit>
     </body>
   </file>

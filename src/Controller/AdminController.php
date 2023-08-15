@@ -401,23 +401,32 @@ class AdminController extends AbstractController
         $form->get('events')->setData(in_array(Calendar::COMPONENT_EVENTS, $components));
         $form->get('todos')->setData(in_array(Calendar::COMPONENT_TODOS, $components));
         $form->get('notes')->setData(in_array(Calendar::COMPONENT_NOTES, $components));
+        $form->get('public')->setData($calendarInstance->isPublic());
         $form->get('principalUri')->setData(Principal::PREFIX.$username);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $components = [];
-            if ($form->get('events')->getData()) {
-                $components[] = Calendar::COMPONENT_EVENTS;
-            }
-            if ($form->get('todos')->getData()) {
-                $components[] = Calendar::COMPONENT_TODOS;
-            }
-            if ($form->get('notes')->getData()) {
-                $components[] = Calendar::COMPONENT_NOTES;
-            }
+            // Only owners can change those
+            if (!$calendarInstance->isShared()) {
+                $components = [];
+                if ($form->get('events')->getData()) {
+                    $components[] = Calendar::COMPONENT_EVENTS;
+                }
+                if ($form->get('todos')->getData()) {
+                    $components[] = Calendar::COMPONENT_TODOS;
+                }
+                if ($form->get('notes')->getData()) {
+                    $components[] = Calendar::COMPONENT_NOTES;
+                }
+                if (true === $form->get('public')->getData()) {
+                    $calendarInstance->setAccess(CalendarInstance::ACCESS_PUBLIC);
+                } else {
+                    $calendarInstance->setAccess(CalendarInstance::ACCESS_SHAREDOWNER);
+                }
 
-            $calendarInstance->getCalendar()->setComponents(implode(',', $components));
+                $calendarInstance->getCalendar()->setComponents(implode(',', $components));
+            }
 
             $entityManager = $doctrine->getManager();
 

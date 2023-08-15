@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\CalendarInstance;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -25,6 +26,14 @@ class CalendarInstanceType extends AbstractType
                 'disabled' => !$options['new'],
                 'help' => 'form.uri.help.caldav',
                 'required' => true,
+            ])
+            ->add('public', ChoiceType::class, [
+                'label' => 'form.public',
+                'mapped' => false,
+                'disabled' => $options['shared'],
+                'help' => 'form.public.help.caldav',
+                'required' => true,
+                'choices' => ['yes' => true, 'no' => false],
             ])
             ->add('displayName', TextType::class, [
                 'label' => 'form.displayName',
