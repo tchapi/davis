@@ -227,7 +227,7 @@ class DAVController extends AbstractController
 
         // Plugins
         $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, $authRealm));
-        $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin());
+        $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin(false)); // We disable the file creation / upload / sharing in the browser
         $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
 
         $aclPlugin = new PublicAwareDAVACLPlugin();
