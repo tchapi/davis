@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
+{% include '_partials/back_button.html.twig' with { url: path('users'), text: "users.back"|trans } %}
 
 <h1 class="display-4 fw-lighter d-flex justify-content-between">{{ "calendars.delegates.for"|trans({'what': principal.displayName}) }}{% if delegation %} <a href="#" data-toggle="modal" data-target="#add_delegate" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.delegates.add"|trans }}</a>{% endif %}</h1>
 

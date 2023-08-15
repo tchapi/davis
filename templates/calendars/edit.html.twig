@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<a href="{{ path('calendars', {username: username}) }}" class="btn btn-link">« {{ "calendars.back"|trans({'user': principal.displayName }) }}</a>
+{% include '_partials/back_button.html.twig' with { url: path('calendars', {username: username}), text: "calendars.back"|trans({'user': principal.displayName }) } %}
 
 {% if calendar.id %}
 <h1 class="display-4 fw-lighter mb-5">{{ "calendars.edit"|trans({'name': calendar.displayName }) }}</h1>

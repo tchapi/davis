@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
+{% include '_partials/back_button.html.twig' with { url: path('users'), text: "users.back"|trans } %}
 
 <h1 class="display-4 d-flex fw-lighter justify-content-between">{{ "addressbooks.for"|trans({'who': principal.displayName}) }} <a href="{{ path('addressbook_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "addressbooks.new"|trans }}</a></h1>
 

@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<a href="{{ path('address_books', {username: username}) }}" class="btn btn-link">« {{ "addressbooks.back"|trans({'user': principal.displayName }) }}</a>
+{% include '_partials/back_button.html.twig' with { url: path('address_books', {username: username}), text: "addressbooks.back"|trans({'user': principal.displayName }) } %}
 
 {% if addressbook.id %}
 <h1 class="display-4 fw-lighter mb-5">{{ "addressbooks.edit"|trans({'name': addressbook.displayName }) }}</h1>
