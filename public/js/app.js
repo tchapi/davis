@@ -40,7 +40,7 @@ $(document).ready(function() {
                     newShare.find('span.badge').text(element.accessText)
                     newShare.find('a.revoke').attr('href', element.revokeUrl)
                     if (element.isWriteAccess) {
-                        newShare.find('span.badge').addClass('badge-success').removeClass('badge-info')
+                        newShare.find('span.badge').addClass('bg-success').removeClass('bg-info')
                     }
                     newShare.appendTo($('#shares'));
                 });

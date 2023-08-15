@@ -5,9 +5,9 @@
 
 <a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
 
-<h1 class="display-4 d-flex font-weight-lighter justify-content-between">{{ "addressbooks.for"|trans({'who': principal.displayName}) }} <a href="{{ path('addressbook_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "addressbooks.new"|trans }}</a></h1>
+<h1 class="display-4 d-flex fw-lighter justify-content-between">{{ "addressbooks.for"|trans({'who': principal.displayName}) }} <a href="{{ path('addressbook_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "addressbooks.new"|trans }}</a></h1>
 
-<div class="list-group mt-5">
+<div class="list-group mt-4">
 {% for addressbook in addressbooks %}
     <div class="list-group-item p-3">
         <div class="d-flex w-100 justify-content-between">

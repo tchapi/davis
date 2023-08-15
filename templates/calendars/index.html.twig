@@ -5,9 +5,9 @@
 
 <a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
 
-<h1 class="display-4 font-weight-lighter d-flex justify-content-between">{{ "calendars.for"|trans({'who': principal.displayName}) }} <a href="{{ path('calendar_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.new"|trans }}</a></h1>
+<h1 class="display-4 fw-lighter d-flex justify-content-between">{{ "calendars.for"|trans({'who': principal.displayName}) }} <a href="{{ path('calendar_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.new"|trans }}</a></h1>
 
-<div class="list-group mt-5">
+<div class="list-group mt-4">
 {% for compoundObject in calendars %}
     {% set calendar = compoundObject.entity %}
     {% set davUri = compoundObject.uri %}
@@ -23,9 +23,9 @@
         <p class="mb-1">{{ calendar.description }}</p>
         <small>{{ "calendars.uri"|trans }} : <code>{{ calendar.uri }}</code>
         {% if calendar.calendar.components|split(',')|length > 0 %}
-            {% if constant('\\App\\Entity\\Calendar::COMPONENT_EVENTS') in calendar.calendar.components %}<span class="badge badge-success">{{ "calendars.component.events"|trans }}</span>{% endif %}
-            {% if constant('\\App\\Entity\\Calendar::COMPONENT_NOTES') in calendar.calendar.components %}<span class="badge badge-info">{{ "calendars.component.notes"|trans }}</span>{% endif %}
-            {% if constant('\\App\\Entity\\Calendar::COMPONENT_TODOS') in calendar.calendar.components %}<span class="badge badge-primary">{{ "calendars.component.todos"|trans }}</span>{% endif %}
+            {% if constant('\\App\\Entity\\Calendar::COMPONENT_EVENTS') in calendar.calendar.components %}<span class="badge bg-primary">{{ "calendars.component.events"|trans }}</span>{% endif %}
+            {% if constant('\\App\\Entity\\Calendar::COMPONENT_NOTES') in calendar.calendar.components %}<span class="badge bg-info">{{ "calendars.component.notes"|trans }}</span>{% endif %}
+            {% if constant('\\App\\Entity\\Calendar::COMPONENT_TODOS') in calendar.calendar.components %}<span class="badge bg-primary-subtle">{{ "calendars.component.todos"|trans }}</span>{% endif %}
         {% endif %}
          — {{ "calendars.entries"|trans({'%count%': calendar.calendar.objects|length}) }}
         </small>
@@ -39,7 +39,7 @@
 </div>
 
 {% if shared|length > 0 %}
-    <h2 class="display-5 mt-4 font-weight-lighter">{{ "calendars.shared.with"|trans({'who': principal.displayName}) }}</h2>
+    <h2 class="h4 mt-5 fw-lighter">{{ "calendars.shared.with"|trans({'who': principal.displayName}) }}</h2>
 
     <div class="list-group mt-3">
     {% for compoundObject in shared %}
@@ -50,9 +50,9 @@
                 <h5 class="mb-1 mr-auto">
                     {{ calendar.displayName }}
                     {% if calendar.access == constant('\\App\\Entity\\CalendarInstance::ACCESS_READWRITE') %}
-                        <span class="badge badge-success ml-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
+                        <span class="badge bg-success ml-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
                     {% else %}
-                        <span class="badge badge-info ml-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
+                        <span class="badge bg-info ml-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
                     {% endif %}
                     <a href="#" class="badge badge-indicator popover-dismiss" role="button" data-toggle="popover" title="{{ 'calendars.setup.title'|trans }}" data-html='true' data-content="<code>{{ davUri }}</code>">ⓘ</a> <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
                 </h5>
@@ -64,9 +64,9 @@
             <p class="mb-1">{{ calendar.description }}</p>
             <small>{{ "calendars.uri"|trans }} : <code>{{ calendar.uri }}</code>
             {% if calendar.calendar.components|split(',')|length > 0 %}
-                {% if constant('\\App\\Entity\\Calendar::COMPONENT_EVENTS') in calendar.calendar.components %}<span class="badge badge-success">{{ "calendars.component.events"|trans }}</span>{% endif %}
-                {% if constant('\\App\\Entity\\Calendar::COMPONENT_NOTES') in calendar.calendar.components %}<span class="badge badge-info">{{ "calendars.component.notes"|trans }}</span>{% endif %}
-                {% if constant('\\App\\Entity\\Calendar::COMPONENT_TODOS') in calendar.calendar.components %}<span class="badge badge-primary">{{ "calendars.component.todos"|trans }}</span>{% endif %}
+                {% if constant('\\App\\Entity\\Calendar::COMPONENT_EVENTS') in calendar.calendar.components %}<span class="badge bg-primary">{{ "calendars.component.events"|trans }}</span>{% endif %}
+                {% if constant('\\App\\Entity\\Calendar::COMPONENT_NOTES') in calendar.calendar.components %}<span class="badge bg-info">{{ "calendars.component.notes"|trans }}</span>{% endif %}
+                {% if constant('\\App\\Entity\\Calendar::COMPONENT_TODOS') in calendar.calendar.components %}<span class="badge bg-primary-subtle">{{ "calendars.component.todos"|trans }}</span>{% endif %}
             {% endif %}
             — {{ "calendars.entries"|trans({'%count%': calendar.calendar.objects|length}) }}
             </small>

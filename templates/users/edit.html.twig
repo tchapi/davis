@@ -6,9 +6,9 @@
 <a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
 
 {% if username %}
-<h1 class="display-4 mb-5">{{ "users.edit"|trans({'username': username }) }}</h1>
+<h1 class="display-4 fw-lighter mb-5">{{ "users.edit"|trans({'username': username }) }}</h1>
 {% else %}
-<h1 class="display-4 mb-5">{{ "users.new"|trans }}</h1>
+<h1 class="display-4 fw-lighter mb-5">{{ "users.new"|trans }}</h1>
 {% endif %}
 
 {{ form(form) }}

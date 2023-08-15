@@ -4,9 +4,9 @@
             {{ delegate.displayName }}
             <a href="mailto:{{ delegate.email }}">&lsaquo;{{ delegate.email }}&rsaquo;</a>
             {% if has_write %}
-                <span class="badge badge-success">{{ "delegates.write"|trans }}</span>
+                <span class="badge bg-success">{{ "delegates.write"|trans }}</span>
             {% else %}
-                <span class="badge badge-info">{{ "delegates.readonly"|trans }}</span>
+                <span class="badge bg-info">{{ "delegates.readonly"|trans }}</span>
             {% endif %}
         </h5>
         <div class="mr-0 text-right d-lg-block d-none">

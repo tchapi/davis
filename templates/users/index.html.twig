@@ -3,9 +3,9 @@
 
 {% block body %}
 
-<h1 class="display-4 d-flex font-weight-lighter justify-content-between">{{ "title.users_and_resources"|trans }}<a href="{{ path('user_create') }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "users.new"|trans }}</a></h1>
+<h1 class="display-4 d-flex fw-lighter justify-content-between">{{ "title.users_and_resources"|trans }}<a href="{{ path('user_create') }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "users.new"|trans }}</a></h1>
 
-<div class="list-group mt-5">
+<div class="list-group mt-4">
 {% for principal in principals %}
     <div class="list-group-item p-3">
         <div class="d-flex w-100 justify-content-between">
@@ -20,7 +20,7 @@
             </div>
         </div>
         <p class="mb-1">{{ "users.username"|trans }} : <code>{{ principal.username }}</code></p>
-        <small>{{ "users.uri"|trans }} : <code>{{ principal.uri }}</code>{% if principal.isAdmin %} — <span class="badge badge-primary">{{ "users.administrator"|trans }}</span>{% endif %}</small>
+        <small>{{ "users.uri"|trans }} : <code>{{ principal.uri }}</code>{% if principal.isAdmin %} — <span class="badge bg-primary">{{ "users.administrator"|trans }}</span>{% endif %}</small>
         <div class="btn-group btn-group-sm mt-3 d-flex d-lg-none" role="group">
             <a href="{{ path('delegates',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">💁&nbsp;</span>{{ "users.delegates"|trans }}</a>
             <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">🗓&nbsp;</span>{{ "users.calendars"|trans }}</a>
