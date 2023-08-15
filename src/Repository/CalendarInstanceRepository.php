@@ -29,8 +29,8 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->leftJoin(Principal::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.principalUri = p.uri')
             ->where('c.calendar = :id')
             ->setParameter('id', $calendarId)
-            ->andWhere('c.access != :ownerAccess')
-            ->setParameter('ownerAccess', CalendarInstance::ACCESS_OWNER);
+            ->andWhere('c.access NOT IN (:ownerAccess)')
+            ->setParameter('ownerAccess', CalendarInstance::getOwnerAccesses());
 
         if ($withCalendar) {
             // Returns CalendarInstances as arrays, with displayName and email of the owner
@@ -52,8 +52,8 @@ class CalendarInstanceRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->where('c.calendar = :id')
             ->setParameter('id', $calendarId)
-            ->andWhere('c.access != :ownerAccess')
-            ->setParameter('ownerAccess', CalendarInstance::ACCESS_OWNER)
+            ->andWhere('c.access NOT IN (:ownerAccess)')
+            ->setParameter('ownerAccess', CalendarInstance::getOwnerAccesses())
             ->andWhere('c.principalUri = :principalUri')
             ->setParameter('principalUri', $principalUri)
             ->getQuery()

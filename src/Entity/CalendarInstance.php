@@ -19,14 +19,29 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class CalendarInstance
 {
-    public const INVITE_STATUS_NORESPONSE = 1;
-    public const INVITE_STATUS_ACCEPTED = 2;
-    public const INVITE_STATUS_DECLINED = 3;
-    public const INVITE_STATUS_INVALID = 4;
+    public const INVITE_NORESPONSE = 1;
+    public const INVITE_ACCEPTED = 2;
+    public const INVITE_DECLINED = 3;
+    public const INVITE_INVALID = 4;
 
-    public const ACCESS_OWNER = 1;
+    public const ACCESS_NOTSHARED = 0;
+    public const ACCESS_SHAREDOWNER = 1;
     public const ACCESS_READ = 2;
     public const ACCESS_READWRITE = 3;
+    public const ACCESS_NOACCESS = 4;
+
+    # Used to identify a public calendar, available to anyone without logging in.
+    # It can't be shared, and it's owned by the principal.
+    public const ACCESS_PUBLIC = 10;  
+
+    public static function getOwnerAccesses(): array
+    {
+        return [
+            self::ACCESS_NOTSHARED,
+            self::ACCESS_SHAREDOWNER,
+            self::ACCESS_PUBLIC,
+        ];
+    }
 
     /**
      * @ORM\Id()
@@ -110,10 +125,10 @@ class CalendarInstance
 
     public function __construct()
     {
-        $this->shareInviteStatus = self::INVITE_STATUS_ACCEPTED;
+        $this->shareInviteStatus = self::INVITE_ACCEPTED;
         $this->transparent = 0;
         $this->calendarOrder = 0;
-        $this->access = self::ACCESS_OWNER;
+        $this->access = self::ACCESS_SHAREDOWNER;
     }
 
     public function getId(): ?int
@@ -155,6 +170,16 @@ class CalendarInstance
         $this->access = $access;
 
         return $this;
+    }
+
+    public function isShared(): bool
+    {
+        return !in_array($this->access, self::getOwnerAccesses());
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->access === self::ACCESS_PUBLIC;
     }
 
     public function getDisplayName(): ?string

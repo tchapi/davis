@@ -343,7 +343,7 @@ class AdminController extends AbstractController
         $calendars = [];
         $shared = [];
         foreach ($allCalendars as $calendar) {
-            if (CalendarInstance::ACCESS_OWNER === $calendar->getAccess()) {
+            if (!$calendar->isShared()) {
                 $calendars[] = [
                     'entity' => $calendar,
                     'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
@@ -393,7 +393,7 @@ class AdminController extends AbstractController
 
         $form = $this->createForm(CalendarInstanceType::class, $calendarInstance, [
             'new' => !$id,
-            'shared' => CalendarInstance::ACCESS_OWNER !== $calendarInstance->getAccess(),
+            'shared' => $calendarInstance->isShared(),
         ]);
 
         $components = explode(',', $calendarInstance->getCalendar()->getComponents());
