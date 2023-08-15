@@ -30,9 +30,9 @@ class CalendarInstance
     public const ACCESS_READWRITE = 3;
     public const ACCESS_NOACCESS = 4;
 
-    # Used to identify a public calendar, available to anyone without logging in.
-    # It can't be shared, and it's owned by the principal.
-    public const ACCESS_PUBLIC = 10;  
+    // Used to identify a public calendar, available to anyone without logging in.
+    // It can't be shared, and it's owned by the principal.
+    public const ACCESS_PUBLIC = 10;
 
     public static function getOwnerAccesses(): array
     {
@@ -179,7 +179,7 @@ class CalendarInstance
 
     public function isPublic(): bool
     {
-        return $this->access === self::ACCESS_PUBLIC;
+        return self::ACCESS_PUBLIC === $this->access;
     }
 
     public function getDisplayName(): ?string
