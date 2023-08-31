@@ -20,7 +20,7 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 ![User creation page](_screenshots/user.png)
 ![Sharing page](_screenshots/sharing.png)
 
-# Requirements
+# 🔩 Requirements
 
   - PHP > 7.3.0 (with `pdo_mysql` [or `pdo_pgsql`, `pdo_sqlite`], `gd` and `intl` extensions), compatible up to PHP 8.2 (_See dependencies table below_)
   - A compatible database layer, such as MySQL or MariaDB (recommended), PostgreSQL (not extensively tested yet) or SQLite (not extensively tested yet)
@@ -36,7 +36,7 @@ Dependencies
 | `v4.*`             | active                     | PHP 8.0+           |
 | `v3.*`             | security fixes only        | PHP 7.3 → 8.2      |
 
-# Installation
+# 🧰 Installation
 
 0. Clone this repository
 
@@ -56,12 +56,16 @@ bin/console doctrine:migrations:migrate
 
 **Davis** can also be used with a pre-existing MySQL database (_for instance, one previously managed by Baïkal_). See the paragraph "Migrating from Baikal" for more info.
 
+> [!NOTE]
+>
 > The tables are not _exactly_ equivalent to those of Baïkal, and allow for a bit more room in columns for instance (among other things)
 
 ## Configuration
 
 Create your own `.env.local` file to change the necessary variables, if you plan on using `symfony/dotenv`.
 
+> [!NOTE]
+>
 > If your installation is behind a web server like Apache or Nginx, you can setup the env vars directly in your Apache or Nginx configuration (see below). Skip this part in this case.
 
 a. The database driver and url (_you should already have it configured since you created the database previously_)
@@ -164,7 +168,7 @@ mysql -uroot -p davis < baikal_to_davis.sql
 bin/console doctrine:migrations:migrate
 ```
 
-# Access / Webserver
+# 🌐 Access / Webserver
 
 A simple status page is available on the root `/` of the server.
 
@@ -172,7 +176,9 @@ The administration interface is available at `/dashboard`. You need to login to 
 
 The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
 
-> Note: For shared hosting, the `symfony/apache-pack` is included and provides a standard `.htaccess` file in the public directory so redirections should work out of the box.
+> [!NOTE]
+>
+> For shared hosting, the `symfony/apache-pack` is included and provides a standard `.htaccess` file in the public directory so redirections should work out of the box.
 
 ### Example Caddy 2 configuration
 
@@ -283,7 +289,7 @@ If you use Nginx, you can add this to your configuration:
        rewrite ^/.well-known/caldav /dav/ redirect;
     }
 
-# Dockerized installation
+# 🐳 Dockerized installation
 
 A `Dockerfile` is available for you to compile the image.
 
@@ -294,6 +300,12 @@ To build the checked out version, just run:
 This will build a `davis:latest` image that you can directly use. Do not forget to pass sensible environment variables to the container since the _dist_ `.env` file will take precedence if no `.env.local` or environment variable is found.
 
 You can use `--platform` to specify the platform to build for. Currently, `arm64` (ARMv8) and `amd64` (x86) are supported.
+
+> [!IMPORTANT]
+> 
+> ⚠ Do not forget to run all the database migrations the first time you run the container :
+>
+>     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
 
 ## Docker images
 
@@ -315,7 +327,7 @@ The edge image is built from the tip of the master branch:
 docker pull ghcr.io/tchapi/davis:edge
 ```
 
-> **Warning**
+> [!WARNING]
 > 
 > The `edge` image must not be considered stable. Use only release images for production.
 
@@ -327,7 +339,7 @@ You can start the containers with :
 
     cd docker && docker-compose up -d
 
-> **Note**
+> [!NOTE]
 >
 > The recipe above uses MariaDB but you can also use PostgreSQL with:
 > ```
@@ -339,11 +351,14 @@ You can start the containers with :
 > cd docker && docker-compose -f docker-compose-sqlite.yml up -d
 > ```
 
-**⚠ Do not forget to run all the migrations the first time you run the container** :
+> [!IMPORTANT]
+> 
+> ⚠ Do not forget to run all the database migrations the first time you run the container :
+>
+>     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
 
-    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
-
-> **Warning**
+> [!WARNING]
+> 
 > For SQLite, you must also make sure that the folder the database will reside in AND the database file in itself have the right permissions! You can do for instance:
 > `chown -R www-data: /data` if `/data` is the folder your SQLite database will be in, just after you have run the migrations
 
@@ -382,13 +397,37 @@ You can use:
 
     ./bin/phpunit
 
-## Code linting
+## ✨ Code linting
 
 We use [PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) with:
 
     PHP_CS_FIXER_IGNORE_ENV=True ./vendor/bin/php-cs-fixer fix
 
-# Libraries used
+## 🐛 Troubleshooting
+
+Depending on how you run Davis, logs are either:
+  - [dev] printed out directly in the console
+  - [dev] available in the Symfony Debug Bar in the [Profiler](https://symfony.com/doc/current/profiler.html)
+  - [dev] logged in `./var/log/dev.log`
+  - [prod] logged in `./var/log/prod.log`, but only if there has been an error (_it's the fingers_crossed filter, explained [here](https://symfony.com/doc/current/logging.html#handlers-that-modify-log-entries)_)
+
+> [!NOTE]
+>
+> It's `./var/log` (relative to the Davis installation), not `/var/log`
+
+### I have a 500 and no tables have been created
+
+You probably forgot to run the migration once to create the necessary DB schema
+
+In Docker:
+
+    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
+
+In a shell, if you run Davis locally:
+
+    bin/console doctrine:migrations:migrate
+
+# 📚 Libraries used
 
   - Symfony 5 (Licence : MIT)
   - Sabre-io/dav (Licence : BSD-3-Clause)
@@ -396,7 +435,7 @@ We use [PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) with:
 
 _This project does not use any pipeline for the assets since the frontend side is relatively simple, and based on Bootstrap._
 
-# Licence
+# ⚖️ Licence
 
 This project is release under the MIT licence. See the LICENCE file
 
