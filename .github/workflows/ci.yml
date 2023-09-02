@@ -34,23 +34,15 @@ jobs:
                 docker-php-ext-install gd
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Cache Composer dependencies
-              uses: actions/cache@v3
-              with:
-                path: ~/.composer/cache
-                key: composer-php${{ matrix.php }}-highest-
-                restore-keys: |
-                   composer-php${{ matrix.php }}-highest-
-                   composer-
             - name: Validate Composer
               run: composer validate
             - name: Install highest dependencies with Composer
-              run: composer update --no-progress --ansi
+              run: composer update --no-interaction --no-progress --ansi
             - name: Analyze
               run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
 
     phpunit:
-        name: PHPUnit (PHP ${{ matrix.php }} Deps ${{ matrix.dependencies }})
+        name: PHPUnit (PHP ${{ matrix.php }} Deps
         runs-on: ubuntu-latest
         container:
             image: php:${{ matrix.php }}-alpine
@@ -78,9 +70,6 @@ jobs:
                     - '8.0'
                     - '8.1'
                     - '8.2'
-                dependencies:
-                    - lowest
-                    - highest
             fail-fast: false
         steps:
             - name: Checkout
@@ -93,20 +82,8 @@ jobs:
                 docker-php-ext-install pdo pdo_mysql intl gd
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Cache Composer dependencies
-              uses: actions/cache@v3
-              with:
-                path: ~/.composer/cache
-                key: composer-php${{ matrix.php }}-${{ matrix.dependencies }}-
-                restore-keys: |
-                    composer-php${{ matrix.php }}-${{ matrix.dependencies }}-
-                    composer-
-            - name: Install lowest dependencies with Composer
-              if: matrix.dependencies == 'lowest'
-              run: composer update --no-progress --prefer-stable --prefer-lowest --ansi
-            - name: Install highest dependencies with Composer
-              if: matrix.dependencies == 'highest'
-              run: composer update --no-progress --ansi
+            - name: Install dependencies with Composer
+              run: composer install --no-progress --no-interaction --ansi
             - name: Migrate database
               run: bin/console doctrine:schema:update --force --no-interaction
             - name: Run tests with PHPUnit
