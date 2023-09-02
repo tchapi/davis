@@ -406,6 +406,8 @@ class AdminController extends AbstractController
 
         $form->handleRequest($request);
 
+        $entityManager = $doctrine->getManager();
+
         if ($form->isSubmitted() && $form->isValid()) {
             // Only owners can change those
             if (!$calendarInstance->isShared()) {
@@ -428,7 +430,14 @@ class AdminController extends AbstractController
                 $calendarInstance->getCalendar()->setComponents(implode(',', $components));
             }
 
-            $entityManager = $doctrine->getManager();
+            // We want to remove all shares if a calendar goes public
+            if (true === $form->get('public')->getData() && $id) {
+                $calendarId = $calendarInstance->getCalendar()->getId();
+                $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarId, false);
+                foreach ($instances as $instance) {
+                    $entityManager->remove($instance);
+                }
+            }
 
             $entityManager->persist($calendarInstance);
             $entityManager->flush();
