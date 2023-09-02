@@ -36,13 +36,13 @@ jobs:
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Validate Composer
               run: composer validate
-            - name: Install highest dependencies with Composer
+            - name: Update to highest dependencies with Composer
               run: composer update --no-interaction --no-progress --ansi
             - name: Analyze
               run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
 
     phpunit:
-        name: PHPUnit (PHP ${{ matrix.php }} Deps
+        name: PHPUnit (PHP ${{ matrix.php }})
         runs-on: ubuntu-latest
         container:
             image: php:${{ matrix.php }}-alpine
@@ -85,6 +85,6 @@ jobs:
             - name: Install dependencies with Composer
               run: composer install --no-progress --no-interaction --ansi
             - name: Migrate database
-              run: bin/console doctrine:schema:update --force --no-interaction
+              run: bin/console doctrine:schema:update --force --no-interaction --complete
             - name: Run tests with PHPUnit
               run: vendor/bin/phpunit --process-isolation --colors=always
