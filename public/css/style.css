@@ -31,15 +31,19 @@ body {
 }
 
 /* Little color swatch to show calendar color */
+#calendar_instance_calendarColor_help{
+ position: relative;
+}
 #calendar_instance_calendarColor_help::after {
     content: "";
     width: 30px;
     height: 30px;
     position: absolute;
-    top: 4px;
-    right: 19px;
+    top: -38px;
+    right: 5px;
     background: var(--calendar-color);
-    border-radius: 2px;
+    border-radius: 3px;
+    border: 1px solid #AAA;
 }
 
 /* Special indicator badge */

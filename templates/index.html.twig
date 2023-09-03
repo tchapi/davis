@@ -24,17 +24,17 @@
         <img class="mb-2" src="/images/logo.png" width="60px">
         <h3 class="mb-4">{{ "davis"|trans }}</h3>
         <ul class="list-group">
-          <li class="caldav list-group-item d-flex justify-content-between">
+          <li class="caldav list-group-item d-flex justify-content-between align-items-center">
             CalDAV
-            {% if calDAVEnabled %}<span class="badge bg-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger">{{ "disabled"|trans }}</span>{% endif %}
+            {% if calDAVEnabled %}<span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span>{% endif %}
           </li>
-          <li class="carddav list-group-item d-flex justify-content-between">
+          <li class="carddav list-group-item d-flex justify-content-between align-items-center">
             CardDAV
-            {% if cardDAVEnabled %}<span class="badge bg-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger">{{ "disabled"|trans }}</span>{% endif %}
+            {% if cardDAVEnabled %}<span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span>{% endif %}
           </li>
-          <li class="webdav list-group-item d-flex justify-content-between">
+          <li class="webdav list-group-item d-flex justify-content-between align-items-center">
             WebDAV
-            {% if webDAVEnabled %}<span class="badge bg-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger">{{ "disabled"|trans }}</span>{% endif %}
+            {% if webDAVEnabled %}<span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span>{% endif %}
           </li>
         </ul>
         <a href="{{ path('dashboard') }}" class="btn btn-light mt-4">{{ "admin.interface"|trans }}</a>

@@ -15,14 +15,19 @@
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 me-auto">{{ calendar.displayName }} <a href="#" class="badge badge-indicator popover-dismiss" role="button" data-toggle="popover" title="{{ 'calendars.setup.title'|trans }}" data-html='true' data-content="<code>{{ davUri }}</code>">ⓘ</a> <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span></h5>
             <div class="me-0 text-right d-md-block d-none">
-                <a href="#" 
+                <a href="#"
                     data-bs-toggle="modal" data-bs-target="#shareModal"
                     data-sharees-href="{{ path('calendar_shares',{username: username, calendarid: calendar.calendar.id})}}" 
                     data-href="{{ path('calendar_share_add', {username: principal.username, instanceid: calendar.id}) }}" 
                     class="btn btn-sm btn-outline-info ms-1 share-modal"
                 >🔗 {{ "sharing"|trans }}</a>
                 <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
-                <a href="#" data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" data-flavour="calendars" class="btn btn-sm btn-outline-danger ms-1 delete-modal">⚠ {{ "delete"|trans }}</a>
+                <a href="#" 
+                    data-bs-toggle="modal" data-bs-target="#deleteModal-calendars"
+                    data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}"
+                    data-flavour="calendars"
+                    class="btn btn-sm btn-outline-danger ms-1 delete-modal"
+                >⚠ {{ "delete"|trans }}</a>
             </div>
         </div>
         <p class="mb-1">{{ calendar.description }}</p>
@@ -42,7 +47,12 @@
                 class="btn btn-outline-info share-modal"
             >🔗 {{ "sharing"|trans }}</a>
             <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
-            <a href="#" data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}" data-flavour="calendars" class="btn btn-outline-danger delete-modal">⚠ {{ "delete"|trans }}</a>
+            <a href="#" 
+                data-bs-toggle="modal" data-bs-target="#deleteModal-calendars"
+                data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}"
+                data-flavour="calendars"
+                class="btn btn-outline-danger delete-modal"
+            >⚠ {{ "delete"|trans }}</a>
         </div>
     </div>
 {% endfor %}
@@ -68,7 +78,12 @@
                 </h5>
                 <div class="me-0 text-right d-md-block d-none">
                     <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
-                    <a href="#" data-href="{{ path('calendar_revoke',{username: username, id: calendar.id})}}" data-flavour="revoke" class="btn btn-sm btn-outline-danger ms-1 delete-modal">🚫 {{ "revoke"|trans }}</a>
+                    <a href="#"
+                        data-bs-toggle="modal" data-bs-target="#deleteModal-revoke"
+                        data-href="{{ path('calendar_revoke',{username: username, id: calendar.id})}}"
+                        data-flavour="revoke"
+                        class="btn btn-sm btn-outline-danger ms-1"
+                    >🚫 {{ "revoke"|trans }}</a>
                 </div>
             </div>
             <p class="mb-1">{{ calendar.description }}</p>
@@ -82,7 +97,12 @@
             </small>
             <div class="btn-group btn-group-sm mt-3 d-flex d-md-none" role="group">
                 <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
-                <a href="#" data-href="{{ path('calendar_revoke',{username: username, id: calendar.id})}}" data-flavour="revoke" class="btn btn-outline-danger delete-modal">🚫 {{ "revoke"|trans }}</a>
+                <a href="#" 
+                    data-bs-toggle="modal" data-bs-target="#deleteModal-revoke"
+                    data-href="{{ path('calendar_revoke',{username: username, id: calendar.id})}}" 
+                    data-flavour="revoke"
+                    class="btn btn-outline-danger"
+                >🚫 {{ "revoke"|trans }}</a>
             </div>
         </div>
     {% endfor %}

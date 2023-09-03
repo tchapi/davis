@@ -1,25 +1,23 @@
-<div class="modal fade" id="add_delegate" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="addDelegateModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">{{ "calendars.delegates.new"|trans }}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form>
           <div class="form-group">
             <label for="member" class="col-form-label">{{ "calendars.delegates.member"|trans }}</label>
-            <select class="form-control" id="member">
+            <select class="form-control" id="addDelegateModal-member">
               {% for principal in principals %}
                 <option value="{{ principal.id}}">{{ principal.displayName }} ({{ principal.email }})</option>
               {% endfor %}
             </select>
             <small class="form-text text-muted">{{ "delegates.member.help"|trans }}</small>
           </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="write">
+          <div class="form-check form-switch mt-2">
+            <input class="form-check-input" type="checkbox" value="" id="addDelegateModal-writeAccess">
             <label class="form-check-label" for="write">
               {{ "calendars.delegates.write.give"|trans }}
             </label>
@@ -28,7 +26,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ "cancel"|trans }}</button>
-        <a data-href="{{ path('user_delegate_add', {username: principal.username}) }}" href="#" class="btn btn-primary add-delegate">{{ "add"|trans }}</a>
+        <a data-href="{{ path('user_delegate_add', {username: principal.username}) }}" href="#" class="btn btn-primary" id="addDelegateModal-cta">{{ "add"|trans }}</a>
       </div>
     </div>
   </div>
