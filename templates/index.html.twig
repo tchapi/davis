@@ -18,6 +18,7 @@
             width: 240px;
           }
         </style>
+        <script type="text/javascript" src="/js/color.mode.toggler.js"></script>
     </head>
     <body>
       <div class="hero">
@@ -37,7 +38,7 @@
             {% if webDAVEnabled %}<span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span>{% endif %}
           </li>
         </ul>
-        <a href="{{ path('dashboard') }}" class="btn btn-light mt-4">{{ "admin.interface"|trans }}</a>
+        <a href="{{ path('dashboard') }}" class="btn btn-sm btn-outline-secondary mt-4">{{ "admin.interface"|trans }}</a>
       </div>
     </body>
 </html>

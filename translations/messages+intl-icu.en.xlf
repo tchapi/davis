@@ -45,6 +45,22 @@
         <source>toggle.navigation</source>
         <target>Toggle navigation</target>
       </trans-unit>
+      <trans-unit id="q3rXQbK" resname="toggle.theme">
+        <source>toggle.theme</source>
+        <target>Toggle theme</target>
+      </trans-unit>
+      <trans-unit id="a.8gbaH" resname="theme.light">
+        <source>theme.light</source>
+        <target>Light</target>
+      </trans-unit>
+      <trans-unit id="PWATBYO" resname="theme.dark">
+        <source>theme.dark</source>
+        <target>Dark</target>
+      </trans-unit>
+      <trans-unit id="kIumP2R" resname="theme.auto">
+        <source>theme.auto</source>
+        <target>Auto</target>
+      </trans-unit>
       <trans-unit id="PMgigwp" resname="title.dashboard">
         <source>title.dashboard</source>
         <target>Dashboard</target>
