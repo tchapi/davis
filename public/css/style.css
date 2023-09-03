@@ -31,7 +31,7 @@ body {
 }
 
 /* Little color swatch to show calendar color */
-#calendar_instance_calendarColor_help{
+#calendar_instance_calendarColor_help {
  position: relative;
 }
 #calendar_instance_calendarColor_help::after {
@@ -48,11 +48,15 @@ body {
 
 /* Special indicator badge */
 .badge.badge-indicator {
-    height: 16px;
-    width: 16px;
+    height: 15px;
+    width: 15px;
     padding: 0;
     border-radius: 50%;
+    text-decoration: none;
+    color: var(--bs-heading-color); /* Comes from Bootstrap */
 }
+
+/* Allow selection in the Bootstrap popover */
 .popover .popover-body {
     user-select: text;
 }

@@ -115,12 +115,15 @@ if (colorPicker) {
     document.body.style.setProperty('--calendar-color', colorPicker.value);
 }
 
+// Bootstrap 5 popovers
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+if (popoverTriggerList) {
+    [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+}
+
 /*
 $(document).ready(function() {
     // For messages
     $('.toast').toast('show');
-
-    // Initialize popovers
-    $('.popover-dismiss').popover()
 })
 */
