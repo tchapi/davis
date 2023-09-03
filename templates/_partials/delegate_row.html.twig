@@ -10,7 +10,12 @@
             {% endif %}
         </h5>
         <div class="me-0 text-right d-lg-block d-none">
-            <a href="#" data-href="{{ path('user_delegate_remove',{username: principal.username, principalProxyId: has_write ? principalProxyWrite.id : principalProxyRead.id, delegateId: delegate.id})}}" data-flavour="delegates" class="btn btn-sm btn-outline-danger ms-1 mb-1 delete-modal">⚠&nbsp;{{ "remove"|trans }}</a>
+            <a href="#" 
+                data-bs-toggle="modal" data-bs-target="#deleteModal-delegates"
+                data-href="{{ path('user_delegate_remove',{username: principal.username, principalProxyId: has_write ? principalProxyWrite.id : principalProxyRead.id, delegateId: delegate.id})}}" 
+                data-flavour="delegates" 
+                class="btn btn-sm btn-outline-danger ms-1 mb-1"
+            >⚠&nbsp;{{ "remove"|trans }}</a>
         </div>
     </div>
     <p class="mb-1">{{ "users.username"|trans }} : <code>{{ delegate.username }}</code></p>

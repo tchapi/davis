@@ -14,9 +14,9 @@ class DashboardTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h3', 'Davis');
 
-        $this->assertSelectorExists('div.caldav');
-        $this->assertSelectorExists('div.carddav');
-        $this->assertSelectorExists('div.webdav');
+        $this->assertSelectorExists('li.caldav');
+        $this->assertSelectorExists('li.carddav');
+        $this->assertSelectorExists('li.webdav');
     }
 
     public function testDashboardPageUnlogged(): void
