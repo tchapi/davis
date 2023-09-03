@@ -473,6 +473,10 @@
         <source>sharing</source>
         <target>Sharing</target>
       </trans-unit>
+      <trans-unit id="X7nEzAm" resname="calendars.sharing">
+        <source>calendars.sharing</source>
+        <target>Calendar sharing</target>
+      </trans-unit>
       <trans-unit id="fWFSd1u" resname="calendars.delegates.add">
         <source>calendars.delegates.add</source>
         <target>Add a delegate</target>
@@ -480,10 +484,6 @@
       <trans-unit id="x3qt3u1" resname="calendars.delegates.for">
         <source>calendars.delegates.for</source>
         <target>Delegates for {what}</target>
-      </trans-unit>
-      <trans-unit id="X7nEzAm" resname="calendars.delegates.new">
-        <source>calendars.delegates.new</source>
-        <target>New delegate</target>
       </trans-unit>
       <trans-unit id="MLydEYK" resname="calendars.delegates.existing">
         <source>calendars.delegates.existing</source>

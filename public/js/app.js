@@ -1,5 +1,66 @@
 'use strict'
 
+// Calendar share modal behaviour
+const shareModal = document.getElementById('shareModal')
+shareModal.addEventListener('show.bs.modal', event => {
+    // Button that triggered the modal
+    const button = event.relatedTarget
+
+    // Grab calendar shares url and add url
+    let shareesUrl = button.getAttribute('data-sharees-href');
+    let targetUrl = button.getAttribute('data-href');
+
+    // Put it into the modal's OK button
+    const addShareeButton = document.getElementById('shareModal-addSharee');
+
+    // Modal to add a sharee on a calendar, catch the click to add the query parameter
+    addShareeButton.addEventListener("click", function(e) {
+        const writeAccess = document.getElementById('shareModal-writeAccess').checked ? 'true' : 'false';
+        const principalId = document.getElementById('shareModal-member').value;
+
+        e.preventDefault()
+        window.location = targetUrl + "?principalId=" + principalId + "&write=" + writeAccess
+    });
+
+    const noneElement = document.getElementById('shareModal-none')
+    
+    // Get calendar shares
+    fetch(shareesUrl)
+        .then((response) => response.json())
+        .then((data) => {
+
+            // No sharee
+            if (data.length === 0) {
+                noneElement.classList.remove("d-none");
+                return
+            }
+  
+            noneElement.classList.add('d-none')
+
+            // Share list item template
+            const template = document.getElementById("shareModal-shareeTemplate");
+
+            // Shares list
+            const shares = document.getElementById('shareModal-shares')
+
+            data.forEach(element => {
+                const clone = template.content.cloneNode(true);
+                let name = clone.querySelectorAll("span.name");
+                name[0].textContent = element.displayName;
+                let badge = clone.querySelectorAll("span.badge");
+                badge[0].textContent = element.accessText;
+                if (element.isWriteAccess) {
+                    badge[0].classList.add('bg-success')
+                    badge[0].classList.remove('bg-info')
+                }
+                let revokeButton = clone.querySelectorAll("a.revoke");
+                revokeButton[0].href = element.revokeUrl;
+
+                shares.appendChild(clone);
+            });
+            
+        });
+})
 $(document).ready(function() {
     // For messages
     $('.toast').toast('show');
