@@ -20,6 +20,10 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 ![User creation page](_screenshots/user.png)
 ![Sharing page](_screenshots/sharing.png)
 
+| Dark / Light mode  | Useful information at hand        |
+|--------------------|----------------------------|
+| ![Color mode](_screenshots/mode.png)| ![Setup information](_screenshots/setup_info.png)|
+
 # 🔩 Requirements
 
   - PHP > 7.3.0 (with `pdo_mysql` [or `pdo_pgsql`, `pdo_sqlite`], `gd` and `intl` extensions), compatible up to PHP 8.2 (_See dependencies table below_)
