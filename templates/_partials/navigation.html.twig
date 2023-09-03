@@ -1,4 +1,4 @@
-<nav class="navbar fixed-top navbar-expand-lg navbar-themed">
+<nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
   <div class="container">
     <a class="navbar-brand" href="#">
       <img src="/images/logo.png" width="30" height="30" alt=""> Davis
@@ -19,7 +19,7 @@
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {{ app.user.username }}
+            👤 {{ app.user.username }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <a class="dropdown-item" href="{{ path('app_logout') }}">{{ "logout"|trans }}</a>

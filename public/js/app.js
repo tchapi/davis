@@ -121,9 +121,11 @@ if (popoverTriggerList) {
     [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
 }
 
-/*
-$(document).ready(function() {
-    // For messages
-    $('.toast').toast('show');
-})
-*/
+// Bootstrap 5 toasts
+const toastElList = document.querySelectorAll('.toast')
+if (toastElList) {
+    [...toastElList].map(toastEl => {
+        const toast = new bootstrap.Toast(toastEl)
+        toast.show()
+    })
+}
