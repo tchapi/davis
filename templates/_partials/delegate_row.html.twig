@@ -1,6 +1,6 @@
 <div class="list-group-item p-3">
     <div class="d-flex w-100 justify-content-between">
-        <h5 class="mr-auto">
+        <h5 class="me-auto">
             {{ delegate.displayName }}
             <a href="mailto:{{ delegate.email }}">&lsaquo;{{ delegate.email }}&rsaquo;</a>
             {% if has_write %}
@@ -9,8 +9,8 @@
                 <span class="badge bg-info">{{ "delegates.readonly"|trans }}</span>
             {% endif %}
         </h5>
-        <div class="mr-0 text-right d-lg-block d-none">
-            <a href="#" data-href="{{ path('user_delegate_remove',{username: principal.username, principalProxyId: has_write ? principalProxyWrite.id : principalProxyRead.id, delegateId: delegate.id})}}" data-flavour="delegates" class="btn btn-sm btn-outline-danger ml-1 mb-1 delete-modal">⚠&nbsp;{{ "remove"|trans }}</a>
+        <div class="me-0 text-right d-lg-block d-none">
+            <a href="#" data-href="{{ path('user_delegate_remove',{username: principal.username, principalProxyId: has_write ? principalProxyWrite.id : principalProxyRead.id, delegateId: delegate.id})}}" data-flavour="delegates" class="btn btn-sm btn-outline-danger ms-1 mb-1 delete-modal">⚠&nbsp;{{ "remove"|trans }}</a>
         </div>
     </div>
     <p class="mb-1">{{ "users.username"|trans }} : <code>{{ delegate.username }}</code></p>

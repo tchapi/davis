@@ -41,7 +41,7 @@
       <li class="list-group-item list-group-item-primary">{{ "dashboard.version"|trans }} : <code>{{ version }}</code> (SabreDAV <code>{{ sabredav_version }}</code>)</li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.auth"|trans }} : <code>{{ authMethod }}</code> ({{ "dashboard.auth_realm"|trans }}: <code>{{ authRealm }}</code>)</li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.invite_from_address"|trans }} : <code>{{ invite_from_address|default('Not set') }}</code></li>
-      <li class="list-group-item list-group-item-secondary">{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone }}</code> <a class="small ml-2" target="_blank" href="https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone">{{ "dashboard.how_to_change_it"|trans }}</a></li>
+      <li class="list-group-item list-group-item-secondary">{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone }}</code> <a class="small ms-2" target="_blank" href="https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone">{{ "dashboard.how_to_change_it"|trans }}</a></li>
 
     </ul>
   </div>
@@ -54,7 +54,7 @@
         {{ "dashboard.users"|trans }} <span class="badge bg-primary rounded-pill">{{ users|length }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>{{ "dashboard.calendars"|trans }}&nbsp;<span class="small text-muted ml-1 mr-auto">{{ "dashboard.calendars.help"|trans }}</span></div> <span class="badge bg-primary rounded-pill">{{ calendars|length }}</span>
+        <div>{{ "dashboard.calendars"|trans }}&nbsp;<span class="small text-muted ms-1 me-auto">{{ "dashboard.calendars.help"|trans }}</span></div> <span class="badge bg-primary rounded-pill">{{ calendars|length }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
         ↳ {{ "dashboard.events"|trans }} <span class="badge bg-secondary rounded-pill">{{ events|length }}</span>
