@@ -6,7 +6,7 @@ Davis
 [![Latest release][release_badge]][release_link]
 [![Sponsor me][sponsor_badge]][sponsor_link]
 
-A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 4](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal).
+A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
 Provides user edition, calendar creation and sharing, and address book creation. The interface is simple and straightforward, responsive, and provides a light and a dark mode.
 
@@ -19,6 +19,10 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 ![Dashboard page](_screenshots/dashboard.png)
 ![User creation page](_screenshots/user.png)
 ![Sharing page](_screenshots/sharing.png)
+
+| Dark / Light mode  | Useful information at hand        |
+|--------------------|----------------------------|
+| ![Color mode](_screenshots/mode.png)| ![Setup information](_screenshots/setup_info.png)|
 
 # 🔩 Requirements
 
@@ -431,7 +435,7 @@ In a shell, if you run Davis locally:
 
   - Symfony 5 (Licence : MIT)
   - Sabre-io/dav (Licence : BSD-3-Clause)
-  - Bootstrap 4 (Licence : MIT)
+  - Bootstrap 5 (Licence : MIT)
 
 _This project does not use any pipeline for the assets since the frontend side is relatively simple, and based on Bootstrap._
 

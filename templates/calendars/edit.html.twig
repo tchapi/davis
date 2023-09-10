@@ -3,12 +3,12 @@
 
 {% block body %}
 
-<a href="{{ path('calendars', {username: username}) }}" class="btn btn-link">« {{ "calendars.back"|trans({'user': principal.displayName }) }}</a>
+{% include '_partials/back_button.html.twig' with { url: path('calendars', {username: username}), text: "calendars.back"|trans({'user': principal.displayName }) } %}
 
 {% if calendar.id %}
-<h1 class="display-4 mb-5">{{ "calendars.edit"|trans({'name': calendar.displayName }) }}</h1>
+<h1 class="display-4 fw-lighter mb-5">{{ "calendars.edit"|trans({'name': calendar.displayName }) }}</h1>
 {% else %}
-<h1 class="display-4 mb-5">{{ "calendars.new"|trans }} <small class="text-muted">for {{ principal.displayName }}</small></h1>
+<h1 class="display-4 fw-lighter mb-5">{{ "calendars.new"|trans }} <small class="text-muted">for {{ principal.displayName }}</small></h1>
 {% endif %}
 
 {{ form(form) }}

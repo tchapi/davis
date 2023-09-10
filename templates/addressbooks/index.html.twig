@@ -3,25 +3,35 @@
 
 {% block body %}
 
-<a href="{{ path('users') }}" class="btn btn-link">« {{ "users.back"|trans }}</a>
+{% include '_partials/back_button.html.twig' with { url: path('users'), text: "users.back"|trans } %}
 
-<h1 class="display-4 d-flex font-weight-lighter justify-content-between">{{ "addressbooks.for"|trans({'who': principal.displayName}) }} <a href="{{ path('addressbook_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "addressbooks.new"|trans }}</a></h1>
+<h1 class="display-4 d-flex fw-lighter justify-content-between">{{ "addressbooks.for"|trans({'who': principal.displayName}) }} <a href="{{ path('addressbook_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "addressbooks.new"|trans }}</a></h1>
 
-<div class="list-group mt-5">
+<div class="list-group mt-4">
 {% for addressbook in addressbooks %}
     <div class="list-group-item p-3">
         <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1 mr-auto">{{ addressbook.displayName }}</h5>
-            <div class="mr-0 text-right d-md-block d-none">
-                <a href="{{ path('addressbook_edit',{username: username, id: addressbook.id})}}" class="btn btn-sm btn-outline-primary ml-1">✎ {{ "edit"|trans }}</a>
-                <a data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" href="#" class="btn btn-sm btn-outline-danger ml-1 delete-modal" data-flavour="addressbooks">⚠ {{ "delete"|trans }}</a>
+            <h5 class="mb-1 me-auto">{{ addressbook.displayName }}</h5>
+            <div class="me-0 text-right d-md-block d-none">
+                <a href="{{ path('addressbook_edit',{username: username, id: addressbook.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
+                <a href="#"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal-addressbooks"
+                    data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}"
+                    class="btn btn-sm btn-outline-danger ms-1" 
+                    data-flavour="addressbooks"
+                >⚠ {{ "delete"|trans }}</a>
             </div>
         </div>
         <p class="mb-1">{{ addressbook.description }}</p>
         <small>{{ "addressbooks.uri"|trans }} : <code>{{ addressbook.uri }}</code> — {{ "addressbooks.contacts"|trans({'%count%': addressbook.cards|length}) }}</small>
         <div class="btn-group btn-group-sm mt-3 d-flex d-md-none" role="group">
             <a href="{{ path('addressbook_edit',{username: username, id: addressbook.id})}}" class="btn btn-sm btn-outline-primary">✎ {{ "edit"|trans }}</a>
-            <a data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" href="#" class="btn btn-sm btn-outline-danger delete-modal" data-flavour="addressbooks">⚠ {{ "delete"|trans }}</a>
+            <a href="#"
+                data-bs-toggle="modal" data-bs-target="#deleteModal-addressbooks"
+                data-href="{{ path('addressbook_delete',{username: username, id: addressbook.id})}}" 
+                class="btn btn-sm btn-outline-danger"
+                data-flavour="addressbooks"
+            >⚠ {{ "delete"|trans }}</a>
         </div>
     </div>
 {% endfor %}

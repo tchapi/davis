@@ -45,6 +45,22 @@
         <source>toggle.navigation</source>
         <target>Toggle navigation</target>
       </trans-unit>
+      <trans-unit id="q3rXQbK" resname="toggle.theme">
+        <source>toggle.theme</source>
+        <target>Toggle theme</target>
+      </trans-unit>
+      <trans-unit id="a.8gbaH" resname="theme.light">
+        <source>theme.light</source>
+        <target>Light</target>
+      </trans-unit>
+      <trans-unit id="PWATBYO" resname="theme.dark">
+        <source>theme.dark</source>
+        <target>Dark</target>
+      </trans-unit>
+      <trans-unit id="kIumP2R" resname="theme.auto">
+        <source>theme.auto</source>
+        <target>Auto</target>
+      </trans-unit>
       <trans-unit id="PMgigwp" resname="title.dashboard">
         <source>title.dashboard</source>
         <target>Dashboard</target>
@@ -359,11 +375,11 @@
       </trans-unit>
       <trans-unit id="6AbgcWQ" resname="form.uri.help.carddav">
         <source>form.uri.help.carddav</source>
-        <target>This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+        <target>This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
       </trans-unit>
       <trans-unit id="JIbKo6n" resname="form.uri.help.caldav">
         <source>form.uri.help.caldav</source>
-        <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+        <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
       </trans-unit>
       <trans-unit id="x5Dmxhi" resname="form.color.help">
         <source>form.color.help</source>
@@ -472,6 +488,10 @@
       <trans-unit id="efo4jbl" resname="sharing">
         <source>sharing</source>
         <target>Sharing</target>
+      </trans-unit>
+      <trans-unit id="Xp2NI1I" resname="calendars.sharing">
+        <source>calendars.sharing</source>
+        <target>Calendar sharing</target>
       </trans-unit>
       <trans-unit id="fWFSd1u" resname="calendars.delegates.add">
         <source>calendars.delegates.add</source>

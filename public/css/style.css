@@ -11,7 +11,7 @@ body {
 /* Add a simple line below display headings */
 .display-4 {
     font-size: 2.5rem;
-    border-bottom: 1px solid var(--gray);
+    border-bottom: 1px solid var(--bs-border-color);
 }
 
 /* Flashes (messages) styles */
@@ -31,24 +31,32 @@ body {
 }
 
 /* Little color swatch to show calendar color */
+#calendar_instance_calendarColor_help {
+ position: relative;
+}
 #calendar_instance_calendarColor_help::after {
     content: "";
     width: 30px;
     height: 30px;
     position: absolute;
-    top: 4px;
-    right: 19px;
+    top: -38px;
+    right: 5px;
     background: var(--calendar-color);
-    border-radius: 2px;
+    border-radius: 3px;
+    border: 1px solid #AAA;
 }
 
 /* Special indicator badge */
 .badge.badge-indicator {
-    height: 16px;
-    width: 16px;
+    height: 15px;
+    width: 15px;
     padding: 0;
     border-radius: 50%;
+    text-decoration: none;
+    color: var(--bs-heading-color); /* Comes from Bootstrap */
 }
+
+/* Allow selection in the Bootstrap popover */
 .popover .popover-body {
     user-select: text;
 }

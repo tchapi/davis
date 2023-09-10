@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<h1 class="display-4">{{ "title.dashboard"|trans }}</h1>
+<h1 class="display-4 fw-lighter">{{ "title.dashboard"|trans }}</h1>
 
 <div class="row">
   <div class="col-md">
@@ -12,26 +12,26 @@
     <ul class="list-group">
       {% if calDAVEnabled %}
       <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">CalDAV
-        <span class="badge badge-success badge-pill">{{ "enabled"|trans }}</span></li>
+        <span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span></li>
       {% else %}
       <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CalDAV
-        <span class="badge badge-danger badge-pill">{{ "disabled"|trans }}</span></li>
+        <span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span></li>
       {% endif %}
 
       {% if cardDAVEnabled %}
       <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">CardDAV
-        <span class="badge badge-success badge-pill">{{ "enabled"|trans }}</span></li>
+        <span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span></li>
       {% else %}
       <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">CardDAV
-        <span class="badge badge-danger badge-pill">{{ "disabled"|trans }}</span></li>
+        <span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span></li>
       {% endif %}
 
       {% if webDAVEnabled %}
       <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">WebDAV
-        <span class="badge badge-success badge-pill">{{ "enabled"|trans }}</span></li>
+        <span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span></li>
       {% else %}
       <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">WebDAV
-        <span class="badge badge-danger badge-pill">{{ "disabled"|trans }}</span></li>
+        <span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span></li>
       {% endif %}
     </ul>
 
@@ -41,7 +41,7 @@
       <li class="list-group-item list-group-item-primary">{{ "dashboard.version"|trans }} : <code>{{ version }}</code> (SabreDAV <code>{{ sabredav_version }}</code>)</li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.auth"|trans }} : <code>{{ authMethod }}</code> ({{ "dashboard.auth_realm"|trans }}: <code>{{ authRealm }}</code>)</li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.invite_from_address"|trans }} : <code>{{ invite_from_address|default('Not set') }}</code></li>
-      <li class="list-group-item list-group-item-secondary">{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone }}</code> <a class="small ml-2" target="_blank" href="https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone">{{ "dashboard.how_to_change_it"|trans }}</a></li>
+      <li class="list-group-item list-group-item-secondary">{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone }}</code> <a class="small ms-2" target="_blank" href="https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone">{{ "dashboard.how_to_change_it"|trans }}</a></li>
 
     </ul>
   </div>
@@ -51,19 +51,19 @@
 
     <ul class="list-group mb-5">
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ "dashboard.users"|trans }} <span class="badge badge-primary badge-pill">{{ users|length }}</span>
+        {{ "dashboard.users"|trans }} <span class="badge bg-primary rounded-pill">{{ users|length }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ "dashboard.calendars"|trans }}<span class="small text-muted ml-1 mr-auto">{{ "dashboard.calendars.help"|trans }}</span> <span class="badge badge-primary badge-pill">{{ calendars|length }}</span>
+        <div>{{ "dashboard.calendars"|trans }}&nbsp;<span class="small text-muted ms-1 me-auto">{{ "dashboard.calendars.help"|trans }}</span></div> <span class="badge bg-primary rounded-pill">{{ calendars|length }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        ↳ {{ "dashboard.events"|trans }} <span class="badge badge-secondary badge-pill">{{ events|length }}</span>
+        ↳ {{ "dashboard.events"|trans }} <span class="badge bg-secondary rounded-pill">{{ events|length }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ "dashboard.address_books"|trans }} <span class="badge badge-primary badge-pill">{{ addressbooks|length }}</span>
+        {{ "dashboard.address_books"|trans }} <span class="badge bg-primary rounded-pill">{{ addressbooks|length }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        ↳ {{ "dashboard.contacts"|trans }} <span class="badge badge-secondary badge-pill">{{ contacts|length }}</span>
+        ↳ {{ "dashboard.contacts"|trans }} <span class="badge bg-secondary rounded-pill">{{ contacts|length }}</span>
       </li>
     </ul>
   </div>

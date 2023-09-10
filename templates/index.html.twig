@@ -2,8 +2,9 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Davis{% endblock %}</title>
-        <link rel="stylesheet" href="/css/bootstrap-light-prefers-dark.min.css" />
+        <link rel="stylesheet" href="/css/bootstrap.min.css" />
         <style type="text/css">
           .hero {
             height: 100vh;
@@ -13,47 +14,31 @@
             justify-content: center;
             flex-direction: column;
           }
-          .badge-success {
-            background-color: #28a745;
-          }
-          .badge-warning {
-            background-color: #ffc107;
-          }
-          .badge-danger {
-            background-color: #dc3545;
-          }
-          .badge {
-            color: #fff;
-            display: inline-block;
-            padding: .25em .4em;
-            font-size: 75%;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: .25rem;
-          }
-          .admin {
-            margin-top: 30px;
-          }
-          h3 {
-            font-size: 1.25em;
-            margin-bottom: 30px;
-          }
-          img {
-            margin-bottom: 10px;
+          .hero .list-group {
+            width: 240px;
           }
         </style>
+        <script type="text/javascript" src="/js/color.mode.toggler.js"></script>
     </head>
     <body>
       <div class="hero">
-        <img src="/images/logo.png" width="60px">
-        <h3>{{ "davis"|trans }}</h3>
-        <div class="caldav">CalDAV : {% if calDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
-        <div class="carddav">CardDAV : {% if cardDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
-        <div class="webdav">WebDAV : {% if webDAVEnabled %}<span class="badge badge-success">{{ "enabled"|trans }}</span>{% else %}<span class="badge badge-danger">{{ "disabled"|trans }}</span>{% endif %}</div>
-        <a href="{{ path('dashboard') }}" class="admin">{{ "admin.interface"|trans }}</a>
+        <img class="mb-2" src="/images/logo.png" width="60px">
+        <h3 class="mb-4">{{ "davis"|trans }}</h3>
+        <ul class="list-group">
+          <li class="caldav list-group-item d-flex justify-content-between align-items-center">
+            CalDAV
+            {% if calDAVEnabled %}<span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span>{% endif %}
+          </li>
+          <li class="carddav list-group-item d-flex justify-content-between align-items-center">
+            CardDAV
+            {% if cardDAVEnabled %}<span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span>{% endif %}
+          </li>
+          <li class="webdav list-group-item d-flex justify-content-between align-items-center">
+            WebDAV
+            {% if webDAVEnabled %}<span class="badge bg-success rounded-pill">{{ "enabled"|trans }}</span>{% else %}<span class="badge bg-danger rounded-pill">{{ "disabled"|trans }}</span>{% endif %}
+          </li>
+        </ul>
+        <a href="{{ path('dashboard') }}" class="btn btn-sm btn-outline-secondary mt-4">{{ "admin.interface"|trans }}</a>
       </div>
     </body>
 </html>
