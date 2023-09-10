@@ -230,7 +230,7 @@ class DAVController extends AbstractController
         $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin(false)); // We disable the file creation / upload / sharing in the browser
         $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
 
-        $aclPlugin = new PublicAwareDAVACLPlugin();
+        $aclPlugin = new PublicAwareDAVACLPlugin($this->em);
         $aclPlugin->hideNodesFromListings = true;
 
         // Fetch admins, if any
