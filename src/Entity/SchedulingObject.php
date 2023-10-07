@@ -27,7 +27,7 @@ class SchedulingObject
     private $principalUri;
 
     /**
-     * @ORM\Column(name="calendardata", type="blob", nullable=true)
+     * @ORM\Column(name="calendardata", type="text", nullable=true, length=65535)
      */
     private $calendarData;
 

@@ -28,7 +28,7 @@ class Card
     private $addressBook;
 
     /**
-     * @ORM\Column(name="carddata", type="blob", nullable=true)
+     * @ORM\Column(name="carddata", type="text", nullable=true, length=65535)
      */
     private $cardData;
 
