@@ -59,7 +59,7 @@ final class IMAPAuth extends IMAP
 
             if (!$user) {
                 // We only have a username, so we use it for displayname and email
-                $this->utils->createUserWithDefaultObjects($username, $password, $username, $username);
+                $this->utils->createPasswordlessUserWithDefaultObjects($username, $username, $username);
 
                 $em = $this->doctrine->getManager();
                 $em->flush();

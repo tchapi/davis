@@ -158,7 +158,7 @@ final class LDAPAuth extends AbstractBasic
                     }
                 }
 
-                $this->utils->createUserWithDefaultObjects($username, $password, $displayName, $email);
+                $this->utils->createPasswordlessUserWithDefaultObjects($username, $displayName, $email);
 
                 $em = $this->doctrine->getManager();
                 $em->flush();
