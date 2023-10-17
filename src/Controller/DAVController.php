@@ -295,6 +295,10 @@ class DAVController extends AbstractController
      */
     public function dav(Request $request, string $path)
     {
+        if ($request->getMethod() === "OPTIONS") {
+            return new Response();
+        }
+
         // \Sabre\DAV\Server does not let us use a custom SAPI, and its behaviour
         // is to directly output headers and content to php://output. Hence, we
         // let the headers pass (we have not choice) and capture the output in a
