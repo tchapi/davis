@@ -49,13 +49,14 @@ final class Utils
         return md5($username.':'.$this->authRealm.':'.$password);
     }
 
-    public function createUserWithDefaultObjects(string $username, string $password, string $displayName, string $email)
+    public function createPasswordlessUserWithDefaultObjects(string $username, string $displayName, string $email)
     {
         $user = new User();
         $user->setUsername($username);
 
-        // Set the password (but hashed beforehand)
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+        // Set the password to a random string (but hashed beforehand)
+        $randomBytes = random_bytes(256);
+        $hash = password_hash($randomBytes, PASSWORD_DEFAULT);
         $user->setPassword($hash);
 
         // Create principal, default calendar and addressbook
