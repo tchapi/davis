@@ -6,8 +6,8 @@
     "require": {
         "php": "^8.0",
         "ext-ctype": "*",
-        "ext-iconv": "*",
         "ext-gd": "*",
+        "ext-iconv": "*",
         "composer-runtime-api": "^2",
         "dantsu/php-osm-static-api": "^0.5.0",
         "doctrine/annotations": "^1.12",
@@ -32,6 +32,7 @@
         "symfony/property-access": "^5.4.21",
         "symfony/property-info": "^5.4.21",
         "symfony/proxy-manager-bridge": "^5.4.21",
+        "symfony/runtime": "^5.4.21",
         "symfony/security-bundle": "^5.4.21",
         "symfony/security-guard": "^5.4.21",
         "symfony/serializer": "^5.4.21",
@@ -62,7 +63,8 @@
         },
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "symfony/flex": true
+            "symfony/flex": true,
+            "symfony/runtime": true
         }
     },
     "autoload": {

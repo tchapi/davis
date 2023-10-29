@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Principal;
 use App\Entity\User;
 use App\Plugins\DavisIMipPlugin;
+use App\Plugins\PublicAwareDAVACLPlugin;
 use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
@@ -226,11 +227,12 @@ class DAVController extends AbstractController
 
         // Plugins
         $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, $authRealm));
-        $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin());
+        $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin(false)); // We disable the file creation / upload / sharing in the browser
         $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
 
-        $aclPlugin = new \Sabre\DAVACL\Plugin();
+        $aclPlugin = new PublicAwareDAVACLPlugin($this->em);
         $aclPlugin->hideNodesFromListings = true;
+
         // Fetch admins, if any
         $admins = $this->em->getRepository(Principal::class)->findBy(['isAdmin' => true]);
         foreach ($admins as $principal) {
@@ -293,6 +295,10 @@ class DAVController extends AbstractController
      */
     public function dav(Request $request, string $path)
     {
+        if ($request->getMethod() === "OPTIONS") {
+            return new Response();
+        }
+
         // \Sabre\DAV\Server does not let us use a custom SAPI, and its behaviour
         // is to directly output headers and content to php://output. Hence, we
         // let the headers pass (we have not choice) and capture the output in a
