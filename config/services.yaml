@@ -56,3 +56,7 @@ services:
         arguments:
             $adminLogin: "%env(ADMIN_LOGIN)%"
             $adminPassword: "%env(ADMIN_PASSWORD)%"
+
+    App\Logging\Monolog\PasswordFilterProcessor:
+        tags:
+            - { name: monolog.processor }
