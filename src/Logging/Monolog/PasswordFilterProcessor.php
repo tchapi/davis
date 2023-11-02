@@ -7,7 +7,7 @@ use Monolog\Processor\ProcessorInterface;
 final class PasswordFilterProcessor implements ProcessorInterface
 {
     private const PASSWORD_KEY = 'password';
-    private const SENSITIVE_ARGS_FUNCTIONS = ['validateUserPass', 'ldapOpen', 'password_verify', 'imapOpen', 'ldap_bind', 'hashPassword'];
+    private const SENSITIVE_ARGS_FUNCTIONS = ['validateUserPass', 'ldapOpen', 'password_verify', 'imapOpen', 'ldap_bind', 'hashPassword', 'dav'];
 
     public function __invoke(array $record): array
     {
