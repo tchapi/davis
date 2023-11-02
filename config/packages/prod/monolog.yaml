@@ -8,7 +8,7 @@ monolog:
             buffer_size: 50 # How many messages should be saved? Prevent memory leaks
         nested:
             type: stream
-            path: "%env(LOG_FILE_PATH)%"
+            path: "%env(resolve:LOG_FILE_PATH)%"
             level: debug
         console:
             type: console
