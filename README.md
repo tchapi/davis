@@ -117,6 +117,14 @@ WEBDAV_TMP_DIR='/tmp'
 WEBDAV_PUBLIC_DIR='/webdav'
 ```
 
+g. The log file path
+
+You can use an absolute file path here, and you can use Symfony's `%kernel.logs_dir%` and `%kernel.environment%` placeholders if needed (as in the default value). Setting it to `/dev/null` will disable logging altogether.
+
+```
+LOG_FILE_PATH="%kernel.logs_dir%/%kernel.environment%.log"
+```
+
 ### Specific environment variables for IMAP and LDAP authentication methods
 
 In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
