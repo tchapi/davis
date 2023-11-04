@@ -62,7 +62,12 @@ final class IMAPAuth extends IMAP
                 $this->utils->createPasswordlessUserWithDefaultObjects($username, $username, $username);
 
                 $em = $this->doctrine->getManager();
-                $em->flush();
+
+                try {
+                    $em->flush();
+                } catch (\Exception $e) {
+                    error_log('IMAP Error (flush): '.$e->getMessage());
+                }
             }
         }
 

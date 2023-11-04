@@ -91,7 +91,7 @@ final class LDAPAuth extends AbstractBasic
         try {
             $ldap = ldap_connect($this->LDAPAuthUrl);
         } catch (\ErrorException $e) {
-            error_log($e->getMessage());
+            error_log('LDAP Error (ldap_connect): '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
         }
 
         if (!$ldap || !ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3)) {
@@ -124,8 +124,7 @@ final class LDAPAuth extends AbstractBasic
                 $success = true;
             }
         } catch (\ErrorException $e) {
-            error_log($e->getMessage());
-            error_log('LDAP Error: '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
+            error_log('LDAP Error (ldap_bind): '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
         }
 
         if ($success && $this->autoCreate) {
@@ -161,7 +160,12 @@ final class LDAPAuth extends AbstractBasic
                 $this->utils->createPasswordlessUserWithDefaultObjects($username, $displayName, $email);
 
                 $em = $this->doctrine->getManager();
-                $em->flush();
+
+                try {
+                    $em->flush();
+                } catch (\Exception $e) {
+                    error_log('LDAP Error (flush): '.$e->getMessage());
+                }
             }
         }
 
