@@ -128,7 +128,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavTmpDir = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, string $inviteAddress = null, string $authMethod = null, string $authRealm = null, string $webdavPublicDir = null, string $webdavTmpDir = null)
     {
         $this->publicDir = $publicDir;
 
@@ -295,7 +295,7 @@ class DAVController extends AbstractController
      */
     public function dav(Request $request, string $path)
     {
-        if ($request->getMethod() === "OPTIONS") {
+        if ('OPTIONS' === $request->getMethod()) {
             return new Response();
         }
 

@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * [PostgreSQL] Change BLOB to TEXT (https://github.com/tchapi/davis/issues/110)
+ * [PostgreSQL] Change BLOB to TEXT (https://github.com/tchapi/davis/issues/110).
  */
 final class Version20231001214112 extends AbstractMigration
 {

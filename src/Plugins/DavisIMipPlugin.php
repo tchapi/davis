@@ -36,12 +36,6 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 
     /**
      * Creates the email handler.
-     *
-     * @param string $senderEmail. The 'senderEmail' is the email that shows up
-     *                             in the 'From:' address. This should
-     *                             generally be some kind of no-reply email
-     *                             address you own.
-     * @param string $publicDir.   The directory where public images are stored.
      */
     public function __construct(MailerInterface $mailer, string $senderEmail, string $publicDir)
     {
@@ -67,8 +61,8 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 
         $summary = $itip->message->VEVENT->SUMMARY;
 
-        if ('mailto' !== parse_url($itip->sender, PHP_URL_SCHEME) ||
-            'mailto' !== parse_url($itip->recipient, PHP_URL_SCHEME)) {
+        if ('mailto' !== parse_url($itip->sender, PHP_URL_SCHEME)
+            || 'mailto' !== parse_url($itip->recipient, PHP_URL_SCHEME)) {
             return;
         }
 
@@ -124,8 +118,8 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                 : new \DateTime('now');
 
         $allDay =
-            isset($itip->message->VEVENT->DTSTART) &&
-            false === $itip->message->VEVENT->DTSTART->hasTime();
+            isset($itip->message->VEVENT->DTSTART)
+            && false === $itip->message->VEVENT->DTSTART->hasTime();
 
         $attendees = [];
         if (isset($itip->message->VEVENT->ATTENDEE)) {

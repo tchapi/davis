@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Change BLOB to TEXT (https://github.com/tchapi/davis/issues/110)
+ * Change BLOB to TEXT (https://github.com/tchapi/davis/issues/110).
  */
 final class Version20231001214111 extends AbstractMigration
 {

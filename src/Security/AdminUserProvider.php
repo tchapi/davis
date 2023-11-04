@@ -17,8 +17,6 @@ class AdminUserProvider implements UserProviderInterface
      * If you're not using these features, you do not need to implement
      * this method.
      *
-     * @param mixed $username
-     *
      * @throws UsernameNotFoundException if the user is not found
      *
      * @return UserInterface
@@ -57,8 +55,6 @@ class AdminUserProvider implements UserProviderInterface
 
     /**
      * Tells Symfony to use this provider for this User class.
-     *
-     * @param mixed $class
      */
     public function supportsClass($class): bool
     {

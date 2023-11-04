@@ -28,9 +28,6 @@ final class BasicAuth extends AbstractBasic
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function validateUserPass($username, $password): bool
     {
         $user = $this->doctrine->getRepository(User::class)->findOneByUsername($username);
