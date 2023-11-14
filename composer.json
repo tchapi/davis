@@ -15,7 +15,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.1",
         "doctrine/orm": "^2.9",
         "phpdocumentor/reflection-docblock": "^5.2",
-        "sabre/dav": "^4.4.0",
+        "sabre/dav": "^4.5.0",
         "symfony/apache-pack": "^1.0.1",
         "symfony/asset": "^5.4.21",
         "symfony/console": "^5.4.21",
