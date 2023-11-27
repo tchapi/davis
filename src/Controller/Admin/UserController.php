@@ -139,7 +139,12 @@ class UserController extends AbstractController
         $entityManager->remove($user);
 
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
+        $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
+
         $entityManager->remove($principal);
+        $entityManager->remove($principalProxyRead);
+        $entityManager->remove($principalProxyWrite);
 
         // Remove calendars and addressbooks
         $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
