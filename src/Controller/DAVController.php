@@ -302,7 +302,7 @@ class DAVController extends AbstractController
 
             // Adapted from CorePlugin's httpOptions()
             // https://github.com/sabre-io/dav/blob/master/lib/DAV/CorePlugin.php#L210
-            $methods = $this->server->getAllowedMethods("");
+            $methods = $this->server->getAllowedMethods('');
 
             $response->headers->set('Allow', strtoupper(implode(', ', $methods)));
             $features = ['1', '3', 'extended-mkcol'];
