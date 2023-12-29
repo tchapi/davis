@@ -27,7 +27,8 @@ class SchedulingObject
     private $principalUri;
 
     /**
-     * @ORM\Column(name="calendardata", type="text", nullable=true, length=65535)
+     * @ORM\Column(name="calendardata", type="text", nullable=true, length=16777215)
+     * The length corresponds to MEDIUMTEXT in MySQL
      */
     private $calendarData;
 
