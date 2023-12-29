@@ -28,7 +28,8 @@ class Card
     private $addressBook;
 
     /**
-     * @ORM\Column(name="carddata", type="text", nullable=true, length=65535)
+     * @ORM\Column(name="carddata", type="text", nullable=true, length=16777215)
+     * The length corresponds to MEDIUMTEXT in MySQL
      */
     private $cardData;
 
