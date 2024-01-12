@@ -47,7 +47,7 @@
       </trans-unit>
       <trans-unit id="z3cOUZo" resname="Username could not be found.">
         <source>Username could not be found.</source>
-        <target>Username could not be found.</target>
+        <target>Invalid credentials.</target>
       </trans-unit>
       <trans-unit id="By5eLYM" resname="Account has expired.">
         <source>Account has expired.</source>
