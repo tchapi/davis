@@ -9,6 +9,8 @@ use Doctrine\Migrations\AbstractMigration;
 
 /**
  * Scale up to MEDIUMTEXT for calendar and card data https://github.com/tchapi/davis/pull/111#issuecomment-1872295498
+ * ⚠️ This does not fail if the column is already a MEDIUM TEXT, which has allowed us to change a previous migration
+ * without touching this one (see https://github.com/tchapi/davis/issues/128)
  */
 final class Version20231229203515 extends AbstractMigration
 {

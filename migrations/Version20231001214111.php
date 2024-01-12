@@ -21,9 +21,9 @@ final class Version20231001214111 extends AbstractMigration
     {
         $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
 
-        $this->addSql('ALTER TABLE calendarobjects CHANGE calendardata calendardata TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE cards CHANGE carddata carddata TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE schedulingobjects CHANGE calendardata calendardata TEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE calendarobjects CHANGE calendardata calendardata MEDIUMTEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE cards CHANGE carddata carddata MEDIUMTEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE schedulingobjects CHANGE calendardata calendardata MEDIUMTEXT DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
