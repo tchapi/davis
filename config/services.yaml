@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     default_database_driver: "mysql"
+    default_admin_auth_bypass: "false"
 
 services:
     # default configuration for services in *this* file
