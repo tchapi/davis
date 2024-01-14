@@ -51,7 +51,7 @@ class DashboardTest extends WebTestCase
         $crawler = $client->followRedirect();
         $this->assertResponseIsSuccessful();
 
-        $this->assertSelectorTextContains('div.alert.alert-danger', 'Username could not be found.');
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Invalid credentials.');
     }
 
     public function testLoginIncorrectPassword(): void

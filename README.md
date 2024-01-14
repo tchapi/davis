@@ -86,6 +86,10 @@ ADMIN_LOGIN=admin
 ADMIN_PASSWORD=test
 ```
 
+> [!NOTE]
+>
+> You can bypass auth entirely if you use a third party authorization provider such as Authelia. In that case, set the `ADMIN_AUTH_BYPASS` env var to `true` (case-sensitive, this is actually the string `true`, not a boolean) to allow full access to the dashboard. This does not change the behaviour of the DAV server.
+
 c. The auth Realm and method for HTTP auth
 
 ```
