@@ -41,8 +41,11 @@
       <li class="list-group-item list-group-item-primary">{{ "dashboard.version"|trans }} : <code>{{ version }}</code> (SabreDAV <code>{{ sabredav_version }}</code>)</li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.auth"|trans }} : <code>{{ authMethod }}</code> ({{ "dashboard.auth_realm"|trans }}: <code>{{ authRealm }}</code>)</li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.invite_from_address"|trans }} : <code>{{ invite_from_address|default('Not set') }}</code></li>
-      <li class="list-group-item list-group-item-secondary">{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone }}</code> <a class="small ms-2" target="_blank" href="https://www.php.net/manual/en/datetime.configuration.php#ini.date.timezone">{{ "dashboard.how_to_change_it"|trans }}</a></li>
-
+      <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center ">
+        <span>{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone.actual_default }}</code></span>
+        {% if timezone.not_set_in_app %}<span class="badge bg-secondary rounded-pill">{{ "dashboard.no_timezone_configuration"|trans }}</span>{% endif %}
+        {% if timezone.bad_value %}<span class="badge bg-danger rounded-pill">{{ "dashboard.bad_timezone_configuration"|trans }}</span>{% endif %}
+      </li>
     </ul>
   </div>
 

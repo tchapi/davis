@@ -59,9 +59,6 @@ RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev k
     && apk del build-deps-imap \
     && rm -rf /tmp/*
 
-# Set timezone correctly
-RUN echo 'date.timezone = "Europe/Paris"' > /usr/local/etc/php/conf.d/timezone.ini
-
 # Davis installation
 ADD . /var/www/davis
 WORKDIR /var/www/davis

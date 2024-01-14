@@ -125,6 +125,20 @@ You can use an absolute file path here, and you can use Symfony's `%kernel.logs_
 LOG_FILE_PATH="%kernel.logs_dir%/%kernel.environment%.log"
 ```
 
+h. The timezone you want for the app
+
+This must comply with the [official list](https://www.php.net/manual/en/timezones.php)
+
+```
+APP_TIMEZONE="Australia/Lord_Howe"
+```
+
+> Set a void value like so:
+> ```
+> APP_TIMEZONE=
+> ```
+> in your environment file if you wish to use the **actual default timezone of the server**, and not enforcing it. 
+
 ### Specific environment variables for IMAP and LDAP authentication methods
 
 In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
@@ -426,6 +440,14 @@ Depending on how you run Davis, logs are either:
 > [!NOTE]
 >
 > It's `./var/log` (relative to the Davis installation), not `/var/log`
+
+### I have a "Bad timezone configuration env var" error on the dashboard
+
+If you see this:
+
+![Bad timezone configuration env var error](_screenshots/bad_timezone_configuration_env_var.png)
+
+It means that the value you set for the `APP_TIMEZONE` env var is not a correct timezone, as per [the official list](https://www.php.net/manual/en/timezones.php). Your timezone has thus not been set and is the server's default (Here, UTC). Adjust the setting accordingly.
 
 ### I have a 500 and no tables have been created
 

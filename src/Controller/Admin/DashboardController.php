@@ -24,13 +24,19 @@ class DashboardController extends AbstractController
         $events = $doctrine->getRepository(CalendarObject::class)->findAll();
         $contacts = $doctrine->getRepository(Card::class)->findAll();
 
+        $timezoneParameter = $this->getParameter('timezone');
+
         return $this->render('dashboard.html.twig', [
             'users' => $users,
             'calendars' => $calendars,
             'addressbooks' => $addressbooks,
             'events' => $events,
             'contacts' => $contacts,
-            'timezone' => date_default_timezone_get(),
+            'timezone' => [
+                'actual_default' => date_default_timezone_get(),
+                'not_set_in_app' => '' === $timezoneParameter,
+                'bad_value' => '' !== $timezoneParameter && !in_array($timezoneParameter, \DateTimeZone::listIdentifiers()),
+            ],
             'version' => \App\Version::VERSION,
             'sabredav_version' => \Sabre\DAV\Version::VERSION,
         ]);
