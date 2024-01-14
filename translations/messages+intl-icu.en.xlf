@@ -119,11 +119,15 @@
       </trans-unit>
       <trans-unit id="Ppc629a" resname="dashboard.server_timezone">
         <source>dashboard.server_timezone</source>
-        <target>Server Timezone</target>
+        <target>App (PHP) Timezone</target>
       </trans-unit>
-      <trans-unit id="vsty3iK" resname="dashboard.how_to_change_it">
-        <source>dashboard.how_to_change_it</source>
-        <target>How to change it ?</target>
+      <trans-unit id="8.dmAfF" resname="dashboard.bad_timezone_configuration">
+        <source>dashboard.bad_timezone_configuration</source>
+        <target>Bad timezone configuration env var</target>
+      </trans-unit>
+      <trans-unit id="c.1lOsz" resname="dashboard.no_timezone_configuration">
+        <source>dashboard.no_timezone_configuration</source>
+        <target>Timezone not enforced by app</target>
       </trans-unit>
       <trans-unit id="rJf3tq1" resname="dashboard.users">
         <source>dashboard.users</source>

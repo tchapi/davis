@@ -40,6 +40,7 @@ services:
       - WEBDAV_TMP_DIR=${WEBDAV_TMP_DIR}
       - WEBDAV_PUBLIC_DIR=${WEBDAV_PUBLIC_DIR}
       - INVITE_FROM_ADDRESS=${INVITE_FROM_ADDRESS}
+      - APP_TIMEZONE=${TIMEZONE}
     volumes:
       - davis_www:/var/www/davis
       - davis_data:/data

@@ -6,6 +6,7 @@
 parameters:
     default_database_driver: "mysql"
     default_admin_auth_bypass: "false"
+    timezone: '%env(APP_TIMEZONE)%'
 
 services:
     # default configuration for services in *this* file
