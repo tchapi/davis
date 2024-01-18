@@ -28,7 +28,7 @@ class AdminUserProvider implements UserProviderInterface
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        throw new \Exception('Not implemented, because not needed');
+        return new AdminUser($identifier, bin2hex(random_bytes(64)));
     }
 
     /**

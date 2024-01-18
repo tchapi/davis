@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AdminUser implements UserInterface
+class AdminUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
     private $username;
     private $password;
@@ -18,20 +19,15 @@ class AdminUser implements UserInterface
     /**
      * @return (Role|string)[] The user roles
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return ['ROLE_ADMIN'];
     }
 
     /**
      * Returns the password used to authenticate the user.
-     *
-     * This should be the encoded password. On authentication, a plain-text
-     * password will be salted, encoded, and then compared to this value.
-     *
-     * @return string|null The encoded password if any
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -69,7 +65,7 @@ class AdminUser implements UserInterface
      * This is important if, at any given point, sensitive information like
      * the plain-text password is stored on this object.
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 }
