@@ -20,7 +20,7 @@ jobs:
         name: Analyze
         runs-on: ubuntu-latest
         container:
-            image: php:8.2-alpine
+            image: php:8.3-alpine
             options: >-
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
@@ -51,7 +51,7 @@ jobs:
               --tmpfs /var/tmp:exec
         services:
           mysql:
-            image: mariadb:10.7
+            image: mariadb:10.11
             env:
               MYSQL_DATABASE: test_db
               MYSQL_USER: user
@@ -67,9 +67,9 @@ jobs:
         strategy:
             matrix:
                 php:
-                    - '8.0'
                     - '8.1'
                     - '8.2'
+                    - '8.3'
             fail-fast: false
         steps:
             - name: Checkout
