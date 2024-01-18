@@ -28,7 +28,7 @@ Created and maintained (with the help of the community) by [@tchapi](https://git
 
 # 🔩 Requirements
 
-  - PHP > 7.3.0 (with `pdo_mysql` [or `pdo_pgsql`, `pdo_sqlite`], `gd` and `intl` extensions), compatible up to PHP 8.2 (_See dependencies table below_)
+  - PHP > 8.1.0 (with `pdo_mysql` [or `pdo_pgsql`, `pdo_sqlite`], `gd` and `intl` extensions), compatible up to PHP 8.3 (_See dependencies table below_)
   - A compatible database layer, such as MySQL or MariaDB (recommended), PostgreSQL (not extensively tested yet) or SQLite (not extensively tested yet)
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
   - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default except in the Docker image_)
@@ -38,8 +38,8 @@ Dependencies
 
 | Release            | Status                     | PHP version        |
 |--------------------|----------------------------|--------------------|
-| `main` (edge)      | development branch         | PHP 8.0+           |
-| `v4.x`             | active                     | PHP 8.0+           |
+| `main` (edge)      | development branch         | PHP 8.1+           |
+| `v4.x`             | security fixes only        | PHP 8.0+           |
 | `v3.x`             | security fixes only        | PHP 7.3 → 8.2      |
 
 # 🧰 Installation
