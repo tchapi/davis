@@ -22,14 +22,14 @@ final class Utils
     /**
      * The translation service.
      *
-     * @var \Symfony\Contracts\Translation\TranslatorInterface
+     * @var TranslatorInterface
      */
     private $trans;
 
     /**
      * Doctrine registry.
      *
-     * @var \Doctrine\Persistence\ManagerRegistry
+     * @var ManagerRegistry
      */
     private $doctrine;
 

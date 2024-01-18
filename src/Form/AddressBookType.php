@@ -28,7 +28,7 @@ class AddressBookType extends AbstractType
                 'label' => 'form.displayName',
                 'help' => 'form.name.help.carddav',
             ])
-            ->add('description', TextAreaType::class, [
+            ->add('description', TextareaType::class, [
                 'label' => 'form.description',
                 'required' => false,
             ])

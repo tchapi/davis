@@ -103,21 +103,21 @@ class DAVController extends AbstractController
     /**
      * Basic Auth Backend class.
      *
-     * @var \App\Services\BasicAuth
+     * @var BasicAuth
      */
     protected $basicAuthBackend;
 
     /**
      * IMAP Auth Backend class.
      *
-     * @var \App\Services\IMAPAuth
+     * @var IMAPAuth
      */
     protected $IMAPAuthBackend;
 
     /**
      * LDAP Auth Backend class.
      *
-     * @var \App\Services\LDAPAuth
+     * @var LDAPAuth
      */
     protected $LDAPAuthBackend;
 
