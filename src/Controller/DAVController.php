@@ -153,10 +153,8 @@ class DAVController extends AbstractController
         $this->initExceptionListener();
     }
 
-    /**
-     * @Route("/", name="home")
-     */
-    public function home()
+    #[Route('/', name: 'home')]
+    public function home(): Response
     {
         return $this->render('index.html.twig', [
             'version' => \App\Version::VERSION,
@@ -290,9 +288,7 @@ class DAVController extends AbstractController
         });
     }
 
-    /**
-     * @Route("/dav/{path}", name="dav", requirements={"path":".*"})
-     */
+    #[Route('/dav/{path}', name: 'dav', requirements: ['path' => '.*'])]
     public function dav(Request $request, string $path)
     {
         // We need to acknowledge the OPTIONS call before sabre/dav for public

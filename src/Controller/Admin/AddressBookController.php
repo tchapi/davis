@@ -8,15 +8,14 @@ use App\Form\AddressBookType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AddressBookController extends AbstractController
 {
-    /**
-     * @Route("/adressbooks/{username}", name="address_books")
-     */
-    public function addressBooks(ManagerRegistry $doctrine, string $username)
+    #[Route('/adressbooks/{username}', name: 'address_books')]
+    public function addressBooks(ManagerRegistry $doctrine, string $username): Response
     {
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
         $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri(Principal::PREFIX.$username);
@@ -28,11 +27,9 @@ class AddressBookController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/adressbooks/{username}/new", name="addressbook_create")
-     * @Route("/adressbooks/{username}/edit/{id}", name="addressbook_edit", requirements={"id":"\d+"})
-     */
-    public function addressbookCreate(ManagerRegistry $doctrine, Request $request, string $username, ?int $id, TranslatorInterface $trans)
+    #[Route('/adressbooks/{username}/new', name: 'addressbook_create')]
+    #[Route('/adressbooks/{username}/edit/{id}', name: 'addressbook_edit', requirements: ['id' => "\d+"])]
+    public function addressbookCreate(ManagerRegistry $doctrine, Request $request, string $username, ?int $id, TranslatorInterface $trans): Response
     {
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
@@ -74,10 +71,8 @@ class AddressBookController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/addressbooks/{username}/delete/{id}", name="addressbook_delete", requirements={"id":"\d+"})
-     */
-    public function addressbookDelete(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans)
+    #[Route('/addressbooks/{username}/delete/{id}', name: 'addressbook_delete', requirements: ['id' => "\d+"])]
+    public function addressbookDelete(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans): Response
     {
         $addressbook = $doctrine->getRepository(AddressBook::class)->findOneById($id);
         if (!$addressbook) {
