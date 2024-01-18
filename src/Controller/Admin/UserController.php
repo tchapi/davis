@@ -14,16 +14,15 @@ use App\Services\Utils;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserController extends AbstractController
 {
-    /**
-     * @Route("/users", name="users")
-     */
-    public function users(ManagerRegistry $doctrine)
+    #[Route('/users', name: 'users')]
+    public function users(ManagerRegistry $doctrine): Response
     {
         $principals = $doctrine->getRepository(Principal::class)->findByIsMain(true);
 
@@ -32,11 +31,9 @@ class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/users/new", name="user_create")
-     * @Route("/users/edit/{username}", name="user_edit")
-     */
-    public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?string $username, TranslatorInterface $trans)
+    #[Route('/users/new', name: 'user_create')]
+    #[Route('/users/edit/{username}', name: 'user_edit')]
+    public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?string $username, TranslatorInterface $trans): Response
     {
         if ($username) {
             $user = $doctrine->getRepository(User::class)->findOneByUsername($username);
@@ -125,10 +122,8 @@ class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/users/delete/{username}", name="user_delete")
-     */
-    public function userDelete(ManagerRegistry $doctrine, string $username, TranslatorInterface $trans)
+    #[Route('/users/delete/{username}', name: 'user_delete')]
+    public function userDelete(ManagerRegistry $doctrine, string $username, TranslatorInterface $trans): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneByUsername($username);
         if (!$user) {
@@ -184,10 +179,8 @@ class UserController extends AbstractController
         return $this->redirectToRoute('users');
     }
 
-    /**
-     * @Route("/users/delegates/{username}", name="delegates")
-     */
-    public function userDelegates(ManagerRegistry $doctrine, string $username)
+    #[Route('/users/delegates/{username}', name: 'delegates')]
+    public function userDelegates(ManagerRegistry $doctrine, string $username): Response
     {
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
@@ -206,10 +199,8 @@ class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/users/delegation/{username}/{toggle}", name="user_delegation_toggle", requirements={"toggle":"(on|off)"})
-     */
-    public function userToggleDelegation(ManagerRegistry $doctrine, string $username, string $toggle)
+    #[Route('/users/delegation/{username}/{toggle}', name: 'user_delegation_toggle', requirements: ['toggle' => '(on|off)'])]
+    public function userToggleDelegation(ManagerRegistry $doctrine, string $username, string $toggle): Response
     {
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
@@ -245,10 +236,8 @@ class UserController extends AbstractController
         return $this->redirectToRoute('delegates', ['username' => $username]);
     }
 
-    /**
-     * @Route("/users/delegates/{username}/add", name="user_delegate_add")
-     */
-    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, string $username)
+    #[Route('/users/delegates/{username}/add', name: 'user_delegate_add')]
+    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, string $username): Response
     {
         if (!is_numeric($request->get('principalId'))) {
             throw new BadRequestHttpException();
@@ -285,10 +274,8 @@ class UserController extends AbstractController
         return $this->redirectToRoute('delegates', ['username' => $username]);
     }
 
-    /**
-     * @Route("/users/delegates/{username}/remove/{principalProxyId}/{delegateId}", name="user_delegate_remove", requirements={"principalProxyId":"\d+", "delegateId":"\d+"})
-     */
-    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, string $username, int $principalProxyId, int $delegateId)
+    #[Route('/users/delegates/{username}/remove/{principalProxyId}/{delegateId}', name: 'user_delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"])]
+    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, string $username, int $principalProxyId, int $delegateId): Response
     {
         $principalProxy = $doctrine->getRepository(Principal::class)->findOneById($principalProxyId);
         if (!$principalProxy) {
