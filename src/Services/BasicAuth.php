@@ -18,7 +18,7 @@ final class BasicAuth extends AbstractBasic
     /**
      * Doctrine registry.
      *
-     * @var \Doctrine\Persistence\ManagerRegistry
+     * @var ManagerRegistry
      */
     private $doctrine;
 
