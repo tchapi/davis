@@ -18,9 +18,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Route('/calendars', name: 'calendar_')]
 class CalendarController extends AbstractController
 {
-    #[Route('/calendars/{username}', name: 'calendars')]
+    #[Route('/{username}', name: 'index')]
     public function calendars(ManagerRegistry $doctrine, UrlGeneratorInterface $router, string $username): Response
     {
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
@@ -55,8 +56,8 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route('/calendars/{username}/new', name: 'calendar_create')]
-    #[Route('/calendars/{username}/edit/{id}', name: 'calendar_edit', requirements: ['id' => "\d+"])]
+    #[Route('/{username}/new', name: 'create')]
+    #[Route('/{username}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
     public function calendarEdit(ManagerRegistry $doctrine, Request $request, string $username, ?int $id, TranslatorInterface $trans): Response
     {
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
@@ -129,7 +130,7 @@ class CalendarController extends AbstractController
 
             $this->addFlash('success', $trans->trans('calendar.saved'));
 
-            return $this->redirectToRoute('calendars', ['username' => $username]);
+            return $this->redirectToRoute('calendar_index', ['username' => $username]);
         }
 
         return $this->render('calendars/edit.html.twig', [
@@ -140,7 +141,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route('/calendars/{username}/shares/{calendarid}', name: 'calendar_shares', requirements: ['calendarid' => "\d+"])]
+    #[Route('/{username}/shares/{calendarid}', name: 'shares', requirements: ['calendarid' => "\d+"])]
     public function calendarShares(ManagerRegistry $doctrine, string $username, string $calendarid, TranslatorInterface $trans): Response
     {
         $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarid, true);
@@ -160,7 +161,7 @@ class CalendarController extends AbstractController
         return new JsonResponse($response);
     }
 
-    #[Route('/calendars/{username}/share/{instanceid}', name: 'calendar_share_add', requirements: ['instanceid' => "\d+"])]
+    #[Route('/{username}/share/{instanceid}', name: 'share_add', requirements: ['instanceid' => "\d+"])]
     public function calendarShareAdd(ManagerRegistry $doctrine, Request $request, string $username, string $instanceid, TranslatorInterface $trans): Response
     {
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($instanceid);
@@ -203,10 +204,10 @@ class CalendarController extends AbstractController
         $entityManager->flush();
         $this->addFlash('success', $trans->trans('calendar.shared'));
 
-        return $this->redirectToRoute('calendars', ['username' => $username]);
+        return $this->redirectToRoute('calendar_index', ['username' => $username]);
     }
 
-    #[Route('/calendars/{username}/delete/{id}', name: 'calendar_delete', requirements: ['id' => "\d+"])]
+    #[Route('/{username}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
     public function calendarDelete(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans): Response
     {
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
@@ -248,10 +249,10 @@ class CalendarController extends AbstractController
         $entityManager->flush();
         $this->addFlash('success', $trans->trans('calendar.deleted'));
 
-        return $this->redirectToRoute('calendars', ['username' => $username]);
+        return $this->redirectToRoute('calendar_index', ['username' => $username]);
     }
 
-    #[Route('/calendars/{username}/revoke/{id}', name: 'calendar_revoke', requirements: ['id' => "\d+"])]
+    #[Route('/{username}/revoke/{id}', name: 'revoke', requirements: ['id' => "\d+"])]
     public function calendarRevoke(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans): Response
     {
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
@@ -265,6 +266,6 @@ class CalendarController extends AbstractController
         $entityManager->flush();
         $this->addFlash('success', $trans->trans('calendar.revoked'));
 
-        return $this->redirectToRoute('calendars', ['username' => $username]);
+        return $this->redirectToRoute('calendar_index', ['username' => $username]);
     }
 }

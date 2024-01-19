@@ -12,7 +12,7 @@
           <a class="nav-link" href="{{ path('dashboard') }}">{{ "title.dashboard"|trans }}</a>
         </li>
         <li class="nav-item{% if menu == "resources" %} active{% endif %}">
-          <a class="nav-link" href="{{ path('users') }}">{{ "title.users_and_resources"|trans }}</a>
+          <a class="nav-link" href="{{ path('user_index') }}">{{ "title.users_and_resources"|trans }}</a>
         </li>
       </ul>
       {% if app.user %}
