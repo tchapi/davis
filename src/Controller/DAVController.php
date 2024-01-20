@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -301,8 +302,11 @@ class DAVController extends AbstractController
     }
 
     #[Route('/dav/{path}', name: 'dav', requirements: ['path' => '.*'])]
-    public function dav(Request $request, string $path)
+    public function dav(Request $request, Profiler $profiler, string $path)
     {
+        // We don't want the toolbar on the /dav/* routes
+        $profiler->disable();
+
         // We need to acknowledge the OPTIONS call before sabre/dav for public
         // calendars since we're circumventing the lib
         if ('OPTIONS' === $request->getMethod()) {
