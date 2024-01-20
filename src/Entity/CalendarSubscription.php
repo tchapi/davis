@@ -4,75 +4,46 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="calendarsubscriptions")
- *
- * @ORM\Entity()
- */
+#[ORM\Entity()]
+#[ORM\Table(name: 'calendarsubscriptions')]
 class CalendarSubscription
 {
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $uri;
 
-    /**
-     * @ORM\Column(name="principaluri", type="string", length=255)
-     */
+    #[ORM\Column(name: 'principaluri', type: 'string', length: 255)]
     private $principalUri;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $source;
 
-    /**
-     * @ORM\Column(name="displayname", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'displayname', type: 'string', length: 255, nullable: true)]
     private $displayName;
 
-    /**
-     * @ORM\Column(name="refreshrate", type="string", length=10, nullable=true)
-     */
+    #[ORM\Column(name: 'refreshrate', type: 'string', length: 10, nullable: true)]
     private $refreshRate;
 
-    /**
-     * @ORM\Column(name="calendarorder", type="integer")
-     */
+    #[ORM\Column(name: 'calendarorder', type: 'integer')]
     private $calendarOrder;
 
-    /**
-     * @ORM\Column(name="calendarcolor", type="string", length=10, nullable=true)
-     */
+    #[ORM\Column(name: 'calendarcolor', type: 'string', length: 10, nullable: true)]
     private $calendarColor;
 
-    /**
-     * @ORM\Column(name="striptodos", type="smallint", nullable=true)
-     */
+    #[ORM\Column(name: 'striptodos', type: 'smallint', nullable: true)]
     private $stripTodos;
 
-    /**
-     * @ORM\Column(name="stripalarms", type="smallint", nullable=true)
-     */
+    #[ORM\Column(name: 'stripalarms', type: 'smallint', nullable: true)]
     private $stripAlarms;
 
-    /**
-     * @ORM\Column(name="stripattachments", type="smallint", nullable=true)
-     */
+    #[ORM\Column(name: 'stripattachments', type: 'smallint', nullable: true)]
     private $stripAttachments;
 
-    /**
-     * @ORM\Column(name="lastmodified", type="integer", nullable=true)
-     */
+    #[ORM\Column(name: 'lastmodified', type: 'integer', nullable: true)]
     private $lastModified;
 
     public function getId(): ?int

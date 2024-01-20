@@ -6,44 +6,29 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="calendars")
- *
- * @ORM\Entity()
- */
+#[ORM\Entity()]
+#[ORM\Table(name: 'calendars')]
 class Calendar
 {
     public const COMPONENT_EVENTS = 'VEVENT';
     public const COMPONENT_TODOS = 'VTODO';
     public const COMPONENT_NOTES = 'VJOURNAL';
 
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $synctoken;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $components;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\CalendarObject", mappedBy="calendar")
-     */
+    #[ORM\OneToMany(targetEntity: "App\Entity\CalendarObject", mappedBy: 'calendar')]
     private $objects;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\CalendarChange", mappedBy="calendar")
-     */
+    #[ORM\OneToMany(targetEntity: "App\Entity\CalendarChange", mappedBy: 'calendar')]
     private $changes;
 
     public function __construct()

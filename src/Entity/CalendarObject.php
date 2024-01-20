@@ -4,73 +4,47 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="calendarobjects")
- *
- * @ORM\Entity()
- */
+#[ORM\Entity()]
+#[ORM\Table(name: 'calendarobjects')]
 class CalendarObject
 {
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
-     * @ORM\Column(name="calendardata", type="text", nullable=true, length=16777215)
-     * The length corresponds to MEDIUMTEXT in MySQL
+     * The length corresponds to MEDIUMTEXT in MySQL.
      */
+    #[ORM\Column(name: 'calendardata', type: 'text', length: 16777215, nullable: true)]
     private $calendarData;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $uri;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", inversedBy="objects")
-     *
-     * @ORM\JoinColumn(name="calendarid", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", inversedBy: 'objects')]
+    #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 
-    /**
-     * @ORM\Column(name="lastmodified", type="integer", nullable=true)
-     */
+    #[ORM\Column(name: 'lastmodified', type: 'integer', nullable: true)]
     private $lastModified;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $etag;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $size;
 
-    /**
-     * @ORM\Column(name="componenttype", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'componenttype', type: 'string', length: 255, nullable: true)]
     private $componentType;
 
-    /**
-     * @ORM\Column(name="firstoccurence", type="integer", nullable=true)
-     */
+    #[ORM\Column(name: 'firstoccurence', type: 'integer', nullable: true)]
     private $firstOccurence;
 
-    /**
-     * @ORM\Column(name="lastoccurence", type="integer", nullable=true)
-     */
+    #[ORM\Column(name: 'lastoccurence', type: 'integer', nullable: true)]
     private $lastOccurence;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $uid;
 
     public function getId(): ?int

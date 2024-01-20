@@ -6,36 +6,23 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Table(name="users")
- *
- * @ORM\Entity()
- *
- * @UniqueEntity("username")
- */
+#[ORM\Entity()]
+#[ORM\Table(name: '`users`')]
+#[UniqueEntity('username')]
 class User
 {
     public const DEFAULT_AUTH_REALM = 'SabreDAV';
 
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     *
-     * @Assert\NotBlank
-     */
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[Assert\NotBlank]
     private $username;
 
-    /**
-     * @ORM\Column(name="digesta1", type="string", length=255)
-     */
+    #[ORM\Column(name: 'digesta1', type: 'string', length: 255)]
     private $password;
 
     public function getId(): ?int
