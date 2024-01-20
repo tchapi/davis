@@ -2,11 +2,11 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\User;
-use App\Entity\Principal;
-use App\Entity\CalendarInstance;
-use App\Entity\Calendar;
 use App\Entity\AddressBook;
+use App\Entity\Calendar;
+use App\Entity\CalendarInstance;
+use App\Entity\Principal;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -14,16 +14,16 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $hash = password_hash("password", PASSWORD_DEFAULT);
+        $hash = password_hash('password', PASSWORD_DEFAULT);
         $user = (new User())
-            ->setUsername("test_user")
+            ->setUsername('test_user')
             ->setPassword($hash);
         $manager->persist($user);
-        
+
         $principal = (new Principal())
             ->setUri(Principal::PREFIX.$user->getUsername())
-            ->setEmail("test@test.com")
-            ->setDisplayName("Test User")
+            ->setEmail('test@test.com')
+            ->setDisplayName('Test User')
             ->setIsAdmin(true);
         $manager->persist($principal);
 
@@ -54,7 +54,7 @@ class AppFixtures extends Fixture
                     ->setDisplayName('default.addressbook.title')
                     ->setDescription('default.addressbook.description');
         $manager->persist($addressbook);
-        
+
         $manager->flush();
     }
 }
