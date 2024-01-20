@@ -10,7 +10,6 @@
         "ext-iconv": "*",
         "composer-runtime-api": "^2",
         "dantsu/php-osm-static-api": "^0.6.4",
-        "doctrine/annotations": "^1.14.3",
         "doctrine/doctrine-bundle": "^2.4",
         "doctrine/doctrine-migrations-bundle": "^3.1",
         "doctrine/orm": "^2.9",
