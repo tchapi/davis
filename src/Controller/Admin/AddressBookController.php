@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/adressbooks', name: 'addressbook_')]
+#[Route('/addressbooks', name: 'addressbook_')]
 class AddressBookController extends AbstractController
 {
     #[Route('/{username}', name: 'index')]
