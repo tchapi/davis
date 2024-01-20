@@ -8,13 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Table(name="principals")
- *
- * @ORM\Entity(repositoryClass="App\Repository\PrincipalRepository")
- *
- * @UniqueEntity("uri")
- */
+#[ORM\Entity(repositoryClass: "App\Repository\PrincipalRepository")]
+#[ORM\Table(name: 'principals')]
+#[UniqueEntity('uri')]
 class Principal
 {
     public const PREFIX = 'principals/';
@@ -22,70 +18,37 @@ class Principal
     public const READ_PROXY_SUFFIX = '/calendar-proxy-read';
     public const WRITE_PROXY_SUFFIX = '/calendar-proxy-write';
 
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     *
-     * @Assert\NotBlank
-     *
-     * @Assert\Unique
-     */
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[Assert\Unique]
+    #[Assert\NotBlank]
     private $uri;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     * @Assert\Email(
-     *     message = "The email '{{ value }}' is not a valid email."
-     * )
-     *
-     * @Assert\NotBlank
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email(message: "The email '{{ value }}' is not a valid email.")]
     private $email;
 
-    /**
-     * @ORM\Column(name="displayname", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'displayname', type: 'string', length: 255, nullable: true)]
     private $displayName;
 
-    /**
-     * @ORM\Column(type="boolean")
-     *
-     * @Assert\NotBlank
-     */
+    #[ORM\Column(type: 'boolean')]
+    #[Assert\NotBlank]
     private $isMain;
 
-    /**
-     * @ORM\Column(type="boolean")
-     *
-     * @Assert\NotBlank
-     */
+    #[ORM\Column(type: 'boolean')]
+    #[Assert\NotBlank]
     private $isAdmin;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Principal")
-     *
-     * @ORM\JoinTable(
-     *  name="groupmembers",
-     *  joinColumns={
-     *
-     *      @ORM\JoinColumn(name="principal_id", referencedColumnName="id")
-     *  },
-     *  inverseJoinColumns={
-     *      @ORM\JoinColumn(name="member_id", referencedColumnName="id")
-     *  }
-     * )
-     */
+    #[ORM\ManyToMany(targetEntity: 'Principal')]
+    #[ORM\JoinTable(name: 'groupmembers')]
+    #[ORM\JoinColumn(name: 'principal_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'member_id', referencedColumnName: 'id')]
     private $delegees;
-    // TODO add inverse correctly for delegees ?
 
     public function __construct()
     {

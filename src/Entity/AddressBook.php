@@ -8,63 +8,36 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Table(name="addressbooks")
- *
- * @ORM\Entity()
- *
- * @UniqueEntity(
- *     fields={"principalUri", "uri"},
- *     errorPath="uri",
- *     message="form.uri.unique"
- * )
- */
+#[ORM\Entity()]
+#[ORM\Table(name: 'addressbooks')]
+#[UniqueEntity(fields: ['principalUri', 'uri'], errorPath: 'uri', message: 'form.uri.unique')]
 class AddressBook
 {
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(name="principaluri", type="string", length=255)
-     */
+    #[ORM\Column(name: 'principaluri', type: 'string', length: 255)]
     private $principalUri;
 
-    /**
-     * @ORM\Column(name="displayname", type="string", length=255)
-     */
+    #[ORM\Column(name: 'displayname', type: 'string', length: 255)]
     private $displayName;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     *
-     * @Assert\Regex("/[0-9a-z\-]+/")
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\Regex("/[0-9a-z\-]+/")]
     private $uri;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $synctoken;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Card", mappedBy="addressBook")
-     */
+    #[ORM\OneToMany(targetEntity: "App\Entity\Card", mappedBy: 'addressBook')]
     private $cards;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\AddressBookChange", mappedBy="addressBook")
-     */
+    #[ORM\OneToMany(targetEntity: "App\Entity\AddressBookChange", mappedBy: 'addressBook')]
     private $changes;
 
     public function __construct()

@@ -16,3 +16,6 @@ framework:
 
     php_errors:
         log: true
+
+    annotations:
+        enabled: false

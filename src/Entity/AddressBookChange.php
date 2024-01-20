@@ -4,42 +4,26 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="addressbookchanges")
- *
- * @ORM\Entity()
- */
+#[ORM\Entity()]
+#[ORM\Table(name: 'addressbookchanges')]
 class AddressBookChange
 {
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $uri;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $synctoken;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\AddressBook", inversedBy="changes")
-     *
-     * @ORM\JoinColumn(name="addressbookid", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: "App\Entity\AddressBook", inversedBy: 'changes')]
+    #[ORM\JoinColumn(name: 'addressbookid', nullable: false)]
     private $addressBook;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $operation;
 
     public function getId(): ?int
