@@ -9,7 +9,6 @@ use App\Plugins\PublicAwareDAVACLPlugin;
 use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
-use Doctrine\DBAL\Connection as DoctrineConnection;
 use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Psr\Log\LoggerInterface;
