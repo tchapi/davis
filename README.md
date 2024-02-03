@@ -39,7 +39,7 @@ Dependencies
 | Release            | Status                     | PHP version        |
 |--------------------|----------------------------|--------------------|
 | `main` (edge)      | development branch         | PHP 8.1+           |
-| `v4.x`             | security fixes only        | PHP 8.0+           |
+| `v4.x`             | security fixes only        | PHP 8.0 → 8.3      |
 | `v3.x`             | security fixes only        | PHP 7.3 → 8.2      |
 
 # 🧰 Installation
