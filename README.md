@@ -6,7 +6,7 @@ Davis
 [![Latest release][release_badge]][release_link]
 [![Sponsor me][sponsor_badge]][sponsor_link]
 
-A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 5](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal).
+A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 6](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal).
 
 Provides user edition, calendar creation and sharing, and address book creation. The interface is simple and straightforward, responsive, and provides a light and a dark mode.
 
