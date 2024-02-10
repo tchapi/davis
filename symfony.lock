@@ -108,12 +108,6 @@
             ".php_cs.dist"
         ]
     },
-    "friendsofphp/proxy-manager-lts": {
-        "version": "v1.0.3"
-    },
-    "laminas/laminas-code": {
-        "version": "3.4.1"
-    },
     "monolog/monolog": {
         "version": "2.1.1"
     },
@@ -238,9 +232,6 @@
     },
     "sebastian/recursion-context": {
         "version": "4.0.4"
-    },
-    "sebastian/resource-operations": {
-        "version": "3.0.3"
     },
     "sebastian/type": {
         "version": "2.3.4"
@@ -479,9 +470,6 @@
     },
     "symfony/property-info": {
         "version": "v5.1.5"
-    },
-    "symfony/proxy-manager-bridge": {
-        "version": "v5.1.11"
     },
     "symfony/routing": {
         "version": "5.1",

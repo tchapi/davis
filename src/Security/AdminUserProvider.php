@@ -40,10 +40,8 @@ class AdminUserProvider implements UserProviderInterface
      *
      * If your firewall is "stateless: true" (for a pure API), this
      * method is not called.
-     *
-     * @return UserInterface
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof AdminUser) {
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
