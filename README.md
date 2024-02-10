@@ -2,7 +2,7 @@ Davis
 ---
 
 [![Build Status][ci_badge]][ci_link]
-[![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/tchapi/davis/actions/workflows/main.yml)
+[![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/tchapi/davis/actions/workflows/main.yml)
 [![Latest release][release_badge]][release_link]
 [![Sponsor me][sponsor_badge]][sponsor_link]
 
@@ -36,9 +36,9 @@ Dependencies
 
 | Release            | Status                     | PHP version        |
 |--------------------|----------------------------|--------------------|
-| `master` (edge)    | development branch         | PHP 8.0+           |
-| `v4.*`             | active                     | PHP 8.0+           |
-| `v3.*`             | security fixes only        | PHP 7.3 → 8.2      |
+| `main` (edge)      | development branch         | PHP 8.0+           |
+| `v4.x`             | active                     | PHP 8.0+           |
+| `v3.x`             | security fixes only        | PHP 7.3 → 8.2      |
 
 # 🧰 Installation
 
@@ -351,7 +351,7 @@ docker pull ghcr.io/tchapi/davis:v3.1.0
 
 ### Edge image
 
-The edge image is built from the tip of the master branch:
+The edge image is built from the tip of the main branch:
 
 ```
 docker pull ghcr.io/tchapi/davis:edge
