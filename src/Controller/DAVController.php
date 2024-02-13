@@ -207,6 +207,7 @@ class DAVController extends AbstractController
         $nodes = [
             // /principals
             new \Sabre\CalDAV\Principal\Collection($principalBackend),
+            new \Sabre\DAVACL\FS\HomeCollection($principalBackend, $this->webdavPublicDir),
         ];
 
         if ($this->calDAVEnabled) {
