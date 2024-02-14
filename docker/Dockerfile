@@ -1,5 +1,9 @@
 FROM php:8.2-fpm-alpine
 
+# https://github.com/docker-library/php/blob/master/8.2/alpine3.18/fpm/Dockerfile#L33
+ARG fpm_user=82:82
+ENV FPM_USER=${fpm_user}
+
 LABEL org.opencontainers.image.authors="tchap@tchap.me"
 LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis"
 LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 4"
@@ -77,6 +81,9 @@ RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0
 RUN docker-php-source delete
 RUN rm -rf /usr/local/bin/composer
 
-RUN chown -R www-data:www-data var
+# Sets the app folder owner as the FPM user
+RUN chown -R ${FPM_USER} .
+
+USER $FPM_USER
 
 HEALTHCHECK --interval=30s --timeout=1s CMD php-fpm-healthcheck || exit 1
