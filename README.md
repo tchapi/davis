@@ -325,7 +325,16 @@ A `Dockerfile` is available for you to compile the image.
 
 To build the checked out version, just run:
 
-    docker build --pull --file docker/Dockerfile --tag davis:latest .
+    docker build --pull --file docker/Dockerfile --tag davis:latest --build-arg fpm_user=82:82 .
+
+> [!TIP]
+> 
+> The `fpm_user` build arg allows to set:
+>  - the uid FPM will run with
+>  - the owner of the app folder
+>
+> This is helpful if you have a proxy that does not use the same default PHP Alpine uid/gid for www-data (82:82). For instance, in the docker compose file, nginx uses 101:101
+>
 
 This will build a `davis:latest` image that you can directly use. Do not forget to pass sensible environment variables to the container since the _dist_ `.env` file will take precedence if no `.env.local` or environment variable is found.
 
