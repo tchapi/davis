@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description="A simple, fully translatable admin i
 
 # Run update, and gets basic packages and packages for runtime
 RUN apk --no-progress --update add --no-cache \
-        curl unzip fcgi \
+        curl unzip \
         # These are for php-intl
         icu-libs \
         # This one is for IMAP (to provide libc-client.so)
