@@ -62,7 +62,8 @@ RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev k
     && rm -rf /tmp/*
 
 # Davis source
-ADD . /var/www/davis
+# The app folder needs to be owned by www-data so PHP-fpm can execute files
+ADD --chown=www-data:www-data . /var/www/davis
 WORKDIR /var/www/davis
 
 # Install Composer 2, then dependencies
@@ -81,9 +82,6 @@ ADD ./docker/configurations/supervisord.conf /etc/supervisord.conf
 RUN mkdir /var/run/php-fpm && chown -R www-data:www-data /var/run/php-fpm
 RUN sed -i 's/listen = /;listen = /' /usr/local/etc/php-fpm.d/www.conf
 RUN sed -i 's/listen = 9000/listen = \/var\/run\/php-fpm\/php-fpm.sock/' /usr/local/etc/php-fpm.d/zz-docker.conf
-
-# The app folder needs to be owned by www-data so PHP-fpm can execute files
-RUN chown -R www-data:www-data /var/www/davis
 
 # Cleanup (only useful when using --squash)
 RUN docker-php-source delete && \
