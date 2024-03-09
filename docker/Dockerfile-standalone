@@ -1,8 +1,8 @@
 FROM php:8.2-fpm-alpine
 
 LABEL org.opencontainers.image.authors="tchap@tchap.me"
-LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis"
-LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 4"
+LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis-standalone"
+LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 4 (Standalone version with reverse-proxy)"
 
 # Run update, and gets basic packages and packages for runtime
 RUN apk --no-progress --update add --no-cache \

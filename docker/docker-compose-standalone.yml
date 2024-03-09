@@ -17,11 +17,11 @@ services:
   davis:
     build:
       context: ../
-      dockerfile: ./docker/Dockerfile-combined
+      dockerfile: ./docker/Dockerfile-standalone
     image: davis:latest
     # If you want to use a prebuilt image from Github
-    # image: ghcr.io/tchapi/davis:edge
-    container_name: davis
+    # image: ghcr.io/tchapi/davis-standalone:edge
+    container_name: davis-standalone
     environment:
       - APP_ENV=prod
       - DATABASE_DRIVER=mysql
