@@ -85,7 +85,6 @@ RUN sed -i 's/listen = 9000/listen = \/var\/run\/php-fpm\/php-fpm.sock/' /usr/lo
 
 # Cleanup (only useful when using --squash)
 RUN docker-php-source delete && \
-    rm -rf /usr/local/bin/composer && \
     rm -rf /var/www/davis/docker
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

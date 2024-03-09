@@ -18,14 +18,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        image:
+          - davis
+          - davis-standalone
         platform:
           - linux/amd64
           - linux/arm64
         include:
-          - dockerfile: docker/Dockerfile
-            image: davis
-          - dockerfile: docker/Dockerfile-standalone
-            image: davis-standalone
+          - image: davis
+            dockerfile: docker/Dockerfile
+          - image: davis-standalone
+            dockerfile: docker/Dockerfile-standalone
     steps:
       -
         name: Prepare
@@ -77,14 +80,14 @@ jobs:
       -
         name: Export digest
         run: |
-          mkdir -p /tmp/digests
+          mkdir -p /tmp/digests/
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"          
       -
         name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ env.PLATFORM_PAIR }}
+          name: digests-${{ matrix.image }}_${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -109,8 +112,8 @@ jobs:
         name: Download digests
         uses: actions/download-artifact@v4
         with:
-          path: /tmp/digests
-          pattern: digests-*
+          path: /tmp/digests/${{ matrix.image }}/
+          pattern: digests-${{ matrix.image }}_*
           merge-multiple: true
       -
         name: Set up Docker Buildx
@@ -139,7 +142,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Create manifest list and push
-        working-directory: /tmp/digests
+        working-directory: /tmp/digests/${{ matrix.image }}/
         run: |
           docker buildx imagetools create \
             $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
