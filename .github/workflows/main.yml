@@ -10,6 +10,10 @@ on:
   release:
     types: [ published ]
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}  # <organization>/<repository>
@@ -44,7 +48,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.token }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/metadata-action@v5
         id: meta
         with:
@@ -77,7 +81,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.token }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/metadata-action@v5
         id: meta
         with:
@@ -93,4 +97,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
       - run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.GITHUB_REF_NAME }}:
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_REF_NAME }}
