@@ -17,8 +17,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}  # <organization>/<repository>
-# BUILD_ARCHITECTURES: linux/amd64,linux/arm64
-  BUILD_ARCHITECTURES: linux/amd64
+  BUILD_ARCHITECTURES: linux/amd64,linux/arm64
 
 jobs:
   build-image:
@@ -65,8 +64,6 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
-      - run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:edge
 
   push-to-version:
     name: Push images (versioned tags)
@@ -96,5 +93,3 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
-      - run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_REF_NAME }}
