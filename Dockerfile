@@ -88,10 +88,6 @@ FROM base-image
 ARG fpm_user=82:82
 ENV FPM_USER=${fpm_user}
 
-LABEL org.opencontainers.image.authors="tchap@tchap.me"
-LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis-standalone"
-LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 4 (Standalone version with reverse-proxy)"
-
 COPY --from=extension-builder /usr/local/etc/php/conf.d     /usr/local/etc/php/conf.d/
 COPY --from=extension-builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions/
 COPY --from=composer          /var/www/davis/vendor         /var/www/davis/vendor/
