@@ -70,6 +70,13 @@ class DAVController extends AbstractController
     protected $webdavPublicDir;
 
     /**
+     * WebDAV User Homes directory.
+     *
+     * @var string
+     */
+    protected $webdavHomesDir;
+
+    /**
      * WebDAV Temporary directory.
      *
      * @var string
@@ -128,7 +135,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, string $inviteAddress = null, string $authMethod = null, string $authRealm = null, string $webdavPublicDir = null, string $webdavTmpDir = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, string $inviteAddress = null, string $authMethod = null, string $authRealm = null, string $webdavPublicDir = null, string $webdavHomesDir = null, string $webdavTmpDir = null)
     {
         $this->publicDir = $publicDir;
 
@@ -138,6 +145,7 @@ class DAVController extends AbstractController
         $this->inviteAddress = $inviteAddress ?? null;
 
         $this->webdavPublicDir = $webdavPublicDir;
+        $this->webdavHomesDir = $webdavHomesDir;
         $this->webdavTmpDir = $webdavTmpDir;
 
         $this->em = $entityManager;
@@ -207,7 +215,7 @@ class DAVController extends AbstractController
         $nodes = [
             // /principals
             new \Sabre\CalDAV\Principal\Collection($principalBackend),
-            new \Sabre\DAVACL\FS\HomeCollection($principalBackend, $this->webdavPublicDir),
+            new \Sabre\DAVACL\FS\HomeCollection($principalBackend, $this->webdavHomesDir),
         ];
 
         if ($this->calDAVEnabled) {
