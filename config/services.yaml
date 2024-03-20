@@ -52,6 +52,7 @@ services:
             $authMethod: "%env(AUTH_METHOD)%"
             $authRealm: "%env(AUTH_REALM)%"
             $webdavPublicDir: "%env(resolve:WEBDAV_PUBLIC_DIR)%"
+            $webdavHomesDir: "%env(resolve:WEBDAV_HOMES_DIR)%"
             $webdavTmpDir: "%env(resolve:WEBDAV_TMP_DIR)%"
 
     App\Security\LoginFormAuthenticator:
