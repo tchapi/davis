@@ -34,11 +34,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  push-to-edge:
-    name: Push images (edge tag)
+  push-image:
+    name: Push images
     runs-on: ubuntu-latest
     needs: [ build-image ]
-    if: ${{ github.ref_name == github.event.repository.default_branch }}
+    if: ${{ github.event_name == 'release' || github.ref_name == github.event.repository.default_branch}}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -54,36 +54,7 @@ jobs:
           context: git
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=edge,branch=${{ github.ref_name }}
-      - uses: docker/build-push-action@v5
-        with:
-          push: true
-          platforms: ${{ env.BUILD_ARCHITECTURES }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          annotations: ${{ steps.meta.outputs.annotations }}
-          labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ steps.meta.outputs.tags }}
-
-  push-to-version:
-    name: Push images (versioned tags)
-    runs-on: ubuntu-latest
-    needs: [ build-image ]
-    if: ${{ github.event_name == 'release' }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/metadata-action@v5
-        id: meta
-        with:
-          context: git
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            type=edge,branch=${{ github.event.repository.default_branch }}
       - uses: docker/build-push-action@v5
         with:
           push: true
