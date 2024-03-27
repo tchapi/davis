@@ -18,7 +18,7 @@ services:
       - 9000:80
 
   mysql:
-    image: mariadb:10.6.10
+    image: mariadb:10.11
     container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}

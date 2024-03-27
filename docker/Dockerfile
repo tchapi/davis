@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.3-fpm-alpine
 
 # https://github.com/docker-library/php/blob/master/8.2/alpine3.18/fpm/Dockerfile#L33
 ARG fpm_user=82:82

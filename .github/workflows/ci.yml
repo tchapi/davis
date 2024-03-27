@@ -13,14 +13,14 @@ env:
     SYMFONY_DEPRECATIONS_HELPER: max[self]=0
     ADMIN_LOGIN: admin
     ADMIN_PASSWORD: test
-    DATABASE_URL: mysql://user:password@mysql:3306/test_db
+    DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
 
 jobs:
     analyze:
         name: Analyze
         runs-on: ubuntu-latest
         container:
-            image: php:8.2-alpine
+            image: php:8.3-alpine
             options: >-
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
@@ -51,11 +51,12 @@ jobs:
               --tmpfs /var/tmp:exec
         services:
           mysql:
-            image: mariadb:10.7
+            image: mariadb:10.11
             env:
-              MYSQL_DATABASE: test_db
-              MYSQL_USER: user
-              MYSQL_PASSWORD: password
+              # Corresponds to what is in .env.test
+              MYSQL_DATABASE: davis_test
+              MYSQL_USER: davis
+              MYSQL_PASSWORD: davis
               MYSQL_ROOT_PASSWORD: root
             options: >-
               --health-cmd "mysqladmin ping"
@@ -67,9 +68,8 @@ jobs:
         strategy:
             matrix:
                 php:
-                    - '8.0'
-                    - '8.1'
                     - '8.2'
+                    - '8.3'
             fail-fast: false
         steps:
             - name: Checkout
@@ -84,7 +84,5 @@ jobs:
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Install dependencies with Composer
               run: composer install --no-progress --no-interaction --ansi
-            - name: Migrate database
-              run: bin/console doctrine:schema:update --force --no-interaction --complete
             - name: Run tests with PHPUnit
               run: vendor/bin/phpunit --process-isolation --colors=always

@@ -11,7 +11,7 @@ final class IMAPAuth extends IMAP
     /**
      * Doctrine registry.
      *
-     * @var \Doctrine\Persistence\ManagerRegistry
+     * @var ManagerRegistry
      */
     private $doctrine;
 

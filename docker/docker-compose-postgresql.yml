@@ -4,7 +4,7 @@ name: "davis-docker"
 services:
 
   nginx:
-    image: nginx:1.23-alpine
+    image: nginx:1.25-alpine
     container_name: nginx
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     depends_on:
@@ -18,7 +18,7 @@ services:
       - 9000:80
 
   postgresql:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: postgresql
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}

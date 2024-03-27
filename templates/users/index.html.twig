@@ -12,9 +12,9 @@
             <h5 class="me-auto">{{ principal.displayName }} <a href="mailto:{{ principal.email }}">&lsaquo;{{ principal.email }}&rsaquo;</a></h5>
 
             <div class="me-0 text-right d-lg-block d-none">
-                <a href="{{ path('delegates',{username: principal.username}) }}" class="btn btn-sm btn-outline-secondary mb-1">💁&nbsp;{{ "users.delegates"|trans }}</a>
-                <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-sm btn-outline-secondary mb-1">🗓&nbsp;{{ "users.calendars"|trans }}</a>
-                <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-sm btn-outline-secondary ms-1 mb-1">📖&nbsp;{{ "users.addressbooks"|trans }}</a>
+                <a href="{{ path('user_delegates',{username: principal.username}) }}" class="btn btn-sm btn-outline-secondary mb-1">💁&nbsp;{{ "users.delegates"|trans }}</a>
+                <a href="{{ path('calendar_index',{username: principal.username}) }}" class="btn btn-sm btn-outline-secondary mb-1">🗓&nbsp;{{ "users.calendars"|trans }}</a>
+                <a href="{{ path('addressbook_index',{username: principal.username})}}" class="btn btn-sm btn-outline-secondary ms-1 mb-1">📖&nbsp;{{ "users.addressbooks"|trans }}</a>
                 <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-sm btn-outline-primary ms-1 mb-1">✎&nbsp;{{ "edit"|trans }}</a>
                 <a href="#" 
                     data-bs-toggle="modal" data-bs-target="#deleteModal-users"
@@ -27,9 +27,9 @@
         <p class="mb-1">{{ "users.username"|trans }} : <code>{{ principal.username }}</code></p>
         <small>{{ "users.uri"|trans }} : <code>{{ principal.uri }}</code>{% if principal.isAdmin %} — <span class="badge bg-primary">{{ "users.administrator"|trans }}</span>{% endif %}</small>
         <div class="btn-group btn-group-sm mt-3 d-flex d-lg-none" role="group">
-            <a href="{{ path('delegates',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">💁&nbsp;</span>{{ "users.delegates"|trans }}</a>
-            <a href="{{ path('calendars',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">🗓&nbsp;</span>{{ "users.calendars"|trans }}</a>
-            <a href="{{ path('address_books',{username: principal.username})}}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">📖&nbsp;</span>{{ "users.addressbooks"|trans }}</a>
+            <a href="{{ path('user_delegates',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">💁&nbsp;</span>{{ "users.delegates"|trans }}</a>
+            <a href="{{ path('calendar_index',{username: principal.username}) }}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">🗓&nbsp;</span>{{ "users.calendars"|trans }}</a>
+            <a href="{{ path('addressbook_index',{username: principal.username})}}" class="btn btn-outline-secondary flex-fill w-100"><span class="d-none d-sm-inline">📖&nbsp;</span>{{ "users.addressbooks"|trans }}</a>
             <a href="{{ path('user_edit',{username: principal.username})}}" class="btn btn-outline-primary flex-fill flex-shrink-1"><span class="d-none d-sm-inline">✎&nbsp;</span>{{ "edit"|trans }}</a>
             <a href="#" 
                 data-bs-toggle="modal" data-bs-target="#deleteModal-users"
@@ -40,7 +40,7 @@
         </div>
     </div>
 {% else %}
-    <div class="my-5 py-5 d-flex justify-content-center align-items-center text-muted">{{ "no.users.yet"|trans }}</div>
+    <div id="no-user" class="my-5 py-5 d-flex justify-content-center align-items-center text-muted">{{ "no.users.yet"|trans }}</div>
 {% endfor %}
 </div>
 

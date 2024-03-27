@@ -1,5 +1,6 @@
 security:
-    enable_authenticator_manager: true
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     providers:
         admin_user_provider:
             id: App\Security\AdminUserProvider
@@ -9,9 +10,8 @@ security:
             security: false
         main:
             lazy: true
-            guard:
-                authenticators:
-                    - App\Security\LoginFormAuthenticator
+            custom_authenticators:
+                - App\Security\LoginFormAuthenticator
             provider: admin_user_provider
             logout:
                 path: app_logout

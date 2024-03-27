@@ -6,17 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Table(name="calendarinstances")
- *
- * @ORM\Entity(repositoryClass="App\Repository\CalendarInstanceRepository")
- *
- * @UniqueEntity(
- *     fields={"principalUri", "uri"},
- *     errorPath="uri",
- *     message="form.uri.unique"
- * )
- */
+#[ORM\Entity(repositoryClass: "App\Repository\CalendarInstanceRepository")]
+#[ORM\Table(name: 'calendarinstances')]
+#[UniqueEntity(fields: ['principalUri', 'uri'], errorPath: 'uri', message: 'form.uri.unique')]
 class CalendarInstance
 {
     public const INVITE_NORESPONSE = 1;
@@ -43,84 +35,51 @@ class CalendarInstance
         ];
     }
 
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", cascade={"persist"})
-     *
-     * @ORM\JoinColumn(name="calendarid", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 
-    /**
-     * @ORM\Column(name="principaluri", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'principaluri', type: 'string', length: 255, nullable: true)]
     private $principalUri;
 
-    /**
-     * @ORM\Column(type="smallint", options={"default" : 1})
-     */
+    #[ORM\Column(type: 'smallint', options: ['default' => 1])]
     private $access;
 
-    /**
-     * @ORM\Column(name="displayname", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'displayname', type: 'string', length: 255, nullable: true)]
     private $displayName;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     * @Assert\Regex("/[0-9a-z\-]+/")
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Assert\Regex("/[0-9a-z\-]+/")]
     private $uri;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @ORM\Column(name="calendarorder", type="integer", options={"default" : 0})
-     */
+    #[ORM\Column(name: 'calendarorder', type: 'integer', options: ['default' => 0])]
     private $calendarOrder;
 
-    /**
-     * @ORM\Column(name="calendarcolor", type="string", length=10, nullable=true)
-     *
-     * @Assert\Regex("/\#[0-9A-F]{6}/")
-     */
+    #[ORM\Column(name: 'calendarcolor', type: 'string', length: 10, nullable: true)]
+    #[Assert\Regex("/\#[0-9A-F]{6}/")]
     private $calendarColor;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $timezone;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $transparent;
 
-    /**
-     * @ORM\Column(name="share_href", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'share_href', type: 'string', length: 255, nullable: true)]
     private $shareHref;
 
-    /**
-     * @ORM\Column(name="share_displayname", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'share_displayname', type: 'string', length: 255, nullable: true)]
     private $shareDisplayName;
 
-    /**
-     * @ORM\Column(name="share_invitestatus", type="integer", options={"default" : 2})
-     */
+    #[ORM\Column(name: 'share_invitestatus', type: 'integer', options: ['default' => 2])]
     private $shareInviteStatus;
 
     public function __construct()

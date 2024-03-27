@@ -43,8 +43,8 @@ class DashboardTest extends WebTestCase
         $crawler = $client->request('GET', '/login');
 
         $form = $crawler->selectButton('Submit')->form();
-        $form['username']->setValue('bad_'.$_ENV['ADMIN_LOGIN']);
-        $form['password']->setValue('bad_password');
+        $form['_username']->setValue('bad_'.$_ENV['ADMIN_LOGIN']);
+        $form['_password']->setValue('bad_password');
 
         $client->submit($form);
         $this->assertResponseRedirects('/login');
@@ -60,8 +60,8 @@ class DashboardTest extends WebTestCase
         $crawler = $client->request('GET', '/login');
 
         $form = $crawler->selectButton('Submit')->form();
-        $form['username']->setValue($_ENV['ADMIN_LOGIN']);
-        $form['password']->setValue('bad_password');
+        $form['_username']->setValue($_ENV['ADMIN_LOGIN']);
+        $form['_password']->setValue('bad_password');
 
         $client->submit($form);
         $this->assertResponseRedirects('/login');
@@ -77,8 +77,8 @@ class DashboardTest extends WebTestCase
         $crawler = $client->request('GET', '/login');
 
         $form = $crawler->selectButton('Submit')->form();
-        $form['username']->setValue($_ENV['ADMIN_LOGIN']);
-        $form['password']->setValue($_ENV['ADMIN_PASSWORD']);
+        $form['_username']->setValue($_ENV['ADMIN_LOGIN']);
+        $form['_password']->setValue($_ENV['ADMIN_PASSWORD']);
 
         $client->submit($form);
         $this->assertResponseRedirects('/dashboard');
