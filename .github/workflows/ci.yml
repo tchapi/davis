@@ -1,90 +1,87 @@
 name: CI
 
 on:
-  push:
-    paths-ignore:
-      - 'docker/**'
   pull_request:
     paths-ignore:
       - 'docker/**'
 
 env:
-    COMPOSER_ALLOW_SUPERUSER: '1'
-    SYMFONY_DEPRECATIONS_HELPER: max[self]=0
-    ADMIN_LOGIN: admin
-    ADMIN_PASSWORD: test
-    DATABASE_URL: mysql://user:password@mysql:3306/test_db
+  COMPOSER_ALLOW_SUPERUSER: '1'
+  SYMFONY_DEPRECATIONS_HELPER: max[self]=0
+  ADMIN_LOGIN: admin
+  ADMIN_PASSWORD: test
+  DATABASE_URL: mysql://user:password@mysql:3306/test_db
 
 jobs:
-    analyze:
-        name: Analyze
-        runs-on: ubuntu-latest
-        container:
-            image: php:8.2-alpine
-            options: >-
-              --tmpfs /tmp:exec
-              --tmpfs /var/tmp:exec
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v3
-            - name: Install GD PHP extension
-              run: |
-                apk add $PHPIZE_DEPS libpng-dev
-                docker-php-ext-configure gd
-                docker-php-ext-install gd
-            - name: Install Composer
-              run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Validate Composer
-              run: composer validate
-            - name: Update to highest dependencies with Composer
-              run: composer update --no-interaction --no-progress --ansi
-            - name: Analyze
-              run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    container:
+      image: php:8.2-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install GD PHP extension
+        run: |
+          apk add $PHPIZE_DEPS libpng-dev
+          docker-php-ext-configure gd
+          docker-php-ext-install gd
+      - name: Install Composer
+        run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Validate Composer
+        run: composer validate
+      - name: Update to highest dependencies with Composer
+        run: composer update --no-interaction --no-progress --ansi
+      - name: Analyze
+        run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
 
-    phpunit:
-        name: PHPUnit (PHP ${{ matrix.php }})
-        runs-on: ubuntu-latest
-        container:
-            image: php:${{ matrix.php }}-alpine
-            options: >-
-              --tmpfs /tmp:exec
-              --tmpfs /var/tmp:exec
-        services:
-          mysql:
-            image: mariadb:10.7
-            env:
-              MYSQL_DATABASE: test_db
-              MYSQL_USER: user
-              MYSQL_PASSWORD: password
-              MYSQL_ROOT_PASSWORD: root
-            options: >-
-              --health-cmd "mysqladmin ping"
-              --health-interval 10s
-              --health-timeout 5s
-              --health-retries 5
-            ports:
-              - 3306:3306
-        strategy:
-            matrix:
-                php:
-                    - '8.0'
-                    - '8.1'
-                    - '8.2'
-            fail-fast: false
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v3
-            - name: Install MySQL / GD PHP extensions
-              run: |
-                apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev
-                docker-php-ext-configure intl
-                docker-php-ext-configure gd
-                docker-php-ext-install pdo pdo_mysql intl gd
-            - name: Install Composer
-              run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Install dependencies with Composer
-              run: composer install --no-progress --no-interaction --ansi
-            - name: Migrate database
-              run: bin/console doctrine:schema:update --force --no-interaction --complete
-            - name: Run tests with PHPUnit
-              run: vendor/bin/phpunit --process-isolation --colors=always
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      mysql:
+        image: mariadb:10.7
+        env:
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: root
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 3306:3306
+    strategy:
+      matrix:
+        php:
+          - '8.0'
+          - '8.1'
+          - '8.2'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install MySQL / GD PHP extensions
+        run: |
+          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev
+          docker-php-ext-configure intl
+          docker-php-ext-configure gd
+          docker-php-ext-install pdo pdo_mysql intl gd
+      - name: Install Composer
+        run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Install dependencies with Composer
+        run: composer install --no-progress --no-interaction --ansi
+      - name: Migrate database
+        run: bin/console doctrine:schema:update --force --no-interaction --complete
+      - name: Run tests with PHPUnit
+        run: vendor/bin/phpunit --process-isolation --colors=always
