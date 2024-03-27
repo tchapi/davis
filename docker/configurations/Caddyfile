@@ -1,0 +1,28 @@
+{
+        auto_https off
+}
+
+:9000 {
+        root * /var/www/davis/public
+        php_fastcgi unix//var/run/php-fpm/php-fpm.sock
+        file_server {
+                # Safety net, just in case
+                hide .git .gitignore
+        }
+
+        # enable compression
+        encode zstd gzip
+
+        # Remove leaky headers
+        header {
+                -Server
+                -X-Powered-By
+
+                # keep referrer data off of HTTP connections
+                Referrer-Policy no-referrer-when-downgrade
+
+                # disable clients from sniffing the media type
+                X-Content-Type-Options nosniff
+        }
+
+}
