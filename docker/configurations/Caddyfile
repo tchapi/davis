@@ -2,7 +2,7 @@
         auto_https off
 }
 
-http://localhost:9000 {
+:9000 {
         root * /var/www/davis/public
         php_fastcgi unix//var/run/php-fpm/php-fpm.sock
         file_server {
