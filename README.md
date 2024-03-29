@@ -118,8 +118,13 @@ f. The paths for the WebDAV installation
 
 ```
 WEBDAV_TMP_DIR='/tmp'
-WEBDAV_PUBLIC_DIR='/webdav'
+WEBDAV_PUBLIC_DIR='/webdav/public'
+WEBDAV_HOMES_DIR=
 ```
+
+> [!NOTE]
+>
+> By default, home directories are disabled totally (the env var is set to an empty string). If needed, it is recommended to use a folder that is **NOT** a child of the public dir, such as `/webdav/homes` for instance, so that users cannot access other users' homes.
 
 g. The log file path
 
