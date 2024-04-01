@@ -148,6 +148,17 @@ APP_TIMEZONE="Australia/Lord_Howe"
 > ```
 > in your environment file if you wish to use the **actual default timezone of the server**, and not enforcing it. 
 
+i. Override Symfony's `%kernel.logs_dir%` and/or `%kernel.cache_dir%`
+
+If necessary you can override the location of Symfony's
+[`%kernel.cache_dir%`](https://symfony.com/doc/current/reference/configuration/kernel.html#kernel-cache-dir)
+and [`%kernel.logs_dir%`](https://symfony.com/doc/current/reference/configuration/kernel.html#kernel-logs-dir) using the two environment variables `CACHE_DIR` and `LOG_DIR`. This might be necessary if the php source files for davis
+are contained in a read-only directory.
+
+`LOG_DIR` only takes effect if `LOG_FILE_PATH` is pointing to a file under `%kernel.logs_dir%` (the default). If `LOG_FILE_PATH` points outside the `kernel.logs_dir`, then `LOG_DIR` will have no effect`LOG_FILE_PATH` takes precedence over `LOG_DIR`.
+
+Also note, these files must be specified in the actual environment (and not in `.env` files) because they are evaluated before the env files are loaded.
+
 ### Specific environment variables for IMAP and LDAP authentication methods
 
 In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.

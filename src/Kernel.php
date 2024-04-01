@@ -25,6 +25,22 @@ class Kernel extends BaseKernel
         }
     }
 
+    public function getCacheDir(): string
+    {
+        if (getenv('CACHE_DIR') !== false) {
+            return getenv('CACHE_DIR');
+        }
+        return parent::getCacheDir();
+    }
+
+    public function getLogDir(): string
+    {
+        if (getenv('LOG_DIR') !== false) {
+            return getenv('LOG_DIR');
+        }
+        return parent::getLogDir();
+    }
+
     protected function configureContainer(ContainerConfigurator $container): void
     {
         $container->import('../config/{packages}/*.yaml');
