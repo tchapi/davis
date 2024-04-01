@@ -1,6 +1,10 @@
 #!/usr/bin/env php
 <?php
 
+if (getenv('ENV_DIR') !== false && getenv('ENV_DIR') !== '' ) {
+    $_SERVER['APP_RUNTIME_OPTIONS']['dotenv_path'] = getenv('ENV_DIR').'/.env';
+}
+
 use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -28,7 +32,8 @@ if ($input->hasParameterOption('--no-debug', true)) {
     putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
 }
 
-(new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+$env_dir = getenv('ENV_DIR') != false ? getenv('ENV_DIR') : dirname(__DIR__);
+(new Dotenv())->bootEnv($env_dir.'/.env');
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);
