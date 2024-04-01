@@ -148,6 +148,15 @@ APP_TIMEZONE="Australia/Lord_Howe"
 > ```
 > in your environment file if you wish to use the **actual default timezone of the server**, and not enforcing it. 
 
+
+i. Override the dotenv path
+
+You can override the expected location of the env files (`.env`, `.env.local`, etc) by setting the `ENV_DIR` directory. The value should be to a folder containing the env files. This value must be specified in the actual environment and *not* in an `.env` file as it is read and evaluated before the env files are read.
+
+```
+ENV_DIR=/var/lib/davis
+```
+
 ### Specific environment variables for IMAP and LDAP authentication methods
 
 In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
