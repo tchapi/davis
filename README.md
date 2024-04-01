@@ -74,14 +74,14 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 
 a. The database driver and url (_you should already have it configured since you created the database previously_)
     
-```
+```shell
 DATABASE_DRIVER=mysql # or postgresql, or sqlite
 DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4
 ```
 
 b. The admin password for the backend
 
-```
+```shell
 ADMIN_LOGIN=admin
 ADMIN_PASSWORD=test
 ```
@@ -92,7 +92,7 @@ ADMIN_PASSWORD=test
 
 c. The auth Realm and method for HTTP auth
 
-```
+```shell
 AUTH_REALM=SabreDAV
 AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 ```
@@ -100,7 +100,7 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 
 d. The global flags to enable CalDAV, CardDAV and WebDAV
 
-```
+```shell
 CALDAV_ENABLED=true
 CARDDAV_ENABLED=true
 WEBDAV_ENABLED=false
@@ -108,7 +108,7 @@ WEBDAV_ENABLED=false
 
 e. The email address that your invites are going to be sent from
 
-```
+```shell
 INVITE_FROM_ADDRESS=no-reply@example.org
 ```
 
@@ -116,7 +116,7 @@ f. The paths for the WebDAV installation
 
 > I recommend that you use absolute directories so you know exactly where your files reside.
 
-```
+```shell
 WEBDAV_TMP_DIR='/tmp'
 WEBDAV_PUBLIC_DIR='/webdav/public'
 WEBDAV_HOMES_DIR=
@@ -130,7 +130,7 @@ g. The log file path
 
 You can use an absolute file path here, and you can use Symfony's `%kernel.logs_dir%` and `%kernel.environment%` placeholders if needed (as in the default value). Setting it to `/dev/null` will disable logging altogether.
 
-```
+```shell
 LOG_FILE_PATH="%kernel.logs_dir%/%kernel.environment%.log"
 ```
 
@@ -138,23 +138,38 @@ h. The timezone you want for the app
 
 This must comply with the [official list](https://www.php.net/manual/en/timezones.php)
 
-```
+```shell
 APP_TIMEZONE="Australia/Lord_Howe"
 ```
 
 > Set a void value like so:
-> ```
+> ```shell
 > APP_TIMEZONE=
 > ```
 > in your environment file if you wish to use the **actual default timezone of the server**, and not enforcing it. 
 
 
-i. Override the dotenv path
+#### Overriding the dotenv (`.env`) path
 
-You can override the expected location of the env files (`.env`, `.env.local`, etc) by setting the `ENV_DIR` directory. The value should be to a folder containing the env files. This value must be specified in the actual environment and *not* in an `.env` file as it is read and evaluated before the env files are read.
+You can override the expected location of the environment files (`.env`, `.env.local`, etc) by setting the `ENV_DIR` variable.
 
+The value should be to a _folder_ containing the env files. This value must be specified in the actual environment and *not* in an `.env` file as it is read and evaluated **before** the env files are read.
+
+For instance, you can use it to call `bin/console` with a specific dotenv directory:
+
+```shell
+> ENV_DIR=/var/lib/davis bin/console
 ```
-ENV_DIR=/var/lib/davis
+
+Or use it directly in the Apache configuration
+
+```apache
+<VirtualHost *:80>
+    # .. rest of config (see ¶ below)
+
+    SetEnv ENV_DIR /var/lib/davis
+    # ... other env vars if needed
+</VirtualHost>
 ```
 
 ### Specific environment variables for IMAP and LDAP authentication methods
@@ -163,14 +178,14 @@ In case you use the `IMAP` auth type, you must specify the auth url (_the "mailb
 
 You should also explicitely define whether you want new authenticated to be created upon login:
 
-```
+```shell
 IMAP_AUTH_URL="{imap.gmail.com:993/imap/ssl/novalidate-cert}"
 IMAP_AUTH_USER_AUTOCREATE=true # false by default
 ```
 
 Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated to be created upon login (_like for IMAP_):
 
-```
+```shell
 LDAP_AUTH_URL="ldap://127.0.0.1"
 LDAP_DN_PATTERN="mail=%u"
 LDAP_MAIL_ATTRIBUTE="mail"
@@ -178,7 +193,7 @@ LDAP_AUTH_USER_AUTOCREATE=true # false by default
 ```
 
 > Ex: for [Zimbra LDAP](https://zimbra.github.io/adminguide/latest/#zimbra_ldap_service), you might want to use the `zimbraMailDeliveryAddress` attribute to retrieve the principal user email:
->    ```
+>    ```shell
 >    LDAP_MAIL_ATTRIBUTE="zimbraMailDeliveryAddress"
 >    ```
 
@@ -188,14 +203,14 @@ If you're migrating from Baïkal, then you will likely want to do the following 
 
 1. Get a backup of your data (without the `CREATE`  statements, but with complete `INSERT`  statements):
 
-```
+```shell
 mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database
 ```
 
 
 2. Create a new database for Davis (let's name it `davis`) and create the base schema:
 
-```
+```shell
 bin/console doctrine:migrations:migrate 'DoctrineMigrations\Version20191030113307' --no-interaction
 ```
 
@@ -226,91 +241,96 @@ The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
 
 ### Example Caddy 2 configuration
 
-    dav.domain.tld {
-        # General settings
-        encode zstd gzip
-        header {
-            -Server
-            -X-Powered-By
+```
+dav.domain.tld {
+    # General settings
+    encode zstd gzip
+    header {
+        -Server
+        -X-Powered-By
 
-            # enable HSTS
-            Strict-Transport-Security max-age=31536000;
+        # enable HSTS
+        Strict-Transport-Security max-age=31536000;
 
-            # disable clients from sniffing the media type
-            X-Content-Type-Options nosniff
+        # disable clients from sniffing the media type
+        X-Content-Type-Options nosniff
 
-            # keep referrer data off of HTTP connections
-            Referrer-Policy no-referrer-when-downgrade
-        }
-
-        root * /var/www/davis/public
-        php_fastcgi 127.0.0.1:8000
-        file_server
+        # keep referrer data off of HTTP connections
+        Referrer-Policy no-referrer-when-downgrade
     }
 
+    root * /var/www/davis/public
+    php_fastcgi 127.0.0.1:8000
+    file_server
+}
+```
 ### Example Apache 2.4 configuration
 
-    <VirtualHost *:80>
-        ServerName dav.domain.tld
+```apache
+<VirtualHost *:80>
+    ServerName dav.domain.tld
 
-        DocumentRoot /var/www/davis/public
-        DirectoryIndex /index.php
+    DocumentRoot /var/www/davis/public
+    DirectoryIndex /index.php
 
-        <Directory /var/www/davis/public>
-            AllowOverride None
-            Order Allow,Deny
-            Allow from All
-            FallbackResource /index.php
-        </Directory>
+    <Directory /var/www/davis/public>
+        AllowOverride None
+        Order Allow,Deny
+        Allow from All
+        FallbackResource /index.php
+    </Directory>
 
-        # Apache > 2.4.25, else remove this part
-        <Directory /var/www/davis/public/bundles>
-            FallbackResource disabled
-        </Directory>
+    # Apache > 2.4.25, else remove this part
+    <Directory /var/www/davis/public/bundles>
+        FallbackResource disabled
+    </Directory>
 
-        # Env vars (if you did not use .env.local)
-        SetEnv APP_ENV prod
-        SetEnv APP_SECRET <app-secret-id>
-        SetEnv DATABASE_DRIVER "mysql"
-        SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4"
-        # ... etc
-    </VirtualHost>
+    # Env vars (if you did not use .env.local)
+    SetEnv APP_ENV prod
+    SetEnv APP_SECRET <app-secret-id>
+    SetEnv DATABASE_DRIVER "mysql"
+    SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4"
+    # ... etc
+</VirtualHost>
+```
 
 ### Example Nginx configuration
 
-    server {
-        server_name dav.domain.tld;
-        root /var/www/davis/public;
+```nginx
+server {
+    server_name dav.domain.tld;
+    root /var/www/davis/public;
 
-        location / {
-            try_files $uri /index.php$is_args$args;
-        }
-
-        location /bundles {
-            try_files $uri =404;
-        }
-
-        location ~ ^/index\.php(/|$) {
-            fastcgi_pass unix:/var/run/php/php7.2-fpm.sock; # Change for your PHP version
-            fastcgi_split_path_info ^(.+\.php)(/.*)$;
-            include fastcgi_params;
-
-            # Env vars (if you did not use .env.local)
-            fastcgi_param APP_ENV prod;
-            fastcgi_param APP_SECRET <app-secret-id>;
-            fastcgi_param DATABASE_DRIVER "mysql"
-            fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4";
-            # ... etc ...
-
-            fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-            fastcgi_param DOCUMENT_ROOT $realpath_root;
-            internal;
-        }
-
-        location ~ \.php$ {
-            return 404;
-        }
+    location / {
+        try_files $uri /index.php$is_args$args;
     }
+
+    location /bundles {
+        try_files $uri =404;
+    }
+
+    location ~ ^/index\.php(/|$) {
+        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock; # Change for your PHP version
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+
+        # Env vars (if you did not use .env.local)
+        fastcgi_param APP_ENV prod;
+        fastcgi_param APP_SECRET <app-secret-id>;
+        fastcgi_param DATABASE_DRIVER "mysql";
+        fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4";
+        # ... etc ...
+
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+        internal;
+    }
+
+    location ~ \.php$ {
+        return 404;
+    }
+}
+```
 
 More examples and information [here](https://symfony.com/doc/current/setup/web_server_configuration.html).
 
@@ -320,18 +340,22 @@ Web-based protocols like CalDAV and CardDAV can be found using a discovery servi
 
 If you use Apache as your webserver, you can enable the redirections with:
 
-    RewriteEngine On
-    RewriteRule ^\.well-known/carddav /dav/ [R=301,L]
-    RewriteRule ^\.well-known/caldav /dav/ [R=301,L]
+```apache
+RewriteEngine On
+RewriteRule ^\.well-known/carddav /dav/ [R=301,L]
+RewriteRule ^\.well-known/caldav /dav/ [R=301,L]
+```
 
 Make sure that `mod_rewrite` is enabled on your installation beforehand.
 
 If you use Nginx, you can add this to your configuration:
 
-    location / {
-       rewrite ^/.well-known/carddav /dav/ redirect;
-       rewrite ^/.well-known/caldav /dav/ redirect;
-    }
+```nginx
+location / {
+    rewrite ^/.well-known/carddav /dav/ redirect;
+    rewrite ^/.well-known/caldav /dav/ redirect;
+}
+```
 
 # 🐳 Dockerized installation
 
@@ -482,7 +506,9 @@ You probably forgot to run the migration once to create the necessary DB schema
 
 In Docker:
 
-    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
+```shell
+docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
+```
 
 In a shell, if you run Davis locally:
 
