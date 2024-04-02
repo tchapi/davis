@@ -2,146 +2,65 @@ name: Publish Docker image
 
 on:
   workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - renovate/**
   release:
-    types: [published]
+    types: [ published ]
+
+permissions:
+  contents: read
+  packages: write
 
 env:
-  # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}  # <organization>/<repository>
+  BUILD_ARCHITECTURES: linux/amd64,linux/arm64
 
 jobs:
-  build:
+  build-image:
     name: Build Docker images
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
     steps:
-      -
-        name: Prepare
-        run: |
-          platform=${{ matrix.platform }}
-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV 
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      - 
-        name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v5
         with:
-          context: git
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # "Push by digest" needs an untagged ref
-          tags: |
-            type=raw,value=
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          version: v0.12.0
-        env:
-          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-      -
-        name: Login to GitHub Container Registry (${{ env.REGISTRY }})
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build and Push by digest
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/Dockerfile
-          platforms: ${{ matrix.platform }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          annotations: ${{ steps.meta.outputs.annotations }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-      -
-        name: Export digest
-        run: |
-          mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"          
-      -
-        name: Upload digest
-        uses: actions/upload-artifact@v4
-        with:
-          name: digests-${{ env.PLATFORM_PAIR }}
-          path: /tmp/digests/*
-          if-no-files-found: error
-          retention-days: 1
+          push: false
+          platforms: ${{ env.BUILD_ARCHITECTURES }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-  merge:
-    name: Create merged manifest and push to Github Packages
+  push-image:
+    name: Push images
     runs-on: ubuntu-latest
-    needs:
-      - build
+    needs: [ build-image ]
+    if: ${{ github.event_name == 'release' || github.ref_name == github.event.repository.default_branch}}
     steps:
-      -
-        # Needed to get the git information for the meta step
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Download digests
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
         with:
-          path: /tmp/digests
-          pattern: digests-*
-          merge-multiple: true
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          version: v0.12.0
-        env:
-          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-      -
-        # Extract metadata to easily get the version and annotations to put in the manifest
-        name: Docker meta
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/metadata-action@v5
         id: meta
-        uses: docker/metadata-action@v5
         with:
           context: git
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{version}}
-            type=edge,branch=${{ github.ref_name }}
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v3
+            type=edge,branch=${{ github.event.repository.default_branch }}
+      - uses: docker/build-push-action@v5
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Create manifest list and push
-        working-directory: /tmp/digests
-        run: |
-          docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            --annotation index:org.opencontainers.image.created="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}" \
-            --annotation index:org.opencontainers.image.description="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}" \
-            --annotation index:org.opencontainers.image.version="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}" \
-            --annotation index:org.opencontainers.image.licenses="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.licenses'] }}" \
-            --annotation index:org.opencontainers.image.title="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.title'] }}" \
-            --annotation index:org.opencontainers.image.source="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.source'] }}" \
-            --annotation index:org.opencontainers.image.url="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.url'] }}" \
-            --annotation index:org.opencontainers.image.revision="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}" \
-            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)          
-      -
-        name: Inspect image
-        run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}          
+          push: true
+          platforms: ${{ env.BUILD_ARCHITECTURES }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          annotations: ${{ steps.meta.outputs.annotations }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
