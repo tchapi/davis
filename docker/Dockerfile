@@ -63,26 +63,22 @@ RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev k
     && apk del build-deps-imap \
     && rm -rf /tmp/*
 
-# Davis installation
-ADD . /var/www/davis
-WORKDIR /var/www/davis
-
-# Install Composer 2, then dependencies
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
-
 # PHP-FPM healthcheck
 RUN set -xe && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0/php-fpm-healthcheck \
     -o /usr/local/bin/php-fpm-healthcheck -s \
     && chmod +x /usr/local/bin/php-fpm-healthcheck
 
-# Cleanup (only useful when using --squash)
-RUN docker-php-source delete
-RUN rm -rf /usr/local/bin/composer
+# Davis installation
+ADD --chown=${FPM_USER} . /var/www/davis
+WORKDIR /var/www/davis
 
-# Sets the app folder owner as the FPM user
-RUN chown -R ${FPM_USER} .
+# Install Composer 2, then dependencies
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
+
+# Cleanup (only useful when using --squash)
+RUN docker-php-source delete && rm -rf /var/www/davis/docker
 
 USER $FPM_USER
 
