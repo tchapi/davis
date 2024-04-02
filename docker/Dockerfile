@@ -4,6 +4,9 @@ FROM php:8.2-fpm-alpine
 ARG fpm_user=82:82
 ENV FPM_USER=${fpm_user}
 
+ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
+    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+
 LABEL org.opencontainers.image.authors="tchap@tchap.me"
 LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis"
 LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 4"
@@ -62,6 +65,10 @@ RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev k
     && docker-php-ext-install imap \
     && apk del build-deps-imap \
     && rm -rf /tmp/*
+
+# OPCache
+RUN docker-php-ext-install opcache
+COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 # PHP-FPM healthcheck
 RUN set -xe && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
