@@ -12,6 +12,8 @@ Provides user edition, calendar creation and sharing, and address book creation.
 
 Easily containerisable (_`Dockerfile` and sample `docker-compose` configuration file provided_).
 
+NixOS package and module available.
+
 Supports **Basic authentication**, as well as **IMAP** and **LDAP** (_via external providers_).
 
 Created and maintained (with the help of the community) by [@tchapi](https://github.com/tchapi).
@@ -457,6 +459,17 @@ Then, head up to `http://<YOUR_DOCKER_IP>:9000` to see the status display :
 ![Status page](_screenshots/status.png)
 
 > Note that there is no user and no principals created by default.
+
+# NixOS Installation
+
+To install Davis on NixOS, you can use the builtin NixOS module [`services.davis`](https://search.nixos.org/options?channel=unstable&query=services.davis).
+
+Currently the NixOS module and package are in the nixos-unstable channel, but they are slated to enter the stable channel in the 24.05 release.
+
+* [All `services.davis` options](https://search.nixos.org/options?channel=unstable&query=services.davis)
+* [Basic Guide](https://nixos.org/manual/nixos/unstable/#module-services-davis)
+
+If you encounter a bug or problem with the NixOS Davis module please open an issue [at the nixpkgs repo](https://github.com/NixOS/nixpkgs/issues/new/choose) so the module maintainers can assist.
 
 # Development
 
