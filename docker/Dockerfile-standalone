@@ -1,5 +1,8 @@
 FROM php:8.2-fpm-alpine
 
+ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
+    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+
 LABEL org.opencontainers.image.authors="tchap@tchap.me"
 LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis-standalone"
 LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 4 (Standalone version with reverse-proxy)"
@@ -60,6 +63,10 @@ RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev k
     && docker-php-ext-install imap \
     && apk del build-deps-imap \
     && rm -rf /tmp/*
+
+# OPCache
+RUN docker-php-ext-install opcache
+COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 # Davis source
 # The app folder needs to be owned by www-data so PHP-fpm can execute files
