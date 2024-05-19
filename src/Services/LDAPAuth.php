@@ -86,15 +86,20 @@ final class LDAPAuth extends AbstractBasic
      */
     protected function ldapOpen($username, $password)
     {
-        $success = false;
-
         try {
             $ldap = ldap_connect($this->LDAPAuthUrl);
-        } catch (\ErrorException $e) {
-            error_log('LDAP Error (ldap_connect): '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
+        } catch (\Exception $e) {
+            error_log('LDAP Error (ldap_connect with '.$this->LDAPAuthUrl.'): '.$e->getMessage());
+            return false;
         }
 
-        if (!$ldap || !ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3)) {
+        if ($ldap === false) {
+            error_log('LDAP Error (ldap_connect with '.$this->LDAPAuthUrl.'): provided LDAP URI does not seems plausible');
+            return false;
+        }
+
+        if (!ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3)) {
+            error_log('LDAP Error (ldap_set_option): could not set LDAP_OPT_PROTOCOL_VERSION to 3');
             return false;
         }
 
@@ -118,13 +123,14 @@ final class LDAPAuth extends AbstractBasic
             $dn = str_replace('%'.$i, $domain_split[$i - 1], $dn);
         }
 
+        $success = false;
         try {
             $bind = ldap_bind($ldap, $dn, $password);
             if ($bind) {
                 $success = true;
             }
-        } catch (\ErrorException $e) {
-            error_log('LDAP Error (ldap_bind): '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
+        } catch (\Exception $e) {
+            error_log('LDAP Error (ldap_bind to '.$this->LDAPAuthUrl.'): '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
         }
 
         if ($success && $this->autoCreate) {
