@@ -3,20 +3,6 @@ name: "davis-docker"
 
 services:
 
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: nginx
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    depends_on:
-      - davis
-    volumes:
-      - davis_www:/var/www/davis
-      - type: bind
-        source: ./configurations/nginx.conf
-        target: /etc/nginx/conf.d/default.conf
-    ports:
-      - 9000:80
-
   mysql:
     image: mariadb:10.6.10
     container_name: mysql
@@ -31,13 +17,11 @@ services:
   davis:
     build:
       context: ../
-      dockerfile: ./docker/Dockerfile
-      args:
-        fpm_user: 101:101
+      dockerfile: ./docker/Dockerfile-standalone
     image: davis:latest
     # If you want to use a prebuilt image from Github
-    # image: ghcr.io/tchapi/davis:edge
-    container_name: davis
+    # image: ghcr.io/tchapi/davis-standalone:edge
+    container_name: davis-standalone
     environment:
       - APP_ENV=prod
       - DATABASE_DRIVER=mysql
@@ -56,11 +40,9 @@ services:
       - APP_TIMEZONE=${TIMEZONE}
     depends_on:
       - mysql
-    volumes:
-      - davis_www:/var/www/davis
+    ports:
+      - 9000:9000
 
 volumes:
-  davis_www:
-    name: davis_www
   database:
     name: database

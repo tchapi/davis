@@ -9,7 +9,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
+  ACCOUNT: tchapi
 
 jobs:
   build:
@@ -18,9 +18,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        image:
+          - davis
+          - davis-standalone
         platform:
           - linux/amd64
           - linux/arm64
+        include:
+          - image: davis
+            dockerfile: docker/Dockerfile
+          - image: davis-standalone
+            dockerfile: docker/Dockerfile-standalone
     steps:
       -
         name: Prepare
@@ -36,7 +44,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           context: git
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}
           # "Push by digest" needs an untagged ref
           tags: |
             type=raw,value=
@@ -63,23 +71,23 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/Dockerfile
+          file: ${{ matrix.dockerfile }}
           platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }},push-by-digest=true,name-canonical=true,push=true
       -
         name: Export digest
         run: |
-          mkdir -p /tmp/digests
+          mkdir -p /tmp/digests/
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"          
       -
         name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ env.PLATFORM_PAIR }}
+          name: digests-${{ matrix.image }}_${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -87,6 +95,12 @@ jobs:
   merge:
     name: Create merged manifest and push to Github Packages
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: 
+          - davis
+          - davis-standalone
     needs:
       - build
     steps:
@@ -98,8 +112,8 @@ jobs:
         name: Download digests
         uses: actions/download-artifact@v4
         with:
-          path: /tmp/digests
-          pattern: digests-*
+          path: /tmp/digests/${{ matrix.image }}/
+          pattern: digests-${{ matrix.image }}_*
           merge-multiple: true
       -
         name: Set up Docker Buildx
@@ -115,7 +129,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           context: git
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}
           tags: |
             type=semver,pattern={{version}}
             type=edge,branch=${{ github.ref_name }}
@@ -128,7 +142,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Create manifest list and push
-        working-directory: /tmp/digests
+        working-directory: /tmp/digests/${{ matrix.image }}/
         run: |
           docker buildx imagetools create \
             $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
@@ -140,8 +154,8 @@ jobs:
             --annotation index:org.opencontainers.image.source="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.source'] }}" \
             --annotation index:org.opencontainers.image.url="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.url'] }}" \
             --annotation index:org.opencontainers.image.revision="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}" \
-            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)          
+            $(printf '${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}@sha256:%s ' *)          
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}          
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}:${{ steps.meta.outputs.version }}          

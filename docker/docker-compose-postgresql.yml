@@ -12,7 +12,7 @@ services:
     volumes:
       - davis_www:/var/www/davis
       - type: bind
-        source: ./configurations/davis.conf
+        source: ./configurations/nginx.conf
         target: /etc/nginx/conf.d/default.conf
     ports:
       - 9000:80
