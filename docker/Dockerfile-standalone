@@ -87,9 +87,10 @@ COPY --from=extension-builder /usr/local/lib/php/extensions /usr/local/lib/php/e
 ADD --chown=www-data:www-data . /var/www/davis
 WORKDIR /var/www/davis
 
-# Install Composer 2, then dependencies
+# Install Composer 2, then dependencies, compress the rather big INTL package
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
+RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader \
+    && php ./vendor/symfony/intl/Resources/bin/compress
 
 # Caddy: web server
 RUN mkdir -p /var/log/caddy
