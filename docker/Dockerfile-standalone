@@ -1,11 +1,8 @@
-FROM php:8.2-fpm-alpine
+# Initial PHP image is available here:
+# https://github.com/docker-library/php/blob/master/8.2/alpine3.18/fpm/Dockerfile#L33
 
-ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
-    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
-
-LABEL org.opencontainers.image.authors="tchap@tchap.me"
-LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis-standalone"
-LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 4 (Standalone version with reverse-proxy)"
+# Base image, used to build extensions and the final image ———————————————————————
+FROM php:8.3-fpm-alpine as base-image
 
 # Run update, and gets basic packages and packages for runtime
 RUN apk --no-progress --update add --no-cache \
@@ -24,6 +21,9 @@ RUN apk --no-progress --update add --no-cache \
         libpq \
         # For the webserver and process manager
         caddy supervisor
+
+# Build all extensions in a separate image ———————————————————————————————————————
+FROM base-image AS extension-builder
 
 # Intl support
 RUN apk --update --virtual build-deps-intl add --no-cache icu-dev \
@@ -67,6 +67,20 @@ RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev k
 # OPCache
 RUN docker-php-ext-install opcache
 COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# Final image ————————————————————————————————————————————————————————————————————
+FROM base-image
+
+ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
+    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+
+LABEL org.opencontainers.image.authors="tchap@tchap.me"
+LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis-standalone"
+LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 5 (Standalone version with reverse-proxy)"
+
+# Rapatriate built extensions
+COPY --from=extension-builder /usr/local/etc/php/conf.d     /usr/local/etc/php/conf.d/
+COPY --from=extension-builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions/
 
 # Davis source
 # The app folder needs to be owned by www-data so PHP-fpm can execute files

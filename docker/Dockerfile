@@ -1,15 +1,9 @@
-FROM php:8.2-fpm-alpine
-
+# Initial PHP image is available here:
 # https://github.com/docker-library/php/blob/master/8.2/alpine3.18/fpm/Dockerfile#L33
 ARG fpm_user=82:82
-ENV FPM_USER=${fpm_user}
 
-ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
-    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
-
-LABEL org.opencontainers.image.authors="tchap@tchap.me"
-LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis"
-LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 4"
+# Base image, used to build extensions and the final image ———————————————————————
+FROM php:8.3-fpm-alpine as base-image
 
 # Run update, and gets basic packages and packages for runtime
 RUN apk --no-progress --update add --no-cache \
@@ -26,6 +20,9 @@ RUN apk --no-progress --update add --no-cache \
         libpng \
         # This is for PostgreSQL
         libpq
+
+# Build all extensions in a separate image ———————————————————————————————————————
+FROM base-image AS extension-builder
 
 # Intl support
 RUN apk --update --virtual build-deps-intl add --no-cache icu-dev \
@@ -70,6 +67,22 @@ RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev k
 RUN docker-php-ext-install opcache
 COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
+# Final image ————————————————————————————————————————————————————————————————————
+FROM base-image
+
+ENV FPM_USER=${fpm_user}
+
+ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
+    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+
+LABEL org.opencontainers.image.authors="tchap@tchap.me"
+LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis"
+LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 5"
+
+# Rapatriate built extensions
+COPY --from=extension-builder /usr/local/etc/php/conf.d     /usr/local/etc/php/conf.d/
+COPY --from=extension-builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions/
+
 # PHP-FPM healthcheck
 RUN set -xe && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0/php-fpm-healthcheck \
@@ -85,7 +98,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
 
 # Cleanup (only useful when using --squash)
-RUN docker-php-source delete && rm -rf /var/www/davis/docker
+RUN rm -rf /var/www/davis/docker
 
 USER $FPM_USER
 
