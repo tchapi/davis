@@ -14,18 +14,6 @@
     "dantsu/php-osm-static-api": {
         "version": "0.3.0"
     },
-    "doctrine/annotations": {
-        "version": "1.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "1.0",
-            "ref": "a2759dd6123694c8d901d0ec80006e044c2e6457"
-        },
-        "files": [
-            "config/routes/annotations.yaml"
-        ]
-    },
     "doctrine/cache": {
         "version": "1.10.2"
     },
@@ -54,6 +42,18 @@
             "config/packages/prod/doctrine.yaml",
             "src/Entity/.gitignore",
             "src/Repository/.gitignore"
+        ]
+    },
+    "doctrine/doctrine-fixtures-bundle": {
+        "version": "3.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "3.0",
+            "ref": "1f5514cfa15b947298df4d771e694e578d4c204d"
+        },
+        "files": [
+            "src/DataFixtures/AppFixtures.php"
         ]
     },
     "doctrine/doctrine-migrations-bundle": {
@@ -107,12 +107,6 @@
         "files": [
             ".php_cs.dist"
         ]
-    },
-    "friendsofphp/proxy-manager-lts": {
-        "version": "v1.0.3"
-    },
-    "laminas/laminas-code": {
-        "version": "3.4.1"
     },
     "monolog/monolog": {
         "version": "2.1.1"
@@ -238,9 +232,6 @@
     },
     "sebastian/recursion-context": {
         "version": "4.0.4"
-    },
-    "sebastian/resource-operations": {
-        "version": "3.0.3"
     },
     "sebastian/type": {
         "version": "2.3.4"
@@ -465,9 +456,6 @@
     "symfony/polyfill-php72": {
         "version": "v1.18.1"
     },
-    "symfony/polyfill-php73": {
-        "version": "v1.18.1"
-    },
     "symfony/polyfill-php80": {
         "version": "v1.18.1"
     },
@@ -482,9 +470,6 @@
     },
     "symfony/property-info": {
         "version": "v5.1.5"
-    },
-    "symfony/proxy-manager-bridge": {
-        "version": "v5.1.11"
     },
     "symfony/routing": {
         "version": "5.1",
@@ -516,9 +501,6 @@
         "version": "v5.1.5"
     },
     "symfony/security-csrf": {
-        "version": "v5.1.5"
-    },
-    "symfony/security-guard": {
         "version": "v5.1.5"
     },
     "symfony/security-http": {

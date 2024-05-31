@@ -93,9 +93,10 @@ RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0
 ADD --chown=${FPM_USER} . /var/www/davis
 WORKDIR /var/www/davis
 
-# Install Composer 2, then dependencies
+# Install Composer 2, then dependencies, compress the rather big INTL package
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
+RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader \
+    && php ./vendor/symfony/intl/Resources/bin/compress
 
 # Cleanup (only useful when using --squash)
 RUN rm -rf /var/www/davis/docker

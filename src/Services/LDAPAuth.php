@@ -43,7 +43,7 @@ final class LDAPAuth extends AbstractBasic
     /**
      * Doctrine registry.
      *
-     * @var \Doctrine\Persistence\ManagerRegistry
+     * @var ManagerRegistry
      */
     private $doctrine;
 
