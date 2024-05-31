@@ -26,7 +26,7 @@ jobs:
               --tmpfs /var/tmp:exec
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Install GD PHP extension
               run: |
                 apk add $PHPIZE_DEPS libpng-dev
@@ -73,7 +73,7 @@ jobs:
             fail-fast: false
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Install MySQL / GD PHP extensions
               run: |
                 apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev
