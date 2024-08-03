@@ -392,10 +392,14 @@ For each release, a Docker image is built and published in the [Github package r
 
 ### Release images
 
-Each release builds and tags an image. Example:
+Each release builds and tags two images: one for the standard build (no reverse-proxy) and one for the standalone build (including Caddy as a reverse-proxy). Example:
 
 ```
-docker pull ghcr.io/tchapi/davis:v3.1.0
+docker pull ghcr.io/tchapi/davis:v4.4.0
+```
+
+```
+docker pull ghcr.io/tchapi/davis-standalone:v4.4.0
 ```
 
 ### Edge image
@@ -412,7 +416,7 @@ docker pull ghcr.io/tchapi/davis:edge
 
 ## Full stack
 
-A `docker-compose.yml` file is also included (in the `docker` folder) as a minimal example setup with a MariaDB database and Nginx as a reverse proxy.
+A few `docker-compose.yml` files are also included (in the `docker` folder) as minimal example setups, with various databases for instance.
 
 You can start the containers with :
 
@@ -420,15 +424,7 @@ You can start the containers with :
 
 > [!NOTE]
 >
-> The recipe above uses MariaDB but you can also use PostgreSQL with:
-> ```
-> cd docker && docker-compose -f docker-compose-postgresql.yml up -d
-> ```
->
-> Or SQLite with:
-> ```
-> cd docker && docker-compose -f docker-compose-sqlite.yml up -d
-> ```
+> The default recipe above uses MariaDB.
 
 > [!IMPORTANT]
 > 
