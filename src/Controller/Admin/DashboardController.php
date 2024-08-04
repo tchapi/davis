@@ -9,14 +9,13 @@ use App\Entity\Card;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {
-    /**
-     * @Route("/dashboard", name="dashboard")
-     */
-    public function dashboard(ManagerRegistry $doctrine)
+    #[Route('/dashboard', name: 'dashboard')]
+    public function dashboard(ManagerRegistry $doctrine): Response
     {
         $users = $doctrine->getRepository(User::class)->findAll();
         $calendars = $doctrine->getRepository(CalendarInstance::class)->findAll();

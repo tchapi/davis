@@ -9,13 +9,13 @@ use App\Plugins\PublicAwareDAVACLPlugin;
 use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
-use Doctrine\DBAL\Connection as DoctrineConnection;
 use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -103,21 +103,21 @@ class DAVController extends AbstractController
     /**
      * Basic Auth Backend class.
      *
-     * @var \App\Services\BasicAuth
+     * @var BasicAuth
      */
     protected $basicAuthBackend;
 
     /**
      * IMAP Auth Backend class.
      *
-     * @var \App\Services\IMAPAuth
+     * @var IMAPAuth
      */
     protected $IMAPAuthBackend;
 
     /**
      * LDAP Auth Backend class.
      *
-     * @var \App\Services\LDAPAuth
+     * @var LDAPAuth
      */
     protected $LDAPAuthBackend;
 
@@ -135,7 +135,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, string $inviteAddress = null, string $authMethod = null, string $authRealm = null, string $webdavPublicDir = null, string $webdavHomesDir = null, string $webdavTmpDir = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null)
     {
         $this->publicDir = $publicDir;
 
@@ -161,10 +161,8 @@ class DAVController extends AbstractController
         $this->initExceptionListener();
     }
 
-    /**
-     * @Route("/", name="home")
-     */
-    public function home()
+    #[Route('/', name: 'home')]
+    public function home(): Response
     {
         return $this->render('index.html.twig', [
             'version' => \App\Version::VERSION,
@@ -174,17 +172,7 @@ class DAVController extends AbstractController
     private function initServer(string $authMethod, string $authRealm = User::DEFAULT_AUTH_REALM)
     {
         // Get the PDO Connection of type PDO
-        // TODO: Once we drop support for PHP < 8.0 and force dbal > 3.3,
-        // We can use getNativeConnection() instead of the deprecated
-        // getWrappedConnection() here, and remove the `if`.
-        if (method_exists(DoctrineConnection::class, 'getNativeConnection')) {
-            $pdo = $this->em->getConnection()->getNativeConnection();
-        } else {
-            $pdo = $this->em->getConnection()->getWrappedConnection();
-        }
-        if (!($pdo instanceof \PDO)) {
-            $pdo = $pdo->getNativeConnection();
-        }
+        $pdo = $this->em->getConnection()->getNativeConnection();
 
         /*
          * The backends.
@@ -302,11 +290,12 @@ class DAVController extends AbstractController
         });
     }
 
-    /**
-     * @Route("/dav/{path}", name="dav", requirements={"path":".*"})
-     */
-    public function dav(Request $request, string $path)
+    #[Route('/dav/{path}', name: 'dav', requirements: ['path' => '.*'])]
+    public function dav(Request $request, Profiler $profiler, string $path)
     {
+        // We don't want the toolbar on the /dav/* routes
+        $profiler->disable();
+
         // We need to acknowledge the OPTIONS call before sabre/dav for public
         // calendars since we're circumventing the lib
         if ('OPTIONS' === $request->getMethod()) {

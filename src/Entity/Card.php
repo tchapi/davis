@@ -4,53 +4,35 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="cards")
- *
- * @ORM\Entity()
- */
+#[ORM\Entity()]
+#[ORM\Table(name: 'cards')]
 class Card
 {
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\AddressBook", inversedBy="cards")
-     *
-     * @ORM\JoinColumn(name="addressbookid", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: "App\Entity\AddressBook", inversedBy: 'cards')]
+    #[ORM\JoinColumn(name: 'addressbookid', nullable: false)]
     private $addressBook;
 
     /**
-     * @ORM\Column(name="carddata", type="text", nullable=true, length=16777215)
-     * The length corresponds to MEDIUMTEXT in MySQL
+     * The length corresponds to MEDIUMTEXT in MySQL.
      */
+    #[ORM\Column(name: 'carddata', type: 'text', length: 16777215, nullable: true)]
     private $cardData;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $uri;
 
-    /**
-     * @ORM\Column(name="lastmodified", type="integer", nullable=true)
-     */
+    #[ORM\Column(name: 'lastmodified', type: 'integer', nullable: true)]
     private $lastModified;
 
-    /**
-     * @ORM\Column(type="string", length=32, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 32, nullable: true)]
     private $etag;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $size;
 
     public function getId(): ?int

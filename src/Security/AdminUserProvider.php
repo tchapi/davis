@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use App\Entity\AdminUser;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -28,7 +27,7 @@ class AdminUserProvider implements UserProviderInterface
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        throw new \Exception('Not implemented, because not needed');
+        return new AdminUser($identifier, bin2hex(random_bytes(64)));
     }
 
     /**
@@ -41,10 +40,8 @@ class AdminUserProvider implements UserProviderInterface
      *
      * If your firewall is "stateless: true" (for a pure API), this
      * method is not called.
-     *
-     * @return UserInterface
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof AdminUser) {
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));

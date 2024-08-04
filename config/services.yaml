@@ -63,3 +63,11 @@ services:
     App\Logging\Monolog\PasswordFilterProcessor:
         tags:
             - { name: monolog.processor }
+
+when@dev:
+    services:
+        Symfony\Component\HttpKernel\Profiler\Profiler: '@profiler'
+
+when@test:
+    services:
+        Symfony\Component\HttpKernel\Profiler\Profiler: '@profiler'

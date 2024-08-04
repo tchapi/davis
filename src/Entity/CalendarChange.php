@@ -4,42 +4,26 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="calendarchanges")
- *
- * @ORM\Entity()
- */
+#[ORM\Entity()]
+#[ORM\Table(name: 'calendarchanges')]
 class CalendarChange
 {
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $uri;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $synctoken;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", inversedBy="changes")
-     *
-     * @ORM\JoinColumn(name="calendarid", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", inversedBy: 'changes')]
+    #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 
-    /**
-     * @ORM\Column(type="smallint")
-     */
+    #[ORM\Column(type: 'smallint')]
     private $operation;
 
     public function getId(): ?int

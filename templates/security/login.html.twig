@@ -10,7 +10,7 @@
 {% else %}
     <div class="row justify-content-md-center">
         <div class="col-md-6 col-lg-4">
-            <form method="post">
+            <form action="{{ path('app_login') }}" method="post">
                 {% if error %}
                     <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
@@ -19,11 +19,11 @@
 
                 <div class="mb-3">
                     <label for="inputUsername" class="form-label sr-only">{{ "login.username"|trans }}</label>
-                    <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" placeholder="{{ "login.username"|trans }}" required autofocus>
+                    <input type="text" value="{{ last_username }}" name="_username" id="inputUsername" class="form-control" placeholder="{{ "login.username"|trans }}" required autofocus>
                 </div>
                 <div class="mb-3">
                     <label for="inputPassword" class="form-label sr-only">{{ "login.password"|trans }}</label>
-                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="{{ "login.password"|trans }}" required>
+                    <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="{{ "login.password"|trans }}" required>
                 </div>
                 <button type="submit" class="btn btn-primary">{{ "login.submit"|trans }}</button>
 
