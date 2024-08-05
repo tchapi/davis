@@ -291,10 +291,12 @@ class DAVController extends AbstractController
     }
 
     #[Route('/dav/{path}', name: 'dav', requirements: ['path' => '.*'])]
-    public function dav(Request $request, Profiler $profiler, string $path)
+    public function dav(Request $request, ?Profiler $profiler = null, ?string $path)
     {
         // We don't want the toolbar on the /dav/* routes
-        $profiler->disable();
+        if ($profiler instanceof Profiler) {
+            $profiler->disable();
+        }
 
         // We need to acknowledge the OPTIONS call before sabre/dav for public
         // calendars since we're circumventing the lib
