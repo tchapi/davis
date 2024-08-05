@@ -1,6 +1,6 @@
 <?php
 
-if (getenv('ENV_DIR') !== false && getenv('ENV_DIR') !== '' ) {
+if (false !== getenv('ENV_DIR') && '' !== getenv('ENV_DIR')) {
     $_SERVER['APP_RUNTIME_OPTIONS']['dotenv_path'] = getenv('ENV_DIR').'/.env';
 }
 
@@ -11,10 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
-
-$env_dir = getenv('ENV_DIR') != false ? getenv('ENV_DIR') : dirname(__DIR__);
+$env_dir = false != getenv('ENV_DIR') ? getenv('ENV_DIR') : dirname(__DIR__);
 (new Dotenv())->bootEnv($env_dir.'/.env');
-
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);

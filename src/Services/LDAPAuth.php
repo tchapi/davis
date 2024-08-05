@@ -90,16 +90,19 @@ final class LDAPAuth extends AbstractBasic
             $ldap = ldap_connect($this->LDAPAuthUrl);
         } catch (\Exception $e) {
             error_log('LDAP Error (ldap_connect with '.$this->LDAPAuthUrl.'): '.$e->getMessage());
+
             return false;
         }
 
-        if ($ldap === false) {
+        if (false === $ldap) {
             error_log('LDAP Error (ldap_connect with '.$this->LDAPAuthUrl.'): provided LDAP URI does not seems plausible');
+
             return false;
         }
 
         if (!ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3)) {
             error_log('LDAP Error (ldap_set_option): could not set LDAP_OPT_PROTOCOL_VERSION to 3');
+
             return false;
         }
 

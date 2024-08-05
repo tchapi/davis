@@ -72,7 +72,7 @@ class DAVController extends AbstractController
     /**
      * WebDAV User Homes directory.
      *
-     * @var string | null
+     * @var string|null
      */
     protected $webdavHomesDir;
 
