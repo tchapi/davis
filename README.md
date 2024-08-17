@@ -490,6 +490,13 @@ We use [PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) with:
 
     PHP_CS_FIXER_IGNORE_ENV=True ./vendor/bin/php-cs-fixer fix
 
+## ❓ How-to's
+
+Below are some issues that can bring more info / insight into custom setups that Davis users have experienced in the past. Hopefully it can help:
+
+  - **Davis on Proxmox / TrueNAS Scale**: https://github.com/tchapi/davis/issues/164
+
+
 ## 🐛 Troubleshooting
 
 Depending on how you run Davis, logs are either:
