@@ -40,13 +40,19 @@ final class Utils
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * Hash a password according to the realm.
-     * Important note: It is very insecure and this is used only for the legacy sabre/dav implementation.
-     */
-    public function hashPassword(string $username, string $password): string
+    public function getRandomBytes($nbBytes = 32)
     {
-        return md5($username.':'.$this->authRealm.':'.$password);
+        $bytes = openssl_random_pseudo_bytes($nbBytes, $strong);
+        if (false !== $bytes && true === $strong) {
+            return $bytes;
+        }
+        else {
+            throw new \Exception("Unable to generate secure token from OpenSSL.");
+        }
+    }
+
+    public function generatePassword($length){
+        return substr(preg_replace("/[^a-zA-Z0-9]/", "", base64_encode($this->getRandomBytes($length+1))),0,$length);
     }
 
     public function createPasswordlessUserWithDefaultObjects(string $username, string $displayName, string $email)
@@ -54,10 +60,8 @@ final class Utils
         $user = new User();
         $user->setUsername($username);
 
-        // Set the password to a random string (but hashed beforehand)
-        $randomBytes = random_bytes(256);
-        $hash = password_hash($randomBytes, PASSWORD_DEFAULT);
-        $user->setPassword($hash);
+        // Set the password to a secure randomly generated password
+        $user->setPassword($this->generatePassword(12));
 
         // Create principal, default calendar and addressbook
         $principal = new Principal();

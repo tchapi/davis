@@ -75,6 +75,15 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         $senderEmail = substr($itip->sender, 7);
         $recipientEmail = substr($itip->recipient, 7);
 
+        if ($itip->senderName) {
+            $senderName = $itip->senderName.' <'.$senderEmail.'>';
+        } else {
+            $senderName = $senderEmail;
+        }
+        if ($itip->recipientName && $itip->recipientName != $recipientEmail) {
+            $recipientName = $itip->recipientName.' <'.$recipientEmail.'>';
+        }
+
         $subject = 'CalDAV message';
         switch (strtoupper($itip->method)) {
             case 'REPLY':
