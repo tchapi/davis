@@ -68,12 +68,13 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 
         $deliveredLocally = '1.2' === $itip->getScheduleStatus();
 
-        $senderName = $itip->senderName;
-        $recipientName = $itip->recipientName;
-
         // 7 is the length of `mailto:`.
         $senderEmail = substr($itip->sender, 7);
         $recipientEmail = substr($itip->recipient, 7);
+
+        // We fallback the senderName to the email if the iTIP originator does not send a name along.
+        $senderName = $itip->senderName ?? $senderEmail;
+        $recipientName = $itip->recipientName;
 
         $subject = 'CalDAV message';
         switch (strtoupper($itip->method)) {
@@ -197,10 +198,23 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             }
         }
 
+        // For the mail headers, we don't automatically default to the email
+        if ($itip->senderName) {
+            // If we have a proper name, we use it with the optional message origin indicator
+            $mailSenderName = $itip->senderName;
+            if (static::MESSAGE_ORIGIN_INDICATOR) {
+                $mailSenderName = $mailSenderName.' '.static::MESSAGE_ORIGIN_INDICATOR;
+            }
+        } elseif (static::MESSAGE_ORIGIN_INDICATOR) {
+            // Otherwise, we don't use the email except if we explicitly have a message origin
+            // indicator (it would be redundant if there wasn't)
+            $mailSenderName = $senderEmail.' '.static::MESSAGE_ORIGIN_INDICATOR;
+        }
+
         $message = (new TemplatedEmail())
-            ->from(new Address($this->senderEmail, $senderName.' '.static::MESSAGE_ORIGIN_INDICATOR))
+            ->from(new Address($this->senderEmail, $mailSenderName))
             ->to(new Address($recipientEmail, $recipientName ?? ''))
-            ->replyTo(new Address($senderEmail, $senderName ?? ''))
+            ->replyTo(new Address($senderEmail, $mailSenderName))
             ->subject($subject);
 
         if (DAV\Server::$exposeVersion) {
