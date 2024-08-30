@@ -55,7 +55,7 @@ final class Utils
         $user->setUsername($username);
 
         // Set the password to a random string (but hashed beforehand)
-        $randomBytes = random_bytes(256);
+        $randomBytes = substr(bin2hex(random_bytes(256)), 0, 48);
         $hash = password_hash($randomBytes, PASSWORD_DEFAULT);
         $user->setPassword($hash);
 
