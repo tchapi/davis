@@ -193,6 +193,7 @@ LDAP_AUTH_URL="ldap://127.0.0.1"
 LDAP_DN_PATTERN="mail=%u"
 LDAP_MAIL_ATTRIBUTE="mail"
 LDAP_AUTH_USER_AUTOCREATE=true # false by default
+LDAP_CERTIFICATE_CHECKING_STRATEGY="try" # try by default.
 ```
 
 > Ex: for [Zimbra LDAP](https://zimbra.github.io/adminguide/latest/#zimbra_ldap_service), you might want to use the `zimbraMailDeliveryAddress` attribute to retrieve the principal user email:

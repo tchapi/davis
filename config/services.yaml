@@ -35,6 +35,7 @@ services:
             $LDAPDnPattern: "%env(LDAP_DN_PATTERN)%"
             $LDAPMailAttribute: "%env(LDAP_MAIL_ATTRIBUTE)%"
             $autoCreate: "%env(bool:LDAP_AUTH_USER_AUTOCREATE)%"
+            $LDAPCertificateCheckingStrategy: "%env(LDAP_CERTIFICATE_CHECKING_STRATEGY)%"
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
