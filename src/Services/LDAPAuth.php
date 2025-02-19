@@ -62,15 +62,23 @@ final class LDAPAuth extends AbstractBasic
      */
     private $autoCreate;
 
+
+    /**
+     * Indicates what to do with certificate.
+     * see https://www.php.net/manual/en/ldap.constants.php#constant.ldap-opt-x-tls-require-cert
+     */
+    private $cert_checking_strat;
+
     /**
      * Creates the backend object.
      */
-    public function __construct(ManagerRegistry $doctrine, Utils $utils, string $LDAPAuthUrl, string $LDAPDnPattern, string $LDAPMailAttribute, bool $autoCreate)
+    public function __construct(ManagerRegistry $doctrine, Utils $utils, string $LDAPAuthUrl, string $LDAPDnPattern, string $LDAPMailAttribute, bool $autoCreate, string $LDAPCertificateCheckingStrategy)
     {
         $this->LDAPAuthUrl = $LDAPAuthUrl;
         $this->LDAPDnPattern = $LDAPDnPattern;
         $this->LDAPMailAttribute = $LDAPMailAttribute ?? 'mail';
         $this->autoCreate = $autoCreate;
+        $this->cert_checking_strat = $LDAPCertificateCheckingStrategy ?? "try";
 
         $this->doctrine = $doctrine;
         $this->utils = $utils;
@@ -86,6 +94,32 @@ final class LDAPAuth extends AbstractBasic
      */
     protected function ldapOpen($username, $password)
     {
+        switch ($this->cert_checking_strat) {
+            case 'never':
+                $cert_strategy = LDAP_OPT_X_TLS_NEVER;
+                break;
+            case 'hard':
+                $cert_strategy = LDAP_OPT_X_TLS_HARD;
+                break;
+            case 'demand':
+                $cert_strategy = LDAP_OPT_X_TLS_DEMAND;
+                break;
+            case 'allow':
+                $cert_strategy = LDAP_OPT_X_TLS_ALLOW;
+                break;
+            case 'try':
+                $cert_strategy = LDAP_OPT_X_TLS_TRY;
+                break;
+            default:
+                error_log('Invalid certificate checking strategy: ' . $this->cert_checking_strat);
+                return false;
+        }
+
+        if (false === ldap_set_option(null, LDAP_OPT_X_TLS_REQUIRE_CERT, $cert_strategy)) {
+            error_log('LDAP Error (ldap_set_option with '.$cert_strategy.'): failed');
+
+            return false;
+        }
         try {
             $ldap = ldap_connect($this->LDAPAuthUrl);
         } catch (\Exception $e) {
