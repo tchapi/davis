@@ -67,18 +67,18 @@ final class LDAPAuth extends AbstractBasic
      * Indicates what to do with certificate.
      * see https://www.php.net/manual/en/ldap.constants.php#constant.ldap-opt-x-tls-require-cert
      */
-    private $cert_checking_strat;
+    private $LDAPCertificateCheckingStrategy;
 
     /**
      * Creates the backend object.
      */
-    public function __construct(ManagerRegistry $doctrine, Utils $utils, string $LDAPAuthUrl, string $LDAPDnPattern, string $LDAPMailAttribute, bool $autoCreate, string $LDAPCertificateCheckingStrategy)
+    public function __construct(ManagerRegistry $doctrine, Utils $utils, string $LDAPAuthUrl, string $LDAPDnPattern, ?string $LDAPMailAttribute, bool $autoCreate, ?string $LDAPCertificateCheckingStrategy)
     {
         $this->LDAPAuthUrl = $LDAPAuthUrl;
         $this->LDAPDnPattern = $LDAPDnPattern;
         $this->LDAPMailAttribute = $LDAPMailAttribute ?? 'mail';
         $this->autoCreate = $autoCreate;
-        $this->cert_checking_strat = $LDAPCertificateCheckingStrategy ?? "try";
+        $this->LDAPCertificateCheckingStrategy = $LDAPCertificateCheckingStrategy ?? "try";
 
         $this->doctrine = $doctrine;
         $this->utils = $utils;
@@ -94,7 +94,7 @@ final class LDAPAuth extends AbstractBasic
      */
     protected function ldapOpen($username, $password)
     {
-        switch ($this->cert_checking_strat) {
+        switch ($this->LDAPCertificateCheckingStrategy) {
             case 'never':
                 $cert_strategy = LDAP_OPT_X_TLS_NEVER;
                 break;
@@ -111,7 +111,7 @@ final class LDAPAuth extends AbstractBasic
                 $cert_strategy = LDAP_OPT_X_TLS_TRY;
                 break;
             default:
-                error_log('Invalid certificate checking strategy: ' . $this->cert_checking_strat);
+                error_log('Invalid certificate checking strategy: ' . $this->LDAPCertificateCheckingStrategy);
                 return false;
         }
 
@@ -120,6 +120,7 @@ final class LDAPAuth extends AbstractBasic
 
             return false;
         }
+
         try {
             $ldap = ldap_connect($this->LDAPAuthUrl);
         } catch (\Exception $e) {
