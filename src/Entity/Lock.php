@@ -19,7 +19,7 @@ class Lock
     #[ORM\Column(type: 'integer', nullable: true)]
     private $timeout;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(type: 'bigint', nullable: true)]
     private $created;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]

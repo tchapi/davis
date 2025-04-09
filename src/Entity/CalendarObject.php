@@ -26,7 +26,7 @@ class CalendarObject
     #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 
-    #[ORM\Column(name: 'lastmodified', type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'lastmodified', type: 'bigint', nullable: true)]
     private $lastModified;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -38,10 +38,10 @@ class CalendarObject
     #[ORM\Column(name: 'componenttype', type: 'string', length: 255, nullable: true)]
     private $componentType;
 
-    #[ORM\Column(name: 'firstoccurence', type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'firstoccurence', type: 'bigint', nullable: true)]
     private $firstOccurence;
 
-    #[ORM\Column(name: 'lastoccurence', type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'lastoccurence', type: 'bigint', nullable: true)]
     private $lastOccurence;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
