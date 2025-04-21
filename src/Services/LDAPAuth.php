@@ -62,10 +62,9 @@ final class LDAPAuth extends AbstractBasic
      */
     private $autoCreate;
 
-
     /**
      * Indicates what to do with certificate.
-     * see https://www.php.net/manual/en/ldap.constants.php#constant.ldap-opt-x-tls-require-cert
+     * see https://www.php.net/manual/en/ldap.constants.php#constant.ldap-opt-x-tls-require-cert.
      */
     private $LDAPCertificateCheckingStrategy;
 
@@ -78,7 +77,7 @@ final class LDAPAuth extends AbstractBasic
         $this->LDAPDnPattern = $LDAPDnPattern;
         $this->LDAPMailAttribute = $LDAPMailAttribute ?? 'mail';
         $this->autoCreate = $autoCreate;
-        $this->LDAPCertificateCheckingStrategy = $LDAPCertificateCheckingStrategy ?? "try";
+        $this->LDAPCertificateCheckingStrategy = $LDAPCertificateCheckingStrategy ?? 'try';
 
         $this->doctrine = $doctrine;
         $this->utils = $utils;
@@ -111,7 +110,8 @@ final class LDAPAuth extends AbstractBasic
                 $cert_strategy = LDAP_OPT_X_TLS_TRY;
                 break;
             default:
-                error_log('Invalid certificate checking strategy: ' . $this->LDAPCertificateCheckingStrategy);
+                error_log('Invalid certificate checking strategy: '.$this->LDAPCertificateCheckingStrategy);
+
                 return false;
         }
 
