@@ -5,581 +5,589 @@
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="RFjpCN2" resname="davis">
+      <trans-unit id="poqANwU" resname="davis">
         <source>davis</source>
         <target>Davis</target>
       </trans-unit>
-      <trans-unit id="_5z3Vga" resname="enabled">
+      <trans-unit id="IRk0vUS" resname="enabled">
         <source>enabled</source>
         <target>enabled</target>
       </trans-unit>
-      <trans-unit id="F_s8AWj" resname="disabled">
+      <trans-unit id="iYiRxKz" resname="disabled">
         <source>disabled</source>
         <target>disabled</target>
       </trans-unit>
-      <trans-unit id="jgKGNDB" resname="label.success">
+      <trans-unit id="04zDTq_" resname="label.success">
         <source>label.success</source>
         <target>Success</target>
       </trans-unit>
-      <trans-unit id="RxX3ZeK" resname="label.warning">
+      <trans-unit id="WcOat7C" resname="label.warning">
         <source>label.warning</source>
         <target>Warning</target>
       </trans-unit>
-      <trans-unit id="nEf.ThC" resname="label.error">
+      <trans-unit id="v4zFdy0" resname="label.error">
         <source>label.error</source>
         <target>Error</target>
       </trans-unit>
-      <trans-unit id="K0Yls7G" resname="admin.interface">
+      <trans-unit id="gyZcKbE" resname="admin.interface">
         <source>admin.interface</source>
         <target>Administration interface</target>
       </trans-unit>
-      <trans-unit id="MQ.yABS" resname="close">
+      <trans-unit id="CAiOZVb" resname="close">
         <source>close</source>
         <target>Close</target>
       </trans-unit>
-      <trans-unit id="FX3KkuQ" resname="save">
+      <trans-unit id="2E3W_Ux" resname="save">
         <source>save</source>
         <target>Save</target>
       </trans-unit>
-      <trans-unit id="fTiRMPg" resname="toggle.navigation">
+      <trans-unit id="4IcFUoR" resname="toggle.navigation">
         <source>toggle.navigation</source>
         <target>Toggle navigation</target>
       </trans-unit>
-      <trans-unit id="q3rXQbK" resname="toggle.theme">
+      <trans-unit id="IY9tLQj" resname="toggle.theme">
         <source>toggle.theme</source>
         <target>Toggle theme</target>
       </trans-unit>
-      <trans-unit id="a.8gbaH" resname="theme.light">
+      <trans-unit id="8z17OnR" resname="theme.light">
         <source>theme.light</source>
         <target>Light</target>
       </trans-unit>
-      <trans-unit id="PWATBYO" resname="theme.dark">
+      <trans-unit id="5ZYx62e" resname="theme.dark">
         <source>theme.dark</source>
         <target>Dark</target>
       </trans-unit>
-      <trans-unit id="kIumP2R" resname="theme.auto">
+      <trans-unit id="suizpO6" resname="theme.auto">
         <source>theme.auto</source>
         <target>Auto</target>
       </trans-unit>
-      <trans-unit id="PMgigwp" resname="title.dashboard">
+      <trans-unit id="YE7XVBb" resname="title.dashboard">
         <source>title.dashboard</source>
         <target>Dashboard</target>
       </trans-unit>
-      <trans-unit id="1btv_DO" resname="title.users_and_resources">
+      <trans-unit id="G3gS3bJ" resname="title.users_and_resources">
         <source>title.users_and_resources</source>
         <target>Users and Resources</target>
       </trans-unit>
-      <trans-unit id="F6FEXlX" resname="users.back">
+      <trans-unit id="Ga1B1H3" resname="users.back">
         <source>users.back</source>
         <target>Back to Users</target>
       </trans-unit>
-      <trans-unit id="K_UNihD" resname="addressbooks.new">
+      <trans-unit id="2Mx633A" resname="addressbooks.new">
         <source>addressbooks.new</source>
         <target>New Address Book</target>
       </trans-unit>
-      <trans-unit id="M_4.DKU" resname="calendars.new">
+      <trans-unit id="ddUyfGF" resname="calendars.new">
         <source>calendars.new</source>
         <target>New Calendar</target>
       </trans-unit>
-      <trans-unit id="eH1zFg7" resname="calendars.uri">
+      <trans-unit id="aCxiLZi" resname="calendars.uri">
         <source>calendars.uri</source>
         <target>URI</target>
       </trans-unit>
-      <trans-unit id="IVokRw3" resname="users.new">
+      <trans-unit id="JPI5wA3" resname="users.new">
         <source>users.new</source>
         <target>New User</target>
       </trans-unit>
-      <trans-unit id="0RNTrsD" resname="dashboard.env">
+      <trans-unit id="weOCfT2" resname="dashboard.env">
         <source>dashboard.env</source>
         <target>Configured environment</target>
       </trans-unit>
-      <trans-unit id="2SVRWUo" resname="dashboard.capabilities">
+      <trans-unit id="wx8fUKV" resname="dashboard.capabilities">
         <source>dashboard.capabilities</source>
         <target>Capabilities</target>
       </trans-unit>
-      <trans-unit id="0ssMhM8" resname="dashboard.objects">
+      <trans-unit id="zJSQAI8" resname="dashboard.objects">
         <source>dashboard.objects</source>
         <target>Objects</target>
       </trans-unit>
-      <trans-unit id="wK69TgJ" resname="dashboard.version">
+      <trans-unit id="mgKUnX3" resname="dashboard.version">
         <source>dashboard.version</source>
         <target>Version</target>
       </trans-unit>
-      <trans-unit id="zNewm0r" resname="dashboard.auth">
+      <trans-unit id="MpsZ_kY" resname="dashboard.auth">
         <source>dashboard.auth</source>
         <target>Auth</target>
       </trans-unit>
-      <trans-unit id="q.9wpuM" resname="dashboard.auth_realm">
+      <trans-unit id="jNecvkm" resname="dashboard.auth_realm">
         <source>dashboard.auth_realm</source>
         <target>Realm</target>
       </trans-unit>
-      <trans-unit id="w84LMcB" resname="dashboard.invite_from_address">
+      <trans-unit id="Utr1VRG" resname="dashboard.invite_from_address">
         <source>dashboard.invite_from_address</source>
         <target>Invite From Address</target>
       </trans-unit>
-      <trans-unit id="Ppc629a" resname="dashboard.server_timezone">
+      <trans-unit id="6A.HMvX" resname="dashboard.server_timezone">
         <source>dashboard.server_timezone</source>
         <target>App (PHP) Timezone</target>
       </trans-unit>
-      <trans-unit id="8.dmAfF" resname="dashboard.bad_timezone_configuration">
+      <trans-unit id="mD_kv2n" resname="dashboard.bad_timezone_configuration">
         <source>dashboard.bad_timezone_configuration</source>
         <target>Bad timezone configuration env var</target>
       </trans-unit>
-      <trans-unit id="c.1lOsz" resname="dashboard.no_timezone_configuration">
+      <trans-unit id="3jV45P0" resname="dashboard.no_timezone_configuration">
         <source>dashboard.no_timezone_configuration</source>
         <target>Timezone not enforced by app</target>
       </trans-unit>
-      <trans-unit id="rJf3tq1" resname="dashboard.users">
+      <trans-unit id="BDynkV_" resname="dashboard.users">
         <source>dashboard.users</source>
         <target>Users</target>
       </trans-unit>
-      <trans-unit id="rSWt7Pl" resname="dashboard.calendars">
+      <trans-unit id="oAGwPD5" resname="dashboard.calendars">
         <source>dashboard.calendars</source>
         <target>Calendars</target>
       </trans-unit>
-      <trans-unit id="QUanlG4" resname="dashboard.calendars.help">
+      <trans-unit id="79cIq7y" resname="dashboard.calendars.help">
         <source>dashboard.calendars.help</source>
         <target>(incl. Reminders lists)</target>
       </trans-unit>
-      <trans-unit id="tiyHD2m" resname="dashboard.events">
+      <trans-unit id="5SShPEM" resname="dashboard.events">
         <source>dashboard.events</source>
         <target>Events</target>
       </trans-unit>
-      <trans-unit id="PASzhyd" resname="dashboard.address_books">
+      <trans-unit id="kl9QvVx" resname="dashboard.address_books">
         <source>dashboard.address_books</source>
         <target>Address Books</target>
       </trans-unit>
-      <trans-unit id="6rQrria" resname="dashboard.contacts">
+      <trans-unit id="OfamhPy" resname="dashboard.contacts">
         <source>dashboard.contacts</source>
         <target>Contacts</target>
       </trans-unit>
-      <trans-unit id="fPG1VTI" resname="addressbooks.edit">
+      <trans-unit id="iQm_wg0" resname="addressbooks.edit">
         <source>addressbooks.edit</source>
         <target>Editing Address Book «{name}»</target>
       </trans-unit>
-      <trans-unit id="JiEhxTc" resname="edit">
+      <trans-unit id="BVAU8Tv" resname="edit">
         <source>edit</source>
         <target>Edit</target>
       </trans-unit>
-      <trans-unit id="fp5aww8" resname="add">
+      <trans-unit id="JmmK.9X" resname="add">
         <source>add</source>
         <target>Add</target>
       </trans-unit>
-      <trans-unit id="YZdZVQP" resname="delete">
+      <trans-unit id="u1x_1qs" resname="delete">
         <source>delete</source>
         <target>Delete</target>
       </trans-unit>
-      <trans-unit id="TUhziVy" resname="calendars.edit">
+      <trans-unit id="lsvVz5G" resname="calendars.edit">
         <source>calendars.edit</source>
         <target>Editing Calendar «{name}»</target>
       </trans-unit>
-      <trans-unit id="EiQLmZz" resname="calendars.entries">
+      <trans-unit id="1kNwhhb" resname="calendars.entries">
         <source>calendars.entries</source>
         <target>{count, plural, =0 {No entry} one {One entry} other {# entries}}</target>
       </trans-unit>
-      <trans-unit id="H7fee0c" resname="calendars.component.events">
+      <trans-unit id="inLkptW" resname="calendars.component.events">
         <source>calendars.component.events</source>
         <target>Events</target>
       </trans-unit>
-      <trans-unit id="iCj9nDa" resname="calendars.component.todos">
+      <trans-unit id="m1s.bXE" resname="calendars.component.todos">
         <source>calendars.component.todos</source>
         <target>Todos</target>
       </trans-unit>
-      <trans-unit id="B2WpruE" resname="calendars.setup.title">
+      <trans-unit id="Mx8PqQR" resname="calendars.setup.title">
         <source>calendars.setup.title</source>
         <target>Setup information</target>
       </trans-unit>
-      <trans-unit id="obdwi48" resname="calendars.component.notes">
+      <trans-unit id="jA5BLYc" resname="calendars.component.notes">
         <source>calendars.component.notes</source>
         <target>Notes</target>
       </trans-unit>
-      <trans-unit id="zjEaC2X" resname="users.edit">
+      <trans-unit id="O2IyoII" resname="users.edit">
         <source>users.edit</source>
         <target>Editing User «{username}»</target>
       </trans-unit>
-      <trans-unit id="8NgrcqA" resname="addressbooks.for">
+      <trans-unit id="NPrwvQ_" resname="addressbooks.for">
         <source>addressbooks.for</source>
         <target>Address books for {who}</target>
       </trans-unit>
-      <trans-unit id="wl0lzxt" resname="addressbooks.uri">
+      <trans-unit id=".ri3V4T" resname="addressbooks.uri">
         <source>addressbooks.uri</source>
         <target>Address book URI</target>
       </trans-unit>
-      <trans-unit id="Clglf_L" resname="addressbooks.contacts">
+      <trans-unit id="miq7_xK" resname="addressbooks.contacts">
         <source>addressbooks.contacts</source>
         <target>{count, plural, =0 {No contact} one {One contact} other {# contacts}}</target>
       </trans-unit>
-      <trans-unit id="pF3C6cO" resname="calendars.for">
+      <trans-unit id="CqvStpa" resname="calendars.for">
         <source>calendars.for</source>
         <target>Calendars for {who}</target>
       </trans-unit>
-      <trans-unit id="7_6nDkX" resname="calendars.shared.with">
+      <trans-unit id="ybqHGGr" resname="calendars.shared.with">
         <source>calendars.shared.with</source>
         <target>Calendars shared with {who}</target>
       </trans-unit>
-      <trans-unit id="bJtU2u_" resname="users.username">
+      <trans-unit id="caEhjpg" resname="users.username">
         <source>users.username</source>
         <target>Username</target>
       </trans-unit>
-      <trans-unit id="NMBKo9a" resname="users.uri">
+      <trans-unit id="kWHR7Qt" resname="users.uri">
         <source>users.uri</source>
         <target>Principal URI</target>
       </trans-unit>
-      <trans-unit id="Xq.ID4c" resname="users.administrator">
+      <trans-unit id="rD9wqzu" resname="users.administrator">
         <source>users.administrator</source>
         <target>Administrator</target>
       </trans-unit>
-      <trans-unit id="rzn9R3M" resname="users.calendars">
+      <trans-unit id="tDUC2FT" resname="users.calendars">
         <source>users.calendars</source>
         <target>Calendars</target>
       </trans-unit>
-      <trans-unit id="lmhuwVZ" resname="users.addressbooks">
+      <trans-unit id="vrTk17r" resname="users.addressbooks">
         <source>users.addressbooks</source>
         <target>Address Books</target>
       </trans-unit>
-      <trans-unit id="kFt0ON2" resname="default.calendar.title">
+      <trans-unit id="KB__Nh8" resname="default.calendar.title">
         <source>default.calendar.title</source>
         <target>Default Calendar</target>
       </trans-unit>
-      <trans-unit id="jNfNiCU" resname="default.calendar.description">
+      <trans-unit id="ORuYu1p" resname="default.calendar.description">
         <source>default.calendar.description</source>
         <target>Default Calendar for {user}</target>
       </trans-unit>
-      <trans-unit id="pPBa2Y1" resname="default.addressbook.title">
+      <trans-unit id="BV0O97e" resname="default.addressbook.title">
         <source>default.addressbook.title</source>
         <target>Default Address Book</target>
       </trans-unit>
-      <trans-unit id="fruFVYl" resname="default.addressbook.description">
+      <trans-unit id="UKZXrbn" resname="default.addressbook.description">
         <source>default.addressbook.description</source>
         <target>Default Address Book for {user}</target>
       </trans-unit>
-      <trans-unit id="sES4d8a" resname="user.saved">
+      <trans-unit id="4jEMVVj" resname="user.saved">
         <source>user.saved</source>
         <target>User saved successfully</target>
       </trans-unit>
-      <trans-unit id="8v0Uq.O" resname="user.deleted">
+      <trans-unit id="j1XlCAb" resname="user.deleted">
         <source>user.deleted</source>
         <target>User deleted successfully</target>
       </trans-unit>
-      <trans-unit id="RcNQmAl" resname="calendar.saved">
+      <trans-unit id="rey4Kec" resname="calendar.saved">
         <source>calendar.saved</source>
         <target>Calendar saved successfully</target>
       </trans-unit>
-      <trans-unit id="wEU.noE" resname="calendar.deleted">
+      <trans-unit id="UkuOpBs" resname="calendar.deleted">
         <source>calendar.deleted</source>
         <target>Calendar deleted successfully</target>
       </trans-unit>
-      <trans-unit id="qCIo2jM" resname="calendar.shared">
+      <trans-unit id="nLmfYXY" resname="calendar.shared">
         <source>calendar.shared</source>
         <target>Calendar shares modified successfully</target>
       </trans-unit>
-      <trans-unit id="fxgFe6c" resname="calendar.revoked">
+      <trans-unit id="a7D0zuw" resname="calendar.revoked">
         <source>calendar.revoked</source>
         <target>Calendar revoked successfully</target>
       </trans-unit>
-      <trans-unit id="grS2E58" resname="calendars.delegates.member.add">
+      <trans-unit id="pL5FhyS" resname="calendars.delegates.member.add">
         <source>calendars.delegates.member.add</source>
         <target>Share this calendar with another user:</target>
       </trans-unit>
-      <trans-unit id="B95edtg" resname="calendars.delegates.member.help">
+      <trans-unit id="gdXa6Lc" resname="calendars.delegates.member.help">
         <source>calendars.delegates.member.help</source>
         <target>Adding a user who already has a shared access to this calendar will only affect its access right</target>
       </trans-unit>
-      <trans-unit id="Pk_1mdm" resname="calendars.delegates.member.none">
+      <trans-unit id="zWt8oG0" resname="calendars.delegates.member.none">
         <source>calendars.delegates.member.none</source>
         <target>There are no other user to share this calendar with</target>
       </trans-unit>
-      <trans-unit id="Iq2tnfk" resname="addressbooks.saved">
+      <trans-unit id="ghe05Yl" resname="addressbooks.saved">
         <source>addressbooks.saved</source>
         <target>Address Book saved successfully</target>
       </trans-unit>
-      <trans-unit id="vfRnbYa" resname="addressbooks.deleted">
+      <trans-unit id="SQckZXJ" resname="addressbooks.deleted">
         <source>addressbooks.deleted</source>
         <target>Address Book deleted successfully</target>
       </trans-unit>
-      <trans-unit id="60dZ6KW" resname="addressbooks.back">
+      <trans-unit id="YcMyNwC" resname="addressbooks.back">
         <source>addressbooks.back</source>
         <target>Back to Address Books for {user}</target>
       </trans-unit>
-      <trans-unit id="N1DviIS" resname="calendars.back">
+      <trans-unit id="VgrgSjx" resname="calendars.back">
         <source>calendars.back</source>
         <target>Back to Calendars for {user}</target>
       </trans-unit>
-      <trans-unit id="6QHea80" resname="form.password.empty">
+      <trans-unit id="xNkdpFb" resname="form.password.empty">
         <source>form.password.empty</source>
         <target>Leave empty if you don't want to change it</target>
       </trans-unit>
-      <trans-unit id="_EJMqRe" resname="form.password.match">
+      <trans-unit id="2wU1UVt" resname="form.password.match">
         <source>form.password.match</source>
         <target>The password fields must match.</target>
       </trans-unit>
-      <trans-unit id="yjqmSBK" resname="form.password">
+      <trans-unit id="r2fjRrB" resname="form.password">
         <source>form.password</source>
         <target>Password</target>
       </trans-unit>
-      <trans-unit id="ILWuW.c" resname="form.password.repeat">
+      <trans-unit id=".EvZY.m" resname="form.password.repeat">
         <source>form.password.repeat</source>
         <target>Repeat Password</target>
       </trans-unit>
-      <trans-unit id="3IGOm9D" resname="form.email">
+      <trans-unit id="vXLetA0" resname="form.email">
         <source>form.email</source>
         <target>Email</target>
       </trans-unit>
-      <trans-unit id="_YeuWGA" resname="form.admin">
+      <trans-unit id="RQWeqAY" resname="form.admin">
         <source>form.admin</source>
         <target>Is this user an administrator ?</target>
       </trans-unit>
-      <trans-unit id="hIz1KP1" resname="form.admin.help">
+      <trans-unit id="sLIuuSU" resname="form.admin.help">
         <source>form.admin.help</source>
         <target>If checked, this user (namely, its principal) will be injected in every single ACL rule with the '{DAV:}all' privileges.</target>
       </trans-unit>
-      <trans-unit id="k660.eC" resname="form.displayName">
+      <trans-unit id="nXCRwB3" resname="form.displayName">
         <source>form.displayName</source>
         <target>Display name</target>
       </trans-unit>
-      <trans-unit id="B0VCgO_" resname="form.username">
+      <trans-unit id="2_y0ttv" resname="form.username">
         <source>form.username</source>
         <target>Username</target>
       </trans-unit>
-      <trans-unit id="7g17wm7" resname="form.username.help">
+      <trans-unit id="iicAzGB" resname="form.username.help">
         <source>form.username.help</source>
         <target>May be an email, but not forcibly.</target>
       </trans-unit>
-      <trans-unit id="2bl0WGs" resname="form.events">
+      <trans-unit id="IHOaweC" resname="form.events">
         <source>form.events</source>
         <target>Events</target>
       </trans-unit>
-      <trans-unit id="h0fN2H5" resname="form.notes">
+      <trans-unit id="4pbkJcC" resname="form.notes">
         <source>form.notes</source>
         <target>Notes</target>
       </trans-unit>
-      <trans-unit id="_aV0396" resname="form.todos">
+      <trans-unit id="dhJC0.u" resname="form.todos">
         <source>form.todos</source>
         <target>Todos</target>
       </trans-unit>
-      <trans-unit id="fPpJrM7" resname="form.uri">
+      <trans-unit id="ku2Vzal" resname="form.uri">
         <source>form.uri</source>
         <target>URI</target>
       </trans-unit>
-      <trans-unit id="h2JZhLm" resname="form.description">
+      <trans-unit id="GBcNXE." resname="form.description">
         <source>form.description</source>
         <target>Description</target>
       </trans-unit>
-      <trans-unit id="cdCL.j8" resname="form.color">
+      <trans-unit id="r_YZYfq" resname="form.color">
         <source>form.color</source>
         <target>Calendar color</target>
       </trans-unit>
-      <trans-unit id="HDHYNe5" resname="form.public">
+      <trans-unit id="IPhqrmQ" resname="form.public">
         <source>form.public</source>
         <target>Public</target>
       </trans-unit>
-      <trans-unit id="CvlrLaA" resname="form.name.help.carddav">
+      <trans-unit id="e02Cnv6" resname="form.name.help.carddav">
         <source>form.name.help.carddav</source>
         <target>This name will be displayed in your CardDAV client</target>
       </trans-unit>
-      <trans-unit id="3Q5ZFQE" resname="form.name.help.caldav">
+      <trans-unit id="rqpkW3X" resname="form.name.help.caldav">
         <source>form.name.help.caldav</source>
         <target>This name will be displayed in your CalDAV client</target>
       </trans-unit>
-      <trans-unit id="6AbgcWQ" resname="form.uri.help.carddav">
+      <trans-unit id="XcmEaP5" resname="form.uri.help.carddav">
         <source>form.uri.help.carddav</source>
         <target>This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
       </trans-unit>
-      <trans-unit id="JIbKo6n" resname="form.uri.help.caldav">
+      <trans-unit id="reeyEAg" resname="form.uri.help.caldav">
         <source>form.uri.help.caldav</source>
         <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
       </trans-unit>
-      <trans-unit id="jMtzjiV" resname="form.public.help.caldav">
+      <trans-unit id="xAoSnrW" resname="form.public.help.caldav">
         <source>form.public.help.caldav</source>
         <target>If the calendar is public, it will be available for anyone with the link</target>
       </trans-unit>
-      <trans-unit id="x5Dmxhi" resname="form.color.help">
+      <trans-unit id="OqHbbck" resname="form.color.help">
         <source>form.color.help</source>
         <target>This is the color that will be displayed in your CalDAV client. It must be supplied in the format '#RRGGBBAA' (alpha channel is optional) with hexadecimal values. This value is optional.</target>
       </trans-unit>
-      <trans-unit id="nYaXSuu" resname="form.events.help">
+      <trans-unit id="ie6kT2V" resname="form.events.help">
         <source>form.events.help</source>
         <target>If checked, events will be enabled on this calendar. It will show up in calendar clients.</target>
       </trans-unit>
-      <trans-unit id="KBkKkDQ" resname="form.todos.help">
+      <trans-unit id="m2d03h7" resname="form.todos.help">
         <source>form.todos.help</source>
         <target>If checked, todos will be enabled on this calendar. It will show up in reminders clients (such as macOS Reminders app)</target>
       </trans-unit>
-      <trans-unit id="kyPtCLt" resname="form.notes.help">
+      <trans-unit id="DZBm7go" resname="form.notes.help">
         <source>form.notes.help</source>
         <target>If checked, notes will be enabled on this calendar.</target>
       </trans-unit>
-      <trans-unit id="lyKuD8d" resname="addressbooks.modal.title">
+      <trans-unit id="nmAIJpy" resname="addressbooks.modal.title">
         <source>addressbooks.modal.title</source>
         <target>Delete this Address Book ?</target>
       </trans-unit>
-      <trans-unit id="S4fu0sv" resname="addressbooks.modal.text">
+      <trans-unit id="3mPrY9E" resname="addressbooks.modal.text">
         <source>addressbooks.modal.text</source>
         <target>Are you sure you want to delete this address book ? All the contacts in it will be deleted too.</target>
       </trans-unit>
-      <trans-unit id="PqEAkt1" resname="calendars.modal.title">
+      <trans-unit id="YmO7Wcu" resname="calendars.modal.title">
         <source>calendars.modal.title</source>
         <target>Delete this Calendar ?</target>
       </trans-unit>
-      <trans-unit id="ADFTXZ_" resname="calendars.modal.text">
+      <trans-unit id="XM0TWcI" resname="calendars.modal.text">
         <source>calendars.modal.text</source>
         <target>Are you sure you want to delete this calendar ? All the events, todos and notes in it will be deleted too.</target>
       </trans-unit>
-      <trans-unit id="0YNDPzI" resname="revoke.modal.title">
+      <trans-unit id="3Own8oC" resname="revoke.modal.title">
         <source>revoke.modal.title</source>
         <target>Revoke access to this calendar ?</target>
       </trans-unit>
-      <trans-unit id="X7G6rbZ" resname="revoke.modal.text">
+      <trans-unit id="N57f0XR" resname="revoke.modal.text">
         <source>revoke.modal.text</source>
         <target>Are you sure you want to revoke access to this calendar ? The user will lose access to all events, todos and notes. The original calendar will not be deleted.</target>
       </trans-unit>
-      <trans-unit id="uqnapzJ" resname="users.modal.title">
+      <trans-unit id="YVgPRJT" resname="users.modal.title">
         <source>users.modal.title</source>
         <target>Delete this User ?</target>
       </trans-unit>
-      <trans-unit id="iBrZ25M" resname="users.modal.text">
+      <trans-unit id="TBZP8bg" resname="users.modal.text">
         <source>users.modal.text</source>
         <target>Are you sure you want to delete this user ? All the associated calendars and address books will be deleted too.</target>
       </trans-unit>
-      <trans-unit id="paWN2ed" resname="delegates.modal.title">
+      <trans-unit id="lyTSshw" resname="delegates.modal.title">
         <source>delegates.modal.title</source>
         <target>Remove this delegate ?</target>
       </trans-unit>
-      <trans-unit id="QhzQj3K" resname="delegates.modal.text">
+      <trans-unit id="MT5Ijud" resname="delegates.modal.text">
         <source>delegates.modal.text</source>
         <target>Are you sure you want to remove this delegate ? This user will no longer have access to the calendars, contacts, etc.</target>
       </trans-unit>
-      <trans-unit id="bsFHDY4" resname="delegates.member.help">
+      <trans-unit id="0BNEzcg" resname="delegates.member.help">
         <source>delegates.member.help</source>
         <target>Adding a user who already is a delegate will only affect its access right</target>
       </trans-unit>
-      <trans-unit id="I3TZF5S" resname="cancel">
+      <trans-unit id="WmbkJDd" resname="cancel">
         <source>cancel</source>
         <target>Cancel</target>
       </trans-unit>
-      <trans-unit id="inmIkP6" resname="yes">
+      <trans-unit id="KoqKM6m" resname="yes">
         <source>yes</source>
         <target>Yes</target>
       </trans-unit>
-      <trans-unit id="k5Apjz_" resname="no">
+      <trans-unit id="e3XmWtO" resname="no">
         <source>no</source>
         <target>No</target>
       </trans-unit>
-      <trans-unit id="DBucN94" resname="login.signin">
+      <trans-unit id="d7yLLjA" resname="login.signin">
         <source>login.signin</source>
         <target>Please sign in</target>
       </trans-unit>
-      <trans-unit id="wsaupPh" resname="login.username">
+      <trans-unit id="4TTdn8M" resname="login.username">
         <source>login.username</source>
         <target>Username</target>
       </trans-unit>
-      <trans-unit id="guXTUCg" resname="login.password">
+      <trans-unit id="sp0KUC6" resname="login.password">
         <source>login.password</source>
         <target>Password</target>
       </trans-unit>
-      <trans-unit id="jlMj..y" resname="login.submit">
+      <trans-unit id="8jf9lcX" resname="login.submit">
         <source>login.submit</source>
         <target>Submit</target>
       </trans-unit>
-      <trans-unit id="ACcM9j_" resname="logout">
+      <trans-unit id="F55nsy3" resname="logout">
         <source>logout</source>
         <target>Logout</target>
       </trans-unit>
-      <trans-unit id="2FwYtBA" resname="login.already">
+      <trans-unit id="GPvgh0L" resname="login.already">
         <source>login.already</source>
         <target>You are already logged in as {username}</target>
       </trans-unit>
-      <trans-unit id="nMyjxoa" resname="no.users.yet">
+      <trans-unit id="RcIhyKp" resname="no.users.yet">
         <source>no.users.yet</source>
         <target>No users yet.</target>
       </trans-unit>
-      <trans-unit id="flYIq2E" resname="remove">
+      <trans-unit id="P5zs.4x" resname="remove">
         <source>remove</source>
         <target>Remove</target>
       </trans-unit>
-      <trans-unit id="d3rE6gp" resname="revoke">
+      <trans-unit id="4HlJBp8" resname="revoke">
         <source>revoke</source>
         <target>Revoke</target>
       </trans-unit>
-      <trans-unit id="efo4jbl" resname="sharing">
+      <trans-unit id="SXq.3tZ" resname="sharing">
         <source>sharing</source>
         <target>Sharing</target>
       </trans-unit>
-      <trans-unit id="Xp2NI1I" resname="calendars.sharing">
+      <trans-unit id="elrbasT" resname="calendars.sharing">
         <source>calendars.sharing</source>
         <target>Calendar sharing</target>
       </trans-unit>
-      <trans-unit id="fWFSd1u" resname="calendars.delegates.add">
+      <trans-unit id="HG_zUPj" resname="calendars.delegates.add">
         <source>calendars.delegates.add</source>
         <target>Add a delegate</target>
       </trans-unit>
-      <trans-unit id="x3qt3u1" resname="calendars.delegates.for">
+      <trans-unit id="CIm3U7z" resname="calendars.delegates.for">
         <source>calendars.delegates.for</source>
         <target>Delegates for {what}</target>
       </trans-unit>
-      <trans-unit id="X7nEzAm" resname="calendars.delegates.new">
+      <trans-unit id="0MBan0c" resname="calendars.delegates.new">
         <source>calendars.delegates.new</source>
         <target>New delegate</target>
       </trans-unit>
-      <trans-unit id="MLydEYK" resname="calendars.delegates.existing">
+      <trans-unit id="P0vGXfx" resname="calendars.delegates.existing">
         <source>calendars.delegates.existing</source>
         <target>This calendar is shared with:</target>
       </trans-unit>
-      <trans-unit id="BROOTDT" resname="calendars.delegates.none">
+      <trans-unit id="0qEUvpG" resname="calendars.delegates.none">
         <source>calendars.delegates.none</source>
         <target>none</target>
       </trans-unit>
-      <trans-unit id="wPVq0sd" resname="calendars.delegates.member">
+      <trans-unit id="p6swGey" resname="calendars.delegates.member">
         <source>calendars.delegates.member</source>
         <target>Member:</target>
       </trans-unit>
-      <trans-unit id="njKq9lh" resname="calendars.delegates.write.give">
+      <trans-unit id="sIayt9k" resname="calendars.delegates.write.give">
         <source>calendars.delegates.write.give</source>
         <target>Give write access ?</target>
       </trans-unit>
-      <trans-unit id="7xX6DUh" resname="users.delegates">
+      <trans-unit id="oxkIwfV" resname="users.delegates">
         <source>users.delegates</source>
         <target>Delegates</target>
       </trans-unit>
-      <trans-unit id="7qza084" resname="delegates.enabled.text">
+      <trans-unit id="q.VJSGh" resname="delegates.enabled.text">
         <source>delegates.enabled.text</source>
         <target>Delegation is enabled for this account.</target>
       </trans-unit>
-      <trans-unit id="N01ZGSL" resname="delegates.disable.warning">
+      <trans-unit id="42j2tRB" resname="delegates.disable.warning">
         <source>delegates.disable.warning</source>
         <target>⚠ If you disable it, all your delegates will lose access to this calendar</target>
       </trans-unit>
-      <trans-unit id="XrBqwfx" resname="delegates.disable">
+      <trans-unit id="HRSK3Wi" resname="delegates.disable">
         <source>delegates.disable</source>
         <target>Disable it</target>
       </trans-unit>
-      <trans-unit id="1gSctFw" resname="delegates.disabled.text">
+      <trans-unit id="KHtTcdj" resname="delegates.disabled.text">
         <source>delegates.disabled.text</source>
         <target>Delegation is not enabled for this account.</target>
       </trans-unit>
-      <trans-unit id="JVYOYTn" resname="delegates.enable">
+      <trans-unit id="bVvwuc_" resname="delegates.enable">
         <source>delegates.enable</source>
         <target>Enable it</target>
       </trans-unit>
-      <trans-unit id="1KaOxYk" resname="delegates.write">
+      <trans-unit id="Au1oBii" resname="delegates.write">
         <source>delegates.write</source>
         <target>has write access</target>
       </trans-unit>
-      <trans-unit id="zAE1QhB" resname="delegates.readonly">
+      <trans-unit id="R7lqMDG" resname="delegates.readonly">
         <source>delegates.readonly</source>
         <target>has readonly access</target>
       </trans-unit>
-      <trans-unit id="pnQau7c" resname="calendar.share_access.2">
+      <trans-unit id="TD5.lT1" resname="calendar.share_access.2">
         <source>calendar.share_access.2</source>
         <target>readonly</target>
       </trans-unit>
-      <trans-unit id="BuDoAdU" resname="calendar.share_access.3">
+      <trans-unit id="wZOPHI8" resname="calendar.share_access.3">
         <source>calendar.share_access.3</source>
         <target>read / write</target>
       </trans-unit>
-      <trans-unit id="wv1eCvz" resname="calendar.share_access.10">
+      <trans-unit id="F8h2YaT" resname="calendar.share_access.10">
         <source>calendar.share_access.10</source>
         <target>public</target>
+      </trans-unit>
+      <trans-unit id="FSDg5q6" resname="calendar.subscription">
+        <source>calendar.subscription</source>
+        <target>subscription</target>
+      </trans-unit>
+      <trans-unit id="mJ_hMaA" resname="calendars.subscriptions">
+        <source>calendars.subscriptions</source>
+        <target>Subscriptions</target>
       </trans-unit>
     </body>
   </file>

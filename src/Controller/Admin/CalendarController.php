@@ -27,6 +27,8 @@ class CalendarController extends AbstractController
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
         $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
 
+        $subscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
+
         // Separate shared calendars
         $calendars = [];
         $shared = [];
@@ -49,6 +51,7 @@ class CalendarController extends AbstractController
 
         return $this->render('calendars/index.html.twig', [
             'calendars' => $calendars,
+            'subscriptions' => $subscriptions,
             'shared' => $shared,
             'principal' => $principal,
             'username' => $username,
