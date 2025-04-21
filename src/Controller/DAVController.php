@@ -252,6 +252,7 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CalDAV\Schedule\Plugin());
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
+            $this->server->addPlugin(new \Sabre\CalDAV\Subscriptions\Plugin());
             if ($this->inviteAddress) {
                 $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->publicDir));
             }
