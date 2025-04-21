@@ -6,17 +6,29 @@ Davis
 [![Latest release][release_badge]][release_link]
 [![Sponsor me][sponsor_badge]][sponsor_link]
 
-A simple, fully translatable admin interface and frontend for `sabre/dav` based on [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
+A simple, fully translatable and full-featured DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
+
+### Web admin dashboard
 
 Provides user edition, calendar creation and sharing, and address book creation. The interface is simple and straightforward, responsive, and provides a light and a dark mode.
 
-Easily containerisable (_`Dockerfile` and sample `docker-compose` configuration file provided_).
-
-NixOS package and module available.
-
 Supports **Basic authentication**, as well as **IMAP** and **LDAP** (_via external providers_).
 
-Created and maintained (with the help of the community) by [@tchapi](https://github.com/tchapi).
+### DAV Server
+
+The underlying server implementation supports (*non-exhaustive list*) CalDAV, CardDAV, WebDAV, calendar sharing, scheduling, mail notifications, and server-side subscriptions (*depending on the capabilities of the client*).
+
+### Deployment
+
+Easily containerisable (_`Dockerfile` and sample `docker-compose` configuration file provided_).
+
+NixOS [package](https://search.nixos.org/packages?channel=unstable&show=davis&from=0&size=50&sort=relevance&type=packages&query=davis) and module available.
+
+Comes with already built Docker images in two flavours: [standalone](https://github.com/tchapi/davis/pkgs/container/davis-standalone) (with included Caddy reverse proxy) or [barebone](https://github.com/tchapi/davis/pkgs/container/davis).
+
+- - -
+
+✨ Created and maintained (with the help of the community) by [@tchapi](https://github.com/tchapi). ✨
 
 ![Dashboard page](_screenshots/dashboard.png)
 ![User creation page](_screenshots/user.png)
@@ -534,7 +546,7 @@ In a shell, if you run Davis locally:
 
 # 📚 Libraries used
 
-  - Symfony 5 (Licence : MIT)
+  - Symfony 7 (Licence : MIT)
   - Sabre-io/dav (Licence : BSD-3-Clause)
   - Bootstrap 5 (Licence : MIT)
 
