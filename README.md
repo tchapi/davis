@@ -434,7 +434,7 @@ A few `docker-compose.yml` files are also included (in the `docker` folder) as m
 
 You can start the containers with :
 
-    cd docker && docker-compose up -d
+    cd docker && docker compose up -d
 
 > [!NOTE]
 >

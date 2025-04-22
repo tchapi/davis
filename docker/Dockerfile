@@ -3,7 +3,7 @@
 ARG fpm_user=82:82
 
 # Base image, used to build extensions and the final image ———————————————————————
-FROM php:8.3-fpm-alpine as base-image
+FROM php:8.3-fpm-alpine AS base-image
 
 # Run update, and gets basic packages and packages for runtime
 RUN apk --no-progress --update add --no-cache \
