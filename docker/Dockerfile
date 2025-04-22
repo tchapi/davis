@@ -70,6 +70,7 @@ COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 # Final image ————————————————————————————————————————————————————————————————————
 FROM base-image
 
+ARG fpm_user=82:82
 ENV FPM_USER=${fpm_user}
 
 ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
