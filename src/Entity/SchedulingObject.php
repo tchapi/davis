@@ -27,7 +27,7 @@ class SchedulingObject
     #[Assert\Regex("/[0-9a-z\-]+/")]
     private $uri;
 
-    #[ORM\Column(name: 'lastmodified', type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'lastmodified', type: 'bigint', nullable: true)]
     private $lastModified;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
