@@ -56,13 +56,6 @@ RUN apk --update --virtual build-deps-ldap add --no-cache openldap-dev \
     && apk del build-deps-ldap \
     && rm -rf /tmp/*
 
-# IMAP auth support
-RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev krb5-dev \
-    && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-ext-install imap \
-    && apk del build-deps-imap \
-    && rm -rf /tmp/*
-
 # OPCache
 RUN docker-php-ext-install opcache
 COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
