@@ -56,6 +56,13 @@ RUN apk --update --virtual build-deps-ldap add --no-cache openldap-dev \
     && apk del build-deps-ldap \
     && rm -rf /tmp/*
 
+# Zip lib for PHP-IMAP
+RUN apk --update --virtual build-deps-zip add --no-cache libzip-dev \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install zip \
+    && apk del build-deps-zip \
+    && rm -rf /tmp/*
+
 # OPCache
 RUN docker-php-ext-install opcache
 COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
