@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
-use Sabre\DAV\Auth\Backend\IMAP;
+use Sabre\DAV\Auth\Backend\AbstractBasic;
+use Webklex\PHPIMAP\Client;
+use Webklex\PHPIMAP\ClientManager;
 
-final class IMAPAuth extends IMAP
+final class IMAPAuth extends AbstractBasic
 {
     /**
      * Doctrine registry.
@@ -30,9 +32,16 @@ final class IMAPAuth extends IMAP
      */
     private $autoCreate;
 
+    /**
+     * IMAP server in the form {host[:port]}.
+     *
+     * @var string
+     */
+    private $IMAPAuthUrl;
+
     public function __construct(ManagerRegistry $doctrine, Utils $utils, string $IMAPAuthUrl, bool $autoCreate)
     {
-        parent::__construct($IMAPAuthUrl);
+        $this->IMAPAuthUrl = $IMAPAuthUrl;
 
         $this->autoCreate = $autoCreate;
 
@@ -43,15 +52,39 @@ final class IMAPAuth extends IMAP
     /**
      * Connects to an IMAP server and tries to authenticate.
      * If the user does not exist, create it.
-     *
-     * @param string $username
-     * @param string $password
-     *
-     * @return bool
      */
-    protected function imapOpen($username, $password)
+    protected function imapOpen(string $username, string $password): bool
     {
-        $success = parent::imapOpen($username, $password);
+        // $cm = new ClientManager('path/to/config/imap.php');
+        $cm = new ClientManager($options = []);
+
+        $components = parse_url($this->IMAPAuthUrl);
+
+        if (!$components) {
+            error_log('IMAP Error (parsing IMAP url "'.$this->IMAPAuthUrl.'" ): '.$e->getMessage());
+
+            return false;
+        }
+
+        // Create a new instance of the IMAP client manually
+        $client = $cm->make([
+            'host' => $components['host'],
+            'port' => $components['port'] ?? 993,
+            'encryption' => 'ssl',
+            'validate_cert' => true,
+            'username' => $username,
+            'password' => $password,
+            'protocol' => 'imap',
+        ]);
+
+        try {
+            $client->connect();
+            $client->disconnect();
+            $success = true;
+        } catch (\Exception $e) {
+            error_log('IMAP Error (connection): '.$e->getMessage());
+            $success = false;
+        }
 
         // Auto-create the user if it does not already exist in the database
         if ($success && $this->autoCreate) {
@@ -72,5 +105,13 @@ final class IMAPAuth extends IMAP
         }
 
         return $success;
+    }
+
+    /**
+     * Validates a username and password by trying to authenticate against IMAP.
+     */
+    protected function validateUserPass($username, $password)
+    {
+        return $this->imapOpen($username, $password);
     }
 }
