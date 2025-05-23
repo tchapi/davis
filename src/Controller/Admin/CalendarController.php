@@ -83,6 +83,7 @@ class CalendarController extends AbstractController
         $form = $this->createForm(CalendarInstanceType::class, $calendarInstance, [
             'new' => !$id,
             'shared' => $calendarInstance->isShared(),
+            'public_calendar_enabled' => $this->getParameter('public_calendar_enabled')
         ]);
 
         $components = explode(',', $calendarInstance->getCalendar()->getComponents());
