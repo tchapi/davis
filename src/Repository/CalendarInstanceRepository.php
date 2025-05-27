@@ -59,4 +59,18 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function hasDifferentOwner(int $calendarId, string $principalUri): bool
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.calendar = :id')
+            ->setParameter('id', $calendarId)
+            ->andWhere('c.access IN (:ownerAccess)')
+            ->setParameter('ownerAccess', CalendarInstance::getOwnerAccesses())
+            ->andWhere('c.principalUri != :principalUri')
+            ->setParameter('principalUri', $principalUri)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
 }
