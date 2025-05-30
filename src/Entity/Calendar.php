@@ -31,6 +31,9 @@ class Calendar
     #[ORM\OneToMany(targetEntity: "App\Entity\CalendarChange", mappedBy: 'calendar')]
     private $changes;
 
+    #[ORM\OneToMany(targetEntity: "App\Entity\CalendarInstance", mappedBy: 'calendar')]
+    private $instances;
+
     public function __construct()
     {
         $this->synctoken = 1;
@@ -128,5 +131,13 @@ class Calendar
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection|CalendarInstance[]
+     */
+    public function getInstances(): Collection
+    {
+        return $this->instances;
     }
 }

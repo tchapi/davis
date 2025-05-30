@@ -155,6 +155,10 @@ class UserController extends AbstractController
                 foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
                     $entityManager->remove($change);
                 }
+                // We need to remove the shared versions of this calendar, too
+                foreach ($instance->getCalendar()->getInstances() ?? [] as $instances) {
+                    $entityManager->remove($instances);
+                }
                 $entityManager->remove($instance->getCalendar());
             }
             $entityManager->remove($instance);
