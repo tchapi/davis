@@ -27,14 +27,21 @@ class CalendarInstanceType extends AbstractType
                 'help' => 'form.uri.help.caldav',
                 'required' => true,
             ])
-            ->add('public', ChoiceType::class, [
-                'label' => 'form.public',
-                'mapped' => false,
-                'disabled' => $options['shared'],
-                'help' => 'form.public.help.caldav',
-                'required' => true,
-                'choices' => ['yes' => true, 'no' => false],
-            ])
+            ->add(
+                'public',
+                $options['public_calendar_enabled'] ? ChoiceType::class : HiddenType::class,
+                $options['public_calendar_enabled'] ?  [
+                    'label' => 'form.public',
+                    'mapped' => false,
+                    'disabled' => $options['shared'],
+                    'help' => 'form.public.help.caldav',
+                    'required' => true,
+                    'choices' => ['yes' => true, 'no' => false],
+                ] : [
+                    'required' => true,
+                    'mapped' => false,
+                ]
+            )
             ->add('displayName', TextType::class, [
                 'label' => 'form.displayName',
                 'help' => 'form.name.help.caldav',
