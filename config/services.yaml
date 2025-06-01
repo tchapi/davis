@@ -51,6 +51,7 @@ services:
             $calDAVEnabled: "%env(bool:CALDAV_ENABLED)%"
             $cardDAVEnabled: "%env(bool:CARDDAV_ENABLED)%"
             $webDAVEnabled: "%env(bool:WEBDAV_ENABLED)%"
+            $publicCalendarEnabled: "%env(default:default_public_calendar_enabled:bool:PUBLIC_CALENDAR_ENABLED)%"
             $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
             $authMethod: "%env(AUTH_METHOD)%"
             $authRealm: "%env(AUTH_REALM)%"
