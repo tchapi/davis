@@ -145,13 +145,22 @@ class UserController extends AbstractController
         // Remove calendars and addressbooks
         $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
         foreach ($calendars ?? [] as $instance) {
-            foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
-                $entityManager->remove($object);
+            // We're only removing the calendar objects / changes / and calendar if the deleted user is an owner,
+            // which means that the underlying calendar instance should not have another principal as owner.
+            $hasDifferentOwner = $doctrine->getRepository(CalendarInstance::class)->hasDifferentOwner($instance->getCalendar()->getId(), Principal::PREFIX.$username);
+            if (!$hasDifferentOwner) {
+                foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
+                    $entityManager->remove($object);
+                }
+                foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
+                    $entityManager->remove($change);
+                }
+                // We need to remove the shared versions of this calendar, too
+                foreach ($instance->getCalendar()->getInstances() ?? [] as $instances) {
+                    $entityManager->remove($instances);
+                }
+                $entityManager->remove($instance->getCalendar());
             }
-            foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
-                $entityManager->remove($change);
-            }
-            $entityManager->remove($instance->getCalendar());
             $entityManager->remove($instance);
         }
         $calendarsSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
