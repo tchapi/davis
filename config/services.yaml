@@ -7,7 +7,8 @@ parameters:
     default_database_driver: "mysql"
     default_admin_auth_bypass: "false"
     timezone: '%env(APP_TIMEZONE)%'
-    public_calendar_enabled: '%env(bool:PUBLIC_CALENDAR_ENABLED)%'
+    public_calendar_enabled: '%env(default:default_public_calendar_enabled:bool:PUBLIC_CALENDAR_ENABLED)%'
+    default_public_calendar_enabled: "true"
 
 services:
     # default configuration for services in *this* file
