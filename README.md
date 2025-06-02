@@ -201,11 +201,11 @@ IMAP_AUTH_USER_AUTOCREATE=true # false by default
 Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated to be created upon login (_like for IMAP_):
 
 ```shell
-LDAP_AUTH_URL="ldap://127.0.0.1"
-LDAP_DN_PATTERN="mail=%u"
-LDAP_MAIL_ATTRIBUTE="mail"
+LDAP_AUTH_URL=ldap://127.0.0.1:3890 # default LDAP port
+LDAP_DN_PATTERN=uid=%u,ou=users,dc=domain,dc=com
+LDAP_MAIL_ATTRIBUTE=mail
 LDAP_AUTH_USER_AUTOCREATE=true # false by default
-LDAP_CERTIFICATE_CHECKING_STRATEGY="try" # try by default.
+LDAP_CERTIFICATE_CHECKING_STRATEGY=try # try by default. Other values are: never, hard, demand or allow
 ```
 
 > Ex: for [Zimbra LDAP](https://zimbra.github.io/adminguide/latest/#zimbra_ldap_service), you might want to use the `zimbraMailDeliveryAddress` attribute to retrieve the principal user email:
@@ -543,6 +543,28 @@ docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrat
 In a shell, if you run Davis locally:
 
     bin/console doctrine:migrations:migrate
+
+### LDAP connection not working
+
+Make sure all parameters are in plain text (no quotes).
+
+Check if your instance can reach your LDAP server.
+- For Docker instances: make sure its on the same network
+- Check connection via ldapsearch:
+```shell
+# For docker: connect into container's shell
+docker exec -it davis sh
+
+# install ldap utils (for alpine linux)
+apk add openldap-clients
+```
+
+```shell
+# User checking their own entry
+ldapsearch -H ldap://lldap-server:3890 -D "uid=someuser,ou=users,dc=domain,dc=com" -W -b "dc=domain,dc=com" "(uid=someuser)"
+```
+- check `LDAP_DN_PATTERN` filter to be complaint with your ldap service
+- example: `uid=%u,ou=people,dc=domain,dc=com`: [LLDAP](https://github.com/lldap/lldap) uses `people` instead of `users`.
 
 # 📚 Libraries used
 
