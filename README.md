@@ -239,12 +239,12 @@ Or use it directly in the Apache configuration
 
 ### Specific environment variables for IMAP and LDAP authentication methods
 
-In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
+In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`.
 
 You should also explicitely define whether you want new authenticated to be created upon login:
 
 ```shell
-IMAP_AUTH_URL={imap.gmail.com:993/imap/ssl/novalidate-cert}
+IMAP_AUTH_URL="{imap.gmail.com:993}"
 IMAP_AUTH_USER_AUTOCREATE=true # false by default
 ```
 
