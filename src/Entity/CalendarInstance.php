@@ -40,7 +40,7 @@ class CalendarInstance
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", cascade: ['persist'], inversedBy: "instances")]
     #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 
