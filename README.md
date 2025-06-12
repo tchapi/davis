@@ -113,13 +113,20 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 ```
 > See [the following paragraph](#specific-environment-variables-for-imap-and-ldap-authentication-methods) for more information if you choose either IMAP or LDAP.
 
-d. The global flags to enable CalDAV, CardDAV and WebDAV
+d. The global flags to enable CalDAV, CardDAV and WebDAV. You can also disable the option to have calendars public
 
 ```shell
 CALDAV_ENABLED=true
 CARDDAV_ENABLED=true
 WEBDAV_ENABLED=false
+
+PUBLIC_CALENDARS_ENABLED=true
 ```
+
+> [!NOTE]
+>
+> By default, `PUBLIC_CALENDARS_ENABLED` is true. That doesn't mean that all calendars are public by default — it just means that you have an option, upon calendar creation, to set the calendar public (but it's not public by default).
+
 
 e. The email address that your invites are going to be sent from
 
