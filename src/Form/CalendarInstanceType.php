@@ -73,6 +73,10 @@ class CalendarInstanceType extends AbstractType
             ->add('save', SubmitType::class, [
                 'label' => 'save',
             ]);
+
+        if (!$options['public_calendar_enabled']) {
+            $builder->remove('public');
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -81,6 +85,7 @@ class CalendarInstanceType extends AbstractType
             'new' => false,
             'shared' => false,
             'data_class' => CalendarInstance::class,
+            'public_calendar_enabled' => true
         ]);
     }
 }
