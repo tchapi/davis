@@ -74,7 +74,7 @@ class CalendarInstanceType extends AbstractType
                 'label' => 'save',
             ]);
 
-        if (!$options['public_calendar_enabled']) {
+        if (!$options['public_calendars_enabled']) {
             $builder->remove('public');
         }
     }
@@ -85,7 +85,7 @@ class CalendarInstanceType extends AbstractType
             'new' => false,
             'shared' => false,
             'data_class' => CalendarInstance::class,
-            'public_calendar_enabled' => true
+            'public_calendars_enabled' => true,
         ]);
     }
 }

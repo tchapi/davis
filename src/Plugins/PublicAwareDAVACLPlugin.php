@@ -17,12 +17,12 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
     /**
      * @var bool
      */
-    protected $public_calendar_enabled;
+    protected $public_calendars_enabled;
 
-    public function __construct(EntityManagerInterface $entityManager, bool $public_enabled)
+    public function __construct(EntityManagerInterface $entityManager, bool $public_calendars_enabled)
     {
         $this->em = $entityManager;
-        $this->public_calendar_enabled = $public_enabled;
+        $this->public_calendars_enabled = $public_calendars_enabled;
     }
 
     /**
@@ -44,7 +44,7 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
         $acl = parent::getAcl($node);
 
         if ($node instanceof \Sabre\CalDAV\Calendar) {
-            if (CalendarInstance::ACCESS_PUBLIC === $node->getShareAccess()) {
+            if (CalendarInstance::ACCESS_PUBLIC === $node->getShareAccess() && $this->public_calendars_enabled) {
                 // We must add the ACL on the calendar itself
                 $acl[] = [
                     'principal' => '{DAV:}unauthenticated',
@@ -61,7 +61,7 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
 
             $calendar = $this->em->getRepository(CalendarInstance::class)->findOneById($calendarInstanceId);
 
-            if ($calendar && $calendar->isPublic() && $this->public_calendar_enabled) {
+            if ($calendar && $calendar->isPublic() && $this->public_calendars_enabled) {
                 // We must add the ACL on the object itself
                 $acl[] = [
                     'principal' => '{DAV:}unauthenticated',

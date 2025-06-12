@@ -48,11 +48,11 @@ class DAVController extends AbstractController
     protected $webDAVEnabled;
 
     /**
-     * is Public Calendar enabled?
+     * Are public calendars enabled?
      *
      * @var bool
      */
-    protected $publicCalendarEnabled;
+    protected $publicCalendarsEnabled;
 
     /**
      * Mail address to send mails from.
@@ -142,14 +142,14 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, bool $publicCalendarEnabled, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, bool $publicCalendarsEnabled = true, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null)
     {
         $this->publicDir = $publicDir;
 
         $this->calDAVEnabled = $calDAVEnabled;
         $this->cardDAVEnabled = $cardDAVEnabled;
         $this->webDAVEnabled = $webDAVEnabled;
-        $this->publicCalendarEnabled = $publicCalendarEnabled;
+        $this->publicCalendarsEnabled = $publicCalendarsEnabled;
         $this->inviteAddress = $inviteAddress ?? null;
 
         $this->webdavPublicDir = $webdavPublicDir;
@@ -238,7 +238,7 @@ class DAVController extends AbstractController
         $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin(false)); // We disable the file creation / upload / sharing in the browser
         $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
 
-        $aclPlugin = new PublicAwareDAVACLPlugin($this->em, $this->publicCalendarEnabled);
+        $aclPlugin = new PublicAwareDAVACLPlugin($this->em, $this->publicCalendarsEnabled);
         $aclPlugin->hideNodesFromListings = true;
 
         // Fetch admins, if any

@@ -80,12 +80,12 @@ class CalendarController extends AbstractController
             $calendarInstance->setCalendar($calendar);
         }
 
-        $isPublicCalendarEnabled = $this->getParameter('public_calendar_enabled');
+        $arePublicCalendarsEnabled = $this->getParameter('public_calendars_enabled');
 
         $form = $this->createForm(CalendarInstanceType::class, $calendarInstance, [
             'new' => !$id,
             'shared' => $calendarInstance->isShared(),
-            'public_calendar_enabled' => $isPublicCalendarEnabled
+            'public_calendars_enabled' => $arePublicCalendarsEnabled,
         ]);
 
         $components = explode(',', $calendarInstance->getCalendar()->getComponents());
@@ -93,7 +93,7 @@ class CalendarController extends AbstractController
         $form->get('events')->setData(in_array(Calendar::COMPONENT_EVENTS, $components));
         $form->get('todos')->setData(in_array(Calendar::COMPONENT_TODOS, $components));
         $form->get('notes')->setData(in_array(Calendar::COMPONENT_NOTES, $components));
-        if ($isPublicCalendarEnabled) {
+        if ($arePublicCalendarsEnabled) {
             $form->get('public')->setData($calendarInstance->isPublic());
         }
         $form->get('principalUri')->setData(Principal::PREFIX.$username);
@@ -115,7 +115,7 @@ class CalendarController extends AbstractController
                 if ($form->get('notes')->getData()) {
                     $components[] = Calendar::COMPONENT_NOTES;
                 }
-                if ($isPublicCalendarEnabled && true === $form->get('public')->getData()) {
+                if ($arePublicCalendarsEnabled && true === $form->get('public')->getData()) {
                     $calendarInstance->setAccess(CalendarInstance::ACCESS_PUBLIC);
                 } else {
                     $calendarInstance->setAccess(CalendarInstance::ACCESS_SHAREDOWNER);
@@ -125,7 +125,7 @@ class CalendarController extends AbstractController
             }
 
             // We want to remove all shares if a calendar goes public
-            if ($isPublicCalendarEnabled && true === $form->get('public')->getData() && $id) {
+            if ($arePublicCalendarsEnabled && true === $form->get('public')->getData() && $id) {
                 $calendarId = $calendarInstance->getCalendar()->getId();
                 $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarId, false);
                 foreach ($instances as $instance) {
