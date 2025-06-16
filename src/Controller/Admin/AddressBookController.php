@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\AddressBook;
 use App\Entity\Principal;
 use App\Form\AddressBookType;
+use App\Services\BirthdayService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +31,7 @@ class AddressBookController extends AbstractController
 
     #[Route('/{username}/new', name: 'create')]
     #[Route('/{username}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
-    public function addressbookCreate(ManagerRegistry $doctrine, Request $request, string $username, ?int $id, TranslatorInterface $trans): Response
+    public function addressbookCreate(ManagerRegistry $doctrine, Request $request, string $username, ?int $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
@@ -61,6 +62,9 @@ class AddressBookController extends AbstractController
 
             $this->addFlash('success', $trans->trans('addressbooks.saved'));
 
+            // Let's sync the user birthday calendar if needed
+            $birthdayService->syncUser($username);
+
             return $this->redirectToRoute('addressbook_index', ['username' => $username]);
         }
 
@@ -73,7 +77,7 @@ class AddressBookController extends AbstractController
     }
 
     #[Route('/{username}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
-    public function addressbookDelete(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans): Response
+    public function addressbookDelete(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
         $addressbook = $doctrine->getRepository(AddressBook::class)->findOneById($id);
         if (!$addressbook) {
@@ -92,6 +96,9 @@ class AddressBookController extends AbstractController
 
         $entityManager->flush();
         $this->addFlash('success', $trans->trans('addressbooks.deleted'));
+
+        // Let's sync the user birthday calendar if needed
+        $birthdayService->syncUser($username);
 
         return $this->redirectToRoute('addressbook_index', ['username' => $username]);
     }
