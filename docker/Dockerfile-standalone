@@ -113,7 +113,7 @@ RUN docker-php-source delete && \
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
-HEALTHCHECK --interval=120s --timeout=10s --start-period=30s --retries=3 \
+HEALTHCHECK --interval=120s --timeout=10s --start-period=60s --retries=3 \
     CMD curl --fail http://localhost:9000 || exit 1 
 
 # It's the Caddy port, not the PHP-fpm one (as we use sockets)
