@@ -139,8 +139,8 @@ f. The paths for the WebDAV installation
 > I recommend that you use absolute directories so you know exactly where your files reside.
 
 ```shell
-WEBDAV_TMP_DIR='/tmp'
-WEBDAV_PUBLIC_DIR='/webdav/public'
+WEBDAV_TMP_DIR=/tmp
+WEBDAV_PUBLIC_DIR=/webdav/public
 WEBDAV_HOMES_DIR=
 ```
 
@@ -161,7 +161,7 @@ h. The timezone you want for the app
 This must comply with the [official list](https://www.php.net/manual/en/timezones.php)
 
 ```shell
-APP_TIMEZONE="Australia/Lord_Howe"
+APP_TIMEZONE=Australia/Lord_Howe
 ```
 
 > Set a void value like so:
@@ -201,23 +201,23 @@ In case you use the `IMAP` auth type, you must specify the auth url (_the "mailb
 You should also explicitely define whether you want new authenticated to be created upon login:
 
 ```shell
-IMAP_AUTH_URL="{imap.gmail.com:993/imap/ssl/novalidate-cert}"
+IMAP_AUTH_URL={imap.gmail.com:993/imap/ssl/novalidate-cert}
 IMAP_AUTH_USER_AUTOCREATE=true # false by default
 ```
 
 Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated to be created upon login (_like for IMAP_):
 
 ```shell
-LDAP_AUTH_URL="ldap://127.0.0.1"
-LDAP_DN_PATTERN="mail=%u"
-LDAP_MAIL_ATTRIBUTE="mail"
+LDAP_AUTH_URL=ldap://127.0.0.1:3890 # default LDAP port
+LDAP_DN_PATTERN=uid=%u,ou=users,dc=domain,dc=com
+LDAP_MAIL_ATTRIBUTE=mail
 LDAP_AUTH_USER_AUTOCREATE=true # false by default
-LDAP_CERTIFICATE_CHECKING_STRATEGY="try" # try by default.
+LDAP_CERTIFICATE_CHECKING_STRATEGY=try # try by default. Other values are: never, hard, demand or allow
 ```
 
 > Ex: for [Zimbra LDAP](https://zimbra.github.io/adminguide/latest/#zimbra_ldap_service), you might want to use the `zimbraMailDeliveryAddress` attribute to retrieve the principal user email:
 >    ```shell
->    LDAP_MAIL_ATTRIBUTE="zimbraMailDeliveryAddress"
+>    LDAP_MAIL_ATTRIBUTE=zimbraMailDeliveryAddress
 >    ```
 
 ## Migrating from Baïkal?
@@ -550,6 +550,31 @@ docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrat
 In a shell, if you run Davis locally:
 
     bin/console doctrine:migrations:migrate
+
+### The LDAP connection is not working
+
+> [!NOTE]
+>
+> Make sure all environment parameters are in plain text (no quotes).
+
+Check if your instance can reach your LDAP server:
+
+  - For Docker instances: make sure it is on the same network
+  - Check connection via `ldapsearch`:
+
+    ```shell
+    # For docker: connect into container's shell
+    docker exec -it davis sh
+
+    # install ldap utils (for alpine linux)
+    apk add openldap-clients
+
+    # User checking their own entry
+    ldapsearch -H ldap://lldap-server:3890 -D "uid=someuser,ou=users,dc=domain,dc=com" -W -b "dc=domain,dc=com" "(uid=someuser)"
+    ```
+
+  - Check that the `LDAP_DN_PATTERN` filter is compliant with your LDAP service
+  - Example: `uid=%u,ou=people,dc=domain,dc=com`: [LLDAP](https://github.com/lldap/lldap) uses `people` instead of `users`.
 
 # 📚 Libraries used
 
