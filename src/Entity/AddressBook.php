@@ -34,6 +34,9 @@ class AddressBook
     #[ORM\Column(type: 'string', length: 255)]
     private $synctoken;
 
+    #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => false])]
+    private $includedInBirthdayCalendar;
+
     #[ORM\OneToMany(targetEntity: "App\Entity\Card", mappedBy: 'addressBook')]
     private $cards;
 
@@ -43,6 +46,7 @@ class AddressBook
     public function __construct()
     {
         $this->synctoken = 1;
+        $this->includedInBirthdayCalendar = false;
         $this->cards = new ArrayCollection();
         $this->changes = new ArrayCollection();
     }
@@ -72,6 +76,18 @@ class AddressBook
     public function setDisplayName(string $displayName): self
     {
         $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    public function isIncludedInBirthdayCalendar(): ?bool
+    {
+        return $this->includedInBirthdayCalendar;
+    }
+
+    public function setIncludedInBirthdayCalendar(bool $includedInBirthdayCalendar): self
+    {
+        $this->includedInBirthdayCalendar = $includedInBirthdayCalendar;
 
         return $this;
     }
