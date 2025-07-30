@@ -78,7 +78,7 @@ ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
 
 LABEL org.opencontainers.image.authors="tchap@tchap.me"
 LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis"
-LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 5"
+LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 7 and Bootstrap 5"
 
 # Rapatriate built extensions
 COPY --from=extension-builder /usr/local/etc/php/conf.d     /usr/local/etc/php/conf.d/
