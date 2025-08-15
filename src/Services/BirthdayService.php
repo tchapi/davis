@@ -239,9 +239,9 @@ class BirthdayService
         return $vCal;
     }
 
-    public function resetForUser(string $username): void
+    public function resetForPrincipal(string $principal): void
     {
-        $calendarInstance = $this->doctrine->getRepository(CalendarInstance::class)->findOneBy(['principalUri' => Principal::PREFIX.$username, 'uri' => Constants::BIRTHDAY_CALENDAR_URI]);
+        $calendarInstance = $this->doctrine->getRepository(CalendarInstance::class)->findOneBy(['principalUri' => $principal, 'uri' => Constants::BIRTHDAY_CALENDAR_URI]);
 
         if (!$calendarInstance) {
             return; // The user's birthday calendar doesn't exist, no need to purge it
@@ -259,19 +259,24 @@ class BirthdayService
 
     public function syncUser(string $username): void
     {
-        if (!$this->shouldBirthdayCalendarExist(Principal::PREFIX.$username)) {
-            $this->deleteBirthdayCalendar(Principal::PREFIX.$username);
+        $this->syncPrincipal(Principal::PREFIX.$username);
+    }
+
+    public function syncPrincipal(string $principal): void
+    {
+        if (!$this->shouldBirthdayCalendarExist($principal)) {
+            $this->deleteBirthdayCalendar($principal);
 
             return;
         }
 
-        $calendarInstance = $this->ensureBirthdayCalendarExists(Principal::PREFIX.$username);
+        $calendarInstance = $this->ensureBirthdayCalendarExists($principal);
 
         // Reset the calendar
-        $this->resetForUser($username);
+        $this->resetForPrincipal($principal);
 
         // Get all address books that should be included and iterate
-        $addressbooks = $this->doctrine->getRepository(AddressBook::class)->findBy(['principalUri' => Principal::PREFIX.$username, 'includedInBirthdayCalendar' => true]);
+        $addressbooks = $this->doctrine->getRepository(AddressBook::class)->findBy(['principalUri' => $principal, 'includedInBirthdayCalendar' => true]);
         foreach ($addressbooks as $book) {
             $cards = $this->doctrine->getRepository(Card::class)->findByAddressBook($book);
 
