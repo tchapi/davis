@@ -48,8 +48,13 @@ class AddressBookController extends AbstractController
             $addressbook = new AddressBook();
         }
 
-        $form = $this->createForm(AddressBookType::class, $addressbook, ['new' => !$id]);
+        $isBirthdayCalendarEnabled = $this->getParameter('caldav_enabled') && $this->getParameter('carddav_enabled');
 
+        $form = $this->createForm(AddressBookType::class, $addressbook, ['new' => !$id, 'birthday_calendar_enabled' => $isBirthdayCalendarEnabled]);
+
+        if ($isBirthdayCalendarEnabled) {
+            $form->get('includedInBirthdayCalendar')->setData($addressbook->isIncludedInBirthdayCalendar());
+        }
         $form->get('principalUri')->setData(Principal::PREFIX.$username);
 
         $form->handleRequest($request);
@@ -62,8 +67,16 @@ class AddressBookController extends AbstractController
 
             $this->addFlash('success', $trans->trans('addressbooks.saved'));
 
-            // Let's sync the user birthday calendar if needed
-            $birthdayService->syncUser($username);
+            if ($isBirthdayCalendarEnabled && true === $form->get('includedInBirthdayCalendar')->getData()) {
+                $addressbook->setIncludedInBirthdayCalendar(true);
+            } else {
+                $addressbook->setIncludedInBirthdayCalendar(false);
+            }
+
+            if ($isBirthdayCalendarEnabled) {
+                // Let's sync the user birthday calendar if needed
+                $birthdayService->syncUser($username);
+            }
 
             return $this->redirectToRoute('addressbook_index', ['username' => $username]);
         }
@@ -97,8 +110,11 @@ class AddressBookController extends AbstractController
         $entityManager->flush();
         $this->addFlash('success', $trans->trans('addressbooks.deleted'));
 
-        // Let's sync the user birthday calendar if needed
-        $birthdayService->syncUser($username);
+        $isBirthdayCalendarEnabled = $this->getParameter('caldav_enabled') && $this->getParameter('carddav_enabled');
+        if ($isBirthdayCalendarEnabled) {
+            // Let's sync the user birthday calendar if needed
+            $birthdayService->syncUser($username);
+        }
 
         return $this->redirectToRoute('addressbook_index', ['username' => $username]);
     }

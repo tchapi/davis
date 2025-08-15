@@ -42,6 +42,10 @@ class AddressBookType extends AbstractType
             ->add('save', SubmitType::class, [
                 'label' => 'save',
             ]);
+
+        if (!$options['birthday_calendar_enabled']) {
+            $builder->remove('includedInBirthdayCalendar');
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -49,6 +53,7 @@ class AddressBookType extends AbstractType
         $resolver->setDefaults([
             'new' => false,
             'data_class' => AddressBook::class,
+            'birthday_calendar_enabled' => true,
         ]);
     }
 }
