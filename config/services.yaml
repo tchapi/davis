@@ -9,6 +9,8 @@ parameters:
     timezone: '%env(APP_TIMEZONE)%'
     public_calendars_enabled: '%env(default:default_public_calendars_enabled:bool:PUBLIC_CALENDARS_ENABLED)%'
     default_public_calendars_enabled: "true"
+    caldav_enabled: "%env(bool:CALDAV_ENABLED)%"
+    carddav_enabled: "%env(bool:CARDDAV_ENABLED)%"
 
 services:
     # default configuration for services in *this* file
