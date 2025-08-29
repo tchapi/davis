@@ -383,7 +383,7 @@
       </trans-unit>
       <trans-unit id="coqCyJL" resname="form.includedInBirthdayCalendar.help">
         <source>form.includedInBirthdayCalendar.help</source>
-        <target>When selected, all cards with a valid birthday will be included in the principal's birthday calendar, which will be available as a subscription</target>
+        <target>When selected, all cards with a valid birthday will be included in the principal's birthday calendar, which will be available as a shared calendar in your account</target>
       </trans-unit>
       <trans-unit id="rqpkW3X" resname="form.name.help.caldav">
         <source>form.name.help.caldav</source>
@@ -391,11 +391,11 @@
       </trans-unit>
       <trans-unit id="XcmEaP5" resname="form.uri.help.carddav">
         <source>form.uri.help.carddav</source>
-        <target>This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+        <target>This is the unique identifier for this address book. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
       </trans-unit>
       <trans-unit id="reeyEAg" resname="form.uri.help.caldav">
         <source>form.uri.help.caldav</source>
-        <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
+        <target>This is the unique identifier for this calendar. Allowed characters are digits, lowercase letters and the dash symbol '-'.</target>
       </trans-unit>
       <trans-unit id="xAoSnrW" resname="form.public.help.caldav">
         <source>form.public.help.caldav</source>
