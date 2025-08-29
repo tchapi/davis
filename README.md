@@ -97,7 +97,7 @@ a. The database driver and url (_you should already have it configured since you
     
 ```shell
 DATABASE_DRIVER=mysql # or postgresql, or sqlite
-DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4
+DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4
 ```
 
 b. The admin password for the backend
@@ -322,7 +322,7 @@ dav.domain.tld {
     SetEnv APP_ENV prod
     SetEnv APP_SECRET <app-secret-id>
     SetEnv DATABASE_DRIVER "mysql"
-    SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4"
+    SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4"
     # ... etc
 </VirtualHost>
 ```
@@ -351,7 +351,7 @@ server {
         fastcgi_param APP_ENV prod;
         fastcgi_param APP_SECRET <app-secret-id>;
         fastcgi_param DATABASE_DRIVER "mysql";
-        fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4";
+        fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4";
         # ... etc ...
 
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
@@ -435,7 +435,7 @@ docker pull ghcr.io/tchapi/davis-standalone:v4.4.0
 
 ### Edge image
 
-The edge image is built from the tip of the main branch:
+The edge image is generally built from the tip of the main branch, but might sometimes be used for specific branch testing:
 
 ```
 docker pull ghcr.io/tchapi/davis:edge
@@ -443,7 +443,7 @@ docker pull ghcr.io/tchapi/davis:edge
 
 > [!WARNING]
 > 
-> The `edge` image must not be considered stable. Use only release images for production.
+> The `edge` image must not be considered stable. **Use only release images for production setups**.
 
 ## Full stack
 
@@ -537,7 +537,12 @@ Depending on how you run Davis, logs are either:
 
 > [!NOTE]
 >
-> It's `./var/log` (relative to the Davis installation), not `/var/log`
+> It's `./var/log` (relative to the Davis installation), not `/var/log`.
+>
+> To tail the aplication log on Docker, do:
+> ```
+> docker exec -it davis tail /var/www/davis/var/log/prod.log
+> ```
 
 ### I have a "Bad timezone configuration env var" error on the dashboard
 
