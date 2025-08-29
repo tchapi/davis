@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- *  Scale timestamps to big int for the Year 2038 problem
+ *  Scale timestamps to big int for the Year 2038 problem.
  */
 final class Version20250409193948 extends AbstractMigration
 {

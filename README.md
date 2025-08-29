@@ -146,6 +146,10 @@ WEBDAV_HOMES_DIR=
 
 > [!NOTE]
 >
+> In a docker setup, I recommend setting `WEBDAV_TMP_DIR` to `/tmp`.
+
+> [!NOTE]
+>
 > By default, home directories are disabled totally (the env var is set to an empty string). If needed, it is recommended to use a folder that is **NOT** a child of the public dir, such as `/webdav/homes` for instance, so that users cannot access other users' homes.
 
 g. The log file path
