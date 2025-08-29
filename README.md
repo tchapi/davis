@@ -6,7 +6,7 @@ Davis
 [![Latest release][release_badge]][release_link]
 [![Sponsor me][sponsor_badge]][sponsor_link]
 
-A simple, fully translatable and full-featured DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
+A modern, simple, feature-packed, fully translatable DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
 
 ### Web admin dashboard
 
@@ -17,6 +17,12 @@ Supports **Basic authentication**, as well as **IMAP** and **LDAP** (_via extern
 ### DAV Server
 
 The underlying server implementation supports (*non-exhaustive list*) CalDAV, CardDAV, WebDAV, calendar sharing, scheduling, mail notifications, and server-side subscriptions (*depending on the capabilities of the client*).
+
+### Additional features ✨
+
+- Subscriptions (to be added via the client, such as the macOS calendar, for instance)
+- Public calendars, available to anyone with the link
+- Automatic birthday calendar, updated on the fly when birthdates change in your contacts
 
 ### Deployment
 
