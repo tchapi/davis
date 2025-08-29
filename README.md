@@ -591,6 +591,14 @@ Check if your instance can reach your LDAP server:
   - Check that the `LDAP_DN_PATTERN` filter is compliant with your LDAP service
   - Example: `uid=%u,ou=people,dc=domain,dc=com`: [LLDAP](https://github.com/lldap/lldap) uses `people` instead of `users`.
 
+### The birthday calendar is not synced / not up to date
+
+An update event might have been missed. In this case, it's easy to resync all contacts by issuing the command:
+
+```
+bin/console dav:sync-birthday-calendar
+```
+
 # 📚 Libraries used
 
   - Symfony 7 (Licence : MIT)
