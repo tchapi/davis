@@ -6,7 +6,7 @@ Davis
 [![Latest release][release_badge]][release_link]
 [![Sponsor me][sponsor_badge]][sponsor_link]
 
-A simple, fully translatable and full-featured DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
+A modern, simple, feature-packed, fully translatable DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
 
 ### Web admin dashboard
 
@@ -17,6 +17,12 @@ Supports **Basic authentication**, as well as **IMAP** and **LDAP** (_via extern
 ### DAV Server
 
 The underlying server implementation supports (*non-exhaustive list*) CalDAV, CardDAV, WebDAV, calendar sharing, scheduling, mail notifications, and server-side subscriptions (*depending on the capabilities of the client*).
+
+### Additional features ✨
+
+- Subscriptions (to be added via the client, such as the macOS calendar, for instance)
+- Public calendars, available to anyone with the link
+- Automatic birthday calendar, updated on the fly when birthdates change in your contacts
 
 ### Deployment
 
@@ -91,7 +97,7 @@ a. The database driver and url (_you should already have it configured since you
     
 ```shell
 DATABASE_DRIVER=mysql # or postgresql, or sqlite
-DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4
+DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4
 ```
 
 b. The admin password for the backend
@@ -316,7 +322,7 @@ dav.domain.tld {
     SetEnv APP_ENV prod
     SetEnv APP_SECRET <app-secret-id>
     SetEnv DATABASE_DRIVER "mysql"
-    SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4"
+    SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4"
     # ... etc
 </VirtualHost>
 ```
@@ -345,7 +351,7 @@ server {
         fastcgi_param APP_ENV prod;
         fastcgi_param APP_SECRET <app-secret-id>;
         fastcgi_param DATABASE_DRIVER "mysql";
-        fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4";
+        fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4";
         # ... etc ...
 
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
@@ -429,7 +435,7 @@ docker pull ghcr.io/tchapi/davis-standalone:v4.4.0
 
 ### Edge image
 
-The edge image is built from the tip of the main branch:
+The edge image is generally built from the tip of the main branch, but might sometimes be used for specific branch testing:
 
 ```
 docker pull ghcr.io/tchapi/davis:edge
@@ -437,7 +443,7 @@ docker pull ghcr.io/tchapi/davis:edge
 
 > [!WARNING]
 > 
-> The `edge` image must not be considered stable. Use only release images for production.
+> The `edge` image must not be considered stable. **Use only release images for production setups**.
 
 ## Full stack
 
@@ -531,7 +537,12 @@ Depending on how you run Davis, logs are either:
 
 > [!NOTE]
 >
-> It's `./var/log` (relative to the Davis installation), not `/var/log`
+> It's `./var/log` (relative to the Davis installation), not `/var/log`.
+>
+> To tail the aplication log on Docker, do:
+> ```
+> docker exec -it davis tail /var/www/davis/var/log/prod.log
+> ```
 
 ### I have a "Bad timezone configuration env var" error on the dashboard
 
@@ -579,6 +590,14 @@ Check if your instance can reach your LDAP server:
 
   - Check that the `LDAP_DN_PATTERN` filter is compliant with your LDAP service
   - Example: `uid=%u,ou=people,dc=domain,dc=com`: [LLDAP](https://github.com/lldap/lldap) uses `people` instead of `users`.
+
+### The birthday calendar is not synced / not up to date
+
+An update event might have been missed. In this case, it's easy to resync all contacts by issuing the command:
+
+```
+bin/console dav:sync-birthday-calendar
+```
 
 # 📚 Libraries used
 
