@@ -33,15 +33,40 @@ final class IMAPAuth extends AbstractBasic
     private $autoCreate;
 
     /**
-     * IMAP server in the form {host[:port]}.
+     * IMAP server in the form host[:port].
      *
      * @var string
      */
     private $IMAPAuthUrl;
 
-    public function __construct(ManagerRegistry $doctrine, Utils $utils, string $IMAPAuthUrl, bool $autoCreate)
+    /**
+     * IMAP encryption method. Could be ssl, tls or false.
+     *
+     * @var mixed (string or bool)
+     */
+    private $IMAPEncryptionMethod;
+
+    /**
+     * Should we validate the certificate?
+     *
+     * @var bool
+     */
+    private $IMAPCertificateValidation;
+
+    public function __construct(ManagerRegistry $doctrine, Utils $utils, string $IMAPAuthUrl, bool $autoCreate, string $IMAPEncryptionMethod, bool $IMAPCertificateValidation)
     {
         $this->IMAPAuthUrl = $IMAPAuthUrl;
+
+        // We're making sure that only ssl, tls or 'false' are passed down to the IMAP client
+        $IMAPEncryptionMethodCleaned = strtolower($IMAPEncryptionMethod);
+        if ('false' === $IMAPEncryptionMethodCleaned) {
+            $this->IMAPEncryptionMethod = false;
+        } elseif ('tls' === $IMAPEncryptionMethodCleaned) {
+            $this->IMAPEncryptionMethod = 'tls';
+        } else {
+            $this->IMAPEncryptionMethod = 'ssl';
+        }
+        $this->IMAPCertificateValidation = $IMAPCertificateValidation;
 
         $this->autoCreate = $autoCreate;
 
@@ -55,7 +80,6 @@ final class IMAPAuth extends AbstractBasic
      */
     protected function imapOpen(string $username, string $password): bool
     {
-        // $cm = new ClientManager('path/to/config/imap.php');
         $cm = new ClientManager($options = []);
 
         $components = parse_url($this->IMAPAuthUrl);
@@ -66,12 +90,21 @@ final class IMAPAuth extends AbstractBasic
             return false;
         }
 
+        // Trying to choose the best port if it was not provided
+        if ($components['port']) {
+            $port = $components['port'];
+        } elseif (false === $this->IMAPEncryptionMethod) {
+            $port = 143;
+        } else {
+            $port = 993;
+        }
+
         // Create a new instance of the IMAP client manually
         $client = $cm->make([
             'host' => $components['host'],
-            'port' => $components['port'] ?? 993,
-            'encryption' => 'ssl',
-            'validate_cert' => true,
+            'port' => $port,
+            'encryption' => $this->IMAPEncryptionMethod,
+            'validate_cert' => $this->IMAPCertificateValidation,
             'username' => $username,
             'password' => $password,
             'protocol' => 'imap',
@@ -110,7 +143,7 @@ final class IMAPAuth extends AbstractBasic
     /**
      * Validates a username and password by trying to authenticate against IMAP.
      */
-    protected function validateUserPass($username, $password)
+    protected function validateUserPass($username, $password): bool
     {
         return $this->imapOpen($username, $password);
     }
