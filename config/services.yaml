@@ -34,6 +34,8 @@ services:
         arguments:
             $IMAPAuthUrl: "%env(IMAP_AUTH_URL)%"
             $autoCreate: "%env(bool:IMAP_AUTH_USER_AUTOCREATE)%"
+            $IMAPEncryptionMethod: "%env(IMAP_ENCRYPTION_METHOD)%"
+            $IMAPCertificateValidation: "%env(bool:IMAP_CERTIFICATE_VALIDATION)%"
 
     App\Services\LDAPAuth:
         arguments:
