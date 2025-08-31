@@ -27,11 +27,12 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Install GD PHP extension
+            - name: Install GD / ZIP PHP extension
               run: |
-                apk add $PHPIZE_DEPS libpng-dev
+                apk add $PHPIZE_DEPS libpng-dev libzip-dev
                 docker-php-ext-configure gd
-                docker-php-ext-install gd
+                docker-php-ext-configure zip
+                docker-php-ext-install gd zip
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Validate Composer
@@ -70,16 +71,18 @@ jobs:
                 php:
                     - '8.2'
                     - '8.3'
+                    - '8.4'
             fail-fast: false
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Install MySQL / GD PHP extensions
+            - name: Install MySQL / GD / ZIP PHP extensions
               run: |
-                apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev
+                apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev
                 docker-php-ext-configure intl
                 docker-php-ext-configure gd
-                docker-php-ext-install pdo pdo_mysql intl gd
+                docker-php-ext-configure zip
+                docker-php-ext-install pdo pdo_mysql intl gd zip
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Install dependencies with Composer
