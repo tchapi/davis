@@ -33,17 +33,17 @@ services:
     App\Services\IMAPAuth:
         arguments:
             $IMAPAuthUrl: "%env(IMAP_AUTH_URL)%"
-            $autoCreate: "%env(bool:IMAP_AUTH_USER_AUTOCREATE)%"
             $IMAPEncryptionMethod: "%env(IMAP_ENCRYPTION_METHOD)%"
             $IMAPCertificateValidation: "%env(bool:IMAP_CERTIFICATE_VALIDATION)%"
+            $autoCreate: "%env(bool:IMAP_AUTH_USER_AUTOCREATE)%"
 
     App\Services\LDAPAuth:
         arguments:
             $LDAPAuthUrl: "%env(LDAP_AUTH_URL)%"
             $LDAPDnPattern: "%env(LDAP_DN_PATTERN)%"
             $LDAPMailAttribute: "%env(LDAP_MAIL_ATTRIBUTE)%"
-            $autoCreate: "%env(bool:LDAP_AUTH_USER_AUTOCREATE)%"
             $LDAPCertificateCheckingStrategy: "%env(LDAP_CERTIFICATE_CHECKING_STRATEGY)%"
+            $autoCreate: "%env(bool:LDAP_AUTH_USER_AUTOCREATE)%"
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
