@@ -31,6 +31,7 @@ class BirthdayService
 {
     public function __construct(
         private ManagerRegistry $doctrine,
+        private string $birthdayReminderOffset,
     ) {
     }
 
@@ -227,12 +228,14 @@ class BirthdayService
         $vEvent->{'SUMMARY'} = $summary;
         $vEvent->{'TRANSP'} = 'TRANSPARENT';
 
-        // Set a reminder
-        $alarm = $vCal->createComponent('VALARM');
-        $alarm->add($vCal->createProperty('TRIGGER', Constants::BIRTHDAY_REMINDER_OFFSET, ['VALUE' => 'DURATION']));
-        $alarm->add($vCal->createProperty('ACTION', 'DISPLAY'));
-        $alarm->add($vCal->createProperty('DESCRIPTION', $vEvent->{'SUMMARY'}));
-        $vEvent->add($alarm);
+        // Set a reminder, if needed
+        if (strtolower($this->birthdayReminderOffset) !== "false") {
+            $alarm = $vCal->createComponent('VALARM');
+            $alarm->add($vCal->createProperty('TRIGGER', $this->birthdayReminderOffset, ['VALUE' => 'DURATION']));
+            $alarm->add($vCal->createProperty('ACTION', 'DISPLAY'));
+            $alarm->add($vCal->createProperty('DESCRIPTION', $vEvent->{'SUMMARY'}));
+            $vEvent->add($alarm);
+        }
 
         $vCal->add($vEvent);
 

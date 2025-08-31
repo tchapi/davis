@@ -67,17 +67,17 @@ Dependencies
 
 1. Retrieve the dependencies:
 
-```
-composer install
-```
+    ```
+    composer install
+    ```
 
 2. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
 
 3. Run the migrations to create all the necessary tables:
 
-```
-bin/console doctrine:migrations:migrate
-```
+    ```
+    bin/console doctrine:migrations:migrate
+    ```
 
 **Davis** can also be used with a pre-existing MySQL database (_for instance, one previously managed by Baïkal_). See the paragraph "Migrating from Baikal" for more info.
 
@@ -93,14 +93,14 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 >
 > If your installation is behind a web server like Apache or Nginx, you can setup the env vars directly in your Apache or Nginx configuration (see below). Skip this part in this case.
 
-a. The database driver and url (_you should already have it configured since you created the database previously_)
+**a. The database driver and url** (_you should already have it configured since you created the database previously_)
     
 ```shell
 DATABASE_DRIVER=mysql # or postgresql, or sqlite
 DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4
 ```
 
-b. The admin password for the backend
+**b. The admin password for the backend**
 
 ```shell
 ADMIN_LOGIN=admin
@@ -111,7 +111,7 @@ ADMIN_PASSWORD=test
 >
 > You can bypass auth entirely if you use a third party authorization provider such as Authelia. In that case, set the `ADMIN_AUTH_BYPASS` env var to `true` (case-sensitive, this is actually the string `true`, not a boolean) to allow full access to the dashboard. This does not change the behaviour of the DAV server.
 
-c. The auth Realm and method for HTTP auth
+**c. The auth Realm and method for HTTP auth**
 
 ```shell
 AUTH_REALM=SabreDAV
@@ -119,7 +119,7 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 ```
 > See [the following paragraph](#specific-environment-variables-for-imap-and-ldap-authentication-methods) for more information if you choose either IMAP or LDAP.
 
-d. The global flags to enable CalDAV, CardDAV and WebDAV. You can also disable the option to have calendars public
+**d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
 ```shell
 CALDAV_ENABLED=true
@@ -134,14 +134,34 @@ PUBLIC_CALENDARS_ENABLED=true
 > By default, `PUBLIC_CALENDARS_ENABLED` is true. That doesn't mean that all calendars are public by default — it just means that you have an option, upon calendar creation, to set the calendar public (but it's not public by default).
 
 
-e. The email address that your invites are going to be sent from
+**e. The email address that your invites are going to be sent from**
 
 ```shell
 INVITE_FROM_ADDRESS=no-reply@example.org
 ```
 
-f. The paths for the WebDAV installation
+**f. The reminder offset for all birthdays**
 
+You must specify a relative duration, as specified in [the RFC 5545 spec](https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.6)
+
+```shell
+BIRTHDAY_REMINDER_OFFSET=PT9H
+```
+
+If you don't want a reminder for birthday events, set it to the `false` value (lowercase):
+
+```shell
+BIRTHDAY_REMINDER_OFFSET=false
+```
+
+> [!NOTE]
+>
+> By default, if the env var is not set or empty, we use `PT9H` (9am on the date of the birthday).
+
+**g. The paths for the WebDAV installation**
+
+> [!TIP]
+>
 > I recommend that you use absolute directories so you know exactly where your files reside.
 
 ```shell
@@ -158,7 +178,7 @@ WEBDAV_HOMES_DIR=
 >
 > By default, home directories are disabled totally (the env var is set to an empty string). If needed, it is recommended to use a folder that is **NOT** a child of the public dir, such as `/webdav/homes` for instance, so that users cannot access other users' homes.
 
-g. The log file path
+**h. The log file path**
 
 You can use an absolute file path here, and you can use Symfony's `%kernel.logs_dir%` and `%kernel.environment%` placeholders if needed (as in the default value). Setting it to `/dev/null` will disable logging altogether.
 
@@ -166,7 +186,7 @@ You can use an absolute file path here, and you can use Symfony's `%kernel.logs_
 LOG_FILE_PATH="%kernel.logs_dir%/%kernel.environment%.log"
 ```
 
-h. The timezone you want for the app
+**i. The timezone you want for the app**
 
 This must comply with the [official list](https://www.php.net/manual/en/timezones.php)
 
@@ -236,29 +256,27 @@ If you're migrating from Baïkal, then you will likely want to do the following 
 
 1. Get a backup of your data (without the `CREATE`  statements, but with complete `INSERT`  statements):
 
-```shell
-mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database
-```
-
+    ```shell
+    mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database
+    ```
 
 2. Create a new database for Davis (let's name it `davis`) and create the base schema:
 
-```shell
-bin/console doctrine:migrations:migrate 'DoctrineMigrations\Version20191030113307' --no-interaction
-```
-
+    ```shell
+    bin/console doctrine:migrations:migrate 'DoctrineMigrations\Version20191030113307' --no-interaction
+    ```
 
 3. Reimport the data back:
 
-```
-mysql -uroot -p davis < baikal_to_davis.sql
-```
+    ```
+    mysql -uroot -p davis < baikal_to_davis.sql
+    ```
 
 4. Run the necessary remaining migrations:
 
-```
-bin/console doctrine:migrations:migrate
-```
+    ```
+    bin/console doctrine:migrations:migrate
+    ```
 
 # 🌐 Access / Webserver
 
@@ -268,7 +286,7 @@ The administration interface is available at `/dashboard`. You need to login to 
 
 The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
 
-> [!NOTE]
+> [!TIP]
 >
 > For shared hosting, the `symfony/apache-pack` is included and provides a standard `.htaccess` file in the public directory so redirections should work out of the box.
 
