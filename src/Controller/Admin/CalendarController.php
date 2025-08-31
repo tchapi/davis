@@ -32,8 +32,14 @@ class CalendarController extends AbstractController
         // Separate shared calendars
         $calendars = [];
         $shared = [];
+        $auto = [];
         foreach ($allCalendars as $calendar) {
-            if (!$calendar->isShared()) {
+            if ($calendar->isAutomaticallyGenerated()) {
+                $auto[] = [
+                    'entity' => $calendar,
+                    'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
+                ];
+            } elseif (!$calendar->isShared()) {
                 $calendars[] = [
                     'entity' => $calendar,
                     'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
@@ -53,6 +59,7 @@ class CalendarController extends AbstractController
             'calendars' => $calendars,
             'subscriptions' => $subscriptions,
             'shared' => $shared,
+            'auto' => $auto,
             'principal' => $principal,
             'username' => $username,
             'allPrincipals' => $allPrincipalsExcept,
