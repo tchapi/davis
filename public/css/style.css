@@ -60,3 +60,15 @@ body {
 .popover .popover-body {
     user-select: text;
 }
+
+/* Github link icon */
+.github-link {
+    background-image: url("/images/github-mark.png");
+    background-repeat: no-repeat;
+    background-size: 23px;
+    height: 23px;
+    width: 23px;
+}
+[data-bs-theme=dark] .github-link {
+    background-image: url("/images/github-mark-white.png");
+}

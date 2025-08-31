@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Constants;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -40,7 +41,7 @@ class CalendarInstance
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", cascade: ['persist'], inversedBy: "instances")]
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", cascade: ['persist'], inversedBy: 'instances')]
     #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 
@@ -139,6 +140,11 @@ class CalendarInstance
     public function isPublic(): bool
     {
         return self::ACCESS_PUBLIC === $this->access;
+    }
+
+    public function isAutomaticallyGenerated(): bool
+    {
+        return in_array($this->uri, [Constants::BIRTHDAY_CALENDAR_URI]);
     }
 
     public function getDisplayName(): ?string

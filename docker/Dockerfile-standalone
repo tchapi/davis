@@ -76,7 +76,7 @@ ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
 
 LABEL org.opencontainers.image.authors="tchap@tchap.me"
 LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis-standalone"
-LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 5 and Bootstrap 5 (Standalone version with reverse-proxy)"
+LABEL org.opencontainers.image.description="A simple, fully translatable admin interface for sabre/dav based on Symfony 7 and Bootstrap 5 (Standalone version with reverse-proxy)"
 
 # Rapatriate built extensions
 COPY --from=extension-builder /usr/local/etc/php/conf.d     /usr/local/etc/php/conf.d/
@@ -113,7 +113,7 @@ RUN docker-php-source delete && \
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
-HEALTHCHECK --interval=120s --timeout=10s --start-period=30s --retries=3 \
+HEALTHCHECK --interval=120s --timeout=10s --start-period=60s --retries=3 \
     CMD curl --fail http://localhost:9000 || exit 1 
 
 # It's the Caddy port, not the PHP-fpm one (as we use sockets)

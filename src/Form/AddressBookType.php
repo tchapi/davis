@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\AddressBook;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -28,6 +29,12 @@ class AddressBookType extends AbstractType
                 'label' => 'form.displayName',
                 'help' => 'form.name.help.carddav',
             ])
+            ->add('includedInBirthdayCalendar', ChoiceType::class, [
+                'label' => 'form.includedInBirthdayCalendar',
+                'help' => 'form.includedInBirthdayCalendar.help',
+                'required' => true,
+                'choices' => ['yes' => true, 'no' => false],
+            ])
             ->add('description', TextareaType::class, [
                 'label' => 'form.description',
                 'required' => false,
@@ -35,6 +42,10 @@ class AddressBookType extends AbstractType
             ->add('save', SubmitType::class, [
                 'label' => 'save',
             ]);
+
+        if (!$options['birthday_calendar_enabled']) {
+            $builder->remove('includedInBirthdayCalendar');
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -42,6 +53,7 @@ class AddressBookType extends AbstractType
         $resolver->setDefaults([
             'new' => false,
             'data_class' => AddressBook::class,
+            'birthday_calendar_enabled' => true,
         ]);
     }
 }

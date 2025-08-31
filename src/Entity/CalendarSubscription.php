@@ -43,7 +43,7 @@ class CalendarSubscription
     #[ORM\Column(name: 'stripattachments', type: 'smallint', nullable: true)]
     private $stripAttachments;
 
-    #[ORM\Column(name: 'lastmodified', type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'lastmodified', type: 'bigint', nullable: true)]
     private $lastModified;
 
     public function getId(): ?int

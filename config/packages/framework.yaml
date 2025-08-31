@@ -14,5 +14,11 @@ framework:
         name: 'DAVIS_SESSION'
         storage_factory_id: session.storage.factory.native
 
+    profiler:
+        collect_serializer_data: true
+
+    property_info:
+        with_constructor_extractor: false
+
     php_errors:
         log: true

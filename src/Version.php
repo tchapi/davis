@@ -4,5 +4,5 @@ namespace App;
 
 final class Version
 {
-    public const VERSION = '5.1.1';
+    public const VERSION = '5.2.0';
 }

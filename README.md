@@ -6,7 +6,7 @@ Davis
 [![Latest release][release_badge]][release_link]
 [![Sponsor me][sponsor_badge]][sponsor_link]
 
-A simple, fully translatable and full-featured DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
+A modern, simple, feature-packed, fully translatable DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
 
 ### Web admin dashboard
 
@@ -17,6 +17,12 @@ Supports **Basic authentication**, as well as **IMAP** and **LDAP** (_via extern
 ### DAV Server
 
 The underlying server implementation supports (*non-exhaustive list*) CalDAV, CardDAV, WebDAV, calendar sharing, scheduling, mail notifications, and server-side subscriptions (*depending on the capabilities of the client*).
+
+### Additional features ✨
+
+- Subscriptions (to be added via the client, such as the macOS calendar, for instance)
+- Public calendars, available to anyone with the link
+- Automatic birthday calendar, updated on the fly when birthdates change in your contacts
 
 ### Deployment
 
@@ -61,17 +67,17 @@ Dependencies
 
 1. Retrieve the dependencies:
 
-```
-composer install
-```
+    ```
+    composer install
+    ```
 
 2. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
 
 3. Run the migrations to create all the necessary tables:
 
-```
-bin/console doctrine:migrations:migrate
-```
+    ```
+    bin/console doctrine:migrations:migrate
+    ```
 
 **Davis** can also be used with a pre-existing MySQL database (_for instance, one previously managed by Baïkal_). See the paragraph "Migrating from Baikal" for more info.
 
@@ -87,14 +93,14 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 >
 > If your installation is behind a web server like Apache or Nginx, you can setup the env vars directly in your Apache or Nginx configuration (see below). Skip this part in this case.
 
-a. The database driver and url (_you should already have it configured since you created the database previously_)
+**a. The database driver and url** (_you should already have it configured since you created the database previously_)
     
 ```shell
 DATABASE_DRIVER=mysql # or postgresql, or sqlite
-DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4
+DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4
 ```
 
-b. The admin password for the backend
+**b. The admin password for the backend**
 
 ```shell
 ADMIN_LOGIN=admin
@@ -105,7 +111,7 @@ ADMIN_PASSWORD=test
 >
 > You can bypass auth entirely if you use a third party authorization provider such as Authelia. In that case, set the `ADMIN_AUTH_BYPASS` env var to `true` (case-sensitive, this is actually the string `true`, not a boolean) to allow full access to the dashboard. This does not change the behaviour of the DAV server.
 
-c. The auth Realm and method for HTTP auth
+**c. The auth Realm and method for HTTP auth**
 
 ```shell
 AUTH_REALM=SabreDAV
@@ -113,35 +119,66 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 ```
 > See [the following paragraph](#specific-environment-variables-for-imap-and-ldap-authentication-methods) for more information if you choose either IMAP or LDAP.
 
-d. The global flags to enable CalDAV, CardDAV and WebDAV
+**d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
 ```shell
 CALDAV_ENABLED=true
 CARDDAV_ENABLED=true
 WEBDAV_ENABLED=false
+
+PUBLIC_CALENDARS_ENABLED=true
 ```
 
-e. The email address that your invites are going to be sent from
+> [!NOTE]
+>
+> By default, `PUBLIC_CALENDARS_ENABLED` is true. That doesn't mean that all calendars are public by default — it just means that you have an option, upon calendar creation, to set the calendar public (but it's not public by default).
+
+
+**e. The email address that your invites are going to be sent from**
 
 ```shell
 INVITE_FROM_ADDRESS=no-reply@example.org
 ```
 
-f. The paths for the WebDAV installation
+**f. The reminder offset for all birthdays**
 
+You must specify a relative duration, as specified in [the RFC 5545 spec](https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.6)
+
+```shell
+BIRTHDAY_REMINDER_OFFSET=PT9H
+```
+
+If you don't want a reminder for birthday events, set it to the `false` value (lowercase):
+
+```shell
+BIRTHDAY_REMINDER_OFFSET=false
+```
+
+> [!NOTE]
+>
+> By default, if the env var is not set or empty, we use `PT9H` (9am on the date of the birthday).
+
+**g. The paths for the WebDAV installation**
+
+> [!TIP]
+>
 > I recommend that you use absolute directories so you know exactly where your files reside.
 
 ```shell
-WEBDAV_TMP_DIR='/tmp'
-WEBDAV_PUBLIC_DIR='/webdav/public'
+WEBDAV_TMP_DIR=/webdav/tmp
+WEBDAV_PUBLIC_DIR=/webdav/public
 WEBDAV_HOMES_DIR=
 ```
 
 > [!NOTE]
 >
+> In a docker setup, I recommend setting `WEBDAV_TMP_DIR` to `/tmp`.
+
+> [!NOTE]
+>
 > By default, home directories are disabled totally (the env var is set to an empty string). If needed, it is recommended to use a folder that is **NOT** a child of the public dir, such as `/webdav/homes` for instance, so that users cannot access other users' homes.
 
-g. The log file path
+**h. The log file path**
 
 You can use an absolute file path here, and you can use Symfony's `%kernel.logs_dir%` and `%kernel.environment%` placeholders if needed (as in the default value). Setting it to `/dev/null` will disable logging altogether.
 
@@ -149,12 +186,12 @@ You can use an absolute file path here, and you can use Symfony's `%kernel.logs_
 LOG_FILE_PATH="%kernel.logs_dir%/%kernel.environment%.log"
 ```
 
-h. The timezone you want for the app
+**i. The timezone you want for the app**
 
 This must comply with the [official list](https://www.php.net/manual/en/timezones.php)
 
 ```shell
-APP_TIMEZONE="Australia/Lord_Howe"
+APP_TIMEZONE=Australia/Lord_Howe
 ```
 
 > Set a void value like so:
@@ -194,23 +231,23 @@ In case you use the `IMAP` auth type, you must specify the auth url (_the "mailb
 You should also explicitely define whether you want new authenticated to be created upon login:
 
 ```shell
-IMAP_AUTH_URL="{imap.gmail.com:993/imap/ssl/novalidate-cert}"
+IMAP_AUTH_URL={imap.gmail.com:993/imap/ssl/novalidate-cert}
 IMAP_AUTH_USER_AUTOCREATE=true # false by default
 ```
 
 Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated to be created upon login (_like for IMAP_):
 
 ```shell
-LDAP_AUTH_URL="ldap://127.0.0.1"
-LDAP_DN_PATTERN="mail=%u"
-LDAP_MAIL_ATTRIBUTE="mail"
+LDAP_AUTH_URL=ldap://127.0.0.1:3890 # default LDAP port
+LDAP_DN_PATTERN=uid=%u,ou=users,dc=domain,dc=com
+LDAP_MAIL_ATTRIBUTE=mail
 LDAP_AUTH_USER_AUTOCREATE=true # false by default
-LDAP_CERTIFICATE_CHECKING_STRATEGY="try" # try by default.
+LDAP_CERTIFICATE_CHECKING_STRATEGY=try # try by default. Other values are: never, hard, demand or allow
 ```
 
 > Ex: for [Zimbra LDAP](https://zimbra.github.io/adminguide/latest/#zimbra_ldap_service), you might want to use the `zimbraMailDeliveryAddress` attribute to retrieve the principal user email:
 >    ```shell
->    LDAP_MAIL_ATTRIBUTE="zimbraMailDeliveryAddress"
+>    LDAP_MAIL_ATTRIBUTE=zimbraMailDeliveryAddress
 >    ```
 
 ## Migrating from Baïkal?
@@ -219,29 +256,27 @@ If you're migrating from Baïkal, then you will likely want to do the following 
 
 1. Get a backup of your data (without the `CREATE`  statements, but with complete `INSERT`  statements):
 
-```shell
-mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database
-```
-
+    ```shell
+    mysqldump -u root -p --no-create-info --complete-insert baikal > baikal_to_davis.sql # baikal is the actual name of your database
+    ```
 
 2. Create a new database for Davis (let's name it `davis`) and create the base schema:
 
-```shell
-bin/console doctrine:migrations:migrate 'DoctrineMigrations\Version20191030113307' --no-interaction
-```
-
+    ```shell
+    bin/console doctrine:migrations:migrate 'DoctrineMigrations\Version20191030113307' --no-interaction
+    ```
 
 3. Reimport the data back:
 
-```
-mysql -uroot -p davis < baikal_to_davis.sql
-```
+    ```
+    mysql -uroot -p davis < baikal_to_davis.sql
+    ```
 
 4. Run the necessary remaining migrations:
 
-```
-bin/console doctrine:migrations:migrate
-```
+    ```
+    bin/console doctrine:migrations:migrate
+    ```
 
 # 🌐 Access / Webserver
 
@@ -251,7 +286,7 @@ The administration interface is available at `/dashboard`. You need to login to 
 
 The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
 
-> [!NOTE]
+> [!TIP]
 >
 > For shared hosting, the `symfony/apache-pack` is included and provides a standard `.htaccess` file in the public directory so redirections should work out of the box.
 
@@ -305,7 +340,7 @@ dav.domain.tld {
     SetEnv APP_ENV prod
     SetEnv APP_SECRET <app-secret-id>
     SetEnv DATABASE_DRIVER "mysql"
-    SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4"
+    SetEnv DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4"
     # ... etc
 </VirtualHost>
 ```
@@ -334,7 +369,7 @@ server {
         fastcgi_param APP_ENV prod;
         fastcgi_param APP_SECRET <app-secret-id>;
         fastcgi_param DATABASE_DRIVER "mysql";
-        fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=mariadb-10.6.10&charset=utf8mb4";
+        fastcgi_param DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4";
         # ... etc ...
 
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
@@ -418,7 +453,7 @@ docker pull ghcr.io/tchapi/davis-standalone:v4.4.0
 
 ### Edge image
 
-The edge image is built from the tip of the main branch:
+The edge image is generally built from the tip of the main branch, but might sometimes be used for specific branch testing:
 
 ```
 docker pull ghcr.io/tchapi/davis:edge
@@ -426,7 +461,7 @@ docker pull ghcr.io/tchapi/davis:edge
 
 > [!WARNING]
 > 
-> The `edge` image must not be considered stable. Use only release images for production.
+> The `edge` image must not be considered stable. **Use only release images for production setups**.
 
 ## Full stack
 
@@ -520,7 +555,12 @@ Depending on how you run Davis, logs are either:
 
 > [!NOTE]
 >
-> It's `./var/log` (relative to the Davis installation), not `/var/log`
+> It's `./var/log` (relative to the Davis installation), not `/var/log`.
+>
+> To tail the aplication log on Docker, do:
+> ```
+> docker exec -it davis tail /var/www/davis/var/log/prod.log
+> ```
 
 ### I have a "Bad timezone configuration env var" error on the dashboard
 
@@ -543,6 +583,39 @@ docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrat
 In a shell, if you run Davis locally:
 
     bin/console doctrine:migrations:migrate
+
+### The LDAP connection is not working
+
+> [!NOTE]
+>
+> Make sure all environment parameters are in plain text (no quotes).
+
+Check if your instance can reach your LDAP server:
+
+  - For Docker instances: make sure it is on the same network
+  - Check connection via `ldapsearch`:
+
+    ```shell
+    # For docker: connect into container's shell
+    docker exec -it davis sh
+
+    # install ldap utils (for alpine linux)
+    apk add openldap-clients
+
+    # User checking their own entry
+    ldapsearch -H ldap://lldap-server:3890 -D "uid=someuser,ou=users,dc=domain,dc=com" -W -b "dc=domain,dc=com" "(uid=someuser)"
+    ```
+
+  - Check that the `LDAP_DN_PATTERN` filter is compliant with your LDAP service
+  - Example: `uid=%u,ou=people,dc=domain,dc=com`: [LLDAP](https://github.com/lldap/lldap) uses `people` instead of `users`.
+
+### The birthday calendar is not synced / not up to date
+
+An update event might have been missed. In this case, it's easy to resync all contacts by issuing the command:
+
+```
+bin/console dav:sync-birthday-calendar
+```
 
 # 📚 Libraries used
 

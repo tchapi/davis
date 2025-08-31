@@ -7,6 +7,12 @@ parameters:
     default_database_driver: "mysql"
     default_admin_auth_bypass: "false"
     timezone: '%env(APP_TIMEZONE)%'
+    public_calendars_enabled: '%env(default:default_public_calendars_enabled:bool:PUBLIC_CALENDARS_ENABLED)%'
+    default_public_calendars_enabled: "true"
+    birthday_reminder_offset: '%env(default:default_birthday_reminder_offset:BIRTHDAY_REMINDER_OFFSET)%'
+    default_birthday_reminder_offset: "PT9H"
+    caldav_enabled: "%env(bool:CALDAV_ENABLED)%"
+    carddav_enabled: "%env(bool:CARDDAV_ENABLED)%"
 
 services:
     # default configuration for services in *this* file
@@ -49,6 +55,7 @@ services:
             $calDAVEnabled: "%env(bool:CALDAV_ENABLED)%"
             $cardDAVEnabled: "%env(bool:CARDDAV_ENABLED)%"
             $webDAVEnabled: "%env(bool:WEBDAV_ENABLED)%"
+            $publicCalendarsEnabled: "%public_calendars_enabled%"
             $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
             $authMethod: "%env(AUTH_METHOD)%"
             $authRealm: "%env(AUTH_REALM)%"
@@ -64,6 +71,10 @@ services:
     App\Logging\Monolog\PasswordFilterProcessor:
         tags:
             - { name: monolog.processor }
+
+    App\Services\BirthdayService:
+        arguments:
+            $birthdayReminderOffset: "%birthday_reminder_offset%"
 
 when@dev:
     services:
