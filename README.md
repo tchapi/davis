@@ -97,7 +97,7 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 
 > [!CAUTION]
 >
-> In a production environnement, the `APP_ENV` variable MUST be set to `prod`.
+> In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data.
 
 **a. The database driver and url** (_you should already have it configured since you created the database previously_)
     
