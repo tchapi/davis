@@ -68,8 +68,10 @@ Dependencies
 1. Retrieve the dependencies:
 
     ```
-    composer install
+    composer install --no-dev
     ```
+
+    Remove `--no-dev` if you plan to install Davis locally for e.g. development purposes.
 
 2. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
 
@@ -92,6 +94,10 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 > [!NOTE]
 >
 > If your installation is behind a web server like Apache or Nginx, you can setup the env vars directly in your Apache or Nginx configuration (see below). Skip this part in this case.
+
+> [!CAUTION]
+>
+> In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data.
 
 **a. The database driver and url** (_you should already have it configured since you created the database previously_)
     
