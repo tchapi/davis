@@ -13,8 +13,6 @@ parameters:
     default_birthday_reminder_offset: "PT9H"
     caldav_enabled: "%env(bool:CALDAV_ENABLED)%"
     carddav_enabled: "%env(bool:CARDDAV_ENABLED)%"
-    trusted_proxies: '%env(default:default_trusted_proxies:TRUSTED_PROXIES)%'
-    default_trusted_proxies: '127.0.0.1,REMOTE_ADDR'
 
 services:
     # default configuration for services in *this* file
