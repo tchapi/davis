@@ -37,7 +37,7 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
 
 # PDO: PostgreSQL
 RUN apk --update --virtual build-deps-pg add --no-cache libpq-dev \
-    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-configure pgsql --with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pgsql pdo_pgsql \
     && apk del build-deps-pg \
     && rm -rf /tmp/*
