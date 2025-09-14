@@ -42,7 +42,7 @@
         <span>{{ "dashboard.version"|trans }} : <code>{{ version }}</code> (SabreDAV <code>{{ sabredav_version }}</code>)</span>
         <a class="github-link" href="https://github.com/tchapi/davis" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Project Github page" data-bs-placement="bottom"></a>
       </li>
-      <li class="list-group-item list-group-item-secondary">{{ "dashboard.auth"|trans }} : <code>{{ authMethod }}</code> ({{ "dashboard.auth_realm"|trans }}: <code>{{ authRealm }}</code>)</li>
+      <li class="list-group-item list-group-item-secondary">{{ "dashboard.auth"|trans }} : <code>{{ authMethod }}</code>{% if authMethod == 'Basic' %} ({{ "dashboard.auth_realm"|trans }}: <code>{{ authRealm }}</code>){% endif %}</li>
       <li class="list-group-item list-group-item-secondary">{{ "dashboard.invite_from_address"|trans }} : <code>{{ invite_from_address|default('Not set') }}</code></li>
       <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center ">
         <span>{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone.actual_default }}</code></span>

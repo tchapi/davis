@@ -8,6 +8,7 @@
         "ext-ctype": "*",
         "ext-gd": "*",
         "ext-iconv": "*",
+        "ext-zip": "*",
         "composer-runtime-api": "^2",
         "dantsu/php-osm-static-api": "^0.6.4",
         "doctrine/doctrine-bundle": "^2.15.1",
@@ -37,7 +38,8 @@
         "symfony/twig-bundle": "^7.3",
         "symfony/validator": "^7.3",
         "symfony/web-link": "^7.3",
-        "symfony/yaml": "^7.3"
+        "symfony/yaml": "^7.3",
+        "webklex/php-imap": "^6.2"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.5",
