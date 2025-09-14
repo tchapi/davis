@@ -33,11 +33,18 @@ final class IMAPAuth extends AbstractBasic
     private $autoCreate;
 
     /**
-     * IMAP server in the form host[:port].
+     * IMAP server host.
      *
      * @var string
      */
-    private $IMAPAuthUrl;
+    private $IMAPHost;
+
+    /**
+     * IMAP server port.
+     *
+     * @var int
+     */
+    private $IMAPPort;
 
     /**
      * IMAP encryption method. Could be ssl, tls or false.
