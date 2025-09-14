@@ -27,6 +27,7 @@ services:
       - DATABASE_DRIVER=mysql
       - DATABASE_URL=mysql://${DB_USER}:${DB_PASSWORD}@mysql:3306/${DB_DATABASE}?serverVersion=mariadb-10.6.10&charset=utf8mb4
       - MAILER_DSN=smtp://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
+      - SYMFONY_TRUSTED_PROXIES=REMOTE_ADDR
     depends_on:
       - mysql
     ports:

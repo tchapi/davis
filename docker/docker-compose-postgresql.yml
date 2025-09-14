@@ -40,6 +40,7 @@ services:
       - DATABASE_DRIVER=postgresql
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgresql:5432/${DB_DATABASE}?serverVersion=15&charset=UTF-8
       - MAILER_DSN=smtp://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
+      - SYMFONY_TRUSTED_PROXIES=REMOTE_ADDR
     depends_on:
       - postgresql
     volumes:

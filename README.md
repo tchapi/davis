@@ -206,6 +206,13 @@ APP_TIMEZONE=Australia/Lord_Howe
 > ```
 > in your environment file if you wish to use the **actual default timezone of the server**, and not enforcing it. 
 
+**j. Trusting forwarded headers**
+
+If you're behind one or several proxies, the TLS termination might be upstream and the application might not be aware of the HTTPS context. In order for urls to be generated with the correct scheme, you should indicate that you trust the chain of proxies until the TLS termination one. You can use the Symfony mechanism for that (see [documentation](https://symfony.com/doc/7.2/deployment/proxies.html) for possible values):
+
+```shell
+SYMFONY_TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
+```
 
 #### Overriding the dotenv (`.env`) path
 
