@@ -79,13 +79,12 @@ Dependencies
     composer install --no-dev
     ```
 
-    > [!CAUTION]
-    > To run in production mode, set `APP_ENV=prod` in your `.env.local` file (see below)
+   And set `APP_ENV=prod` in your `.env.local` file (see below)
 
 
-2. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
+3. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
 
-3. Run the migrations to create all the necessary tables:
+4. Run the migrations to create all the necessary tables:
 
     ```
     bin/console doctrine:migrations:migrate
