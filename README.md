@@ -67,11 +67,21 @@ Dependencies
 
 1. Retrieve the dependencies:
 
+    a. If you plan to run Davis locally, for development purposes
+
+    ```
+    composer install
+    ```
+
+    b. If you plan to run Davis on production
+
     ```
     composer install --no-dev
     ```
 
-    Remove `--no-dev` if you plan to install Davis locally for e.g. development purposes.
+    > [!CAUTION]
+    > To run in production mode, set `APP_ENV=prod` in your `.env.local` file (see below)
+
 
 2. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
 
@@ -596,6 +606,15 @@ docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrat
 In a shell, if you run Davis locally:
 
     bin/console doctrine:migrations:migrate
+
+### I have a 500 and a log about `Uncaught Error: Class "Symfony\Bundle\WebProfilerBundle\WebProfilerBundle" not found`
+
+You are running the app in dev mode, but you haven't installed the dev dependencies. Either:
+
+a. Set `APP_ENV=prod` in your local env file (See configuration above)
+
+b. Or `composer install` (without the `--no-dev` flag)
+
 
 ### The LDAP connection is not working
 
