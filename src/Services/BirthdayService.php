@@ -229,7 +229,7 @@ class BirthdayService
         $vEvent->{'TRANSP'} = 'TRANSPARENT';
 
         // Set a reminder, if needed
-        if (strtolower($this->birthdayReminderOffset) !== "false") {
+        if ('false' !== strtolower($this->birthdayReminderOffset)) {
             $alarm = $vCal->createComponent('VALARM');
             $alarm->add($vCal->createProperty('TRIGGER', $this->birthdayReminderOffset, ['VALUE' => 'DURATION']));
             $alarm->add($vCal->createProperty('ACTION', 'DISPLAY'));

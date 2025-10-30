@@ -248,16 +248,18 @@ Or use it directly in the Apache configuration
 
 ### Specific environment variables for IMAP and LDAP authentication methods
 
-In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
+In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL` as `host:port`, the encryption method (SSL, TLS or None) and whether the certificate should be validated.
 
-You should also explicitely define whether you want new authenticated to be created upon login:
+You should also explicitely define whether you want new authenticated users to be created upon login:
 
 ```shell
-IMAP_AUTH_URL={imap.gmail.com:993/imap/ssl/novalidate-cert}
+IMAP_AUTH_URL=imap.mydomain.com:993
+IMAP_ENCRYPTION_METHOD=ssl # ssl, tls or false
+IMAP_CERTIFICATE_VALIDATION=true
 IMAP_AUTH_USER_AUTOCREATE=true # false by default
 ```
 
-Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated to be created upon login (_like for IMAP_):
+Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated users to be created upon login (_like for IMAP_):
 
 ```shell
 LDAP_AUTH_URL=ldap://127.0.0.1:3890 # default LDAP port
