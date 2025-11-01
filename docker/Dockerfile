@@ -10,10 +10,10 @@ RUN apk --no-progress --update add --no-cache \
         curl unzip fcgi \
         # These are for php-intl
         icu-libs \
-        # This one is for IMAP (to provide libc-client.so)
-        c-client \
         # This one for LDAP
         libldap \
+        # This one for IMAP
+        libzip \
         # These are for GD (map image in mail)
         freetype \
         libjpeg-turbo \
