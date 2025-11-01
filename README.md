@@ -302,6 +302,9 @@ If you're migrating from Baïkal, then you will likely want to do the following 
     bin/console doctrine:migrations:migrate
     ```
 
+> [!NOTE]
+> Some details / steps to resolve are also available in https://github.com/tchapi/davis/issues/226.
+
 # 🌐 Access / Webserver
 
 A simple status page is available on the root `/` of the server.
