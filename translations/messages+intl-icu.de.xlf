@@ -361,6 +361,10 @@
         <source>form.uri</source>
         <target>URI</target>
       </trans-unit>
+      <trans-unit id="PHZs.1x" resname="form.includedInBirthdayCalendar">
+        <source>form.includedInBirthdayCalendar</source>
+        <target>Im Geburtstagskalender enthalten?</target>
+      </trans-unit>
       <trans-unit id="GBcNXE." resname="form.description">
         <source>form.description</source>
         <target>Beschreibung</target>
@@ -376,6 +380,10 @@
       <trans-unit id="e02Cnv6" resname="form.name.help.carddav">
         <source>form.name.help.carddav</source>
         <target>Dieser Name wird in Ihrem CardDAV-Client angezeigt.</target>
+      </trans-unit>
+      <trans-unit id="coqCyJL" resname="form.includedInBirthdayCalendar.help">
+        <source>form.includedInBirthdayCalendar.help</source>
+        <target>Wenn diese Option ausgewählt ist, werden alle Karten mit einem gültigen Geburtstag in den Geburtstagskalender des Hauptbenutzers aufgenommen, der als freigegebener Kalender in Ihrem Konto verfügbar ist.</target>
       </trans-unit>
       <trans-unit id="rqpkW3X" resname="form.name.help.caldav">
         <source>form.name.help.caldav</source>
@@ -581,6 +589,10 @@
         <source>calendar.share_access.10</source>
         <target>öffentlich</target>
       </trans-unit>
+      <trans-unit id="mYDsetM" resname="calendar.auto">
+        <source>calendar.auto</source>
+        <target>auto</target>
+      </trans-unit>
       <trans-unit id="FSDg5q6" resname="calendar.subscription">
         <source>calendar.subscription</source>
         <target>Abonnement</target>
@@ -588,6 +600,10 @@
       <trans-unit id="mJ_hMaA" resname="calendars.subscriptions">
         <source>calendars.subscriptions</source>
         <target>Abonnements</target>
+      </trans-unit>
+      <trans-unit id="ZnEWE47" resname="calendars.auto">
+        <source>calendars.auto</source>
+        <target>Automatisch generiert</target>
       </trans-unit>
     </body>
   </file>
