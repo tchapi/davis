@@ -10,10 +10,10 @@ RUN apk --no-progress --update add --no-cache \
         curl unzip fcgi \
         # These are for php-intl
         icu-libs \
-        # This one is for IMAP (to provide libc-client.so)
-        c-client \
         # This one for LDAP
         libldap \
+        # This one for IMAP
+        libzip \
         # These are for GD (map image in mail)
         freetype \
         libjpeg-turbo \
@@ -56,11 +56,11 @@ RUN apk --update --virtual build-deps-ldap add --no-cache openldap-dev \
     && apk del build-deps-ldap \
     && rm -rf /tmp/*
 
-# IMAP auth support
-RUN apk --update --virtual build-deps-imap add --no-cache imap-dev openssl-dev krb5-dev \
-    && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-ext-install imap \
-    && apk del build-deps-imap \
+# Zip lib for PHP-IMAP
+RUN apk --update --virtual build-deps-zip add --no-cache libzip-dev \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install zip \
+    && apk del build-deps-zip \
     && rm -rf /tmp/*
 
 # OPCache

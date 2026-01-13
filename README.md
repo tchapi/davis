@@ -67,13 +67,24 @@ Dependencies
 
 1. Retrieve the dependencies:
 
+    a. If you plan to run Davis locally, for development purposes
+
     ```
     composer install
     ```
 
-2. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
+    b. If you plan to run Davis on production
 
-3. Run the migrations to create all the necessary tables:
+    ```
+    composer install --no-dev
+    ```
+
+   And set `APP_ENV=prod` in your `.env.local` file (see below)
+
+
+3. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
+
+4. Run the migrations to create all the necessary tables:
 
     ```
     bin/console doctrine:migrations:migrate
@@ -92,6 +103,10 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 > [!NOTE]
 >
 > If your installation is behind a web server like Apache or Nginx, you can setup the env vars directly in your Apache or Nginx configuration (see below). Skip this part in this case.
+
+> [!CAUTION]
+>
+> In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data.
 
 **a. The database driver and url** (_you should already have it configured since you created the database previously_)
     
@@ -200,6 +215,13 @@ APP_TIMEZONE=Australia/Lord_Howe
 > ```
 > in your environment file if you wish to use the **actual default timezone of the server**, and not enforcing it. 
 
+**j. Trusting forwarded headers**
+
+If you're behind one or several proxies, the TLS termination might be upstream and the application might not be aware of the HTTPS context. In order for urls to be generated with the correct scheme, you should indicate that you trust the chain of proxies until the TLS termination one. You can use the Symfony mechanism for that (see [documentation](https://symfony.com/doc/7.2/deployment/proxies.html) for possible values):
+
+```shell
+SYMFONY_TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
+```
 
 #### Overriding the dotenv (`.env`) path
 
@@ -226,16 +248,18 @@ Or use it directly in the Apache configuration
 
 ### Specific environment variables for IMAP and LDAP authentication methods
 
-In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL`. See https://www.php.net/manual/en/function.imap-open.php for more details.
+In case you use the `IMAP` auth type, you must specify the auth url (_the "mailbox" url_) in `IMAP_AUTH_URL` as `host:port`, the encryption method (SSL, TLS or None) and whether the certificate should be validated.
 
-You should also explicitely define whether you want new authenticated to be created upon login:
+You should also explicitely define whether you want new authenticated users to be created upon login:
 
 ```shell
-IMAP_AUTH_URL={imap.gmail.com:993/imap/ssl/novalidate-cert}
+IMAP_AUTH_URL=imap.mydomain.com:993
+IMAP_ENCRYPTION_METHOD=ssl # ssl, tls or false
+IMAP_CERTIFICATE_VALIDATION=true
 IMAP_AUTH_USER_AUTOCREATE=true # false by default
 ```
 
-Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated to be created upon login (_like for IMAP_):
+Same goes for LDAP, where you must specify the LDAP server url, the DN pattern, the Mail attribute, as well as whether you want new authenticated users to be created upon login (_like for IMAP_):
 
 ```shell
 LDAP_AUTH_URL=ldap://127.0.0.1:3890 # default LDAP port
@@ -277,6 +301,9 @@ If you're migrating from Baïkal, then you will likely want to do the following 
     ```
     bin/console doctrine:migrations:migrate
     ```
+
+> [!NOTE]
+> Some details / steps to resolve are also available in https://github.com/tchapi/davis/issues/226.
 
 # 🌐 Access / Webserver
 
@@ -583,6 +610,15 @@ docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrat
 In a shell, if you run Davis locally:
 
     bin/console doctrine:migrations:migrate
+
+### I have a 500 and a log about `Uncaught Error: Class "Symfony\Bundle\WebProfilerBundle\WebProfilerBundle" not found`
+
+You are running the app in dev mode, but you haven't installed the dev dependencies. Either:
+
+a. Set `APP_ENV=prod` in your local env file (See configuration above)
+
+b. Or `composer install` (without the `--no-dev` flag)
+
 
 ### The LDAP connection is not working
 

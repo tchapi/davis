@@ -8,7 +8,13 @@
 	redir /.well-known/carddav /dav/
 
         root * /var/www/davis/public
-        php_fastcgi unix//var/run/php-fpm/php-fpm.sock
+        php_fastcgi unix//var/run/php-fpm/php-fpm.sock {
+                # Preserve the original X-Forwarded-Proto from upstream, as it might be HTTPS
+                header_up X-Forwarded-Proto {http.request.header.X-Forwarded-Proto}
+                header_up X-Forwarded-Host {http.request.header.X-Forwarded-Host}
+                header_up X-Forwarded-For {http.request.header.X-Forwarded-For}
+        }
+
         file_server {
                 # Safety net, just in case
                 hide .git .gitignore
