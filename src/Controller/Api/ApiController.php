@@ -375,7 +375,6 @@ class ApiController extends AbstractController
             $entityManager->flush();
         }
 
-
         return $this->json(['status' => 'success'], 200);
     }
 }
