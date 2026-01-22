@@ -6,7 +6,6 @@ use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
-use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -283,7 +282,16 @@ class ApiController extends AbstractController
         return $this->json($response, 200);
     }
 
-    #[Route('/calendars/{username}/share/{calendar_id}', name: 'calendars_share', methods: ['POST'])]
+    /**
+     * Sets or updates a share for a specific calendar of a specific user.
+     *
+     * @param Request $request     The HTTP POST request
+     * @param string  $username    The username of the user whose calendar share is to be set or updated
+     * @param string  $calendar_id The ID of the calendar whose share is to be set or updated
+     *
+     * @return JsonResponse A JSON response indicating the success or failure of the operation
+     */
+    #[Route('/calendars/{username}/shares/{calendar_id}/add', name: 'calendars_share', methods: ['POST'])]
     public function setUserCalendarsShare(Request $request, string $username, string $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
@@ -324,6 +332,49 @@ class ApiController extends AbstractController
             $entityManager->persist($sharedInstance);
         }
         $entityManager->flush();
+
+        return $this->json(['status' => 'success'], 200);
+    }
+
+    /**
+     * Removes a share for a specific calendar of a specific user.
+     *
+     * @param Request $request     The HTTP POST request
+     * @param string  $username    The username of the user whose calendar share is to be removed
+     * @param string  $calendar_id The ID of the calendar whose share is to be removed
+     *
+     * @return JsonResponse A JSON response indicating the success or failure of the operation
+     */
+    #[Route('/calendars/{username}/shares/{calendar_id}/remove', name: 'calendars_share_remove', methods: ['POST'])]
+    public function removeUserCalendarsShare(Request $request, string $username, string $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    {
+        if (!$this->validateApiKey($request)) {
+            return $this->json(['status' => 'Error', 'message' => 'Unauthorized'], 401);
+        }
+
+        if (!is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username) || !is_numeric($calendar_id)) {
+            return $this->json(['status' => 'Error', 'message' => 'Invalid Username/Calendar ID'], 400);
+        }
+
+        if (!is_numeric($request->get('id'))) {
+            return $this->json(['status' => 'Error', 'message' => 'Invalid Sharee ID'], 400);
+        }
+
+        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($calendar_id);
+        $shareeToRemove = $doctrine->getRepository(Principal::class)->findOneById($request->get('id'));
+
+        if (!$instance || !$shareeToRemove) {
+            return $this->json(['status' => 'Error', 'message' => 'Calendar Instance/User Not Found'], 404);
+        }
+
+        $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $shareeToRemove->getUri());
+
+        if ($existingSharedInstance) {
+            $entityManager = $doctrine->getManager();
+            $entityManager->remove($existingSharedInstance);
+            $entityManager->flush();
+        }
+
 
         return $this->json(['status' => 'success'], 200);
     }
