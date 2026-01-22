@@ -4,9 +4,8 @@ namespace App\Controller\Api;
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
-
 use App\Entity\Principal;
-use App\Form\CalendarInstanceType;
+use App\Entity\User;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -78,6 +77,41 @@ class ApiController extends AbstractController
     }
 
     /**
+     * Retrieves details of a specific user.
+     *
+     * @param Request $request The HTTP GET request
+     * @param string $username The username of the user whose details are to be retrieved
+     * @return JsonResponse A JSON response containing the user details
+     */
+    #[Route('/users/{username}', name: 'user_detail', methods: ['GET'])]
+    public function getUserDetials(Request $request, ManagerRegistry $doctrine, string $username): JsonResponse 
+    {
+        if (!$this->validateApiKey($request)) {
+            return $this->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if (empty($username) || !is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username)) {
+            return $this->json(['status' => 'Error', 'message' => 'Invalid Username'], 400);
+        }
+
+        $user = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+
+        if (!$user) {
+            return $this->json(['status' => 'success', 'data' => []], 200);
+        }
+
+        $response = [
+            "id" => $user->getId(),
+            "uri" => $user->getUri(),
+            "username" => $user->getUsername(),
+            "displayname" => $user->getDisplayName(),
+            "email" => $user->getEmail(),
+        ];
+
+        return $this->json($response, 200);
+    }
+
+    /**
      * Retrieves a list of calendars for a specific user.
      *
      * @param Request $request The HTTP GET request
@@ -105,9 +139,9 @@ class ApiController extends AbstractController
         foreach ($allCalendars as $calendar) {
             if (!$calendar->isShared()) {
                 $calendars[] = [
-                    "displayname" => $calendar->getDisplayName(),
-                    "uri" => $calendar->getUri(),
                     "id" => $calendar->getId(),
+                    "uri" => $calendar->getUri(),
+                    "displayname" => $calendar->getDisplayName(),
                     "description" => $calendar->getDescription(),
                     "events" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_EVENTS)),
                     "notes" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_NOTES)),
@@ -115,9 +149,9 @@ class ApiController extends AbstractController
                 ];
             } else {
                 $sharedCalendars[] = [
-                    "displayname" => $calendar->getDisplayName(),
-                    "uri" => $calendar->getUri(),
                     "id" => $calendar->getId(),
+                    "uri" => $calendar->getUri(),
+                    "displayname" => $calendar->getDisplayName(),
                     "description" => $calendar->getDescription(),
                     "events" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_EVENTS)),
                     "notes" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_NOTES)),
@@ -128,8 +162,9 @@ class ApiController extends AbstractController
 
         foreach ($subscriptions as $subscription) {
             $calendars[] = [
-                "displayname" => $subscription->getDisplayName(),
+                "id" => $subscription->getId(),
                 "uri" => $subscription->getUri(),
+                "displayname" => $subscription->getDisplayName(),
                 "description" => $subscription->getDescription(),
                 "events" => count($subscription->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_EVENTS)),
                 "notes" => count($subscription->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_NOTES)),
@@ -141,9 +176,60 @@ class ApiController extends AbstractController
             "status" => "success",
             "data" => [
                 "user_calendars" => $calendars ?? [],
-                "other_calendars" => $sharedCalendars ?? [],
+                "shared_calendars" => $sharedCalendars ?? [],
                 "subscriptions" => $subscriptions ?? []
             ]
+        ];
+
+        return $this->json($response, 200);
+    }
+
+    /**
+     * Retrieves details of a specific calendar for a specific user.
+     *
+     * @param Request $request The HTTP GET request
+     * @param string $username The username of the user whose calendar details are to be retrieved
+     * @param int $calendar_id The ID of the calendar whose details are to be retrieved
+     * @return JsonResponse A JSON response containing the calendar details
+     */
+    #[Route('/calendars/{username}/{calendar_id}', name: 'calendar_details', methods: ['GET'])]
+    public function getUserCalendarDetails(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    {
+        if (!$this->validateApiKey($request)) {
+            return $this->json(['status' => 'Error', 'message' => 'Unauthorized'], 401);
+        }
+
+        if (empty($username) || !is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username)) {
+            return $this->json(['status' => 'Error', 'message' => 'Invalid Username'], 400);
+        }
+
+        if (empty($calendar_id) || !is_int($calendar_id)) {
+            return $this->json(['status' => 'Error', 'message' => 'Invalid Calendar ID'], 400);
+        }
+
+        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
+
+        if (!$allCalendars) {
+            return $this->json(['status' => 'success', 'data' => []], 200);
+        }
+
+        foreach ($allCalendars as $calendar) {
+            if (!$calendar->isShared() && $calendar->getId() === $calendar_id) {
+                $calendar = [
+                    "id" => $calendar->getId(),
+                    "uri" => $calendar->getUri(),
+                    "displayname" => $calendar->getDisplayName(),
+                    "description" => $calendar->getDescription(),
+                    "events" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_EVENTS)),
+                    "notes" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_NOTES)),
+                    "tasks" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_TODOS)),
+                ];
+            }
+        }
+
+        $response = [
+            "status" => "success",
+            "data" => $calendar ?? []
         ];
 
         return $this->json($response, 200);
@@ -167,8 +253,7 @@ class ApiController extends AbstractController
         if (!is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username) || !is_int($calendar_id)) {
             return $this->json(['status' => 'Error', 'message' => 'Invalid Username/Calendar ID'], 400);
         }
-
-        // TODO: Either wrong Id is return or sth else is wrong here
+        
         $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendar_id, true);
 
         if (!$instances) {
@@ -203,6 +288,10 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'Error', 'message' => 'Invalid Username/Calendar ID'], 400);
         }
 
+        if (!is_numeric($request->get('id')) || !in_array($request->get('write'), ['true', 'false'], true)) {
+            return $this->json(['status' => 'Error', 'message' => 'Invalid Sharee ID/Write Access Value'], 400);
+        }
+
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($calendar_id);
         $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('id'));
 
@@ -211,9 +300,7 @@ class ApiController extends AbstractController
         }
 
         $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
-
         $writeAccess = ('true' === $request->get('write') ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
-
         $entityManager = $doctrine->getManager();
 
         if ($existingSharedInstance) {
@@ -230,13 +317,8 @@ class ApiController extends AbstractController
                      ->setAccess($writeAccess);
             $entityManager->persist($sharedInstance);
         }
-
         $entityManager->flush();
 
-        $response = [
-            "status" => "success"
-        ];
-
-        return $this->json($response, 200);
+        return $this->json(["status" => "success"], 200);
     }
 }
