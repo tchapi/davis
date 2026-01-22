@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Api;
 
 use App\Entity\Calendar;
@@ -6,12 +7,11 @@ use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
 use App\Entity\User;
-
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\Persistence\ManagerRegistry;
 
 #[Route('/api', name: 'api_')]
 class ApiController extends AbstractController
@@ -26,6 +26,7 @@ class ApiController extends AbstractController
     private function validateApiKey(Request $request): bool
     {
         $key = $request->headers->get('X-API-Key');
+
         return hash_equals($this->apiKey, $key ?? '');
     }
 
@@ -38,12 +39,13 @@ class ApiController extends AbstractController
 
         return $this->json(['status' => 'OK'], 200);
     }
-    
+
     /**
      * Retrieves a list of users.
      *
      * @param Request $request The HTTP GET request
-     * @return JsonResponse A JSON response containing the list of users, 
+     *
+     * @return JsonResponse A JSON response containing the list of users,
      */
     #[Route('/users', name: 'users', methods: ['GET'])]
     public function getUsers(Request $request, ManagerRegistry $doctrine): JsonResponse
@@ -60,17 +62,17 @@ class ApiController extends AbstractController
 
         foreach ($principals as $principal) {
             $users[] = [
-                "id" => $principal->getId(),
-                "uri" => $principal->getUri(),
-                "username" => $principal->getUsername(),
-                "displayname" => $principal->getDisplayName(),
-                "email" => $principal->getEmail(),
+                'id' => $principal->getId(),
+                'uri' => $principal->getUri(),
+                'username' => $principal->getUsername(),
+                'displayname' => $principal->getDisplayName(),
+                'email' => $principal->getEmail(),
             ];
         }
 
         $response = [
-            "status" => "success",
-            "data" => $users
+            'status' => 'success',
+            'data' => $users,
         ];
 
         return $this->json($response, 200);
@@ -79,12 +81,13 @@ class ApiController extends AbstractController
     /**
      * Retrieves details of a specific user.
      *
-     * @param Request $request The HTTP GET request
-     * @param string $username The username of the user whose details are to be retrieved
+     * @param Request $request  The HTTP GET request
+     * @param string  $username The username of the user whose details are to be retrieved
+     *
      * @return JsonResponse A JSON response containing the user details
      */
     #[Route('/users/{username}', name: 'user_detail', methods: ['GET'])]
-    public function getUserDetials(Request $request, ManagerRegistry $doctrine, string $username): JsonResponse 
+    public function getUserDetials(Request $request, ManagerRegistry $doctrine, string $username): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
             return $this->json(['error' => 'Unauthorized'], 401);
@@ -101,11 +104,11 @@ class ApiController extends AbstractController
         }
 
         $response = [
-            "id" => $user->getId(),
-            "uri" => $user->getUri(),
-            "username" => $user->getUsername(),
-            "displayname" => $user->getDisplayName(),
-            "email" => $user->getEmail(),
+            'id' => $user->getId(),
+            'uri' => $user->getUri(),
+            'username' => $user->getUsername(),
+            'displayname' => $user->getDisplayName(),
+            'email' => $user->getEmail(),
         ];
 
         return $this->json($response, 200);
@@ -114,8 +117,9 @@ class ApiController extends AbstractController
     /**
      * Retrieves a list of calendars for a specific user.
      *
-     * @param Request $request The HTTP GET request
-     * @param string $username The username of the user whose calendars are to be retrieved
+     * @param Request $request  The HTTP GET request
+     * @param string  $username The username of the user whose calendars are to be retrieved
+     *
      * @return JsonResponse A JSON response containing the list of calendars
      */
     #[Route('/calendars/{username}', name: 'calendars', methods: ['GET'])]
@@ -139,46 +143,46 @@ class ApiController extends AbstractController
         foreach ($allCalendars as $calendar) {
             if (!$calendar->isShared()) {
                 $calendars[] = [
-                    "id" => $calendar->getId(),
-                    "uri" => $calendar->getUri(),
-                    "displayname" => $calendar->getDisplayName(),
-                    "description" => $calendar->getDescription(),
-                    "events" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_EVENTS)),
-                    "notes" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_NOTES)),
-                    "tasks" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_TODOS)),
+                    'id' => $calendar->getId(),
+                    'uri' => $calendar->getUri(),
+                    'displayname' => $calendar->getDisplayName(),
+                    'description' => $calendar->getDescription(),
+                    'events' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
+                    'notes' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
+                    'tasks' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
                 ];
             } else {
                 $sharedCalendars[] = [
-                    "id" => $calendar->getId(),
-                    "uri" => $calendar->getUri(),
-                    "displayname" => $calendar->getDisplayName(),
-                    "description" => $calendar->getDescription(),
-                    "events" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_EVENTS)),
-                    "notes" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_NOTES)),
-                    "tasks" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_TODOS)),
+                    'id' => $calendar->getId(),
+                    'uri' => $calendar->getUri(),
+                    'displayname' => $calendar->getDisplayName(),
+                    'description' => $calendar->getDescription(),
+                    'events' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
+                    'notes' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
+                    'tasks' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
                 ];
             }
         }
 
         foreach ($subscriptions as $subscription) {
             $calendars[] = [
-                "id" => $subscription->getId(),
-                "uri" => $subscription->getUri(),
-                "displayname" => $subscription->getDisplayName(),
-                "description" => $subscription->getDescription(),
-                "events" => count($subscription->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_EVENTS)),
-                "notes" => count($subscription->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_NOTES)),
-                "tasks" => count($subscription->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_TODOS)),
+                'id' => $subscription->getId(),
+                'uri' => $subscription->getUri(),
+                'displayname' => $subscription->getDisplayName(),
+                'description' => $subscription->getDescription(),
+                'events' => count($subscription->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
+                'notes' => count($subscription->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
+                'tasks' => count($subscription->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
             ];
         }
 
         $response = [
-            "status" => "success",
-            "data" => [
-                "user_calendars" => $calendars ?? [],
-                "shared_calendars" => $sharedCalendars ?? [],
-                "subscriptions" => $subscriptions ?? []
-            ]
+            'status' => 'success',
+            'data' => [
+                'user_calendars' => $calendars ?? [],
+                'shared_calendars' => $sharedCalendars ?? [],
+                'subscriptions' => $subscriptions ?? [],
+            ],
         ];
 
         return $this->json($response, 200);
@@ -187,9 +191,10 @@ class ApiController extends AbstractController
     /**
      * Retrieves details of a specific calendar for a specific user.
      *
-     * @param Request $request The HTTP GET request
-     * @param string $username The username of the user whose calendar details are to be retrieved
-     * @param int $calendar_id The ID of the calendar whose details are to be retrieved
+     * @param Request $request     The HTTP GET request
+     * @param string  $username    The username of the user whose calendar details are to be retrieved
+     * @param int     $calendar_id The ID of the calendar whose details are to be retrieved
+     *
      * @return JsonResponse A JSON response containing the calendar details
      */
     #[Route('/calendars/{username}/{calendar_id}', name: 'calendar_details', methods: ['GET'])]
@@ -216,20 +221,20 @@ class ApiController extends AbstractController
         foreach ($allCalendars as $calendar) {
             if (!$calendar->isShared() && $calendar->getId() === $calendar_id) {
                 $calendar = [
-                    "id" => $calendar->getId(),
-                    "uri" => $calendar->getUri(),
-                    "displayname" => $calendar->getDisplayName(),
-                    "description" => $calendar->getDescription(),
-                    "events" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_EVENTS)),
-                    "notes" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_NOTES)),
-                    "tasks" => count($calendar->getCalendar()->getObjects()->filter(fn($obj) => $obj->getComponentType() === Calendar::COMPONENT_TODOS)),
+                    'id' => $calendar->getId(),
+                    'uri' => $calendar->getUri(),
+                    'displayname' => $calendar->getDisplayName(),
+                    'description' => $calendar->getDescription(),
+                    'events' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
+                    'notes' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
+                    'tasks' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
                 ];
             }
         }
 
         $response = [
-            "status" => "success",
-            "data" => $calendar ?? []
+            'status' => 'success',
+            'data' => $calendar ?? [],
         ];
 
         return $this->json($response, 200);
@@ -238,13 +243,14 @@ class ApiController extends AbstractController
     /**
      * Retrieves a list of shares for a specific calendar of a specific user.
      *
-     * @param Request $request The HTTP GET request
-     * @param string $username The username of the user whose calendar shares are to be retrieved
-     * @param string $calendar_id The ID of the calendar whose shares are to be retrieved
+     * @param Request $request     The HTTP GET request
+     * @param string  $username    The username of the user whose calendar shares are to be retrieved
+     * @param string  $calendar_id The ID of the calendar whose shares are to be retrieved
+     *
      * @return JsonResponse A JSON response containing the list of calendar shares
      */
     #[Route('/calendars/{username}/shares/{calendar_id}', name: 'calendars_shares', methods: ['GET'])]
-    public function getUserCalendarsShares(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine) : JsonResponse
+    public function getUserCalendarsShares(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
             return $this->json(['status' => 'Error', 'message' => 'Unauthorized'], 401);
@@ -253,13 +259,13 @@ class ApiController extends AbstractController
         if (!is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username) || !is_int($calendar_id)) {
             return $this->json(['status' => 'Error', 'message' => 'Invalid Username/Calendar ID'], 400);
         }
-        
+
         $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendar_id, true);
 
         if (!$instances) {
             return $this->json(['status' => 'success', 'data' => []], 200);
         }
-        
+
         foreach ($instances as $instance) {
             $calendars[] = [
                 'username' => mb_substr($instance[0]['principalUri'], strlen(Principal::PREFIX)),
@@ -270,8 +276,8 @@ class ApiController extends AbstractController
         }
 
         $response = [
-            "status" => "success",
-            "data" => $calendars
+            'status' => 'success',
+            'data' => $calendars,
         ];
 
         return $this->json($response, 200);
@@ -319,6 +325,6 @@ class ApiController extends AbstractController
         }
         $entityManager->flush();
 
-        return $this->json(["status" => "success"], 200);
+        return $this->json(['status' => 'success'], 200);
     }
 }
