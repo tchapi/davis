@@ -15,10 +15,25 @@ Removes access to a specific shared calendar for a specific user.
 :calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 
+** Request Body Constraints**
+```json
+{
+	"user_id": "[numeric id of the user to remove access]"
+}
+```
+
 **URL example**
 
 ```json
 /api/calendars/mdoe/share/1/remove
+```
+
+**Body example**
+
+```json
+{
+	"user_id": "3",
+}
 ```
 
 ## Success Response
