@@ -329,6 +329,16 @@ The main endpoint for CalDAV, WebDAV or CardDAV is at `/dav`.
 >
 > For shared hosting, the `symfony/apache-pack` is included and provides a standard `.htaccess` file in the public directory so redirections should work out of the box.
 
+## API Endpoint
+
+For user and calendar management there is an API endpoint. See [the API documentation](docs/api/README.md) for more information.
+
+> [!TIP]
+>
+> The API endpoint requires an environment variable `API_KEY` set to a secret key that you will use in the `X-API-Key` header of your requests to authenticate. You can generate it with `bin/console api:generate`
+
+## Webserver Configuration Examples
+
 ### Example Caddy 2 configuration
 
 ```

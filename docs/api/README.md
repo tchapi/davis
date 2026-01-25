@@ -8,7 +8,7 @@ Open endpoints require no Authentication.
 
 ## Endpoints that require Authentication
 
-Closed endpoints require a valid `X-API-Key` to be included in the header of the request. Token needs to be configured in .env file and can be generated using `php bin/console api:generate` command.
+Closed endpoints require a valid `X-API-Key` to be included in the header of the request. Token needs to be configured in .env file (as a environment variable `API_KEY`) and can be generated using `php bin/console api:generate` command.
 
 ### User related
 
