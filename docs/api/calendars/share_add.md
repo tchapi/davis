@@ -15,10 +15,27 @@ Shares (or updates write access) a calendar owned by the specified user to anoth
 :calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 
+** Request Body constraints**
+```json
+{
+	"user_id": "[numeric id of the user to remove access]",
+	"write_access": "[boolean: true to grant write access, false for read-only]"
+}
+```
+
 **URL example**
 
 ```json
 /api/calendars/mdoe/share/1/add
+```
+
+**Body example**
+
+```json
+{
+	"user_id": "3",
+	"write_access": true
+}
 ```
 
 ## Success Response
