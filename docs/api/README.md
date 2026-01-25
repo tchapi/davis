@@ -22,7 +22,7 @@ Each endpoint displays information related to the User:
 Endpoints for viewing and modifying user calendars.
 
 * [Show All User Calendars](calendars/all.md) : `GET /api/calendars/:username`
-* Show User Calendar Details : `GET /api/calendars/:username/:calendar_id`
-* Show User Calendar Shares : `GET /api/calendars/:username/shares/:calendar_id`
-* Share User Calendar : `POST /api/calendars/:username/share/:calendar_id/add`
-* Remove Share User Calendar : `POST /api/calendars/:username/share/:calendar_id/remove`
+* [Show User Calendar Details](calendars/details.md) : `GET /api/calendars/:username/:calendar_id`
+* [Show User Calendar Shares](calendars/shares.md) : `GET /api/calendars/:username/shares/:calendar_id`
+* [Share User Calendar](calendars/share_add.md) : `POST /api/calendars/:username/share/:calendar_id/add`
+* [Remove Share User Calendar](calendars/share_remove.md) : `POST /api/calendars/:username/share/:calendar_id/remove`

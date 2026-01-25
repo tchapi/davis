@@ -29,7 +29,7 @@ Gets a list of all available Davis users.
 }
 ```
 
-Shown when no there are no users in Davis:
+Shown when there are no users in Davis:
 ```json
 {
 	"status": "success",
