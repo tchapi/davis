@@ -1,6 +1,6 @@
 # Get Users
 
-Gets a list of all available Davis users.
+Gets a list of all available users.
 
 **URL** : `/api/users`
 
@@ -22,8 +22,6 @@ Gets a list of all available Davis users.
 			"id": 3,
 			"uri": "principals/jdoe",
 			"username": "jdoe",
-			"displayname": "John Doe",
-			"email": "jdoe@example.org"
 		}
     ]
 }

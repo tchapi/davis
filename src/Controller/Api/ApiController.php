@@ -29,6 +29,13 @@ class ApiController extends AbstractController
         return hash_equals($this->apiKey, $key ?? '');
     }
 
+    /**
+     * Health check endpoint.
+     *
+     * @param Request $request The HTTP GET request
+     *
+     * @return JsonResponse A JSON response indicating the health status
+     */
     #[Route('/health', name: 'health', methods: ['GET'])]
     public function healthCheck(Request $request): JsonResponse
     {
@@ -36,11 +43,11 @@ class ApiController extends AbstractController
     }
 
     /**
-     * Retrieves a list of users.
+     * Retrieves a list of users (with their id, uri, username, and displayname).
      *
      * @param Request $request The HTTP GET request
      *
-     * @return JsonResponse A JSON response containing the list of users,
+     * @return JsonResponse A JSON response containing the list of users
      */
     #[Route('/users', name: 'users', methods: ['GET'])]
     public function getUsers(Request $request, ManagerRegistry $doctrine): JsonResponse
@@ -60,8 +67,6 @@ class ApiController extends AbstractController
                 'id' => $principal->getId(),
                 'uri' => $principal->getUri(),
                 'username' => $principal->getUsername(),
-                'displayname' => $principal->getDisplayName(),
-                'email' => $principal->getEmail(),
             ];
         }
 
@@ -74,7 +79,7 @@ class ApiController extends AbstractController
     }
 
     /**
-     * Retrieves details of a specific user.
+     * Retrieves details of a specific user (id, uri, username, displayname, email).
      *
      * @param Request $request  The HTTP GET request
      * @param string  $username The username of the user whose details are to be retrieved
@@ -115,12 +120,12 @@ class ApiController extends AbstractController
     }
 
     /**
-     * Retrieves a list of calendars for a specific user.
+     * Retrieves a list of calendars for a specific user, including user calendars, shared calendars, and subscriptions.
      *
      * @param Request $request  The HTTP GET request
      * @param string  $username The username of the user whose calendars are to be retrieved
      *
-     * @return JsonResponse A JSON response containing the list of calendars
+     * @return JsonResponse A JSON response containing the list of calendars for the specified user
      */
     #[Route('/calendars/{username}', name: 'calendars', methods: ['GET'])]
     public function getUserCalendars(Request $request, string $username, ManagerRegistry $doctrine): JsonResponse
@@ -189,7 +194,7 @@ class ApiController extends AbstractController
     }
 
     /**
-     * Retrieves details of a specific calendar for a specific user.
+     * Retrieves details of a specific calendar for a specific user (id, uri, displayname, description, number of events, notes, and tasks).
      *
      * @param Request $request     The HTTP GET request
      * @param string  $username    The username of the user whose calendar details are to be retrieved
@@ -241,7 +246,7 @@ class ApiController extends AbstractController
     }
 
     /**
-     * Retrieves a list of shares for a specific calendar of a specific user.
+     * Retrieves a list of shares for a specific calendar of a specific user (id, username, displayname, email, write_access).
      *
      * @param Request $request     The HTTP GET request
      * @param string  $username    The username of the user whose calendar shares are to be retrieved
