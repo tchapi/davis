@@ -1,8 +1,8 @@
-# User Calendars
+# User Calendar Details
 
 Gets a list of all available calendars for a specific user.
 
-**URL** : `/api/calendars/:username`
+**URL** : `/api/calendars/:username/:calendar_id`
 
 **Method** : `GET`
 
@@ -12,12 +12,13 @@ Gets a list of all available calendars for a specific user.
 
 ```
 :username -> "[username in plain text]",
+:calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 
 **URL example**
 
 ```json
-/api/calendars/jdoe
+/api/calendars/jdoe/1
 ```
 
 ## Success Response
@@ -30,50 +31,22 @@ Gets a list of all available calendars for a specific user.
 {
 	"status": "success",
 	"data": {
-		"user_calendars": [
-			{
-				"id": 1,
-				"uri": "default",
-				"displayname": "Default Calendar",
-				"description": "Default Calendar for John Doe",
-				"events": 0,
-				"notes": 0,
-				"tasks": 0
-			}
-		],
-		"shared_calendars": [
-			{
-				"id": 10,
-				"uri": "c2152eb0-ada1-451f-bf33-b4a9571ec92e",
-				"displayname": "Default Calendar",
-				"description": "Default Calendar for Mark Doe",
-				"events": 0,
-				"notes": 0,
-				"tasks": 0
-			}
-		],
-		"subscriptions": []
+		"id": 1,
+		"uri": "default",
+		"displayname": "Default Calendar",
+		"description": "Default Calendar for Joe Doe",
+		"events": 0,
+		"notes": 0,
+		"tasks": 0
 	}
 }
 ```
 
-Shown when there are no users in Davis:
+Shown when user has no calendars with the given id:
 ```json
 {
 	"status": "success",
 	"data": []
-}
-```
-
-Shown when user does not have calendars:
-```json
-{
-	"status": "success",
-	"data": {
-		"user_calendars": [],
-		"shared_calendars": [],
-		"subscriptions": []
-	}
 }
 ```
 
@@ -102,5 +75,18 @@ Shown when user does not have calendars:
 {
 	"status": "error", 
     "message": "Invalid Username"
+}
+```
+
+**Condition** : If ':calendar_id' is not a valid numeric value.
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+	"status": "error", 
+    "message": "Invalid Calendar ID"
 }
 ```

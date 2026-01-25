@@ -1,6 +1,6 @@
 # User Details
 
-Used for getting details regarding a specific user.
+Gets details about a specific user account.
 
 **URL** : `/api/users/:username`
 
