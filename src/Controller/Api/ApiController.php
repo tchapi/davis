@@ -58,6 +58,7 @@ class ApiController extends AbstractController
 
         $principals = $doctrine->getRepository(Principal::class)->findByIsMain(true);
 
+        $users = [];
         foreach ($principals as $principal) {
             $users[] = [
                 'id' => $principal->getId(),
