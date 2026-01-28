@@ -97,7 +97,7 @@ class ApiController extends AbstractController
         $user = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
 
         if (!$user) {
-            return $this->json(['status' => 'success', 'data' => []], 200);
+            return $this->json(['status' => 'error', 'message' => 'User Not Found'], 404);
         }
 
         $data = [
