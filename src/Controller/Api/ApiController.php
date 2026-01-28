@@ -29,6 +29,11 @@ class ApiController extends AbstractController
         return hash_equals($this->apiKey, $key ?? '');
     }
 
+    private function validateUsername(string $username): bool
+    {
+        return !empty($username) && is_string($username) && !preg_match('/[^a-zA-Z0-9_-]/', $username);
+    }
+
     /**
      * Health check endpoint.
      *
@@ -83,15 +88,11 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response containing the user details
      */
-    #[Route('/users/{username}', name: 'user_detail', methods: ['GET'])]
+    #[Route('/users/{username}', name: 'user_detail', methods: ['GET'], requirements: ['username' => "[a-zA-Z0-9_-]+"])]
     public function getUserDetails(Request $request, ManagerRegistry $doctrine, string $username): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
             return $this->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        if (empty($username) || !is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Username'], 400);
         }
 
         $user = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
@@ -124,15 +125,11 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response containing the list of calendars for the specified user
      */
-    #[Route('/calendars/{username}', name: 'calendars', methods: ['GET'])]
+    #[Route('/calendars/{username}', name: 'calendars', methods: ['GET'], requirements: ['username' => "[a-zA-Z0-9_-]+"])]
     public function getUserCalendars(Request $request, string $username, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
             return $this->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        if (empty($username) || !is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Username'], 400);
         }
 
         $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
@@ -199,19 +196,11 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response containing the calendar details
      */
-    #[Route('/calendars/{username}/{calendar_id}', name: 'calendar_details', methods: ['GET'], requirements: ['calendar_id' => "\d+"])]
+    #[Route('/calendars/{username}/{calendar_id}', name: 'calendar_details', methods: ['GET'], requirements: ['calendar_id' => "\d+", 'username' => "[a-zA-Z0-9_-]+"])]
     public function getUserCalendarDetails(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
             return $this->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        if (empty($username) || !is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Username'], 400);
-        }
-
-        if (empty($calendar_id) || !is_int($calendar_id)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID'], 400);
         }
 
         $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
@@ -251,19 +240,11 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response containing the list of calendar shares
      */
-    #[Route('/calendars/{username}/shares/{calendar_id}', name: 'calendars_shares', methods: ['GET'], requirements: ['calendar_id' => "\d+"])]
+    #[Route('/calendars/{username}/shares/{calendar_id}', name: 'calendars_shares', methods: ['GET'], requirements: ['calendar_id' => "\d+", 'username' => "[a-zA-Z0-9_-]+"])]
     public function getUserCalendarsShares(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
             return $this->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        if (empty($username) || !is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Username'], 400);
-        }
-
-        if (!is_int($calendar_id)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID'], 400);
         }
 
         $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
@@ -310,15 +291,11 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/share/{calendar_id}/add', name: 'calendars_share', methods: ['POST'], requirements: ['calendar_id' => "\d+"])]
+    #[Route('/calendars/{username}/share/{calendar_id}/add', name: 'calendars_share', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => "[a-zA-Z0-9_-]+"])]
     public function setUserCalendarsShare(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
             return $this->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        if (empty($username) || !is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Username/Calendar ID'], 400);
         }
 
         $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
@@ -375,17 +352,13 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/share/{calendar_id}/remove', name: 'calendars_share_remove', methods: ['POST'], requirements: ['calendar_id' => "\d+"])]
+    #[Route('/calendars/{username}/share/{calendar_id}/remove', name: 'calendars_share_remove', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => "[a-zA-Z0-9_-]+"])]
     public function removeUserCalendarsShare(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
             return $this->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
-
-        if (empty($username) || !is_string($username) || preg_match('/[^a-zA-Z0-9_-]/', $username)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Username/Calendar ID'], 400);
-        }
-
+        
         $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
             'id' => $calendar_id,
             'principalUri' => Principal::PREFIX.$username,
