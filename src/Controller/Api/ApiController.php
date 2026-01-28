@@ -133,12 +133,10 @@ class ApiController extends AbstractController
         }
 
         $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
-        $subscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $allSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
 
-        if (!$allCalendars && !$subscriptions) {
-            return $this->json(['status' => 'success', 'data' => []], 200);
-        }
-
+        $calendars = [];
+        $sharedCalendars = [];
         foreach ($allCalendars as $calendar) {
             if (!$calendar->isShared()) {
                 $calendars[] = [
@@ -163,8 +161,9 @@ class ApiController extends AbstractController
             }
         }
 
-        foreach ($subscriptions as $subscription) {
-            $calendars[] = [
+        $subscriptions = [];
+        foreach ($allSubscriptions as $subscription) {
+            $subscriptions[] = [
                 'id' => $subscription->getId(),
                 'uri' => $subscription->getUri(),
                 'displayname' => $subscription->getDisplayName(),
@@ -204,10 +203,6 @@ class ApiController extends AbstractController
         }
 
         $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
-
-        if (!$allCalendars) {
-            return $this->json(['status' => 'success', 'data' => []], 200);
-        }
 
         foreach ($allCalendars as $calendar) {
             if (!$calendar->isShared() && $calendar->getId() === $calendar_id) {
@@ -257,10 +252,6 @@ class ApiController extends AbstractController
         }
 
         $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendar_id, true);
-
-        if (!$instances) {
-            return $this->json(['status' => 'success', 'data' => []], 200);
-        }
 
         foreach ($instances as $instance) {
             $user_id = $doctrine->getRepository(Principal::class)->findOneByUri($instance[0]['principalUri']);
@@ -358,7 +349,7 @@ class ApiController extends AbstractController
         if (!$this->validateApiKey($request)) {
             return $this->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
-        
+
         $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
             'id' => $calendar_id,
             'principalUri' => Principal::PREFIX.$username,
