@@ -88,7 +88,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response containing the user details
      */
-    #[Route('/users/{username}', name: 'user_detail', methods: ['GET'], requirements: ['username' => "[a-zA-Z0-9_-]+"])]
+    #[Route('/users/{username}', name: 'user_detail', methods: ['GET'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
     public function getUserDetails(Request $request, ManagerRegistry $doctrine, string $username): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
@@ -125,7 +125,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response containing the list of calendars for the specified user
      */
-    #[Route('/calendars/{username}', name: 'calendars', methods: ['GET'], requirements: ['username' => "[a-zA-Z0-9_-]+"])]
+    #[Route('/calendars/{username}', name: 'calendars', methods: ['GET'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
     public function getUserCalendars(Request $request, string $username, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
@@ -195,7 +195,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response containing the calendar details
      */
-    #[Route('/calendars/{username}/{calendar_id}', name: 'calendar_details', methods: ['GET'], requirements: ['calendar_id' => "\d+", 'username' => "[a-zA-Z0-9_-]+"])]
+    #[Route('/calendars/{username}/{calendar_id}', name: 'calendar_details', methods: ['GET'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
     public function getUserCalendarDetails(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
@@ -235,7 +235,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response containing the list of calendar shares
      */
-    #[Route('/calendars/{username}/shares/{calendar_id}', name: 'calendars_shares', methods: ['GET'], requirements: ['calendar_id' => "\d+", 'username' => "[a-zA-Z0-9_-]+"])]
+    #[Route('/calendars/{username}/shares/{calendar_id}', name: 'calendars_shares', methods: ['GET'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
     public function getUserCalendarsShares(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
@@ -282,7 +282,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/share/{calendar_id}/add', name: 'calendars_share', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => "[a-zA-Z0-9_-]+"])]
+    #[Route('/calendars/{username}/share/{calendar_id}/add', name: 'calendars_share', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
     public function setUserCalendarsShare(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
@@ -343,7 +343,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/share/{calendar_id}/remove', name: 'calendars_share_remove', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => "[a-zA-Z0-9_-]+"])]
+    #[Route('/calendars/{username}/share/{calendar_id}/remove', name: 'calendars_share_remove', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
     public function removeUserCalendarsShare(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         if (!$this->validateApiKey($request)) {
