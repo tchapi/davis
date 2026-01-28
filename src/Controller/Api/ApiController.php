@@ -110,7 +110,7 @@ class ApiController extends AbstractController
 
         $response = [
             'status' => 'success',
-            'data' => $data ?? [],
+            'data' => $data,
         ];
 
         return $this->json($response, 200);
