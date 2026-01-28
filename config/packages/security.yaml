@@ -8,6 +8,11 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api:
+            pattern: ^/api
+            stateless: true
+            custom_authenticators:
+                - App\Security\ApiKeyAuthenticator
         main:
             lazy: true
             custom_authenticators:
@@ -16,6 +21,7 @@ security:
             logout:
                 path: app_logout
                 target: dashboard
+            
 
     access_control:
         - { path: ^/$, roles: PUBLIC_ACCESS }
@@ -24,3 +30,5 @@ security:
         - { path: ^/users, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
         - { path: ^/calendars, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
         - { path: ^/adressbooks, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
+        - { path: ^/api, roles: IS_AUTHENTICATED }
+        - { path: ^/api/health$, roles: PUBLIC_ACCESS }
