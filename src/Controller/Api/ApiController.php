@@ -227,6 +227,68 @@ class ApiController extends AbstractController
     }
 
     /**
+     * Creates a new calendar for a specific user.
+     * 
+     * @param Request $request  The HTTP POST request
+     * @param string  $username The username of the user for whom the calendar is to be created
+     * 
+     * @return JsonResponse A JSON response indicating the success or failure of the operation
+     */
+    #[Route('/calendars/{username}/create', name: 'calendar_create', methods: ['POST'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
+    public function createNewUserCalendar(Request $request, string $username, ManagerRegistry $doctrine): JsonResponse
+    {
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+            return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $calendarName = $request->get('name');
+        if (preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName) !== 1) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Name', 'timestamp' => $this->getTimestamp()], 400);
+        }
+        $calendarURI = strtolower(str_replace(' ', '_', $calendarName));
+
+        $calendarDescription = $request->get('description', '');
+        if (preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription) !== 1) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Description', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $entityManager = $doctrine->getManager();
+        $calendarInstance = new CalendarInstance();
+        $calendar = new Calendar();
+        $calendarInstance->setCalendar($calendar);
+
+        $calendarComponents = [];
+        if ($request->get('events_support', 'true') === 'true') {
+            $calendarComponents[] = Calendar::COMPONENT_EVENTS;
+        }
+        if ($request->get('notes_support', 'false') === 'true') {
+            $calendarComponents[] = Calendar::COMPONENT_NOTES;
+        }
+        if ($request->get('tasks_support', 'false') === 'true') {
+            $calendarComponents[] = Calendar::COMPONENT_TODOS;
+        }
+        $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
+        
+        $calendarInstance
+            ->setCalendar($calendar)
+            ->setAccess(CalendarInstance::ACCESS_SHAREDOWNER)
+            ->setDescription($calendarDescription)
+            ->setDisplayName($calendarName)
+            ->setUri($calendarURI)
+            ->setPrincipalUri(Principal::PREFIX.$username);
+
+        $entityManager->persist($calendarInstance);
+        $entityManager->flush();
+
+        $response = [
+            'status' => 'success',
+            'timestamp' => $this->getTimestamp(),
+        ];
+
+        return $this->json($response, 200);
+    }
+
+    /**
      * Retrieves a list of shares for a specific calendar of a specific user (id, username, displayname, email, write_access).
      *
      * @param Request $request     The HTTP GET request
