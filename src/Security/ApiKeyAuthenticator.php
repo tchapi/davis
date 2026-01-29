@@ -24,6 +24,11 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request): ?bool
     {
+        // Skip authentication for public health endpoint
+        if (preg_match('#^/api/v1/health$#', $request->getPathInfo())) {
+            return false;
+        }
+        
         // Always attempt to authenticate even if no API token is provided in the request
         // This stops the login page from being shown when accessing API routes
         return true;
