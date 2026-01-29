@@ -8,8 +8,8 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        api:
-            pattern: ^/api
+        api_v1:
+            pattern: ^/api/v1
             stateless: true
             custom_authenticators:
                 - App\Security\ApiKeyAuthenticator
@@ -31,4 +31,4 @@ security:
         - { path: ^/calendars, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
         - { path: ^/adressbooks, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
         - { path: ^/api, roles: IS_AUTHENTICATED }
-        - { path: ^/api/health$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/health$, roles: PUBLIC_ACCESS }

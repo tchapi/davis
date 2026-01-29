@@ -25,6 +25,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
     public function supports(Request $request): ?bool
     {
         // Always attempt to authenticate even if no API token is provided in the request
+        // This stops the login page from being shown when accessing API routes
         return true;
     }
 
@@ -51,6 +52,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
     {
         $data = [
             'message' => $exception->getMessage(),
+            'timestamp' => date('c'),
         ];
 
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
