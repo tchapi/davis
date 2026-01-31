@@ -41,33 +41,39 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
 
     public function getAcl($node): array
     {
+        // Note:
+        // '{DAV:}unauthenticated' - only unauthenticated users
+        // '{DAV:}all' - all users (both authenticated and unauthenticated)
+        // '{DAV:}authenticated' - only authenticated users
         $acl = parent::getAcl($node);
 
-        if ($node instanceof \Sabre\CalDAV\Calendar) {
-            if (CalendarInstance::ACCESS_PUBLIC === $node->getShareAccess() && $this->public_calendars_enabled) {
-                // We must add the ACL on the calendar itself
-                $acl[] = [
-                    'principal' => '{DAV:}unauthenticated',
-                    'privilege' => '{DAV:}read',
-                    'protected' => false,
-                ];
-            }
-        } elseif ($node instanceof \Sabre\CalDAV\CalendarObject) {
-            // The property is private in \Sabre\CalDAV\CalendarObject and we don't want to create
-            // a new class just to access it, so we use a closure.
-            $calendarInfo = (fn () => $this->calendarInfo)->call($node);
-            // [0] is the calendarId, [1] is the calendarInstanceId
-            $calendarInstanceId = $calendarInfo['id'][1];
+        if ($this->public_calendars_enabled) {
+            if ($node instanceof \Sabre\CalDAV\Calendar) {
+                if ($node->isPublic()) {
+                    // We must add the ACL on the calendar itself
+                    $acl[] = [
+                        'principal' => '{DAV:}unauthenticated',
+                        'privilege' => '{DAV:}read',
+                        'protected' => false,
+                    ];
+                }
+            } elseif ($node instanceof \Sabre\CalDAV\CalendarObject) {
+                // The property is private in \Sabre\CalDAV\CalendarObject and we don't want to create
+                // a new class just to access it, so we use a closure.
+                $calendarInfo = (fn () => $this->calendarInfo)->call($node);
+                // [0] is the calendarId, [1] is the calendarInstanceId
+                $calendarInstanceId = $calendarInfo['id'][1];
 
-            $calendar = $this->em->getRepository(CalendarInstance::class)->findOneById($calendarInstanceId);
+                $calendar = $this->em->getRepository(CalendarInstance::class)->findOneById($calendarInstanceId);
 
-            if ($calendar && $calendar->isPublic() && $this->public_calendars_enabled) {
-                // We must add the ACL on the object itself
-                $acl[] = [
-                    'principal' => '{DAV:}unauthenticated',
-                    'privilege' => '{DAV:}read',
-                    'protected' => false,
-                ];
+                if ($calendar && $calendar->isPublic()) {
+                    // We must add the ACL on the object itself
+                    $acl[] = [
+                        'principal' => '{DAV:}unauthenticated',
+                        'privilege' => '{DAV:}read',
+                        'protected' => false,
+                    ];
+                }
             }
         }
 

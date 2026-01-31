@@ -29,7 +29,6 @@ class CalendarInstanceType extends AbstractType
             ])
             ->add('public', ChoiceType::class, [
                 'label' => 'form.public',
-                'mapped' => false,
                 'disabled' => $options['shared'],
                 'help' => 'form.public.help.caldav',
                 'required' => true,

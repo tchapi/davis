@@ -19,6 +19,7 @@ use App\Entity\CalendarObject;
 use App\Entity\Card;
 use App\Entity\Principal;
 use Doctrine\Persistence\ManagerRegistry;
+use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VCard;
 use Sabre\VObject\DateTimeParser;
@@ -94,7 +95,7 @@ class BirthdayService
                     ->setPrincipalUri($principalUri)
                     ->setDisplayName('🎁 Birthdays')
                     ->setDescription('Birthdays')
-                    ->setAccess(CalendarInstance::ACCESS_READ)
+                    ->setAccess(SharingPlugin::ACCESS_READ)
                     ->setCalendarOrder(0)
                     ->setCalendar($calendar)
                     ->setTransparent(1)
