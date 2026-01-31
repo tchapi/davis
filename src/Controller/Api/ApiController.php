@@ -205,14 +205,24 @@ class ApiController extends AbstractController
         $calendar_details = [];
         foreach ($allCalendars as $calendar) {
             if (!$calendar->isShared() && $calendar->getId() === $calendar_id) {
+                $calendarComponents = explode(',', $calendar->getCalendar()->getComponents());
                 $calendar_details = [
                     'id' => $calendar->getId(),
                     'uri' => $calendar->getUri(),
                     'displayname' => $calendar->getDisplayName(),
                     'description' => $calendar->getDescription(),
-                    'events' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
-                    'notes' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
-                    'tasks' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
+                    'events' => [
+                        'enabled' => in_array(Calendar::COMPONENT_EVENTS, $calendarComponents, true),
+                        'count' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
+                    ],
+                    'notes' => [
+                        'enabled' => in_array(Calendar::COMPONENT_NOTES, $calendarComponents, true),
+                        'count' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
+                    ],
+                    'tasks' => [
+                        'enabled' => in_array(Calendar::COMPONENT_TODOS, $calendarComponents, true),
+                        'count' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
+                    ],
                 ];
             }
         }
@@ -224,6 +234,59 @@ class ApiController extends AbstractController
         ];
 
         return $this->json($response, 200);
+    }
+
+    #[Route('/calendars/{username}/{calendar_id}/edit', name: 'calendar_edit', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
+    public function editUserCalendar(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    {
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+            return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
+            'id' => $calendar_id,
+            'principalUri' => Principal::PREFIX.$username,
+        ]);
+
+        if (!$ownerInstance) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $calendarInstance = $doctrine->getRepository(CalendarInstance::class)->findOneById($calendar_id);
+        if (!$calendarInstance) {
+            return $this->json(['status' => 'error', 'message' => 'Calendar Instance Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $calendarName = $request->get('name');
+        if (preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName) !== 1) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Name', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $calendarDescription = $request->get('description', '');
+        if (preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription) !== 1) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Description', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $entityManager = $doctrine->getManager();
+        $calendarInstance->setDisplayName($calendarName);
+        $calendarInstance->setDescription($calendarDescription);
+
+        $calendarComponents = explode(',', $calendarInstance->getCalendar()->getComponents());
+        if ($request->get('events_support', 'true') === 'true') {
+            $calendarComponents[] = Calendar::COMPONENT_EVENTS;
+        }
+        if ($request->get('notes_support', 'false') === 'true') {
+            $calendarComponents[] = Calendar::COMPONENT_NOTES;
+        }
+        if ($request->get('tasks_support', 'false') === 'true') {
+            $calendarComponents[] = Calendar::COMPONENT_TODOS;
+        }
+        $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
+
+        $entityManager->persist($calendarInstance);
+        $entityManager->flush();
+
+        return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
     }
 
     /**
