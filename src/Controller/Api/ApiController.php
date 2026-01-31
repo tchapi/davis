@@ -258,12 +258,12 @@ class ApiController extends AbstractController
         }
 
         $calendarName = $request->get('name');
-        if (preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName) !== 1) {
+        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Name', 'timestamp' => $this->getTimestamp()], 400);
         }
 
         $calendarDescription = $request->get('description', '');
-        if (preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription) !== 1) {
+        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Description', 'timestamp' => $this->getTimestamp()], 400);
         }
 
@@ -272,13 +272,13 @@ class ApiController extends AbstractController
         $calendarInstance->setDescription($calendarDescription);
 
         $calendarComponents = explode(',', $calendarInstance->getCalendar()->getComponents());
-        if ($request->get('events_support', 'true') === 'true') {
+        if ('true' === $request->get('events_support', 'true')) {
             $calendarComponents[] = Calendar::COMPONENT_EVENTS;
         }
-        if ($request->get('notes_support', 'false') === 'true') {
+        if ('true' === $request->get('notes_support', 'false')) {
             $calendarComponents[] = Calendar::COMPONENT_NOTES;
         }
-        if ($request->get('tasks_support', 'false') === 'true') {
+        if ('true' === $request->get('tasks_support', 'false')) {
             $calendarComponents[] = Calendar::COMPONENT_TODOS;
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
@@ -291,10 +291,10 @@ class ApiController extends AbstractController
 
     /**
      * Creates a new calendar for a specific user.
-     * 
+     *
      * @param Request $request  The HTTP POST request
      * @param string  $username The username of the user for whom the calendar is to be created
-     * 
+     *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
     #[Route('/calendars/{username}/create', name: 'calendar_create', methods: ['POST'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
@@ -305,13 +305,13 @@ class ApiController extends AbstractController
         }
 
         $calendarName = $request->get('name');
-        if (preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName) !== 1) {
+        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Name', 'timestamp' => $this->getTimestamp()], 400);
         }
         $calendarURI = strtolower(str_replace(' ', '_', $calendarName));
 
         $calendarDescription = $request->get('description', '');
-        if (preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription) !== 1) {
+        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Description', 'timestamp' => $this->getTimestamp()], 400);
         }
 
@@ -321,17 +321,17 @@ class ApiController extends AbstractController
         $calendarInstance->setCalendar($calendar);
 
         $calendarComponents = [];
-        if ($request->get('events_support', 'true') === 'true') {
+        if ('true' === $request->get('events_support', 'true')) {
             $calendarComponents[] = Calendar::COMPONENT_EVENTS;
         }
-        if ($request->get('notes_support', 'false') === 'true') {
+        if ('true' === $request->get('notes_support', 'false')) {
             $calendarComponents[] = Calendar::COMPONENT_NOTES;
         }
-        if ($request->get('tasks_support', 'false') === 'true') {
+        if ('true' === $request->get('tasks_support', 'false')) {
             $calendarComponents[] = Calendar::COMPONENT_TODOS;
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
-        
+
         $calendarInstance
             ->setCalendar($calendar)
             ->setAccess(CalendarInstance::ACCESS_SHAREDOWNER)

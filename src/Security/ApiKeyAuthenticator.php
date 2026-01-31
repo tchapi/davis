@@ -28,7 +28,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
         if (preg_match('#^/api/v1/health$#', $request->getPathInfo())) {
             return false;
         }
-        
+
         // Always attempt to authenticate even if no API token is provided in the request
         // This stops the login page from being shown when accessing API routes
         return true;
