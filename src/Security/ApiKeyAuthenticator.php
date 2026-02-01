@@ -19,6 +19,11 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
 
     public function __construct(string $apiKey)
     {
+        // Disable API endpoint if no API key is set
+        if (hash_equals('', trim($apiKey))) {
+            throw new \LogicException('API_KEY environment variable must not be empty. API endpoint is disabled.');
+        }
+        
         $this->apiKey = $apiKey;
     }
 
@@ -38,11 +43,11 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
     {
         $apiToken = $request->headers->get('X-Davis-API-Token');
         if (null === $apiToken) {
-            throw new CustomUserMessageAuthenticationException('No API token provided');
+            throw new CustomUserMessageAuthenticationException('Missing X-Davis-API-Token header');
         }
 
-        if ($apiToken !== $this->apiKey) {
-            throw new CustomUserMessageAuthenticationException('Invalid API token');
+        if (hash_equals($this->apiKey, $apiToken) === false) {
+            throw new CustomUserMessageAuthenticationException('Invalid X-Davis-API-Token header');
         }
 
         return new SelfValidatingPassport(new UserBadge('X-DAVIS-API'));
