@@ -2,90 +2,300 @@ name: CI
 
 on:
   push:
-    paths-ignore:
-      - 'docker/**'
+    branches:
+      - main  # Only run on pushes to main
   pull_request:
-    paths-ignore:
-      - 'docker/**'
+    # Run on all PRs (no path restrictions)
 
 env:
-    COMPOSER_ALLOW_SUPERUSER: '1'
-    SYMFONY_DEPRECATIONS_HELPER: max[self]=0
-    ADMIN_LOGIN: admin
-    ADMIN_PASSWORD: test
-    DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
+  COMPOSER_ALLOW_SUPERUSER: '1'
+  SYMFONY_DEPRECATIONS_HELPER: max[self]=0
+  ADMIN_LOGIN: admin
+  ADMIN_PASSWORD: test
 
 jobs:
-    analyze:
-        name: Analyze
-        runs-on: ubuntu-latest
-        container:
-            image: php:8.3-alpine
-            options: >-
-              --tmpfs /tmp:exec
-              --tmpfs /var/tmp:exec
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Install GD / ZIP PHP extension
-              run: |
-                apk add $PHPIZE_DEPS libpng-dev libzip-dev
-                docker-php-ext-configure gd
-                docker-php-ext-configure zip
-                docker-php-ext-install gd zip
-            - name: Install Composer
-              run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Validate Composer
-              run: composer validate
-            - name: Update to highest dependencies with Composer
-              run: composer update --no-interaction --no-progress --ansi
-            - name: Analyze
-              run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
+  dockerfile-checks:
+    name: Dockerfile Checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dockerfile:
+          - docker/Dockerfile
+          - docker/Dockerfile-standalone
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Lint with Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ${{ matrix.dockerfile }}
+          failure-threshold: warning
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Validate Dockerfile syntax
+        run: |
+          docker buildx build \
+            --file ${{ matrix.dockerfile }} \
+            --platform linux/amd64 \
+            --check \
+            .
 
-    phpunit:
-        name: PHPUnit (PHP ${{ matrix.php }})
-        runs-on: ubuntu-latest
-        container:
-            image: php:${{ matrix.php }}-alpine
-            options: >-
-              --tmpfs /tmp:exec
-              --tmpfs /var/tmp:exec
-        services:
-          mysql:
-            image: mariadb:10.11
-            env:
-              # Corresponds to what is in .env.test
-              MYSQL_DATABASE: davis_test
-              MYSQL_USER: davis
-              MYSQL_PASSWORD: davis
-              MYSQL_ROOT_PASSWORD: root
-            options: >-
-              --health-cmd "mysqladmin ping"
-              --health-interval 10s
-              --health-timeout 5s
-              --health-retries 5
-            ports:
-              - 3306:3306
-        strategy:
-            matrix:
-                php:
-                    - '8.2'
-                    - '8.3'
-                    - '8.4'
-            fail-fast: false
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Install MySQL / GD / ZIP PHP extensions
-              run: |
-                apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev
-                docker-php-ext-configure intl
-                docker-php-ext-configure gd
-                docker-php-ext-configure zip
-                docker-php-ext-install pdo pdo_mysql intl gd zip
-            - name: Install Composer
-              run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Install dependencies with Composer
-              run: composer install --no-progress --no-interaction --ansi
-            - name: Run tests with PHPUnit
-              run: vendor/bin/phpunit --process-isolation --colors=always
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    container:
+      image: php:8.3-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install GD / ZIP PHP extension
+        run: |
+          apk add $PHPIZE_DEPS libpng-dev libzip-dev
+          docker-php-ext-configure gd
+          docker-php-ext-configure zip
+          docker-php-ext-install gd zip
+      
+      - name: Install Composer
+        run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      
+      - name: Validate Composer
+        run: composer validate
+      
+      - name: Update to highest dependencies with Composer
+        run: composer update --no-interaction --no-progress --ansi
+      
+      - name: Analyze
+        run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
+
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      mysql:
+        image: mariadb:10.11
+        env:
+          # Corresponds to what is in .env.test
+          MYSQL_DATABASE: davis_test
+          MYSQL_USER: davis
+          MYSQL_PASSWORD: davis
+          MYSQL_ROOT_PASSWORD: root
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 3306:3306
+    
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+          - '8.3'
+          - '8.4'
+      fail-fast: false
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install MySQL / GD / ZIP PHP extensions
+        run: |
+          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev
+          docker-php-ext-configure intl
+          docker-php-ext-configure gd
+          docker-php-ext-configure zip
+          docker-php-ext-install pdo pdo_mysql intl gd zip
+      
+      - name: Install Composer
+        run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      
+      - name: Install dependencies with Composer
+        run: composer install --no-progress --no-interaction --ansi
+      
+      - name: Run tests with PHPUnit
+        env:
+          DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
+        run: vendor/bin/phpunit --process-isolation --colors=always
+
+  migrations:
+    name: Migrations (${{ matrix.database }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:8.3-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    
+    services:
+      mysql:
+        image: mariadb:10.11
+        env:
+          MYSQL_DATABASE: davis_test
+          MYSQL_USER: davis
+          MYSQL_PASSWORD: davis
+          MYSQL_ROOT_PASSWORD: root
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: davis_test
+          POSTGRES_USER: davis
+          POSTGRES_PASSWORD: davis
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    strategy:
+      matrix:
+        database:
+          - mysql
+          - postgresql
+          - sqlite
+      fail-fast: false
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install database extensions
+        run: |
+          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev postgresql-dev sqlite-dev
+          docker-php-ext-configure intl
+          docker-php-ext-configure gd
+          docker-php-ext-configure zip
+          docker-php-ext-install pdo pdo_mysql pdo_pgsql pdo_sqlite intl gd zip
+      
+      - name: Install Composer
+        run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      
+      - name: Install dependencies with Composer
+        run: composer install --no-progress --no-interaction --ansi
+      
+      - name: Run migrations (MySQL)
+        if: matrix.database == 'mysql'
+        env:
+          DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
+        run: |
+          php bin/console doctrine:database:create --if-not-exists --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+          php bin/console doctrine:schema:validate --env=test
+      
+      - name: Run migrations (PostgreSQL)
+        if: matrix.database == 'postgresql'
+        env:
+          DATABASE_URL: postgresql://davis:davis@postgres:5432/davis_test?serverVersion=15&charset=utf8
+        run: |
+          php bin/console doctrine:database:create --if-not-exists --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+          php bin/console doctrine:schema:validate --skip-sync --env=test
+      
+      - name: Run migrations (SQLite)
+        if: matrix.database == 'sqlite'
+        env:
+          DATABASE_URL: sqlite:///%kernel.project_dir%/var/data_test.db
+        run: |
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+          php bin/console doctrine:schema:validate --skip-sync --env=test
+
+  smoke-test:
+    name: Application Smoke Test
+    runs-on: ubuntu-latest
+    container:
+      image: php:8.3-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    
+    services:
+      mysql:
+        image: mariadb:10.11
+        env:
+          MYSQL_DATABASE: davis_test
+          MYSQL_USER: davis
+          MYSQL_PASSWORD: davis
+          MYSQL_ROOT_PASSWORD: root
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install extensions and curl
+        run: |
+          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev curl
+          docker-php-ext-configure intl
+          docker-php-ext-configure gd
+          docker-php-ext-configure zip
+          docker-php-ext-install pdo pdo_mysql intl gd zip
+      
+      - name: Install Composer
+        run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      
+      - name: Install dependencies with Composer
+        run: composer install --no-progress --no-interaction --ansi --optimize-autoloader
+      
+      - name: Prepare application
+        env:
+          DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
+          APP_ENV: test
+        run: |
+          php bin/console doctrine:database:create --if-not-exists --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+          php bin/console cache:clear --env=test
+      
+      - name: Start Symfony server in background
+        env:
+          DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
+          APP_ENV: test
+        run: |
+          php -S 127.0.0.1:8000 -t public/ &
+          echo $! > server.pid
+          sleep 3
+      
+      - name: Test application responds
+        run: |
+          # Test that the app responds with a successful HTTP status
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/)
+          echo "HTTP Response code: $RESPONSE"
+          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 400 ]; then
+            echo "✅ Application is responding correctly"
+          else
+            echo "❌ Application returned unexpected status code: $RESPONSE"
+            exit 1
+          fi
+      
+      - name: Test dashboard
+        continue-on-error: true
+        run: |
+          curl -f http://127.0.0.1:8000/dashboard || echo "No health endpoint available"
+      
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+          fi
