@@ -16,7 +16,7 @@
             <h5 class="mb-1 me-auto">
                 {{ calendar.displayName }}
                 {% if calendar.isPublic() %}
-                    <span class="badge bg-success ml-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
+                    <span class="badge bg-success ml-1">{{ ('calendar.public')|trans }}</span>
                 {% endif %}
                 <a href="#" tabindex="0" class="badge badge-indicator" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ calendar.uri }}</code><br />Absolute path: <code>{{ davUri }}</code>">ⓘ</a>
                 <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>

@@ -585,8 +585,8 @@
         <source>calendar.share_access.3</source>
         <target>lesen / schreiben</target>
       </trans-unit>
-      <trans-unit id="F8h2YaT" resname="calendar.share_access.10">
-        <source>calendar.share_access.10</source>
+      <trans-unit id="F8h2YaT" resname="calendar.public">
+        <source>calendar.public</source>
         <target>öffentlich</target>
       </trans-unit>
       <trans-unit id="mYDsetM" resname="calendar.auto">
