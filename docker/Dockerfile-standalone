@@ -99,9 +99,12 @@ RUN mkdir -p /var/log/supervisor && mkdir -p /var/log/php-fpm
 COPY ./docker/configurations/supervisord.conf /etc/supervisord.conf
 
 # We want to use sockets inside the container between Caddy and PHP-fpm
+# NOTE: Creating a custom zzzz-custom.conf overrides the www.conf setting (files are processed alphabetically)
 RUN mkdir /var/run/php-fpm && chown -R www-data:www-data /var/run/php-fpm \
-    && sed -i 's/listen = /;listen = /' /usr/local/etc/php-fpm.d/www.conf \
-    && sed -i 's/listen = 9000/listen = \/var\/run\/php-fpm\/php-fpm.sock/' /usr/local/etc/php-fpm.d/zz-docker.conf
+    && { \
+        echo '[www]'; \
+        echo 'listen = /var/run/php-fpm/php-fpm.sock'; \
+    } | tee /usr/local/etc/php-fpm.d/zzzz-custom-docker.conf
 
 RUN mkdir -p ./var/log ./var/cache && chown -R www-data:www-data ./var
 
