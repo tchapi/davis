@@ -5,6 +5,10 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
@@ -29,46 +33,43 @@ jobs:
             dockerfile: docker/Dockerfile
           - image: davis-standalone
             dockerfile: docker/Dockerfile-standalone
+    
     steps:
-      -
-        name: Prepare
+      - name: Prepare
         run: |
           platform=${{ matrix.platform }}
-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV 
-      -
-        name: Checkout
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+      
+      - name: Checkout
         uses: actions/checkout@v4
-      - 
-        name: Extract metadata
+      
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           context: git
           images: ${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}
-          # "Push by digest" needs an untagged ref
-          tags: |
-            type=raw,value=
-      -
-        name: Set up QEMU
+          tags: type=raw,value=
+      
+      - name: Set up QEMU
+        if: matrix.platform == 'linux/arm64'
         uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
+      
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           version: latest
-        env:
-          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-      -
-        name: Login to GitHub Container Registry (${{ env.REGISTRY }})
+      
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build and Push by digest
+      
+      - name: Build and Push by digest
         id: build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ${{ matrix.dockerfile }}
@@ -77,56 +78,58 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           outputs: type=image,name=${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      -
-        name: Export digest
+          cache-from: type=gha,scope=${{ matrix.image }}-${{ env.PLATFORM_PAIR }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}-${{ env.PLATFORM_PAIR }}
+      
+      - name: Export digest
         run: |
           mkdir -p /tmp/digests/
           digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"          
-      -
-        name: Upload digest
+          touch "/tmp/digests/${digest#sha256:}"
+      
+      - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
           name: digests-${{ matrix.image }}_${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
+      
+      - name: Build summary
+        run: |
+          echo "### ✅ Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: \`${{ matrix.image }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platform**: \`${{ matrix.platform }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Digest**: \`${{ steps.build.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
 
   merge:
-    name: Create merged manifest and push to Github Packages
+    name: Create merged manifest
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        image: 
+        image:
           - davis
           - davis-standalone
-    needs:
-      - build
+    needs: build
+    
     steps:
-      -
-        # Needed to get the git information for the meta step
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4
-      -
-        name: Download digests
+      
+      - name: Download digests
         uses: actions/download-artifact@v4
         with:
           path: /tmp/digests/${{ matrix.image }}/
           pattern: digests-${{ matrix.image }}_*
           merge-multiple: true
-      -
-        name: Set up Docker Buildx
+      
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           version: latest
-        env:
-          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-      -
-        # Extract metadata to easily get the version and annotations to put in the manifest
-        name: Docker meta
+      
+      - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -135,29 +138,32 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=edge,branch=${{ github.ref_name }}
-      -
-        name: Login to Docker Hub
+      
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Create manifest list and push
+      
+      - name: Create manifest list and push
         working-directory: /tmp/digests/${{ matrix.image }}/
+        env:
+          METADATA_JSON: ${{ steps.meta.outputs.json }}
         run: |
+          # Build annotation flags from metadata
+          ANNOTATIONS=$(echo "$METADATA_JSON" | jq -r '
+            .labels | to_entries | 
+            map("--annotation index:\(.key)=\(.value)") | 
+            join(" ")
+          ')
+          
           docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            --annotation index:org.opencontainers.image.created="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}" \
-            --annotation index:org.opencontainers.image.description="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}" \
-            --annotation index:org.opencontainers.image.version="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}" \
-            --annotation index:org.opencontainers.image.licenses="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.licenses'] }}" \
-            --annotation index:org.opencontainers.image.title="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.title'] }}" \
-            --annotation index:org.opencontainers.image.source="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.source'] }}" \
-            --annotation index:org.opencontainers.image.url="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.url'] }}" \
-            --annotation index:org.opencontainers.image.revision="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}" \
-            $(printf '${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}@sha256:%s ' *)          
-      -
-        name: Inspect image
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$METADATA_JSON") \
+            $ANNOTATIONS \
+            $(printf '${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}@sha256:%s ' *)
+      
+      - name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}:${{ steps.meta.outputs.version }}          
+          docker buildx imagetools inspect \
+            ${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}:${{ steps.meta.outputs.version }}

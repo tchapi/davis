@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # Initial PHP image is available here:
 # https://github.com/docker-library/php/blob/master/8.2/alpine3.18/fpm/Dockerfile#L33
 ARG fpm_user=82:82
@@ -24,47 +26,41 @@ RUN apk --no-progress --update add --no-cache \
 # Build all extensions in a separate image ———————————————————————————————————————
 FROM base-image AS extension-builder
 
-# Intl support
-RUN apk --update --virtual build-deps-intl add --no-cache icu-dev \
-    && docker-php-ext-install intl \
-    && apk del build-deps-intl \
-    && rm -rf /tmp/*
+# Install ALL build dependencies at once
+RUN apk --update --virtual build-deps add --no-cache \
+    # Intl support
+    icu-dev \
+    # PDO: PostgreSQL
+    libpq-dev \
+    # GD (map image in mail)
+    freetype-dev libjpeg-turbo-dev libpng-dev \
+    # LDAP auth support
+    openldap-dev \
+    # Zip lib for PHP-IMAP
+    libzip-dev \
+    $PHPIZE_DEPS
 
-# PDO: MySQL
-RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
-    && docker-php-ext-install pdo_mysql
-
-# PDO: PostgreSQL
-RUN apk --update --virtual build-deps-pg add --no-cache libpq-dev \
+# Build ALL extensions in one RUN command to reduce layers
+# and allow parallel compilation for extensions
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
-    && docker-php-ext-install pgsql pdo_pgsql \
-    && apk del build-deps-pg \
-    && rm -rf /tmp/*
-
-# GD (map image in mail)
-RUN apk --update --virtual build-deps-gd add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev \
     && docker-php-ext-configure gd --with-freetype \
-    && docker-php-ext-install gd \
-    && docker-php-ext-enable gd \
-    && apk del build-deps-gd \
-    && rm -rf /tmp/*
-
-# LDAP auth support
-RUN apk --update --virtual build-deps-ldap add --no-cache openldap-dev \
     && docker-php-ext-configure ldap \
-    && docker-php-ext-install ldap \
-    && apk del build-deps-ldap \
-    && rm -rf /tmp/*
-
-# Zip lib for PHP-IMAP
-RUN apk --update --virtual build-deps-zip add --no-cache libzip-dev \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install zip \
-    && apk del build-deps-zip \
-    && rm -rf /tmp/*
+    && docker-php-ext-install -j$(nproc) \
+        intl \
+        pdo_mysql \
+        pgsql \
+        pdo_pgsql \
+        gd \
+        ldap \
+        zip \
+        opcache \
+    && docker-php-ext-enable gd opcache \
+    && apk del build-deps \
+    && rm -rf /tmp/* /var/cache/apk/*
 
-# OPCache
-RUN docker-php-ext-install opcache
 COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 # Final image ————————————————————————————————————————————————————————————————————
@@ -96,7 +92,7 @@ WORKDIR /var/www/davis
 
 # Install Composer 2, then dependencies, compress the rather big INTL package
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader \
+RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader \
     && php ./vendor/symfony/intl/Resources/bin/compress
 
 # Cleanup (only useful when using --squash)
