@@ -2,7 +2,7 @@
 
 Gets a list of all users with whom a specific user calendar is shared.
 
-**URL** : `/api/calendars/:username/shares/:calendar_id`
+**URL** : `/api/v1/calendars/:username/shares/:calendar_id`
 
 **Method** : `GET`
 
@@ -18,7 +18,7 @@ Gets a list of all users with whom a specific user calendar is shared.
 **URL example**
 
 ```json
-/api/calendars/mdoe/shares/1
+/api/v1/calendars/mdoe/shares/1
 ```
 
 ## Success Response
@@ -49,17 +49,9 @@ Gets a list of all users with whom a specific user calendar is shared.
 }
 ```
 
-Shown when user has no calendars with the given id:
-```json
-{
-	"status": "success",
-	"data": []
-}
-```
-
 ## Error Response
 
-**Condition** : If 'X-API-Key' is not present or mismatched in headers.
+**Condition** : If 'X-Davis-API-Token' is not present or mismatched in headers.
 
 **Code** : `401 UNAUTHORIZED`
 
@@ -67,12 +59,35 @@ Shown when user has no calendars with the given id:
 
 ```json
 {
+	"message": "No API token provided",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
+or
+
+```json
+{
+	"message": "Invalid API token",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
+**Condition** : If user is not found.
+
+**Code** : `404 NOT FOUND`
+
+**Content** :
+
+```json
+{
 	"status": "error",
-	"message": "Unauthorized"
+	"message": "User Not Found",
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
 
-**Condition** : If ':username' is not a valid string containing chars: `a-zA-Z0-9_-`.
+**Condition** : If ':calendar_id' and ':username' combination is invalid.
 
 **Code** : `400 BAD REQUEST`
 
@@ -80,33 +95,8 @@ Shown when user has no calendars with the given id:
 
 ```json
 {
-	"status": "error", 
-    "message": "Invalid Username"
-}
-```
-
-**Condition** : If ':calendar_id' is not a valid numeric value.
-
-**Code** : `400 BAD REQUEST`
-
-**Content** :
-
-```json
-{
-	"status": "error", 
-    "message": "Invalid Calendar ID"
-}
-```
-
-**Condition** : If ':calendar_id' is not for the specified ':username'.
-
-**Code** : `400 BAD REQUEST`
-
-**Content** :
-
-```json
-{
-	"status": "error", 
-    "message": "Invalid Calendar ID/Username"
+	"status": "error",
+	"message": "Invalid Calendar ID/Username",
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```

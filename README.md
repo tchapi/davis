@@ -335,7 +335,7 @@ For user and calendar management there is an API endpoint. See [the API document
 
 > [!TIP]
 >
-> The API endpoint requires an environment variable `API_KEY` set to a secret key that you will use in the `X-API-Key` header of your requests to authenticate. You can generate it with `bin/console api:generate`
+> The API endpoint requires an environment variable `API_KEY` set to a secret key that you will use in the `X-Davis-API-Token` header of your requests to authenticate. You can generate it with `bin/console api:generate`
 
 ## Webserver Configuration Examples
 

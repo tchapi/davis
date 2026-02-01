@@ -2,7 +2,7 @@
 
 Used to check if the API endpoint is active.
 
-**URL** : `/api/health/`
+**URL** : `/api/v1/health`
 
 **Method** : `GET`
 

@@ -2,7 +2,7 @@
 
 Gets details about a specific user account.
 
-**URL** : `/api/users/:username`
+**URL** : `/api/v1/users/:username`
 
 **Method** : `GET`
 
@@ -17,7 +17,7 @@ Gets details about a specific user account.
 **URL example**
 
 ```json
-/api/users/jdoe
+/api/v1/users/jdoe
 ```
 
 ## Success Response
@@ -35,21 +35,14 @@ Gets details about a specific user account.
 		"username": "jdoe",
 		"displayname": "John Doe",
 		"email": "jdoe@example.org"
-	}
-}
-```
-
-Shown when there are no users in Davis:
-```json
-{
-	"status": "success",
-	"data": []
+	},
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
 
 ## Error Response
 
-**Condition** : If 'X-API-Key' is not present or mismatched in headers.
+**Condition** : If 'X-Davis-API-Token' is not present or mismatched in headers.
 
 **Code** : `401 UNAUTHORIZED`
 
@@ -57,19 +50,29 @@ Shown when there are no users in Davis:
 
 ```json
 {
-	"status": "error",
-	"message": "Unauthorized"
+	"message": "No API token provided",
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
 
-**Condition** : If ':username' is not a valid string containing chars: `a-zA-Z0-9_-`.
+or
 
-**Code** : `400 BAD REQUEST`
+```json
+{
+	"message": "Invalid API token",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
+**Condition** : If user is not found.
+
+**Code** : `404 NOT FOUND`
 
 **Content** :
 
 ```json
 {
-	"status": "error", 
-    "message": "Invalid Username"
+	"status": "error",
+	"message": "User Not Found",
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }

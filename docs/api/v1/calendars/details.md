@@ -2,7 +2,7 @@
 
 Gets a list of all available calendars for a specific user.
 
-**URL** : `/api/calendars/:username/:calendar_id`
+**URL** : `/api/v1/calendars/:username/:calendar_id`
 
 **Method** : `GET`
 
@@ -18,7 +18,7 @@ Gets a list of all available calendars for a specific user.
 **URL example**
 
 ```json
-/api/calendars/jdoe/1
+/api/v1/calendars/jdoe/1
 ```
 
 ## Success Response
@@ -35,10 +35,20 @@ Gets a list of all available calendars for a specific user.
 		"uri": "default",
 		"displayname": "Default Calendar",
 		"description": "Default Calendar for Joe Doe",
-		"events": 0,
-		"notes": 0,
-		"tasks": 0
-	}
+		"events": {
+			"enabled": true,
+			"count": 0
+		},
+		"notes": {
+			"enabled": false,
+			"count": 0
+		},
+		"tasks": {
+			"enabled": false,
+			"count": 0
+		}
+	},
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
 
@@ -46,13 +56,14 @@ Shown when user has no calendars with the given id:
 ```json
 {
 	"status": "success",
-	"data": []
+	"data": {},
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
 
 ## Error Response
 
-**Condition** : If 'X-API-Key' is not present or mismatched in headers.
+**Condition** : If 'X-Davis-API-Token' is not present or mismatched in headers.
 
 **Code** : `401 UNAUTHORIZED`
 
@@ -60,33 +71,16 @@ Shown when user has no calendars with the given id:
 
 ```json
 {
-	"status": "error",
-	"message": "Unauthorized"
+	"message": "No API token provided",
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
 
-**Condition** : If ':username' is not a valid string containing chars: `a-zA-Z0-9_-`.
-
-**Code** : `400 BAD REQUEST`
-
-**Content** :
+or
 
 ```json
 {
-	"status": "error", 
-    "message": "Invalid Username"
-}
-```
-
-**Condition** : If ':calendar_id' is not a valid numeric value.
-
-**Code** : `400 BAD REQUEST`
-
-**Content** :
-
-```json
-{
-	"status": "error", 
-    "message": "Invalid Calendar ID"
+	"message": "Invalid API token",
+	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
