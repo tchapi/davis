@@ -30,7 +30,12 @@ final class Version20260131161930 extends AbstractMigration
         }
 
         // Migrate ACCESS_PUBLIC (10) to ACCESS_SHAREDOWNER (1) + public = true
-        $this->addSql('UPDATE calendarinstances SET public = 1, access = 1 WHERE access = 10');
+        if ('postgresql' === $engine) {
+            $this->addSql('UPDATE calendarinstances SET public = TRUE, access = 1 WHERE access = 10');
+        } else {
+            // MySQL and SQLite accept 1/0 for booleans
+            $this->addSql('UPDATE calendarinstances SET public = 1, access = 1 WHERE access = 10');
+        }
     }
 
     public function down(Schema $schema): void
@@ -38,7 +43,11 @@ final class Version20260131161930 extends AbstractMigration
         $engine = $this->connection->getDatabasePlatform()->getName();
 
         // Revert is_public = true back to ACCESS_PUBLIC (10)
-        $this->addSql('UPDATE calendarinstances SET access = 10 WHERE public = 1');
+        if ('postgresql' === $engine) {
+            $this->addSql('UPDATE calendarinstances SET access = 10 WHERE is_public = TRUE');
+        } else {
+            $this->addSql('UPDATE calendarinstances SET access = 10 WHERE is_public = 1');
+        }
 
         if ('mysql' === $engine) {
             $this->addSql('ALTER TABLE calendarinstances DROP public');
