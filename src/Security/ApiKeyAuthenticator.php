@@ -23,7 +23,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
         if (hash_equals('', trim($apiKey))) {
             throw new \LogicException('API endpoint is disabled.');
         }
-        
+
         $this->apiKey = $apiKey;
     }
 
@@ -46,7 +46,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
             throw new CustomUserMessageAuthenticationException('Missing X-Davis-API-Token header');
         }
 
-        if (hash_equals($this->apiKey, $apiToken) === false) {
+        if (false === hash_equals($this->apiKey, $apiToken)) {
             throw new CustomUserMessageAuthenticationException('Invalid X-Davis-API-Token header');
         }
 
