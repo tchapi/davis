@@ -26,6 +26,7 @@ RUN apk --no-progress --update add --no-cache \
 FROM base-image AS extension-builder
 
 # Install ALL build dependencies at once
+# hadolint ignore=SC2086
 RUN apk --update --virtual build-deps add --no-cache \
     # Intl support
     icu-dev \
@@ -37,7 +38,7 @@ RUN apk --update --virtual build-deps add --no-cache \
     openldap-dev \
     # Zip lib for PHP-IMAP
     libzip-dev \
-    "$PHPIZE_DEPS"
+    $PHPIZE_DEPS
 
 # Build ALL extensions in one RUN command to reduce layers
 # and allow parallel compilation for extensions
