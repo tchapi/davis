@@ -148,19 +148,17 @@ jobs:
       
       - name: Create manifest list and push
         working-directory: /tmp/digests/${{ matrix.image }}/
-        env:
-          METADATA_JSON: ${{ steps.meta.outputs.json }}
         run: |
-          # Build annotation flags from metadata
-          ANNOTATIONS=$(echo "$METADATA_JSON" | jq -r '
-            .labels | to_entries | 
-            map("--annotation index:\(.key)=\(.value)") | 
-            join(" ")
-          ')
-          
           docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$METADATA_JSON") \
-            $ANNOTATIONS \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            --annotation index:org.opencontainers.image.created="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}" \
+            --annotation index:org.opencontainers.image.description="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}" \
+            --annotation index:org.opencontainers.image.version="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}" \
+            --annotation index:org.opencontainers.image.licenses="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.licenses'] }}" \
+            --annotation index:org.opencontainers.image.title="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.title'] }}" \
+            --annotation index:org.opencontainers.image.source="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.source'] }}" \
+            --annotation index:org.opencontainers.image.url="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.url'] }}" \
+            --annotation index:org.opencontainers.image.revision="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}" \
             $(printf '${{ env.REGISTRY }}/${{ env.ACCOUNT }}/${{ matrix.image }}@sha256:%s ' *)
       
       - name: Inspect image
