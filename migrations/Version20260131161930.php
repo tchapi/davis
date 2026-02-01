@@ -42,7 +42,7 @@ final class Version20260131161930 extends AbstractMigration
     {
         $engine = $this->connection->getDatabasePlatform()->getName();
 
-        // Revert is_public = true back to ACCESS_PUBLIC (10)
+        // Revert public = true back to ACCESS_PUBLIC (10)
         if ('postgresql' === $engine) {
             $this->addSql('UPDATE calendarinstances SET access = 10 WHERE is_public = TRUE');
         } else {
