@@ -174,9 +174,9 @@ class ApiController extends AbstractController
         $response = [
             'status' => 'success',
             'data' => [
-                'user_calendars' => $calendars ?? [],
-                'shared_calendars' => $sharedCalendars ?? [],
-                'subscriptions' => $subscriptions ?? [],
+                'user_calendars' => $calendars,
+                'shared_calendars' => $sharedCalendars,
+                'subscriptions' => $subscriptions,
             ],
             'timestamp' => $this->getTimestamp(),
         ];
@@ -234,59 +234,6 @@ class ApiController extends AbstractController
         ];
 
         return $this->json($response, 200);
-    }
-
-    #[Route('/calendars/{username}/{calendar_id}/edit', name: 'calendar_edit', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
-    public function editUserCalendar(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
-    {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
-            return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
-        }
-
-        $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
-            'id' => $calendar_id,
-            'principalUri' => Principal::PREFIX.$username,
-        ]);
-
-        if (!$ownerInstance) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID', 'timestamp' => $this->getTimestamp()], 400);
-        }
-
-        $calendarInstance = $doctrine->getRepository(CalendarInstance::class)->findOneById($calendar_id);
-        if (!$calendarInstance) {
-            return $this->json(['status' => 'error', 'message' => 'Calendar Instance Not Found', 'timestamp' => $this->getTimestamp()], 404);
-        }
-
-        $calendarName = $request->get('name');
-        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Name', 'timestamp' => $this->getTimestamp()], 400);
-        }
-
-        $calendarDescription = $request->get('description', '');
-        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Description', 'timestamp' => $this->getTimestamp()], 400);
-        }
-
-        $entityManager = $doctrine->getManager();
-        $calendarInstance->setDisplayName($calendarName);
-        $calendarInstance->setDescription($calendarDescription);
-
-        $calendarComponents = explode(',', $calendarInstance->getCalendar()->getComponents());
-        if ('true' === $request->get('events_support', 'true')) {
-            $calendarComponents[] = Calendar::COMPONENT_EVENTS;
-        }
-        if ('true' === $request->get('notes_support', 'false')) {
-            $calendarComponents[] = Calendar::COMPONENT_NOTES;
-        }
-        if ('true' === $request->get('tasks_support', 'false')) {
-            $calendarComponents[] = Calendar::COMPONENT_TODOS;
-        }
-        $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
-
-        $entityManager->persist($calendarInstance);
-        $entityManager->flush();
-
-        return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
     }
 
     /**
@@ -351,6 +298,59 @@ class ApiController extends AbstractController
         return $this->json($response, 200);
     }
 
+    #[Route('/calendars/{username}/{calendar_id}/edit', name: 'calendar_edit', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
+    public function editUserCalendar(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    {
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+            return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
+            'id' => $calendar_id,
+            'principalUri' => Principal::PREFIX.$username,
+        ]);
+
+        if (!$ownerInstance) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $calendarInstance = $doctrine->getRepository(CalendarInstance::class)->findOneById($calendar_id);
+        if (!$calendarInstance) {
+            return $this->json(['status' => 'error', 'message' => 'Calendar Instance Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $calendarName = $request->get('name');
+        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Name', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $calendarDescription = $request->get('description', '');
+        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Description', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $entityManager = $doctrine->getManager();
+        $calendarInstance->setDisplayName($calendarName);
+        $calendarInstance->setDescription($calendarDescription);
+
+        $calendarComponents = explode(',', $calendarInstance->getCalendar()->getComponents());
+        if ('true' === $request->get('events_support', 'true')) {
+            $calendarComponents[] = Calendar::COMPONENT_EVENTS;
+        }
+        if ('true' === $request->get('notes_support', 'false')) {
+            $calendarComponents[] = Calendar::COMPONENT_NOTES;
+        }
+        if ('true' === $request->get('tasks_support', 'false')) {
+            $calendarComponents[] = Calendar::COMPONENT_TODOS;
+        }
+        $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
+
+        $entityManager->persist($calendarInstance);
+        $entityManager->flush();
+
+        return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
+    }
+
     /**
      * Retrieves a list of shares for a specific calendar of a specific user (id, username, displayname, email, write_access).
      *
@@ -373,7 +373,7 @@ class ApiController extends AbstractController
         ]);
 
         if (!$ownerInstance) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID', 'timestamp' => $this->getTimestamp()], 400);
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID/Username', 'timestamp' => $this->getTimestamp()], 400);
         }
 
         $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendar_id, true);
@@ -422,7 +422,7 @@ class ApiController extends AbstractController
         ]);
 
         if (!$ownerInstance) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID', 'timestamp' => $this->getTimestamp()], 400);
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID and User ID', 'timestamp' => $this->getTimestamp()], 400);
         }
 
         $userId = $request->get('user_id');
