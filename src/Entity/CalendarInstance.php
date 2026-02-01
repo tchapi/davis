@@ -126,7 +126,7 @@ class CalendarInstance
         return !in_array($this->access, self::getOwnerAccesses());
     }
 
-    public function setIsPublic(bool $public): self
+    public function setPublic(bool $public): self
     {
         $this->public = $public;
 

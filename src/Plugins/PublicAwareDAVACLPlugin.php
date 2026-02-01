@@ -48,7 +48,10 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
         $acl = parent::getAcl($node);
 
         if ($this->public_calendars_enabled) {
-            if ($node instanceof \Sabre\CalDAV\Calendar) {
+            if ($node instanceof \Sabre\CalDAV\SharedCalendar) {
+                // SharedCalendar extends Calendar, but we don't support making
+                // them public so we just bail out
+            } elseif ($node instanceof \Sabre\CalDAV\Calendar) {
                 if ($node->isPublic()) {
                     // We must add the ACL on the calendar itself
                     $acl[] = [
