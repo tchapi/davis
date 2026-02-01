@@ -48,7 +48,7 @@ RUN docker-php-ext-configure intl \
     && docker-php-ext-configure gd --with-freetype \
     && docker-php-ext-configure ldap \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install -j$(nproc) \
+    && docker-php-ext-install -j"$(nproc)" \
         intl \
         pdo_mysql \
         pgsql \
@@ -87,7 +87,7 @@ RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0
     && chmod +x /usr/local/bin/php-fpm-healthcheck
 
 # Davis installation
-ADD --chown=${FPM_USER} . /var/www/davis
+COPY --chown=${FPM_USER} . /var/www/davis
 WORKDIR /var/www/davis
 
 # Install Composer 2, then dependencies, compress the rather big INTL package
