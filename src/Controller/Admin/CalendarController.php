@@ -121,9 +121,9 @@ class CalendarController extends AbstractController
                     $components[] = Calendar::COMPONENT_NOTES;
                 }
                 if ($arePublicCalendarsEnabled && true === $form->get('public')->getData()) {
-                    $calendarInstance->setIsPublic(true);
+                    $calendarInstance->setPublic(true);
                 } else {
-                    $calendarInstance->setIsPublic(false);
+                    $calendarInstance->setPublic(false);
                 }
 
                 $calendarInstance->getCalendar()->setComponents(implode(',', $components));
