@@ -38,7 +38,7 @@ RUN apk --update --virtual build-deps add --no-cache \
     openldap-dev \
     # Zip lib for PHP-IMAP
     libzip-dev \
-    $PHPIZE_DEPS
+    "$PHPIZE_DEPS"
 
 # Build ALL extensions in one RUN command to reduce layers
 # and allow parallel compilation for extensions
@@ -80,6 +80,9 @@ LABEL org.opencontainers.image.description="A simple, fully translatable admin i
 COPY --from=extension-builder /usr/local/etc/php/conf.d     /usr/local/etc/php/conf.d/
 COPY --from=extension-builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions/
 
+# This is for Hadolint
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
 # PHP-FPM healthcheck
 RUN set -xe && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0/php-fpm-healthcheck \
@@ -90,13 +93,11 @@ RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0
 COPY --chown=${FPM_USER} . /var/www/davis
 WORKDIR /var/www/davis
 
-# Install Composer 2, then dependencies, compress the rather big INTL package
+# Install Composer 2, then dependencies, compress the rather big INTL package, and then cleanup (only useful when using --squash)
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader \
-    && php ./vendor/symfony/intl/Resources/bin/compress
-
-# Cleanup (only useful when using --squash)
-RUN rm -rf /var/www/davis/docker
+    && php ./vendor/symfony/intl/Resources/bin/compress \
+    && rm -rf /var/www/davis/docker
 
 USER $FPM_USER
 

@@ -37,7 +37,7 @@ RUN apk --update --virtual build-deps add --no-cache \
     openldap-dev \
     # Zip lib for PHP-IMAP
     libzip-dev \
-    $PHPIZE_DEPS
+    "$PHPIZE_DEPS"
 
 # Build ALL extensions in one RUN command to reduce layers
 # and allow parallel compilation for extensions
@@ -81,9 +81,12 @@ COPY --from=extension-builder /usr/local/lib/php/extensions /usr/local/lib/php/e
 COPY --chown=www-data:www-data . /var/www/davis
 WORKDIR /var/www/davis
 
+# This is for Hadolint
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
 # Install Composer 2, then dependencies, compress the rather big INTL package
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader \
+RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader \
     && php ./vendor/symfony/intl/Resources/bin/compress
 
 # Caddy: web server
