@@ -12,6 +12,8 @@ Open endpoints require no Authentication.
 
 Closed endpoints require a valid `X-Davis-API-Token` to be included in the header of the request. Token needs to be configured in .env file (as a environment variable `API_KEY`) and can be generated using `php bin/console api:generate` command.
 
+When `API_KEY` is not set, the API endpoints are disabled and will return a 500 error if accessed.
+
 #### User related
 
 Each endpoint displays information related to the User:

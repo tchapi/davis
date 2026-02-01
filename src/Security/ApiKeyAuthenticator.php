@@ -21,7 +21,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
     {
         // Disable API endpoint if no API key is set
         if (hash_equals('', trim($apiKey))) {
-            throw new \LogicException('API_KEY environment variable must not be empty. API endpoint is disabled.');
+            throw new \LogicException('API endpoint is disabled.');
         }
         
         $this->apiKey = $apiKey;
