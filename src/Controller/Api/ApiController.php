@@ -135,39 +135,34 @@ class ApiController extends AbstractController
         $calendars = [];
         $sharedCalendars = [];
         foreach ($allCalendars as $calendar) {
+            $objectCounts = $doctrine->getRepository(CalendarInstance::class)->getObjectCountsByComponentType($calendar->getCalendar()->getId());
+            $calendarData = [
+                'id' => $calendar->getId(),
+                'uri' => $calendar->getUri(),
+                'displayname' => $calendar->getDisplayName(),
+                'description' => $calendar->getDescription(),
+                'events' => $objectCounts['events'],
+                'notes' => $objectCounts['notes'],
+                'tasks' => $objectCounts['tasks'],
+            ];
             if (!$calendar->isShared()) {
-                $calendars[] = [
-                    'id' => $calendar->getId(),
-                    'uri' => $calendar->getUri(),
-                    'displayname' => $calendar->getDisplayName(),
-                    'description' => $calendar->getDescription(),
-                    'events' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
-                    'notes' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
-                    'tasks' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
-                ];
+                $calendars[] = $calendarData;
             } else {
-                $sharedCalendars[] = [
-                    'id' => $calendar->getId(),
-                    'uri' => $calendar->getUri(),
-                    'displayname' => $calendar->getDisplayName(),
-                    'description' => $calendar->getDescription(),
-                    'events' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
-                    'notes' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
-                    'tasks' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
-                ];
+                $sharedCalendars[] = $calendarData;
             }
         }
 
         $subscriptions = [];
         foreach ($allSubscriptions as $subscription) {
+            $objectCounts = $doctrine->getRepository(CalendarInstance::class)->getObjectCountsByComponentType($subscription->getCalendar()->getId());
             $subscriptions[] = [
                 'id' => $subscription->getId(),
                 'uri' => $subscription->getUri(),
                 'displayname' => $subscription->getDisplayName(),
                 'description' => $subscription->getDescription(),
-                'events' => count($subscription->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
-                'notes' => count($subscription->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
-                'tasks' => count($subscription->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
+                'events' => $objectCounts['events'],
+                'notes' => $objectCounts['notes'],
+                'tasks' => $objectCounts['tasks'],
             ];
         }
 
@@ -205,23 +200,23 @@ class ApiController extends AbstractController
         $calendar_details = [];
         foreach ($allCalendars as $calendar) {
             if (!$calendar->isShared() && $calendar->getId() === $calendar_id) {
-                $calendarComponents = explode(',', $calendar->getCalendar()->getComponents());
+                $objectCounts = $doctrine->getRepository(CalendarInstance::class)->getObjectCountsByComponentType($calendar->getCalendar()->getId());
                 $calendar_details = [
                     'id' => $calendar->getId(),
                     'uri' => $calendar->getUri(),
                     'displayname' => $calendar->getDisplayName(),
                     'description' => $calendar->getDescription(),
                     'events' => [
-                        'enabled' => in_array(Calendar::COMPONENT_EVENTS, $calendarComponents, true),
-                        'count' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_EVENTS === $obj->getComponentType())),
+                        'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_EVENTS),
+                        'count' => $objectCounts['events'],
                     ],
                     'notes' => [
-                        'enabled' => in_array(Calendar::COMPONENT_NOTES, $calendarComponents, true),
-                        'count' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_NOTES === $obj->getComponentType())),
+                        'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_NOTES),
+                        'count' => $objectCounts['notes'],
                     ],
                     'tasks' => [
-                        'enabled' => in_array(Calendar::COMPONENT_TODOS, $calendarComponents, true),
-                        'count' => count($calendar->getCalendar()->getObjects()->filter(fn ($obj) => Calendar::COMPONENT_TODOS === $obj->getComponentType())),
+                        'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_TODOS),
+                        'count' => $objectCounts['tasks'],
                     ],
                 ];
             }

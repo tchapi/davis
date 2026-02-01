@@ -73,4 +73,46 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult() > 0;
     }
+
+    /**
+     * Get counts of calendar objects by component type for a calendar instance.
+     *
+     * @param int $calendarId The ID of the calendar
+     *
+     * @return array An associative array with keys 'events', 'notes', 'tasks' containing their respective counts
+     */
+    public function getObjectCountsByComponentType(int $calendarId): array
+    {
+        $objectRepository = $this->getEntityManager()->getRepository(\App\Entity\CalendarObject::class);
+
+        // Instead of three separate queries, get all counts in a single query
+        $results = $objectRepository->createQueryBuilder('o')
+            ->select('o.componentType, COUNT(o.id) as count')
+            ->where('o.calendar = :calendarId')
+            ->setParameter('calendarId', $calendarId)
+            ->groupBy('o.componentType')
+            ->getQuery()
+            ->getResult();
+
+        $componentTypeMap = [
+            \App\Entity\Calendar::COMPONENT_EVENTS => 'events',
+            \App\Entity\Calendar::COMPONENT_NOTES => 'notes',
+            \App\Entity\Calendar::COMPONENT_TODOS => 'tasks',
+        ];
+
+        $counts = [
+            'events' => 0,
+            'notes' => 0,
+            'tasks' => 0,
+        ];
+
+        // Map query results to the expected keys
+        foreach ($results as $result) {
+            if (isset($componentTypeMap[$result['componentType']])) {
+                $counts[$componentTypeMap[$result['componentType']]] = (int) $result['count'];
+            }
+        }
+
+        return $counts;
+    }
 }
