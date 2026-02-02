@@ -48,19 +48,8 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
         $acl = parent::getAcl($node);
 
         if ($this->public_calendars_enabled) {
-            if ($node instanceof \Sabre\CalDAV\SharedCalendar) {
-                // SharedCalendar extends Calendar, but we don't support making
-                // them public so we just bail out
-            } elseif ($node instanceof \Sabre\CalDAV\Calendar) {
-                if ($node->isPublic()) {
-                    // We must add the ACL on the calendar itself
-                    $acl[] = [
-                        'principal' => '{DAV:}unauthenticated',
-                        'privilege' => '{DAV:}read',
-                        'protected' => false,
-                    ];
-                }
-            } elseif ($node instanceof \Sabre\CalDAV\CalendarObject) {
+            // Handle both Calendar AND SharedCalendar (which extends Calendar)
+            if ($node instanceof \Sabre\CalDAV\Calendar || $node instanceof \Sabre\CalDAV\CalendarObject) {
                 // The property is private in \Sabre\CalDAV\CalendarObject and we don't want to create
                 // a new class just to access it, so we use a closure.
                 $calendarInfo = (fn () => $this->calendarInfo)->call($node);
@@ -70,7 +59,7 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
                 $calendar = $this->em->getRepository(CalendarInstance::class)->findOneById($calendarInstanceId);
 
                 if ($calendar && $calendar->isPublic()) {
-                    // We must add the ACL on the object itself
+                    // Add unauthenticated read access on the object itself
                     $acl[] = [
                         'principal' => '{DAV:}unauthenticated',
                         'privilege' => '{DAV:}read',
