@@ -149,11 +149,20 @@ PUBLIC_CALENDARS_ENABLED=true
 > By default, `PUBLIC_CALENDARS_ENABLED` is true. That doesn't mean that all calendars are public by default — it just means that you have an option, upon calendar creation, to set the calendar public (but it's not public by default).
 
 
-**e. The email address that your invites are going to be sent from**
+**e. Mailer configuration**
+
+It includes:
+  - the mailer uri (`MAILER_DSN`) 
+  - The email address that your invites are going to be sent from
 
 ```shell
+MAILER_DSN=smtp://user:pass@smtp.example.com:port
 INVITE_FROM_ADDRESS=no-reply@example.org
 ```
+
+> [!WARNING]
+> If the username, password or host contain any character considered special in a URI (such as `: / ? # [ ] @ ! $ & ' ( ) * + , ; =`), you MUST encode them.
+> See [here](https://symfony.com/doc/current/mailer.html#transport-setup) for more details.
 
 **f. The reminder offset for all birthdays**
 
