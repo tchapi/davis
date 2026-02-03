@@ -4,6 +4,9 @@ Davis
 [![Build Status][ci_badge]][ci_link]
 [![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/tchapi/davis/actions/workflows/main.yml)
 [![Latest release][release_badge]][release_link]
+[![License](https://img.shields.io/github/license/tchapi/davis)](https://github.com/tchapi/davis/blob/main/LICENSE)
+![Platform](https://img.shields.io/badge/platform-amd64%20%7C%20arm64-blue?logo=docker)
+![PHP Version](https://img.shields.io/badge/php-8.2%20%7C%208.3%20%7C%208.4-777BB4?logo=php&logoColor=white)
 [![Sponsor me][sponsor_badge]][sponsor_link]
 
 A modern, simple, feature-packed, fully translatable DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)

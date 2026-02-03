@@ -9,6 +9,7 @@ use App\Entity\Principal;
 use App\Entity\SchedulingObject;
 use App\Form\CalendarInstanceType;
 use Doctrine\Persistence\ManagerRegistry;
+use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -100,9 +101,6 @@ class CalendarController extends AbstractController
         $form->get('events')->setData(in_array(Calendar::COMPONENT_EVENTS, $components));
         $form->get('todos')->setData(in_array(Calendar::COMPONENT_TODOS, $components));
         $form->get('notes')->setData(in_array(Calendar::COMPONENT_NOTES, $components));
-        if ($arePublicCalendarsEnabled) {
-            $form->get('public')->setData($calendarInstance->isPublic());
-        }
         $form->get('principalUri')->setData(Principal::PREFIX.$username);
 
         $form->handleRequest($request);
@@ -123,9 +121,9 @@ class CalendarController extends AbstractController
                     $components[] = Calendar::COMPONENT_NOTES;
                 }
                 if ($arePublicCalendarsEnabled && true === $form->get('public')->getData()) {
-                    $calendarInstance->setAccess(CalendarInstance::ACCESS_PUBLIC);
+                    $calendarInstance->setPublic(true);
                 } else {
-                    $calendarInstance->setAccess(CalendarInstance::ACCESS_SHAREDOWNER);
+                    $calendarInstance->setPublic(false);
                 }
 
                 $calendarInstance->getCalendar()->setComponents(implode(',', $components));
@@ -168,7 +166,7 @@ class CalendarController extends AbstractController
                 'displayName' => $instance['displayName'],
                 'email' => $instance['email'],
                 'accessText' => $trans->trans('calendar.share_access.'.$instance[0]['access']),
-                'isWriteAccess' => CalendarInstance::ACCESS_READWRITE === $instance[0]['access'],
+                'isWriteAccess' => SharingPlugin::ACCESS_READWRITE === $instance[0]['access'],
                 'revokeUrl' => $this->generateUrl('calendar_revoke', ['username' => $username, 'id' => $instance[0]['id']]),
             ];
         }
@@ -197,7 +195,7 @@ class CalendarController extends AbstractController
         // already existing first, so we can update it:
         $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
 
-        $writeAccess = ('true' === $request->get('write') ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
+        $writeAccess = ('true' === $request->get('write') ? SharingPlugin::ACCESS_READWRITE : SharingPlugin::ACCESS_READ);
 
         $entityManager = $doctrine->getManager();
 

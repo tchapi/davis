@@ -15,8 +15,8 @@
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 me-auto">
                 {{ calendar.displayName }}
-                {% if calendar.access == constant('\\App\\Entity\\CalendarInstance::ACCESS_PUBLIC') %}
-                    <span class="badge bg-success ml-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
+                {% if calendar.isPublic() %}
+                    <span class="badge bg-success ml-1">{{ ('calendar.public')|trans }}</span>
                 {% endif %}
                 <a href="#" tabindex="0" class="badge badge-indicator" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ calendar.uri }}</code><br />Absolute path: <code>{{ davUri }}</code>">ⓘ</a>
                 <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
@@ -79,7 +79,7 @@
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1 me-auto">
                     {{ calendar.displayName }}
-                    {% if calendar.access == constant('\\App\\Entity\\CalendarInstance::ACCESS_READWRITE') %}
+                    {% if calendar.access == constant('Sabre\\DAV\\Sharing\\Plugin::ACCESS_READWRITE') %}
                         <span class="badge bg-success ms-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
                     {% else %}
                         <span class="badge bg-info ms-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Constants;
 use Doctrine\ORM\Mapping as ORM;
+use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -12,27 +13,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['principalUri', 'uri'], errorPath: 'uri', message: 'form.uri.unique')]
 class CalendarInstance
 {
-    public const INVITE_NORESPONSE = 1;
-    public const INVITE_ACCEPTED = 2;
-    public const INVITE_DECLINED = 3;
-    public const INVITE_INVALID = 4;
-
-    public const ACCESS_NOTSHARED = 0;
-    public const ACCESS_SHAREDOWNER = 1;
-    public const ACCESS_READ = 2;
-    public const ACCESS_READWRITE = 3;
-    public const ACCESS_NOACCESS = 4;
-
-    // Used to identify a public calendar, available to anyone without logging in.
-    // It can't be shared, and it's owned by the principal.
-    public const ACCESS_PUBLIC = 10;
-
     public static function getOwnerAccesses(): array
     {
         return [
-            self::ACCESS_NOTSHARED,
-            self::ACCESS_SHAREDOWNER,
-            self::ACCESS_PUBLIC,
+            SharingPlugin::ACCESS_NOTSHARED,
+            SharingPlugin::ACCESS_SHAREDOWNER,
         ];
     }
 
@@ -83,12 +68,16 @@ class CalendarInstance
     #[ORM\Column(name: 'share_invitestatus', type: 'integer', options: ['default' => 2])]
     private $shareInviteStatus;
 
+    #[ORM\Column(name: 'public', type: 'boolean', options: ['default' => false])]
+    private $public;
+
     public function __construct()
     {
-        $this->shareInviteStatus = self::INVITE_ACCEPTED;
+        $this->shareInviteStatus = SharingPlugin::INVITE_ACCEPTED;
         $this->transparent = 0;
         $this->calendarOrder = 0;
-        $this->access = self::ACCESS_SHAREDOWNER;
+        $this->access = SharingPlugin::ACCESS_SHAREDOWNER;
+        $this->public = false;
     }
 
     public function getId(): ?int
@@ -137,9 +126,16 @@ class CalendarInstance
         return !in_array($this->access, self::getOwnerAccesses());
     }
 
+    public function setPublic(bool $public): self
+    {
+        $this->public = $public;
+
+        return $this;
+    }
+
     public function isPublic(): bool
     {
-        return self::ACCESS_PUBLIC === $this->access;
+        return $this->public;
     }
 
     public function isAutomaticallyGenerated(): bool
