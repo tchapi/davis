@@ -8,9 +8,9 @@ class ApiControllerTest extends WebTestCase
 {
     /*
      * Helper function to get an existing username from the user list
-     * 
+     *
      * @param mixed $client
-     * 
+     *
      * @return string Username
      */
     private function getUserUsername($client): string
@@ -22,10 +22,10 @@ class ApiControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
 
-        $this->assertArrayHasKey('data', $data);;
+        $this->assertArrayHasKey('data', $data);
         $this->assertIsArray($data['data']);
         $this->assertStringContainsString('test_user', $data['data'][0]['username']);
 
@@ -34,11 +34,11 @@ class ApiControllerTest extends WebTestCase
 
     /*
      * Helper function to get an existing calendar ID from the user calendar list
-     * 
+     *
      * @param mixed  $client
      * @param string $username
      * @param bool   $default  Whether to get the default calendar (true) or the second calendar (false)
-     * 
+     *
      * @return int Calendar ID
      */
     private function getCalendarId($client, string $username, bool $default = true): int
@@ -196,7 +196,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertIsArray($data);
         $this->assertNotEmpty($data);
 
-
         // Check if calendar details are correct
         $this->assertArrayHasKey('id', $data['data']);
         $this->assertArrayHasKey('uri', $data['data']);
@@ -218,7 +217,8 @@ class ApiControllerTest extends WebTestCase
     /*
      * Test creating a new user calendar
      */
-    public function testCreateUserCalendar(): void {
+    public function testCreateUserCalendar(): void
+    {
         $client = static::createClient();
         $username = $this->getUserUsername($client);
 
@@ -242,14 +242,14 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
         $data = json_decode($client->getResponse()->getContent(), true);
-        
+
         $this->assertIsArray($data);
         $this->assertArrayHasKey('status', $data);
         $this->assertEquals('success', $data['status']);
         $this->assertArrayHasKey('data', $data);
         $this->assertMatchesRegularExpression('/^\d+$/', $data['data']['calendar_id']);
         $this->assertStringContainsString('api_calendar', $data['data']['calendar_uri']);
-        
+
         // Check if calendar is created
         $calendarId = $data['data']['calendar_id'];
         $client->request('GET', '/api/v1/calendars/'.$username.'/'.$calendarId, [], [], [
@@ -277,7 +277,8 @@ class ApiControllerTest extends WebTestCase
     /*
      * Test editing a user calendar
      */
-    public function testEditUserCalendar(): void {
+    public function testEditUserCalendar(): void
+    {
         $client = static::createClient();
         $username = $this->getUserUsername($client);
         $calendar_id = $this->getCalendarId($client, $username, true);
@@ -317,7 +318,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertIsArray($data['data']);
         $this->assertStringContainsString($payload['name'], $data['data']['displayname']);
         $this->assertStringContainsString($payload['description'], $data['data']['description']);
-        
+
         $this->assertArrayHasKey('events', $data['data']);
         $this->assertIsBool($data['data']['events']['enabled']);
         $this->assertTrue($data['data']['events']['enabled']);
@@ -328,7 +329,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertIsBool($data['data']['notes']['enabled']);
         $this->assertTrue($data['data']['notes']['enabled']);
     }
-
 
     // TODO: TestShareCalendarToUser
     // TODO: TestShareCalendarList

@@ -250,7 +250,7 @@ class ApiController extends AbstractController
 
         // Parse JSON body
         $data = json_decode($request->getContent(), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
         }
 
@@ -276,15 +276,15 @@ class ApiController extends AbstractController
         $calendarComponents = [];
         // Handle both boolean and string values
         $eventsSupport = $data['events_support'] ?? true;
-        if ($eventsSupport === true || $eventsSupport === 'true') {
+        if (true === $eventsSupport || 'true' === $eventsSupport) {
             $calendarComponents[] = Calendar::COMPONENT_EVENTS;
         }
         $notesSupport = $data['notes_support'] ?? false;
-        if ($notesSupport === true || $notesSupport === 'true') {
+        if (true === $notesSupport || 'true' === $notesSupport) {
             $calendarComponents[] = Calendar::COMPONENT_NOTES;
         }
         $tasksSupport = $data['tasks_support'] ?? false;
-        if ($tasksSupport === true || $tasksSupport === 'true') {
+        if (true === $tasksSupport || 'true' === $tasksSupport) {
             $calendarComponents[] = Calendar::COMPONENT_TODOS;
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
@@ -345,7 +345,7 @@ class ApiController extends AbstractController
 
         // Parse JSON body
         $data = json_decode($request->getContent(), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
         }
 
@@ -366,15 +366,15 @@ class ApiController extends AbstractController
         $calendarComponents = [];
         // Handle both boolean and string values
         $eventsSupport = $data['events_support'] ?? true;
-        if ($eventsSupport === true || $eventsSupport === 'true') {
+        if (true === $eventsSupport || 'true' === $eventsSupport) {
             $calendarComponents[] = Calendar::COMPONENT_EVENTS;
         }
         $notesSupport = $data['notes_support'] ?? false;
-        if ($notesSupport === true || $notesSupport === 'true') {
+        if (true === $notesSupport || 'true' === $notesSupport) {
             $calendarComponents[] = Calendar::COMPONENT_NOTES;
         }
         $tasksSupport = $data['tasks_support'] ?? false;
-        if ($tasksSupport === true || $tasksSupport === 'true') {
+        if (true === $tasksSupport || 'true' === $tasksSupport) {
             $calendarComponents[] = Calendar::COMPONENT_TODOS;
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
@@ -461,7 +461,7 @@ class ApiController extends AbstractController
 
         // Parse JSON body
         $data = json_decode($request->getContent(), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
         }
 
@@ -479,7 +479,7 @@ class ApiController extends AbstractController
         }
 
         $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
-        $accessLevel = ($writeAccess === true || $writeAccess === 'true' ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
+        $accessLevel = (true === $writeAccess || 'true' === $writeAccess ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
         $entityManager = $doctrine->getManager();
 
         if ($existingSharedInstance) {
@@ -528,7 +528,7 @@ class ApiController extends AbstractController
 
         // Parse JSON body
         $data = json_decode($request->getContent(), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
         }
 
