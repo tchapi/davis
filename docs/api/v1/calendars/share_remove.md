@@ -32,7 +32,7 @@ Removes access to a specific shared calendar for a specific user.
 
 ```json
 {
-	"user_id": "3",
+	"user_id": "3"
 }
 ```
 
@@ -83,6 +83,20 @@ or
 {
 	"status": "error",
 	"message": "User Not Found",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
+**Condition** : If request body contains invalid JSON.
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+	"status": "error",
+	"message": "Invalid JSON",
 	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```

@@ -19,6 +19,7 @@ Creates a new calendar for a specific user.
 ```json
 {
 	"name": "[string: calendar name, alphanumeric, spaces, underscores and hyphens, max 64 chars]",
+	"uri": "[string: calendar URI, lowercase alphanumeric, underscores and hyphens, max 128 chars]",
 	"description": "[string: calendar description, alphanumeric, spaces, underscores and hyphens, max 256 chars, optional]",
 	"events_support": "[string: 'true' or 'false', default 'true', optional]",
 	"notes_support": "[string: 'true' or 'false', default 'false', optional]",
@@ -37,6 +38,7 @@ Creates a new calendar for a specific user.
 ```json
 {
 	"name": "Work Calendar",
+	"uri": "work-calendar",
 	"description": "Calendar for work events",
 	"events_support": "true",
 	"notes_support": "false",
@@ -53,6 +55,10 @@ Creates a new calendar for a specific user.
 ```json
 {
 	"status": "success",
+	"data": {
+		"calendar_id": 5,
+		"calendar_uri": "work-calendar"
+	},
 	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
@@ -95,6 +101,20 @@ or
 }
 ```
 
+**Condition** : If request body contains invalid JSON.
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+	"status": "error",
+	"message": "Invalid JSON",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
 **Condition** : If 'name' parameter is invalid (not matching the regex or exceeds length).
 
 **Code** : `400 BAD REQUEST`
@@ -105,6 +125,20 @@ or
 {
 	"status": "error",
 	"message": "Invalid Calendar Name",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
+**Condition** : If 'uri' parameter is invalid (not matching the regex or exceeds length).
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+	"status": "error",
+	"message": "Invalid Calendar URI",
 	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```

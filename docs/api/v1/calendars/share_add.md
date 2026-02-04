@@ -18,7 +18,7 @@ Shares (or updates write access) a calendar owned by the specified user to anoth
 ** Request Body constraints**
 ```json
 {
-	"user_id": "[numeric id of the user to remove access]",
+	"user_id": "[numeric id of the user to add/update access]",
 	"write_access": "[boolean: true to grant write access, false for read-only]"
 }
 ```
@@ -85,6 +85,20 @@ or
 {
 	"status": "error",
 	"message": "User Not Found",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
+**Condition** : If request body contains invalid JSON.
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+	"status": "error",
+	"message": "Invalid JSON",
 	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```

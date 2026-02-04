@@ -96,6 +96,20 @@ or
 }
 ```
 
+**Condition** : If request body contains invalid JSON.
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+	"status": "error",
+	"message": "Invalid JSON",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
 **Condition** : If ':calendar_id' is not owned by the specified ':username'.
 
 **Code** : `400 BAD REQUEST`
