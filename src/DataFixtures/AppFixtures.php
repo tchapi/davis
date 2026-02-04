@@ -69,7 +69,7 @@ class AppFixtures extends Fixture
             ->setUri(Principal::PREFIX.$user->getUsername())
             ->setEmail('test2@test.com')
             ->setDisplayName('Test User 2')
-            ->setIsAdmin(true);
+            ->setIsAdmin(false);
         $manager->persist($principal);
 
         // Create all the default calendar / addressbook
@@ -77,8 +77,8 @@ class AppFixtures extends Fixture
         $calendar = new Calendar();
         $calendarInstance->setPrincipalUri(Principal::PREFIX.$user->getUsername())
                     ->setUri('default')
-                    ->setDisplayName('default.calendar.title')
-                    ->setDescription('default.calendar.description')
+                    ->setDisplayName('default.calendar.title2')
+                    ->setDescription('default.calendar.description2')
                     ->setCalendar($calendar);
         $manager->persist($calendarInstance);
 
@@ -96,11 +96,10 @@ class AppFixtures extends Fixture
         $addressbook = new AddressBook();
         $addressbook->setPrincipalUri(Principal::PREFIX.$user->getUsername())
                     ->setUri('default')
-                    ->setDisplayName('default.addressbook.title')
-                    ->setDescription('default.addressbook.description');
+                    ->setDisplayName('default.addressbook.title2')
+                    ->setDescription('default.addressbook.description2');
         $manager->persist($addressbook);
 
         $manager->flush();
-
     }
 }
