@@ -9,11 +9,12 @@ class ApiControllerTest extends WebTestCase
     /*
      * Helper function to get an existing username from the user list
      *
+     * @param int  $index   Index of the user in the list (0 - first user, 1 - second user)
      * @param mixed $client
      *
      * @return string Username
      */
-    private function getUserUsername($client): string
+    private function getUserUsername($client, int $index): string
     {
         $client->request('GET', '/api/v1/users', [], [], [
             'HTTP_ACCEPT' => 'application/json',
@@ -26,9 +27,35 @@ class ApiControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('data', $data);
-        $this->assertStringContainsString('test_user', $data['data'][0]['username']);
+        $this->assertStringContainsString('test_user', $data['data'][$index]['username']);
 
-        return $data['data'][0]['username'];
+        return $data['data'][$index]['username'];
+    }
+
+    /*
+     * Helper function to get an existing user ID from the user list
+     *
+     * @param mixed  $client
+     * @param int    $index   Index of the user in the list (0 - first user, 1 - second user)
+     *
+     * @return int User ID
+     */
+    private function getUserId($client, int $index): int
+    {
+        $client->request('GET', '/api/v1/users', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertArrayHasKey('data', $data);
+        $this->assertStringContainsString('test_user', $data['data'][$index]['username']);
+
+        return $data['data'][$index]['id'];
     }
 
     /*
@@ -78,6 +105,41 @@ class ApiControllerTest extends WebTestCase
     }
 
     /*
+     * Test the API endpoint with invalid token
+     */
+    public function testApiInvalidToken(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/api/v1/users', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => 'invalid_token',
+        ]);
+        $this->assertResponseStatusCodeSame(401);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertEquals('Invalid X-Davis-API-Token header', $data['message']);
+    }
+
+    /*
+     * Test the API endpoint with missing token
+     */
+    public function testApiMissingToken(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/api/v1/users', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+        ]);
+        $this->assertResponseStatusCodeSame(401);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertEquals('Missing X-Davis-API-Token header', $data['message']);
+    }
+
+    /*
      * Test the user list endpoint
      */
     public function testUserList(): void
@@ -93,12 +155,19 @@ class ApiControllerTest extends WebTestCase
 
         $data = json_decode($client->getResponse()->getContent(), true);
 
-        // Check if user is present in db
+        // Check if user1 is present in db
         $this->assertArrayHasKey('id', $data['data'][0]);
         $this->assertArrayHasKey('uri', $data['data'][0]);
         $this->assertStringContainsString('principals/test_user', $data['data'][0]['uri']);
         $this->assertArrayHasKey('username', $data['data'][0]);
         $this->assertStringContainsString('test_user', $data['data'][0]['username']);
+
+        // Check if user2 is present in db
+        $this->assertArrayHasKey('id', $data['data'][1]);
+        $this->assertArrayHasKey('uri', $data['data'][1]);
+        $this->assertStringContainsString('principals/test_user2', $data['data'][1]['uri']);
+        $this->assertArrayHasKey('username', $data['data'][1]);
+        $this->assertStringContainsString('test_user2', $data['data'][1]['username']);
     }
 
     /*
@@ -110,7 +179,7 @@ class ApiControllerTest extends WebTestCase
         $client = static::createClient();
 
         // Get username from existing user lists
-        $username = $this->getUserUsername($client);
+        $username = $this->getUserUsername($client, 0);
 
         // Check user details endpoint
         $client->request('GET', '/api/v1/users/'.$username, [], [], [
@@ -136,7 +205,7 @@ class ApiControllerTest extends WebTestCase
     public function testUserCalendarsList(): void
     {
         $client = static::createClient();
-        $username = $this->getUserUsername($client);
+        $username = $this->getUserUsername($client, 0);
 
         $client->request('GET', '/api/v1/calendars/'.$username, [], [], [
             'HTTP_ACCEPT' => 'application/json',
@@ -163,7 +232,7 @@ class ApiControllerTest extends WebTestCase
     public function testUserCalendarDetails(): void
     {
         $client = static::createClient();
-        $username = $this->getUserUsername($client);
+        $username = $this->getUserUsername($client, 0);
 
         // Get calendar list to retrieve calendar ID
         $client->request('GET', '/api/v1/calendars/'.$username, [], [], [
@@ -207,9 +276,9 @@ class ApiControllerTest extends WebTestCase
     public function testCreateUserCalendar(): void
     {
         $client = static::createClient();
-        $username = $this->getUserUsername($client);
+        $username = $this->getUserUsername($client, 0);
 
-        // Create user API request with JSON body
+        // Create calendar API request with JSON body
         $payload = [
             'uri' => 'api_calendar',
             'name' => 'api.calendar.title',
@@ -261,8 +330,8 @@ class ApiControllerTest extends WebTestCase
     public function testEditUserCalendar(): void
     {
         $client = static::createClient();
-        $username = $this->getUserUsername($client);
-        $calendar_id = $this->getCalendarId($client, $username, true);
+        $username = $this->getUserUsername($client, 0);
+        $calendarId = $this->getCalendarId($client, $username, true);
 
         // Edit user default calendar
         $payload = [
@@ -272,7 +341,7 @@ class ApiControllerTest extends WebTestCase
             'tasks_support' => true,
             'notes_support' => true,
         ];
-        $client->request('POST', '/api/v1/calendars/'.$username.'/'.$calendar_id.'/edit', [], [], [
+        $client->request('POST', '/api/v1/calendars/'.$username.'/'.$calendarId.'/edit', [], [], [
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
@@ -286,7 +355,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals('success', $data['status']);
 
         // Check if edits were applied
-        $client->request('GET', '/api/v1/calendars/'.$username.'/'.$calendar_id, [], [], [
+        $client->request('GET', '/api/v1/calendars/'.$username.'/'.$calendarId, [], [], [
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
         ]);
@@ -306,7 +375,112 @@ class ApiControllerTest extends WebTestCase
         $this->assertTrue($data['data']['notes']['enabled']);
     }
 
-    // TODO: TestShareCalendarToUser
-    // TODO: TestShareCalendarList
-    // TODO: TestUnshareCalendarToUser
+    /*
+     * Test getting shares for a user calendar (should be empty initially)
+     */
+    public function testGetUserCalendarSharesEmpty(): void
+    {
+        $client = static::createClient();
+        $username = $this->getUserUsername($client, 0);
+        $calendarId = $this->getCalendarId($client, $username, true);
+
+        // Get shares for user default calendar
+        $client->request('GET', '/api/v1/calendars/'.$username.'/shares/'.$calendarId, [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('status', $data);
+        $this->assertEquals('success', $data['status']);
+        $this->assertArrayHasKey('data', $data);
+        $this->assertEmpty($data['data']);
+    }
+
+    // TODO: FIX WHY IT DOES NOT PERSISTS BETWEEN REQUESTS
+    public function testShareUserCalendar(): void
+    {
+        $client = static::createClient();
+        $username = $this->getUserUsername($client, 0);
+        $shareeUserId = $this->getUserId($client, 1);
+        $calendarId = $this->getCalendarId($client, $username, true);
+
+        // Share user default calendar to test_user2
+        $payload = [
+            'user_id' => $shareeUserId,
+            'write_access' => false,
+        ];
+        $client->request('POST', '/api/v1/calendars/'.$username.'/share/'.$calendarId.'/add', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('status', $data);
+        $this->assertEquals('success', $data['status']);
+        var_dump($data);
+
+        // Check if share was applied
+        $client->request('GET', '/api/v1/calendars/'.$username.'/shares/'.$calendarId, [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data2 = json_decode($client->getResponse()->getContent(), true);
+        $this->assertIsArray($data2);
+        $this->assertArrayHasKey('status', $data2);
+        $this->assertEquals('success', $data2['status']);
+        $this->assertArrayHasKey('data', $data2);
+        var_dump($data2);
+    }
+
+    /*
+     * Test removing shared access to user calendar
+     */
+    public function testUnshareUserCalendar(): void
+    {
+        $client = static::createClient();
+        $username = $this->getUserUsername($client, 0);
+        $shareeUserId = $this->getUserId($client, 1);
+        $calendarId = $this->getCalendarId($client, $username, true);
+
+        // Unshare user default calendar from test_user2
+        $payload = [
+            'user_id' => $shareeUserId,
+        ];
+        $client->request('POST', '/api/v1/calendars/'.$username.'/share/'.$calendarId.'/remove', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertIsArray($data);
+        $this->assertEquals('success', $data['status']);
+
+        // Check if unshare was applied
+        $client->request('GET', '/api/v1/calendars/'.$username.'/shares/'.$calendarId, [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertIsArray($data);
+        $this->assertEquals('success', $data['status']);
+        $this->assertArrayHasKey('data', $data);
+        $this->assertEmpty($data['data']);
+    }
 }
