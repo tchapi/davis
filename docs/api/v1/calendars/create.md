@@ -143,6 +143,20 @@ or
 }
 ```
 
+**Condition** : If calendar with specified URI already exists for the user.
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+	"status": "error",
+	"message": "Calendar URI Already Exists",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```
+
 **Condition** : If 'description' parameter is invalid (not matching the regex or exceeds length).
 
 **Code** : `400 BAD REQUEST`
