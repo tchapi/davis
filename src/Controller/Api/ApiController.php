@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/v1', name: 'api_v1_')]
+// TODO: Check in insomnia the fix for JSON body data parsing
 class ApiController extends AbstractController
 {
     /**
@@ -239,6 +240,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
+    // TODO: Update docs
     #[Route('/calendars/{username}/create', name: 'calendar_create', methods: ['POST'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
     public function createNewUserCalendar(Request $request, string $username, ManagerRegistry $doctrine): JsonResponse
     {
@@ -246,14 +248,23 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
-        $calendarName = $request->get('name');
-        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName)) {
+        // Parse JSON body
+        $data = json_decode($request->getContent(), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $calendarName = $data['name'] ?? null;
+        if (empty($calendarName) || 1 !== preg_match('/^[a-zA-Z0-9 ._-]{1,64}$/', $calendarName)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Name', 'timestamp' => $this->getTimestamp()], 400);
         }
-        $calendarURI = strtolower(str_replace(' ', '_', $calendarName));
+        $calendarURI = $data['uri'] ?? null;
+        if (empty($calendarURI) || 1 !== preg_match('/^[a-z0-9_-]{1,128}$/', $calendarURI)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Calendar URI', 'timestamp' => $this->getTimestamp()], 400);
+        }
 
-        $calendarDescription = $request->get('description', '');
-        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription)) {
+        $calendarDescription = $data['description'] ?? '';
+        if (!empty($calendarDescription) && 1 !== preg_match('/^[a-zA-Z0-9 ._-]{1,256}$/', $calendarDescription)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Description', 'timestamp' => $this->getTimestamp()], 400);
         }
 
@@ -263,13 +274,17 @@ class ApiController extends AbstractController
         $calendarInstance->setCalendar($calendar);
 
         $calendarComponents = [];
-        if ('true' === $request->get('events_support', 'true')) {
+        // Handle both boolean and string values
+        $eventsSupport = $data['events_support'] ?? true;
+        if ($eventsSupport === true || $eventsSupport === 'true') {
             $calendarComponents[] = Calendar::COMPONENT_EVENTS;
         }
-        if ('true' === $request->get('notes_support', 'false')) {
+        $notesSupport = $data['notes_support'] ?? false;
+        if ($notesSupport === true || $notesSupport === 'true') {
             $calendarComponents[] = Calendar::COMPONENT_NOTES;
         }
-        if ('true' === $request->get('tasks_support', 'false')) {
+        $tasksSupport = $data['tasks_support'] ?? false;
+        if ($tasksSupport === true || $tasksSupport === 'true') {
             $calendarComponents[] = Calendar::COMPONENT_TODOS;
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
@@ -287,12 +302,26 @@ class ApiController extends AbstractController
 
         $response = [
             'status' => 'success',
+            'data' => [
+                'calendar_id' => $calendarInstance->getId(),
+                'calendar_uri' => $calendarInstance->getUri(),
+            ],
             'timestamp' => $this->getTimestamp(),
         ];
 
         return $this->json($response, 200);
     }
 
+    /**
+     * Edits an existing calendar for a specific user.
+     *
+     * @param Request $request     The HTTP POST request
+     * @param string  $username    The username of the user whose calendar is to be edited
+     * @param int     $calendar_id The ID of the calendar to be edited
+     *
+     * @return JsonResponse A JSON response indicating the success or failure of the operation
+     */
+    // TODO: Update docs
     #[Route('/calendars/{username}/{calendar_id}/edit', name: 'calendar_edit', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
     public function editUserCalendar(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
@@ -314,13 +343,19 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Calendar Instance Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
-        $calendarName = $request->get('name');
-        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,64}$/', $calendarName)) {
+        // Parse JSON body
+        $data = json_decode($request->getContent(), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $calendarName = $data['name'] ?? null;
+        if (empty($calendarName) || 1 !== preg_match('/^[a-zA-Z0-9 ._-]{1,64}$/', $calendarName)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Name', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        $calendarDescription = $request->get('description', '');
-        if (1 !== preg_match('/^[a-zA-Z0-9 _-]{0,256}$/', $calendarDescription)) {
+        $calendarDescription = $data['description'] ?? '';
+        if (!empty($calendarDescription) && 1 !== preg_match('/^[a-zA-Z0-9 ._-]{1,256}$/', $calendarDescription)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar Description', 'timestamp' => $this->getTimestamp()], 400);
         }
 
@@ -328,14 +363,18 @@ class ApiController extends AbstractController
         $calendarInstance->setDisplayName($calendarName);
         $calendarInstance->setDescription($calendarDescription);
 
-        $calendarComponents = explode(',', $calendarInstance->getCalendar()->getComponents());
-        if ('true' === $request->get('events_support', 'true')) {
+        $calendarComponents = [];
+        // Handle both boolean and string values
+        $eventsSupport = $data['events_support'] ?? true;
+        if ($eventsSupport === true || $eventsSupport === 'true') {
             $calendarComponents[] = Calendar::COMPONENT_EVENTS;
         }
-        if ('true' === $request->get('notes_support', 'false')) {
+        $notesSupport = $data['notes_support'] ?? false;
+        if ($notesSupport === true || $notesSupport === 'true') {
             $calendarComponents[] = Calendar::COMPONENT_NOTES;
         }
-        if ('true' === $request->get('tasks_support', 'false')) {
+        $tasksSupport = $data['tasks_support'] ?? false;
+        if ($tasksSupport === true || $tasksSupport === 'true') {
             $calendarComponents[] = Calendar::COMPONENT_TODOS;
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
@@ -420,9 +459,15 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID and User ID', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        $userId = $request->get('user_id');
-        $writeAccess = $request->get('write_access');
-        if (!is_numeric($userId) || !in_array($writeAccess, ['true', 'false'], true)) {
+        // Parse JSON body
+        $data = json_decode($request->getContent(), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $userId = $data['user_id'] ?? null;
+        $writeAccess = $data['write_access'] ?? null;
+        if (!is_numeric($userId) || !in_array($writeAccess, [true, false, 'true', 'false'], true)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Sharee ID/Write Access Value', 'timestamp' => $this->getTimestamp()], 400);
         }
 
@@ -434,7 +479,7 @@ class ApiController extends AbstractController
         }
 
         $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
-        $accessLevel = ('true' === $writeAccess ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
+        $accessLevel = ($writeAccess === true || $writeAccess === 'true' ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
         $entityManager = $doctrine->getManager();
 
         if ($existingSharedInstance) {
@@ -481,7 +526,13 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        $userId = $request->get('user_id');
+        // Parse JSON body
+        $data = json_decode($request->getContent(), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $userId = $data['user_id'] ?? null;
         if (!is_numeric($userId)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Sharee ID', 'timestamp' => $this->getTimestamp()], 400);
         }
