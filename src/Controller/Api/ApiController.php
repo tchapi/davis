@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/v1', name: 'api_v1_')]
-// TODO: Check in insomnia the fix for JSON body data parsing
 class ApiController extends AbstractController
 {
     /**
@@ -240,7 +239,6 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    // TODO: Update docs
     #[Route('/calendars/{username}/create', name: 'calendar_create', methods: ['POST'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
     public function createNewUserCalendar(Request $request, string $username, ManagerRegistry $doctrine): JsonResponse
     {
@@ -261,6 +259,14 @@ class ApiController extends AbstractController
         $calendarURI = $data['uri'] ?? null;
         if (empty($calendarURI) || 1 !== preg_match('/^[a-z0-9_-]{1,128}$/', $calendarURI)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar URI', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $uriCheck = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.$username,
+            'uri' => $calendarURI,
+        ]);
+        if ($uriCheck) {
+            return $this->json(['status' => 'error', 'message' => 'Calendar URI Already Exists', 'timestamp' => $this->getTimestamp()], 400);
         }
 
         $calendarDescription = $data['description'] ?? '';
@@ -321,7 +327,6 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    // TODO: Update docs
     #[Route('/calendars/{username}/{calendar_id}/edit', name: 'calendar_edit', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
     public function editUserCalendar(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
