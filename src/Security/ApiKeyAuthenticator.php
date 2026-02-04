@@ -61,6 +61,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $data = [
+            'status' => 'error',
             'message' => $exception->getMessage(),
             'timestamp' => date('c'),
         ];
