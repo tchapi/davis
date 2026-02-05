@@ -21,6 +21,8 @@ Gets a list of all users with whom a specific user calendar is shared.
 /api/v1/calendars/mdoe/shares/1
 ```
 
+**Important Note** : The `:calendar_id` must be a calendar instance owned by the user. The endpoint retrieves shares of the underlying Calendar entity, ensuring shares are found correctly regardless of the instance reference.
+
 ## Success Response
 
 **Code** : `200 OK`
@@ -33,14 +35,14 @@ Gets a list of all users with whom a specific user calendar is shared.
 	"data": [
 		{
 			"username": "adoe",
-			"user_id": 9,
+			"principal_id": 9,
 			"displayname": "Aiden Doe",
 			"email": "adoe@example.org",
 			"write_access": false
 		},
 		{
 			"username": "jdoe",
-			"user_id": 3,
+			"principal_id": 3,
 			"displayname": "John Doe",
 			"email": "jdoe@example.org",
 			"write_access": true
