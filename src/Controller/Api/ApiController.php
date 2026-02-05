@@ -286,7 +286,6 @@ class ApiController extends AbstractController
         $calendarInstance->setCalendar($calendar);
 
         $calendarComponents = [];
-        // Handle both boolean and string values
         $eventsSupport = $data['events_support'] ?? true;
         if (true === $eventsSupport || 'true' === $eventsSupport) {
             $calendarComponents[] = Calendar::COMPONENT_EVENTS;
@@ -384,7 +383,6 @@ class ApiController extends AbstractController
         $calendarInstance->setDescription($calendarDescription);
 
         $calendarComponents = [];
-        // Handle both boolean and string values
         $eventsSupport = $data['events_support'] ?? true;
         if (true === $eventsSupport || 'true' === $eventsSupport) {
             $calendarComponents[] = Calendar::COMPONENT_EVENTS;
