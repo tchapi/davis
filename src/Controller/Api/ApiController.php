@@ -98,7 +98,7 @@ class ApiController extends AbstractController
         }
 
         $data = [
-            'id' => $user->getId(),
+            'principal_id' => $user->getId(),
             'uri' => $user->getUri(),
             'username' => $user->getUsername(),
             'displayname' => $user->getDisplayName(),
@@ -295,7 +295,8 @@ class ApiController extends AbstractController
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
 
-        $calendarInstance
+        try {
+            $calendarInstance
             ->setCalendar($calendar)
             ->setAccess(CalendarInstance::ACCESS_SHAREDOWNER)
             ->setDescription($calendarDescription)
@@ -303,8 +304,11 @@ class ApiController extends AbstractController
             ->setUri($calendarURI)
             ->setPrincipalUri(Principal::PREFIX.$username);
 
-        $entityManager->persist($calendarInstance);
-        $entityManager->flush();
+            $entityManager->persist($calendarInstance);
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            return $this->json(['status' => 'error', 'message' => 'Failed to Create Calendar', 'timestamp' => $this->getTimestamp()], 500);
+        }
 
         $response = [
             'status' => 'success',
@@ -384,8 +388,12 @@ class ApiController extends AbstractController
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
 
-        $entityManager->persist($calendarInstance);
-        $entityManager->flush();
+        try {
+            $entityManager->persist($calendarInstance);
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            return $this->json(['status' => 'error', 'message' => 'Failed to Edit Calendar', 'timestamp' => $this->getTimestamp()], 500);
+        }
 
         return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
     }
@@ -470,14 +478,14 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        $userId = $data['user_id'] ?? null;
+        $shareeUsername = $data['username'] ?? null;
         $writeAccess = $data['write_access'] ?? null;
-        if (!is_numeric($userId) || !in_array($writeAccess, [true, false, 'true', 'false'], true)) {
+        if (!$this->validateUsername($shareeUsername) || !in_array($writeAccess, [true, false, 'true', 'false'], true)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Sharee ID/Write Access Value', 'timestamp' => $this->getTimestamp()], 400);
         }
 
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($calendar_id);
-        $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($userId);
+        $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$shareeUsername);
 
         if (!$instance || !$newShareeToAdd) {
             return $this->json(['status' => 'error', 'message' => 'Calendar Instance/User Not Found', 'timestamp' => $this->getTimestamp()], 404);
@@ -487,21 +495,25 @@ class ApiController extends AbstractController
         $accessLevel = (true === $writeAccess || 'true' === $writeAccess ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
         $entityManager = $doctrine->getManager();
 
-        if ($existingSharedInstance) {
-            $existingSharedInstance->setAccess($accessLevel);
-        } else {
-            $sharedInstance = new CalendarInstance();
-            $sharedInstance->setTransparent(1)
-                     ->setCalendar($instance->getCalendar())
-                     ->setShareHref('mailto:'.$newShareeToAdd->getEmail())
-                     ->setDescription($instance->getDescription())
-                     ->setDisplayName($instance->getDisplayName())
-                     ->setUri(\Sabre\DAV\UUIDUtil::getUUID())
-                     ->setPrincipalUri($newShareeToAdd->getUri())
-                     ->setAccess($accessLevel);
-            $entityManager->persist($sharedInstance);
+        try {
+            if ($existingSharedInstance) {
+                $existingSharedInstance->setAccess($accessLevel);
+            } else {
+                $sharedInstance = new CalendarInstance();
+                $sharedInstance->setTransparent(1)
+                        ->setCalendar($instance->getCalendar())
+                        ->setShareHref('mailto:'.$newShareeToAdd->getEmail())
+                        ->setDescription($instance->getDescription())
+                        ->setDisplayName($instance->getDisplayName())
+                        ->setUri(\Sabre\DAV\UUIDUtil::getUUID())
+                        ->setPrincipalUri($newShareeToAdd->getUri())
+                        ->setAccess($accessLevel);
+                $entityManager->persist($sharedInstance);
+            }
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            return $this->json(['status' => 'error', 'message' => 'Failed to Edit Calendar', 'timestamp' => $this->getTimestamp()], 500);
         }
-        $entityManager->flush();
 
         return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
     }
@@ -537,24 +549,28 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        $userId = $data['user_id'] ?? null;
-        if (!is_numeric($userId)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid Sharee ID', 'timestamp' => $this->getTimestamp()], 400);
+        $shareeUsername = $data['username'] ?? null;
+        if (!$this->validateUsername($shareeUsername)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Username', 'timestamp' => $this->getTimestamp()], 400);
         }
 
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($calendar_id);
-        $shareeToRemove = $doctrine->getRepository(Principal::class)->findOneById($userId);
+        $shareeToRemove = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$shareeUsername);
 
         if (!$instance || !$shareeToRemove) {
             return $this->json(['status' => 'error', 'message' => 'Calendar Instance/User Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
-        $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $shareeToRemove->getUri());
+        try {
+            $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $shareeToRemove->getUri());
 
-        if ($existingSharedInstance) {
-            $entityManager = $doctrine->getManager();
-            $entityManager->remove($existingSharedInstance);
-            $entityManager->flush();
+            if ($existingSharedInstance) {
+                $entityManager = $doctrine->getManager();
+                $entityManager->remove($existingSharedInstance);
+                $entityManager->flush();
+            }
+        } catch (\Exception $e) {
+            return $this->json(['status' => 'error', 'message' => 'Failed to Remove Share', 'timestamp' => $this->getTimestamp()], 500);
         }
 
         return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
