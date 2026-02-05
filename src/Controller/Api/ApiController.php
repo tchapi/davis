@@ -6,6 +6,7 @@ use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
+use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -308,7 +309,7 @@ class ApiController extends AbstractController
         try {
             $calendarInstance
             ->setCalendar($calendar)
-            ->setAccess(CalendarInstance::ACCESS_SHAREDOWNER)
+            ->setAccess(SharingPlugin::ACCESS_SHAREDOWNER)
             ->setDescription($calendarDescription)
             ->setDisplayName($calendarName)
             ->setUri($calendarURI)
@@ -437,18 +438,19 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Invalid Calendar ID/Username', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendar_id, true);
-
+        // This fixes the issue where shared calendars are not being retrieved properly
+        $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($ownerInstance->getCalendar()->getId(), true);
+        
         $calendars = [];
         foreach ($instances as $instance) {
-            $user_id = $doctrine->getRepository(Principal::class)->findOneByUri($instance[0]['principalUri']);
+            $principalId = $doctrine->getRepository(Principal::class)->findOneByUri($instance[0]['principalUri']);
 
             $calendars[] = [
                 'username' => mb_substr($instance[0]['principalUri'], strlen(Principal::PREFIX)),
-                'user_id' => $user_id?->getId() ?? null,
+                'principal_id' => $principalId?->getId() ?? null,
                 'displayname' => $instance['displayName'],
                 'email' => $instance['email'],
-                'write_access' => CalendarInstance::ACCESS_READWRITE === $instance[0]['access'],
+                'write_access' => SharingPlugin::ACCESS_READWRITE === $instance[0]['access'],
             ];
         }
 
@@ -506,7 +508,7 @@ class ApiController extends AbstractController
         }
 
         $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
-        $accessLevel = (true === $writeAccess || 'true' === $writeAccess ? CalendarInstance::ACCESS_READWRITE : CalendarInstance::ACCESS_READ);
+        $accessLevel = (true === $writeAccess || 'true' === $writeAccess ? SharingPlugin::ACCESS_READWRITE : SharingPlugin::ACCESS_READ);
         $entityManager = $doctrine->getManager();
 
         try {
