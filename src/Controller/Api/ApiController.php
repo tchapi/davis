@@ -299,7 +299,12 @@ class ApiController extends AbstractController
         if (true === $tasksSupport || 'true' === $tasksSupport) {
             $calendarComponents[] = Calendar::COMPONENT_TODOS;
         }
-        $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
+
+        // Validate that at least one component is selected
+        if (empty($calendarComponents)) {
+            return $this->json(['status' => 'error', 'message' => 'At least one calendar component must be enabled (events, notes, or tasks)', 'timestamp' => $this->getTimestamp()], 400);
+        }
+        $calendar->setComponents(implode(',', $calendarComponents));
 
         try {
             $calendarInstance
@@ -391,6 +396,11 @@ class ApiController extends AbstractController
         $tasksSupport = $data['tasks_support'] ?? false;
         if (true === $tasksSupport || 'true' === $tasksSupport) {
             $calendarComponents[] = Calendar::COMPONENT_TODOS;
+        }
+
+        // Validate that at least one component is selected
+        if (empty($calendarComponents)) {
+            return $this->json(['status' => 'error', 'message' => 'At least one calendar component must be enabled (events, notes, or tasks)', 'timestamp' => $this->getTimestamp()], 400);
         }
         $calendarInstance->getCalendar()->setComponents(implode(',', $calendarComponents));
 

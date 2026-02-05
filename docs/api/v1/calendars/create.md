@@ -170,3 +170,17 @@ or
 	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```
+
+**Condition** : If no calendar components are enabled (all of `events_support`, `notes_support`, and `tasks_support` are false).
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+	"status": "error",
+	"message": "At least one calendar component must be enabled (events, notes, or tasks)",
+	"timestamp": "2026-01-23T15:01:33+01:00"
+}
+```

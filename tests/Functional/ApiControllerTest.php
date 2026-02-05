@@ -441,4 +441,68 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('data', $data);
         $this->assertEmpty($data['data']);
     }
+
+    /*
+     * Test creating a calendar with no components enabled should return validation error
+     */
+    public function testCreateUserCalendarNoComponents(): void
+    {
+        $client = static::createClient();
+        $username = $this->getUserUsername($client, 0);
+
+        // Create calendar API request with no components enabled
+        $payload = [
+            'uri' => 'no_components_calendar',
+            'name' => 'no.components.calendar',
+            'description' => 'no.components.description',
+            'events_support' => false,
+            'tasks_support' => false,
+            'notes_support' => false,
+        ];
+
+        $client->request('POST', '/api/v1/calendars/'.$username.'/create', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertStringContainsString('At least one calendar component must be enabled', $data['message']);
+    }
+
+    /*
+     * Test editing a calendar with no components enabled should return validation error
+     */
+    public function testEditUserCalendarNoComponents(): void
+    {
+        $client = static::createClient();
+        $username = $this->getUserUsername($client, 0);
+        $calendarId = $this->getCalendarId($client, $username, true);
+
+        // Edit calendar API request with no components enabled
+        $payload = [
+            'name' => 'edited.calendar.title',
+            'description' => 'edited.calendar.description',
+            'events_support' => false,
+            'tasks_support' => false,
+            'notes_support' => false,
+        ];
+
+        $client->request('POST', '/api/v1/calendars/'.$username.'/'.$calendarId.'/edit', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertStringContainsString('At least one calendar component must be enabled', $data['message']);
+    }
 }
