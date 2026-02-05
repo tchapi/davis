@@ -6,8 +6,8 @@ use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
-use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Doctrine\Persistence\ManagerRegistry;
+use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -440,7 +440,7 @@ class ApiController extends AbstractController
 
         // This fixes the issue where shared calendars are not being retrieved properly
         $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($ownerInstance->getCalendar()->getId(), true);
-        
+
         $calendars = [];
         foreach ($instances as $instance) {
             $principalId = $doctrine->getRepository(Principal::class)->findOneByUri($instance[0]['principalUri']);
