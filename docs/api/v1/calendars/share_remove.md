@@ -18,7 +18,7 @@ Removes access to a specific shared calendar for a specific user.
 ** Request Body Constraints**
 ```json
 {
-	"user_id": "[numeric id of the user to remove access]"
+	"username": "[username of the user to remove access]"
 }
 ```
 
@@ -32,7 +32,7 @@ Removes access to a specific shared calendar for a specific user.
 
 ```json
 {
-	"user_id": "3"
+	"username": "jdoe"
 }
 ```
 
@@ -115,7 +115,7 @@ or
 }
 ```
 
-**Condition** : If 'user_id' is not numeric.
+**Condition** : If 'username' is not valid.
 
 **Code** : `400 BAD REQUEST`
 
@@ -124,7 +124,7 @@ or
 ```json
 {
 	"status": "error",
-	"message": "Invalid Sharee ID",
+	"message": "Invalid Username",
 	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```

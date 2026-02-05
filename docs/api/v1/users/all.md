@@ -19,7 +19,7 @@ Gets a list of all available users.
 	"status": "success",
 	"data": [
 		{
-			"id": 3,
+			"principal_id": 3,
 			"uri": "principals/jdoe",
 			"username": "jdoe"
 		}

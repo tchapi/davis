@@ -24,6 +24,8 @@ Gets a list of all available calendars for a specific user.
 
 **Code** : `200 OK`
 
+**Notes**: The `events`, `notes`, and `tasks` fields return a count (number) if the component is enabled for the calendar, or `null` if the component is disabled.
+
 **Content examples**
 
 ```json
@@ -35,10 +37,9 @@ Gets a list of all available calendars for a specific user.
 				"id": 1,
 				"uri": "default",
 				"displayname": "Default Calendar",
-				"description": "Default Calendar for John Doe",
 				"events": 0,
-				"notes": 0,
-				"tasks": 0
+				"notes": null,
+				"tasks": null
 			}
 		],
 		"shared_calendars": [
@@ -46,10 +47,9 @@ Gets a list of all available calendars for a specific user.
 				"id": 10,
 				"uri": "c2152eb0-ada1-451f-bf33-b4a9571ec92e",
 				"displayname": "Default Calendar",
-				"description": "Default Calendar for Mark Doe",
 				"events": 0,
-				"notes": 0,
-				"tasks": 0
+				"notes": null,
+				"tasks": null
 			}
 		],
 		"subscriptions": []

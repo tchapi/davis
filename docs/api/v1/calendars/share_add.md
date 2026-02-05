@@ -18,7 +18,7 @@ Shares (or updates write access) a calendar owned by the specified user to anoth
 ** Request Body constraints**
 ```json
 {
-	"user_id": "[numeric id of the user to add/update access]",
+	"username": "[username of the user to add/update access]",
 	"write_access": "[boolean: true to grant write access, false for read-only]"
 }
 ```
@@ -33,7 +33,7 @@ Shares (or updates write access) a calendar owned by the specified user to anoth
 
 ```json
 {
-	"user_id": "3",
+	"username": "jdoe",
 	"write_access": true
 }
 ```
@@ -117,7 +117,7 @@ or
 }
 ```
 
-**Condition** : If 'user_id' is not numeric or 'write_access' is not 'true' or 'false' string.
+**Condition** : If 'username' is not valid or 'write_access' is not 'true' or 'false'.
 
 **Code** : `400 BAD REQUEST`
 

@@ -65,7 +65,7 @@ class ApiController extends AbstractController
         $users = [];
         foreach ($principals as $principal) {
             $users[] = [
-                'id' => $principal->getId(),
+                'principal_id' => $principal->getId(),
                 'uri' => $principal->getUri(),
                 'username' => $principal->getUsername(),
             ];
@@ -136,14 +136,17 @@ class ApiController extends AbstractController
         $sharedCalendars = [];
         foreach ($allCalendars as $calendar) {
             $objectCounts = $doctrine->getRepository(CalendarInstance::class)->getObjectCountsByComponentType($calendar->getCalendar()->getId());
+            $eventsCount = $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_EVENTS) ? $objectCounts['events'] : null;
+            $notesCount = $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_NOTES) ? $objectCounts['notes'] : null;
+            $tasksCount = $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_TODOS) ? $objectCounts['tasks'] : null;
+
             $calendarData = [
                 'id' => $calendar->getId(),
                 'uri' => $calendar->getUri(),
                 'displayname' => $calendar->getDisplayName(),
-                'description' => $calendar->getDescription(),
-                'events' => $objectCounts['events'],
-                'notes' => $objectCounts['notes'],
-                'tasks' => $objectCounts['tasks'],
+                'events' => $eventsCount,
+                'notes' => $notesCount,
+                'tasks' => $tasksCount,
             ];
             if (!$calendar->isShared()) {
                 $calendars[] = $calendarData;
@@ -155,14 +158,17 @@ class ApiController extends AbstractController
         $subscriptions = [];
         foreach ($allSubscriptions as $subscription) {
             $objectCounts = $doctrine->getRepository(CalendarInstance::class)->getObjectCountsByComponentType($subscription->getCalendar()->getId());
+            $eventsCount = $subscription->getCalendar()->isComponentEnabled(Calendar::COMPONENT_EVENTS) ? $objectCounts['events'] : null;
+            $notesCount = $subscription->getCalendar()->isComponentEnabled(Calendar::COMPONENT_NOTES) ? $objectCounts['notes'] : null;
+            $tasksCount = $subscription->getCalendar()->isComponentEnabled(Calendar::COMPONENT_TODOS) ? $objectCounts['tasks'] : null;
+
             $subscriptions[] = [
                 'id' => $subscription->getId(),
                 'uri' => $subscription->getUri(),
                 'displayname' => $subscription->getDisplayName(),
-                'description' => $subscription->getDescription(),
-                'events' => $objectCounts['events'],
-                'notes' => $objectCounts['notes'],
-                'tasks' => $objectCounts['tasks'],
+                'events' => $eventsCount,
+                'notes' => $notesCount,
+                'tasks' => $tasksCount,
             ];
         }
 
