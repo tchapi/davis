@@ -399,8 +399,19 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('status', $data);
         $this->assertEquals('success', $data['status']);
 
-        // Note: The sharee is not returned by the API endpoint even though the share was created
-        // successfully and is visible in the database. This check only verifies the response is successful.
+        // Check if share was applied
+        $client->request('GET', '/api/v1/calendars/'.$username.'/shares/'.$calendarId, [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('success', $data['status']);
+        $this->assertArrayHasKey('data', $data);
+        $this->assertStringContainsString($shareeUsername, $data['data'][0]['username']);
+        $this->assertFalse($data['data'][0]['write_access']);
     }
 
     /*
