@@ -6,6 +6,7 @@ use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
+use App\Entity\SchedulingObject;
 use Doctrine\Persistence\ManagerRegistry;
 use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -408,6 +409,68 @@ class ApiController extends AbstractController
             $entityManager->flush();
         } catch (\Exception $e) {
             return $this->json(['status' => 'error', 'message' => 'Failed to Edit Calendar', 'timestamp' => $this->getTimestamp()], 500);
+        }
+
+        return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
+    }
+
+    /**
+     * Deletes a specific calendar for a specific user.
+     *
+     * @param Request $request     The HTTP POST request
+     * @param string  $username    The username of the user whose calendar is to be deleted
+     * @param int     $calendar_id The ID of the calendar to be deleted
+     *
+     * @return JsonResponse A JSON response indicating the success or failure of the operation
+     */
+    #[Route('/calendars/{username}/{calendar_id}/delete', name: 'calendar_delete', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
+    public function deleteUserCalendar(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine)
+    {
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+            return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
+            'id' => $calendar_id,
+            'principalUri' => Principal::PREFIX.$username,
+        ]);
+
+        if (!$instance) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Instance Not Found', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        try {
+            $entityManager = $doctrine->getManager();
+            $calendarsSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($instance->getPrincipalUri());
+            $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri($instance->getPrincipalUri());
+
+            // Remove calendar objects
+            foreach ($calendarsSubscriptions ?? [] as $subscription) {
+                $entityManager->remove($subscription);
+            }
+            foreach ($schedulingObjects ?? [] as $object) {
+                $entityManager->remove($object);
+            }
+            foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
+                $entityManager->remove($object);
+            }
+            foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
+                $entityManager->remove($change);
+            }
+
+            // Remove the original calendar instance
+            $entityManager->remove($instance);
+
+            // Remove shared instances of the calendar
+            $sharedInstances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($instance->getCalendar()->getId(), false);
+            foreach ($sharedInstances as $sharedInstance) {
+                $entityManager->remove($sharedInstance);
+            }
+
+            $entityManager->remove($instance->getCalendar());
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            return $this->json(['status' => 'error', 'message' => 'Failed to Delete Calendar', 'timestamp' => $this->getTimestamp()], 500);
         }
 
         return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);

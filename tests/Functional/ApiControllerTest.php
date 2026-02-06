@@ -516,4 +516,39 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals('error', $data['status']);
         $this->assertStringContainsString('At least one calendar component must be enabled', $data['message']);
     }
+
+    /*
+    * Test deleting a user calendar
+    */
+    public function testDeleteUserCalendar(): void
+    {
+        $client = static::createClient();
+        $username = $this->getUserUsername($client, 0);
+        $calendarId = $this->getCalendarId($client, $username, true);
+
+        // Delete the calendar
+        $client->request('POST', '/api/v1/calendars/'.$username.'/'.$calendarId.'/delete', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('success', $data['status']);
+
+        // Check if calendar is deleted
+        $client->request('GET', '/api/v1/calendars/'.$username.'/'.$calendarId, [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('success', $data['status']);
+        $this->assertEmpty($data['data']);
+    }
 }
