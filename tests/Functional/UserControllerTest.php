@@ -20,7 +20,7 @@ class UserControllerTest extends WebTestCase
         $this->assertSelectorExists('nav.navbar');
         $this->assertSelectorTextContains('h1', 'Users and Resources');
         $this->assertSelectorTextContains('a.btn', '+ New User');
-        $this->assertSelectorTextContains('h5', 'Test User');
+        $this->assertAnySelectorTextContains('h5', 'Test User');
     }
 
     public function testUserEdit(): void
@@ -41,7 +41,7 @@ class UserControllerTest extends WebTestCase
         $this->assertResponseRedirects('/users/');
         $client->followRedirect();
 
-        $this->assertSelectorTextContains('h5', 'Test User');
+        $this->assertAnySelectorTextContains('h5', 'Test User');
     }
 
     public function testUserNew(): void
@@ -72,7 +72,7 @@ class UserControllerTest extends WebTestCase
         $this->assertResponseRedirects('/users/');
         $client->followRedirect();
 
-        $this->assertSelectorTextContains('h5', 'Test User');
+        $this->assertAnySelectorTextContains('h5', 'Test User');
         $this->assertAnySelectorTextContains('h5', 'New test User');
     }
 
@@ -83,6 +83,13 @@ class UserControllerTest extends WebTestCase
         $client = static::createClient();
         $client->loginUser($user);
         $client->request('GET', '/users/delete/test_user');
+
+        $this->assertResponseRedirects('/users/');
+        $client->followRedirect();
+
+        $this->assertAnySelectorTextContains('h5', 'Test User 2');
+
+        $client->request('GET', '/users/delete/test_user2');
 
         $this->assertResponseRedirects('/users/');
         $client->followRedirect();

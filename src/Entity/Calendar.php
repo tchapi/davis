@@ -140,4 +140,16 @@ class Calendar
     {
         return $this->instances;
     }
+
+    /**
+     * Check if this calendar supports a specific component type.
+     *
+     * @param string $componentType The component type to check
+     *
+     * @return bool True if the component is supported, false otherwise
+     */
+    public function isComponentEnabled(string $componentType): bool
+    {
+        return in_array($componentType, explode(',', $this->components ?? ''), true);
+    }
 }

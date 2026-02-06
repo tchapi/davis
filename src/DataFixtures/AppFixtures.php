@@ -14,6 +14,7 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+        // Test User 1
         $hash = password_hash('password', PASSWORD_DEFAULT);
         $user = (new User())
             ->setUsername('test_user')
@@ -53,6 +54,50 @@ class AppFixtures extends Fixture
                     ->setUri('default')
                     ->setDisplayName('default.addressbook.title')
                     ->setDescription('default.addressbook.description');
+        $manager->persist($addressbook);
+
+        $manager->flush();
+
+        // Test User 2 - For API testing
+        $hash = password_hash('password2', PASSWORD_DEFAULT);
+        $user = (new User())
+            ->setUsername('test_user2')
+            ->setPassword($hash);
+        $manager->persist($user);
+
+        $principal = (new Principal())
+            ->setUri(Principal::PREFIX.$user->getUsername())
+            ->setEmail('test2@test.com')
+            ->setDisplayName('Test User 2')
+            ->setIsAdmin(false);
+        $manager->persist($principal);
+
+        // Create all the default calendar / addressbook
+        $calendarInstance = new CalendarInstance();
+        $calendar = new Calendar();
+        $calendarInstance->setPrincipalUri(Principal::PREFIX.$user->getUsername())
+                    ->setUri('default')
+                    ->setDisplayName('default.calendar.title2')
+                    ->setDescription('default.calendar.description2')
+                    ->setCalendar($calendar);
+        $manager->persist($calendarInstance);
+
+        // Enable delegation by default
+        $principalProxyRead = new Principal();
+        $principalProxyRead->setUri($principal->getUri().Principal::READ_PROXY_SUFFIX)
+                            ->setIsMain(false);
+        $manager->persist($principalProxyRead);
+
+        $principalProxyWrite = new Principal();
+        $principalProxyWrite->setUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX)
+                            ->setIsMain(false);
+        $manager->persist($principalProxyWrite);
+
+        $addressbook = new AddressBook();
+        $addressbook->setPrincipalUri(Principal::PREFIX.$user->getUsername())
+                    ->setUri('default')
+                    ->setDisplayName('default.addressbook.title2')
+                    ->setDescription('default.addressbook.description2');
         $manager->persist($addressbook);
 
         $manager->flush();

@@ -78,6 +78,10 @@ services:
         arguments:
             $birthdayReminderOffset: "%birthday_reminder_offset%"
 
+    App\Security\ApiKeyAuthenticator:
+        arguments:
+            $apiKey: "%env(API_KEY)%"
+
 when@dev:
     services:
         Symfony\Component\HttpKernel\Profiler\Profiler: '@profiler'
