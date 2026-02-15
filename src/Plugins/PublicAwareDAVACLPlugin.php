@@ -54,17 +54,19 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
                 // a new class just to access it, so we use a closure.
                 $calendarInfo = (fn () => $this->calendarInfo)->call($node);
                 // [0] is the calendarId, [1] is the calendarInstanceId
-                $calendarInstanceId = $calendarInfo['id'][1];
+                if (isset($calendarInfo['id']) && is_array($calendarInfo['id']) && isset($calendarInfo['id'][1])) {
+                    $calendarInstanceId = $calendarInfo['id'][1];
 
-                $calendar = $this->em->getRepository(CalendarInstance::class)->findOneById($calendarInstanceId);
+                    $calendar = $this->em->getRepository(CalendarInstance::class)->findOneById($calendarInstanceId);
 
-                if ($calendar && $calendar->isPublic()) {
-                    // Add unauthenticated read access on the object itself
-                    $acl[] = [
-                        'principal' => '{DAV:}unauthenticated',
-                        'privilege' => '{DAV:}read',
-                        'protected' => false,
-                    ];
+                    if ($calendar && $calendar->isPublic()) {
+                        // Add unauthenticated read access on the object itself
+                        $acl[] = [
+                            'principal' => '{DAV:}unauthenticated',
+                            'privilege' => '{DAV:}read',
+                            'protected' => false,
+                        ];
+                    }
                 }
             }
         }
