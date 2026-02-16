@@ -43,12 +43,9 @@ class ApiController extends AbstractController
     /**
      * Resolves a User entity from a userId, or returns a JSON error response.
      *
-     * @param ManagerRegistry $doctrine
-     * @param int             $userId
-     *
-     * @return User| null The User entity, or null if not found
+     * @return User|null The User entity, or null if not found
      */
-    private function resolveUser(ManagerRegistry $doctrine, int $userId): User|null
+    private function resolveUser(ManagerRegistry $doctrine, int $userId): ?User
     {
         return $doctrine->getRepository(User::class)->findOneById($userId);
     }
