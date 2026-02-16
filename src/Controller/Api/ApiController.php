@@ -7,6 +7,7 @@ use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
 use App\Entity\SchedulingObject;
+use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +27,7 @@ class ApiController extends AbstractController
      */
     private function validateUsername(string $username): bool
     {
-        return !empty($username) && is_string($username) && !preg_match('/[^a-zA-Z0-9_-]/', $username);
+        return !empty($username) && is_string($username) && !preg_match('/[^a-zA-Z0-9_.@-]/', $username);
     }
 
     /**
@@ -37,6 +38,19 @@ class ApiController extends AbstractController
     private function getTimestamp(): string
     {
         return date('c');
+    }
+
+    /**
+     * Resolves a User entity from a userId, or returns a JSON error response.
+     *
+     * @param ManagerRegistry $doctrine
+     * @param int             $userId
+     *
+     * @return User| null The User entity, or null if not found
+     */
+    private function resolveUser(ManagerRegistry $doctrine, int $userId): User|null
+    {
+        return $doctrine->getRepository(User::class)->findOneById($userId);
     }
 
     /**
@@ -53,7 +67,7 @@ class ApiController extends AbstractController
     }
 
     /**
-     * Retrieves a list of users (with their id, uri, username, and displayname).
+     * Retrieves a list of users (with their user_id, principal_id, uri, username, and displayname).
      *
      * @param Request $request The HTTP GET request
      *
@@ -62,11 +76,13 @@ class ApiController extends AbstractController
     #[Route('/users', name: 'users', methods: ['GET'])]
     public function getUsers(Request $request, ManagerRegistry $doctrine): JsonResponse
     {
-        $principals = $doctrine->getRepository(Principal::class)->findByIsMain(true);
+        $results = $doctrine->getRepository(Principal::class)->findAllMainPrincipalsWithUserIds();
 
         $users = [];
-        foreach ($principals as $principal) {
+        foreach ($results as $result) {
+            $principal = $result[0];
             $users[] = [
+                'user_id' => $result['userId'],
                 'principal_id' => $principal->getId(),
                 'uri' => $principal->getUri(),
                 'username' => $principal->getUsername(),
@@ -83,28 +99,34 @@ class ApiController extends AbstractController
     }
 
     /**
-     * Retrieves details of a specific user (id, uri, username, displayname, email).
+     * Retrieves details of a specific user (user_id, principal_id, uri, username, displayname, email).
      *
-     * @param Request $request  The HTTP GET request
-     * @param string  $username The username of the user whose details are to be retrieved
+     * @param Request $request The HTTP GET request
+     * @param int     $userId  The ID of the user whose details are to be retrieved
      *
      * @return JsonResponse A JSON response containing the user details
      */
-    #[Route('/users/{username}', name: 'user_detail', methods: ['GET'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
-    public function getUserDetails(Request $request, ManagerRegistry $doctrine, string $username): JsonResponse
+    #[Route('/users/{userId}', name: 'user_detail', methods: ['GET'], requirements: ['userId' => '\d+'])]
+    public function getUserDetails(Request $request, ManagerRegistry $doctrine, int $userId): JsonResponse
     {
-        $user = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
-
+        $user = $this->resolveUser($doctrine, $userId);
         if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$user->getUsername());
+
+        if (!$principal) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
         $data = [
-            'principal_id' => $user->getId(),
-            'uri' => $user->getUri(),
-            'username' => $user->getUsername(),
-            'displayname' => $user->getDisplayName(),
-            'email' => $user->getEmail(),
+            'user_id' => $user->getId(),
+            'principal_id' => $principal->getId(),
+            'uri' => $principal->getUri(),
+            'username' => $principal->getUsername(),
+            'displayname' => $principal->getDisplayName(),
+            'email' => $principal->getEmail(),
         ];
 
         $response = [
@@ -119,20 +141,27 @@ class ApiController extends AbstractController
     /**
      * Retrieves a list of calendars for a specific user, including user calendars, shared calendars, and subscriptions.
      *
-     * @param Request $request  The HTTP GET request
-     * @param string  $username The username of the user whose calendars are to be retrieved
+     * @param Request $request The HTTP GET request
+     * @param int     $userId  The ID of the user whose calendars are to be retrieved
      *
      * @return JsonResponse A JSON response containing the list of calendars for the specified user
      */
-    #[Route('/calendars/{username}', name: 'calendars', methods: ['GET'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
-    public function getUserCalendars(Request $request, string $username, ManagerRegistry $doctrine): JsonResponse
+    #[Route('/calendars/{userId}', name: 'calendars', methods: ['GET'], requirements: ['userId' => '\d+'])]
+    public function getUserCalendars(Request $request, int $userId, ManagerRegistry $doctrine): JsonResponse
     {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
-        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
-        $allSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri($principalUri)) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
+        $allSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($principalUri);
 
         $calendars = [];
         $sharedCalendars = [];
@@ -191,19 +220,26 @@ class ApiController extends AbstractController
      * Retrieves details of a specific calendar for a specific user (id, uri, displayname, description, number of events, notes, and tasks).
      *
      * @param Request $request     The HTTP GET request
-     * @param string  $username    The username of the user whose calendar details are to be retrieved
+     * @param int     $userId      The ID of the user whose calendar details are to be retrieved
      * @param int     $calendar_id The ID of the calendar whose details are to be retrieved
      *
      * @return JsonResponse A JSON response containing the calendar details
      */
-    #[Route('/calendars/{username}/{calendar_id}', name: 'calendar_details', methods: ['GET'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
-    public function getUserCalendarDetails(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    #[Route('/calendars/{userId}/{calendar_id}', name: 'calendar_details', methods: ['GET'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
+    public function getUserCalendarDetails(Request $request, int $userId, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
-        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri($principalUri)) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
 
         $calendar_details = [];
         foreach ($allCalendars as $calendar) {
@@ -242,16 +278,23 @@ class ApiController extends AbstractController
     /**
      * Creates a new calendar for a specific user.
      *
-     * @param Request $request  The HTTP POST request
-     * @param string  $username The username of the user for whom the calendar is to be created
+     * @param Request $request The HTTP POST request
+     * @param int     $userId  The ID of the user for whom the calendar is to be created
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/create', name: 'calendar_create', methods: ['POST'], requirements: ['username' => '[a-zA-Z0-9_-]+'])]
-    public function createNewUserCalendar(Request $request, string $username, ManagerRegistry $doctrine): JsonResponse
+    #[Route('/calendars/{userId}/create', name: 'calendar_create', methods: ['POST'], requirements: ['userId' => '\d+'])]
+    public function createNewUserCalendar(Request $request, int $userId, ManagerRegistry $doctrine): JsonResponse
     {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri($principalUri)) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
         // Parse JSON body
@@ -270,7 +313,7 @@ class ApiController extends AbstractController
         }
 
         $uriCheck = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
-            'principalUri' => Principal::PREFIX.$username,
+            'principalUri' => $principalUri,
             'uri' => $calendarURI,
         ]);
         if ($uriCheck) {
@@ -314,7 +357,7 @@ class ApiController extends AbstractController
             ->setDescription($calendarDescription)
             ->setDisplayName($calendarName)
             ->setUri($calendarURI)
-            ->setPrincipalUri(Principal::PREFIX.$username);
+            ->setPrincipalUri($principalUri);
 
             $entityManager->persist($calendarInstance);
             $entityManager->flush();
@@ -338,21 +381,28 @@ class ApiController extends AbstractController
      * Edits an existing calendar for a specific user.
      *
      * @param Request $request     The HTTP POST request
-     * @param string  $username    The username of the user whose calendar is to be edited
+     * @param int     $userId      The ID of the user whose calendar is to be edited
      * @param int     $calendar_id The ID of the calendar to be edited
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/{calendar_id}/edit', name: 'calendar_edit', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
-    public function editUserCalendar(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    #[Route('/calendars/{userId}/{calendar_id}/edit', name: 'calendar_edit', methods: ['POST'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
+    public function editUserCalendar(Request $request, int $userId, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri($principalUri)) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
         $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
             'id' => $calendar_id,
-            'principalUri' => Principal::PREFIX.$username,
+            'principalUri' => $principalUri,
         ]);
 
         if (!$ownerInstance) {
@@ -418,21 +468,28 @@ class ApiController extends AbstractController
      * Deletes a specific calendar for a specific user.
      *
      * @param Request $request     The HTTP POST request
-     * @param string  $username    The username of the user whose calendar is to be deleted
+     * @param int     $userId      The ID of the user whose calendar is to be deleted
      * @param int     $calendar_id The ID of the calendar to be deleted
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/{calendar_id}/delete', name: 'calendar_delete', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
-    public function deleteUserCalendar(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine)
+    #[Route('/calendars/{userId}/{calendar_id}/delete', name: 'calendar_delete', methods: ['POST'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
+    public function deleteUserCalendar(Request $request, int $userId, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri($principalUri)) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
             'id' => $calendar_id,
-            'principalUri' => Principal::PREFIX.$username,
+            'principalUri' => $principalUri,
         ]);
 
         if (!$instance) {
@@ -480,21 +537,28 @@ class ApiController extends AbstractController
      * Retrieves a list of shares for a specific calendar of a specific user (id, username, displayname, email, write_access).
      *
      * @param Request $request     The HTTP GET request
-     * @param string  $username    The username of the user whose calendar shares are to be retrieved
+     * @param int     $userId      The ID of the user whose calendar shares are to be retrieved
      * @param int     $calendar_id The ID of the calendar whose shares are to be retrieved
      *
      * @return JsonResponse A JSON response containing the list of calendar shares
      */
-    #[Route('/calendars/{username}/shares/{calendar_id}', name: 'calendars_shares', methods: ['GET'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
-    public function getUserCalendarsShares(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    #[Route('/calendars/{userId}/shares/{calendar_id}', name: 'calendars_shares', methods: ['GET'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
+    public function getUserCalendarsShares(Request $request, int $userId, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri($principalUri)) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
         $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
             'id' => $calendar_id,
-            'principalUri' => Principal::PREFIX.$username,
+            'principalUri' => $principalUri,
         ]);
 
         if (!$ownerInstance) {
@@ -530,21 +594,28 @@ class ApiController extends AbstractController
      * Sets or updates a share for a specific calendar of a specific user.
      *
      * @param Request $request     The HTTP POST request
-     * @param string  $username    The username of the user whose calendar share is to be set or updated
+     * @param int     $userId      The ID of the user whose calendar share is to be set or updated
      * @param string  $calendar_id The ID of the calendar whose share is to be set or updated
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/share/{calendar_id}/add', name: 'calendars_share', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
-    public function setUserCalendarsShare(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    #[Route('/calendars/{userId}/share/{calendar_id}/add', name: 'calendars_share', methods: ['POST'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
+    public function setUserCalendarsShare(Request $request, int $userId, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri($principalUri)) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
         $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
             'id' => $calendar_id,
-            'principalUri' => Principal::PREFIX.$username,
+            'principalUri' => $principalUri,
         ]);
 
         if (!$ownerInstance) {
@@ -601,21 +672,28 @@ class ApiController extends AbstractController
      * Removes a share for a specific calendar of a specific user.
      *
      * @param Request $request     The HTTP POST request
-     * @param string  $username    The username of the user whose calendar share is to be removed
+     * @param int     $userId      The ID of the user whose calendar share is to be removed
      * @param string  $calendar_id The ID of the calendar whose share is to be removed
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{username}/share/{calendar_id}/remove', name: 'calendars_share_remove', methods: ['POST'], requirements: ['calendar_id' => "\d+", 'username' => '[a-zA-Z0-9_-]+'])]
-    public function removeUserCalendarsShare(Request $request, string $username, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
+    #[Route('/calendars/{userId}/share/{calendar_id}/remove', name: 'calendars_share_remove', methods: ['POST'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
+    public function removeUserCalendarsShare(Request $request, int $userId, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
-        if (!$doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username)) {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
             return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        if (!$doctrine->getRepository(Principal::class)->findOneByUri($principalUri)) {
+            return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
         $ownerInstance = $doctrine->getRepository(CalendarInstance::class)->findOneBy([
             'id' => $calendar_id,
-            'principalUri' => Principal::PREFIX.$username,
+            'principalUri' => $principalUri,
         ]);
 
         if (!$ownerInstance) {
