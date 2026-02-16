@@ -50,6 +50,6 @@ class PrincipalRepository extends ServiceEntityRepository
             ->setParameter('isMain', true)
             ->setParameter('prefix', Principal::PREFIX)
             ->getQuery()
-        ->getResult();
+            ->getResult();
     }
 }

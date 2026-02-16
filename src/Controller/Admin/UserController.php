@@ -120,11 +120,12 @@ class UserController extends AbstractController
         return $this->render('users/edit.html.twig', [
             'form' => $form->createView(),
             'userId' => $userId,
+            'username' => $user->getUsername(),
         ]);
     }
 
     #[Route('/delete/{userId}', name: 'delete')]
-    public function userDelete(ManagerRegistry $doctrine, string $userId, TranslatorInterface $trans): Response
+    public function userDelete(ManagerRegistry $doctrine, int $userId, TranslatorInterface $trans): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
@@ -192,7 +193,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/delegates/{userId}', name: 'delegates')]
-    public function userDelegates(ManagerRegistry $doctrine, string $userId): Response
+    public function userDelegates(ManagerRegistry $doctrine, int $userId): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
@@ -220,7 +221,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'])]
-    public function userToggleDelegation(ManagerRegistry $doctrine, string $userId, string $toggle): Response
+    public function userToggleDelegation(ManagerRegistry $doctrine, int $userId, string $toggle): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
@@ -264,7 +265,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/delegates/{userId}/add', name: 'delegate_add')]
-    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, string $userId): Response
+    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, int $userId): Response
     {
         if (!is_numeric($request->get('principalId'))) {
             throw new BadRequestHttpException();
@@ -309,7 +310,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"])]
-    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, string $userId, int $principalProxyId, int $delegateId): Response
+    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, int $userId, int $principalProxyId, int $delegateId): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
