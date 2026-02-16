@@ -28,8 +28,8 @@ Endpoints for viewing and modifying user calendars.
 * [Show All User Calendars](v1/calendars/all.md) : `GET /api/v1/calendars/:username`
 * [Show User Calendar Details](v1/calendars/details.md) : `GET /api/v1/calendars/:username/:calendar_id`
 * [Create User Calendar](v1/calendars/create.md) : `POST /api/v1/calendars/:username/create`
-* [Edit User Calendar](v1/calendars/edit.md) : `POST /api/v1/calendars/:username/:calendar_id/edit`
-* [Delete User Calendar](v1/calendars/delete.md) : `POST /api/v1/calendars/:username/:calendar_id/delete`
+* [Edit User Calendar](v1/calendars/edit.md) : `PUT /api/v1/calendars/:username/:calendar_id`
+* [Delete User Calendar](v1/calendars/delete.md) : `DELETE /api/v1/calendars/:username/:calendar_id`
 * [Show User Calendar Shares](v1/calendars/shares.md) : `GET /api/v1/calendars/:username/shares/:calendar_id`
 * [Share User Calendar](v1/calendars/share_add.md) : `POST /api/v1/calendars/:username/share/:calendar_id/add`
 * [Remove Share User Calendar](v1/calendars/share_remove.md) : `POST /api/v1/calendars/:username/share/:calendar_id/remove`

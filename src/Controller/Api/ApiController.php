@@ -383,7 +383,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{userId}/{calendar_id}/edit', name: 'calendar_edit', methods: ['POST'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
+    #[Route('/calendars/{userId}/{calendar_id}', name: 'calendar_edit', methods: ['PUT', 'PATCH'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
     public function editUserCalendar(Request $request, int $userId, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         $user = $this->resolveUser($doctrine, $userId);
@@ -470,7 +470,7 @@ class ApiController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
-    #[Route('/calendars/{userId}/{calendar_id}/delete', name: 'calendar_delete', methods: ['POST'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
+    #[Route('/calendars/{userId}/{calendar_id}', name: 'calendar_delete', methods: ['DELETE'], requirements: ['calendar_id' => '\d+', 'userId' => '\d+'])]
     public function deleteUserCalendar(Request $request, int $userId, int $calendar_id, ManagerRegistry $doctrine): JsonResponse
     {
         $user = $this->resolveUser($doctrine, $userId);

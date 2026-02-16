@@ -2,9 +2,9 @@
 
 Deletes a specific calendar for a specific user.
 
-**URL** : `/api/v1/calendars/:username/:calendar_id/delete`
+**URL** : `/api/v1/calendars/:username/:calendar_id`
 
-**Method** : `POST`
+**Method** : `DELETE`
 
 **Auth required** : YES
 
@@ -18,7 +18,7 @@ Deletes a specific calendar for a specific user.
 **URL example**
 
 ```
-/api/v1/calendars/jdoe/1/delete
+/api/v1/calendars/jdoe/1
 ```
 
 ## Success Response

@@ -346,7 +346,7 @@ class ApiControllerTest extends WebTestCase
             'tasks_support' => true,
             'notes_support' => true,
         ];
-        $client->request('POST', '/api/v1/calendars/'.$userId.'/'.$calendarId.'/edit', [], [], [
+        $client->request('PATCH', '/api/v1/calendars/'.$userId.'/'.$calendarId, [], [], [
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
@@ -534,7 +534,7 @@ class ApiControllerTest extends WebTestCase
             'notes_support' => false,
         ];
 
-        $client->request('POST', '/api/v1/calendars/'.$userId.'/'.$calendarId.'/edit', [], [], [
+        $client->request('PUT', '/api/v1/calendars/'.$userId.'/'.$calendarId, [], [], [
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
@@ -558,7 +558,7 @@ class ApiControllerTest extends WebTestCase
         $calendarId = $this->getCalendarId($client, $userId, true);
 
         // Delete the calendar
-        $client->request('POST', '/api/v1/calendars/'.$userId.'/'.$calendarId.'/delete', [], [], [
+        $client->request('DELETE', '/api/v1/calendars/'.$userId.'/'.$calendarId, [], [], [
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
