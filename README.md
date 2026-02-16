@@ -579,7 +579,7 @@ If you change or add translations, you need to update the `messages` XLIFF file 
 
 You can use:
 
-    ./bin/phpunit
+    ./vendor/bin/phpunit
 
 ## ✨ Code linting
 

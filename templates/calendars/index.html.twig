@@ -5,7 +5,7 @@
 
 {% include '_partials/back_button.html.twig' with { url: path('user_index'), text: "users.back"|trans } %}
 
-<h1 class="display-4 fw-lighter d-flex justify-content-between">{{ "calendars.for"|trans({'who': principal.displayName}) }} <a href="{{ path('calendar_create', {username: username}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.new"|trans }}</a></h1>
+<h1 class="display-4 fw-lighter d-flex justify-content-between">{{ "calendars.for"|trans({'who': principal.displayName}) }} <a href="{{ path('calendar_create', {userId: userId}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.new"|trans }}</a></h1>
 
 <div class="list-group mt-4">
 {% for compoundObject in calendars %}
@@ -25,15 +25,15 @@
                 {% if not calendar.isPublic() %}
                     <a href="#"
                         data-bs-toggle="modal" data-bs-target="#shareModal"
-                        data-sharees-href="{{ path('calendar_shares',{username: username, calendarid: calendar.calendar.id})}}" 
-                        data-href="{{ path('calendar_share_add', {username: principal.username, instanceid: calendar.id}) }}" 
+                        data-sharees-href="{{ path('calendar_shares',{userId: userId, calendarid: calendar.calendar.id})}}" 
+                        data-href="{{ path('calendar_share_add', {userId: userId, instanceid: calendar.id}) }}" 
                         class="btn btn-sm btn-outline-info ms-1 share-modal"
                     >🔗 {{ "sharing"|trans }}</a>
                 {% endif %}
-                <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
+                <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
                 <a href="#" 
                     data-bs-toggle="modal" data-bs-target="#deleteModal-calendars"
-                    data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}"
+                    data-href="{{ path('calendar_delete',{userId: userId, id: calendar.id})}}"
                     data-flavour="calendars"
                     class="btn btn-sm btn-outline-danger ms-1 delete-modal"
                 >⚠ {{ "delete"|trans }}</a>
@@ -51,15 +51,15 @@
             {% if not calendar.isPublic() %}
                 <a href="#" 
                     data-bs-toggle="modal" data-bs-target="#shareModal"
-                    data-sharees-href="{{ path('calendar_shares',{username: username, calendarid: calendar.calendar.id})}}" 
-                    data-href="{{ path('calendar_share_add', {username: principal.username, instanceid: calendar.id}) }}" 
+                    data-sharees-href="{{ path('calendar_shares',{userId: userId, calendarid: calendar.calendar.id})}}" 
+                    data-href="{{ path('calendar_share_add', {userId: userId, instanceid: calendar.id}) }}" 
                     class="btn btn-outline-info share-modal"
                 >🔗 {{ "sharing"|trans }}</a>
             {% endif %}
-            <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
+            <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
             <a href="#" 
                 data-bs-toggle="modal" data-bs-target="#deleteModal-calendars"
-                data-href="{{ path('calendar_delete',{username: username, id: calendar.id})}}"
+                data-href="{{ path('calendar_delete',{userId: userId, id: calendar.id})}}"
                 data-flavour="calendars"
                 class="btn btn-outline-danger delete-modal"
             >⚠ {{ "delete"|trans }}</a>
@@ -88,10 +88,10 @@
                     <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
                 </h5>
                 <div class="me-0 text-right d-md-block d-none">
-                    <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
+                    <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
                     <a href="#"
                         data-bs-toggle="modal" data-bs-target="#deleteModal-revoke"
-                        data-href="{{ path('calendar_revoke',{username: username, id: calendar.id})}}"
+                        data-href="{{ path('calendar_revoke',{userId: userId, id: calendar.id})}}"
                         data-flavour="revoke"
                         class="btn btn-sm btn-outline-danger ms-1"
                     >🚫 {{ "revoke"|trans }}</a>
@@ -106,10 +106,10 @@
             — {{ "calendars.entries"|trans({'%count%': calendar.calendar.objects|length}) }}
             </small>
             <div class="btn-group btn-group-sm mt-3 d-flex d-md-none" role="group">
-                <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
+                <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
                 <a href="#" 
                     data-bs-toggle="modal" data-bs-target="#deleteModal-revoke"
-                    data-href="{{ path('calendar_revoke',{username: username, id: calendar.id})}}" 
+                    data-href="{{ path('calendar_revoke',{userId: userId, id: calendar.id})}}" 
                     data-flavour="revoke"
                     class="btn btn-outline-danger"
                 >🚫 {{ "revoke"|trans }}</a>
@@ -138,7 +138,7 @@
                     <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
                 </h5>
                 <div class="me-0 text-right d-md-block d-none">
-                    <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
+                    <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
                 </div>
             </div>
             <p class="mb-1">{{ calendar.description }}</p>
@@ -150,7 +150,7 @@
             — {{ "calendars.entries"|trans({'%count%': calendar.calendar.objects|length}) }}
             </small>
             <div class="btn-group btn-group-sm mt-3 d-flex d-md-none" role="group">
-                <a href="{{ path('calendar_edit',{username: username, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
+                <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-outline-primary">✎ {{ "edit"|trans }}</a>
             </div>
         </div>
     {% endfor %}

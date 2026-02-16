@@ -2,11 +2,20 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\User;
 use App\Security\AdminUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class UserControllerTest extends WebTestCase
 {
+    private function getUserId($client, string $username): int
+    {
+        $userRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $user = $userRepository->findOneByUsername($username);
+
+        return $user->getId();
+    }
+
     public function testUserIndex(): void
     {
         $user = new AdminUser('admin', 'test');
@@ -29,7 +38,10 @@ class UserControllerTest extends WebTestCase
 
         $client = static::createClient();
         $client->loginUser($user);
-        $client->request('GET', '/users/edit/test_user');
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $client->request('GET', '/users/edit/'.$userId);
 
         $this->assertResponseIsSuccessful();
 
@@ -82,14 +94,18 @@ class UserControllerTest extends WebTestCase
 
         $client = static::createClient();
         $client->loginUser($user);
-        $client->request('GET', '/users/delete/test_user');
+
+        $userId1 = $this->getUserId($client, 'test_user');
+        $userId2 = $this->getUserId($client, 'test_user2');
+
+        $client->request('GET', '/users/delete/'.$userId1);
 
         $this->assertResponseRedirects('/users/');
         $client->followRedirect();
 
         $this->assertAnySelectorTextContains('h5', 'Test User 2');
 
-        $client->request('GET', '/users/delete/test_user2');
+        $client->request('GET', '/users/delete/'.$userId2);
 
         $this->assertResponseRedirects('/users/');
         $client->followRedirect();
@@ -103,7 +119,10 @@ class UserControllerTest extends WebTestCase
 
         $client = static::createClient();
         $client->loginUser($user);
-        $client->request('GET', '/users/delegates/test_user');
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $client->request('GET', '/users/delegates/'.$userId);
 
         $this->assertResponseIsSuccessful();
 
@@ -115,7 +134,7 @@ class UserControllerTest extends WebTestCase
 
         $client->clickLink('Disable it');
 
-        $this->assertResponseRedirects('/users/delegates/test_user');
+        $this->assertResponseRedirects('/users/delegates/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorExists('nav.navbar');

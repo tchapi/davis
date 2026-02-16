@@ -3,18 +3,30 @@
 namespace App\Tests\Functional;
 
 use App\Entity\AddressBook;
+use App\Entity\User;
 use App\Security\AdminUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AddressBookControllerTest extends WebTestCase
 {
+    private function getUserId($client, string $username): int
+    {
+        $userRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $user = $userRepository->findOneByUsername($username);
+
+        return $user->getId();
+    }
+
     public function testAddressBookIndex(): void
     {
         $user = new AdminUser('admin', 'test');
 
         $client = static::createClient();
         $client->loginUser($user);
-        $client->request('GET', '/addressbooks/test_user');
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $client->request('GET', '/addressbooks/'.$userId);
 
         $this->assertResponseIsSuccessful();
 
@@ -31,10 +43,12 @@ class AddressBookControllerTest extends WebTestCase
         $client = static::createClient();
         $client->loginUser($user);
 
+        $userId = $this->getUserId($client, 'test_user');
+
         $addressbookRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(AddressBook::class);
         $addressbook = $addressbookRepository->findOneByDisplayName('default.addressbook.title');
 
-        $client->request('GET', '/addressbooks/test_user/edit/'.$addressbook->getId());
+        $client->request('GET', '/addressbooks/'.$userId.'/edit/'.$addressbook->getId());
 
         $this->assertResponseIsSuccessful();
 
@@ -43,7 +57,7 @@ class AddressBookControllerTest extends WebTestCase
 
         $client->submitForm('address_book_save');
 
-        $this->assertResponseRedirects('/addressbooks/test_user');
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorTextContains('h5', 'default.addressbook.title');
@@ -55,7 +69,10 @@ class AddressBookControllerTest extends WebTestCase
 
         $client = static::createClient();
         $client->loginUser($user);
-        $crawler = $client->request('GET', '/addressbooks/test_user/new');
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $crawler = $client->request('GET', '/addressbooks/'.$userId.'/new');
 
         $this->assertResponseIsSuccessful();
 
@@ -71,7 +88,7 @@ class AddressBookControllerTest extends WebTestCase
             'address_book[description]' => 'new address book',
         ]);
 
-        $this->assertResponseRedirects('/addressbooks/test_user');
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorTextContains('h5', 'default.addressbook.title');
@@ -85,12 +102,14 @@ class AddressBookControllerTest extends WebTestCase
         $client = static::createClient();
         $client->loginUser($user);
 
+        $userId = $this->getUserId($client, 'test_user');
+
         $addressbookRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(AddressBook::class);
         $addressbook = $addressbookRepository->findOneByDisplayName('default.addressbook.title');
 
-        $client->request('GET', '/addressbooks/test_user/delete/'.$addressbook->getId());
+        $client->request('GET', '/addressbooks/'.$userId.'/delete/'.$addressbook->getId());
 
-        $this->assertResponseRedirects('/addressbooks/test_user');
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorTextNotContains('h5', 'default.addressbook.title');
