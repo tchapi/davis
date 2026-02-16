@@ -2,7 +2,7 @@
 
 Gets a list of all available calendars for a specific user.
 
-**URL** : `/api/v1/calendars/:username/:calendar_id`
+**URL** : `/api/v1/calendars/:user_id/:calendar_id`
 
 **Method** : `GET`
 
@@ -11,7 +11,7 @@ Gets a list of all available calendars for a specific user.
 **Params constraints**
 
 ```
-:username -> "[username in plain text]",
+:user_id -> "[user id as an int]",
 :calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 

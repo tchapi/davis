@@ -2,7 +2,7 @@
 
 Gets details about a specific user account.
 
-**URL** : `/api/v1/users/:username`
+**URL** : `/api/v1/users/:user_id`
 
 **Method** : `GET`
 
@@ -11,7 +11,7 @@ Gets details about a specific user account.
 **Params constraints**
 
 ```
-:username -> "[username in plain text]",
+:user_id -> "[user id as an int]",
 ```
 
 **URL example**

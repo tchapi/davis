@@ -2,7 +2,7 @@
 
 Shares (or updates write access) a calendar owned by the specified user to another user.
 
-**URL** : `/api/v1/calendars/:username/share/:calendar_id/add`
+**URL** : `/api/v1/calendars/:user_id/share/:calendar_id/add`
 
 **Method** : `POST`
 
@@ -11,7 +11,7 @@ Shares (or updates write access) a calendar owned by the specified user to anoth
 **Params constraints**
 
 ```
-:username -> "[username in plain text]",
+:user_id -> "[user id as an int]",
 :calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 
