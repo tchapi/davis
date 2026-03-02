@@ -99,7 +99,7 @@ class BirthdayService
                     ->setCalendarOrder(0)
                     ->setCalendar($calendar)
                     ->setTransparent(1)
-                    ->setShareInviteStatus(CalendarInstance::INVITE_ACCEPTED)
+                    ->setShareInviteStatus(SharingPlugin::INVITE_ACCEPTED)
                     ->setUri(Constants::BIRTHDAY_CALENDAR_URI);
 
         $em->persist($instance);
