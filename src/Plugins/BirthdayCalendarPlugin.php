@@ -3,6 +3,7 @@
 namespace App\Plugins;
 
 use App\Services\BirthdayService;
+use Sabre\CalDAV\Backend\PDO as CalendarBackend;
 use Sabre\CardDAV;
 use Sabre\DAV;
 
@@ -18,9 +19,10 @@ class BirthdayCalendarPlugin extends DAV\ServerPlugin
      */
     protected $server;
 
-    public function __construct(BirthdayService $birthdayService)
+    public function __construct(BirthdayService $birthdayService, CalendarBackend $calendarBackend)
     {
         $this->birthdayService = $birthdayService;
+        $this->birthdayService->setBackend($calendarBackend);
     }
 
     public function initialize(DAV\Server $server)
@@ -39,40 +41,30 @@ class BirthdayCalendarPlugin extends DAV\ServerPlugin
         $server->on('beforeUnbind', [$this, 'beforeCardDelete']);
     }
 
-    private function resyncCurrentPrincipal()
+    public function afterCardCreate(string $path, DAV\ICollection $parentNode): void
     {
-        $authPlugin = $this->server->getPlugin('auth');
-
-        if (!$authPlugin) {
-            return null;
-        }
-
-        $principal = $authPlugin->getCurrentPrincipal();
-
-        if ($principal) {
-            $this->birthdayService->syncPrincipal($principal);
-        }
-    }
-
-    public function afterCardCreate($path, DAV\ICollection $parentNode)
-    {
-        if (!$parentNode instanceof CardDAV\IAddressBook) {
+        if (!$parentNode instanceof CardDAV\AddressBook) {
             return;
         }
-
-        $principal = $this->resyncCurrentPrincipal();
+        $this->handleCardChange($path, $parentNode);
     }
 
-    public function afterCardUpdate($path, DAV\IFile $node)
+    public function afterCardUpdate(string $path, DAV\IFile $node): void
     {
         if (!$node instanceof CardDAV\ICard) {
             return;
         }
+        $parentPath = dirname($path);
+        $parentNode = $this->server->tree->getNodeForPath($parentPath);
 
-        $principal = $this->resyncCurrentPrincipal();
+        if (!$parentNode instanceof CardDAV\AddressBook) {
+            return;
+        }
+
+        $this->handleCardChange($path, $parentNode);
     }
 
-    public function beforeCardDelete($path)
+    public function beforeCardDelete(string $path): void
     {
         $node = $this->server->tree->getNodeForPath($path);
 
@@ -80,7 +72,25 @@ class BirthdayCalendarPlugin extends DAV\ServerPlugin
             return;
         }
 
-        $principal = $this->resyncCurrentPrincipal();
+        $parentPath = dirname($path);
+        $parentNode = $this->server->tree->getNodeForPath($parentPath);
+
+        if (!$parentNode instanceof CardDAV\AddressBook) {
+            return;
+        }
+
+        $addressBookId = $parentNode->getProperties(['id'])['id'];
+
+        $this->birthdayService->onCardDeleted($addressBookId, basename($path));
+    }
+
+    private function handleCardChange(string $path, CardDAV\AddressBook $parentNode): void
+    {
+        $cardUri = basename($path);
+        $addressBookId = $parentNode->getProperties(['id'])['id'];
+        $cardNode = $this->server->tree->getNodeForPath($path);
+
+        $this->birthdayService->onCardChanged($addressBookId, $cardUri, $cardNode->get());
     }
 
     public function getPluginName(): string

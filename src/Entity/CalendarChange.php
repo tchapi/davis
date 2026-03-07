@@ -24,7 +24,7 @@ class CalendarChange
     private $calendar;
 
     #[ORM\Column(type: 'smallint')]
-    private $operation;
+    private $operation;  // 1 = create, 2 = update, 3 = delete
 
     public function getId(): ?int
     {
