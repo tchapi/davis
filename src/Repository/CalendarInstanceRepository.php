@@ -74,6 +74,19 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->getSingleScalarResult() > 0;
     }
 
+    public function findAllSchedulingObjectsForCalendar(int $calendarId): array
+    {
+        $objectRepository = $this->getEntityManager()->getRepository(\App\Entity\SchedulingObject::class);
+
+        return $objectRepository->createQueryBuilder('s')
+            ->leftJoin(CalendarObject::class, 'c', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.uri = s.uri')
+            ->where('c.calendarid = :id')
+            ->andWhere('s.principaluri = :principalUri')
+            ->setParameter('id', $calendarId)
+            ->getQuery()
+            ->getResult();
+    }
+
     /**
      * Get counts of calendar objects by component type for a calendar instance.
      *

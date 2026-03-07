@@ -48,6 +48,10 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
         $acl = parent::getAcl($node);
 
         if ($this->public_calendars_enabled) {
+            // We have nothing to handle here, but SchedulingObject extends Calendar so we bail out early
+            if ($node instanceof \Sabre\CalDAV\SchedulingObject) {
+                return $acl;
+            }
             // Handle both Calendar AND SharedCalendar (which extends Calendar)
             if ($node instanceof \Sabre\CalDAV\Calendar || $node instanceof \Sabre\CalDAV\CalendarObject) {
                 // The property is private in \Sabre\CalDAV\CalendarObject and we don't want to create

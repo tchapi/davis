@@ -252,11 +252,11 @@ class CalendarController extends AbstractController
             $entityManager->remove($subscription);
         }
 
-        $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri($instance->getPrincipalUri());
-        foreach ($schedulingObjects ?? [] as $object) {
+        // Scheduling objects attached to the calendar objects of the calendar
+        $schedulingObjectsOfCalendarObjects = $doctrine->getRepository(CalendarInstance::class)->findAllSchedulingObjectsForCalendar($instance->getId());
+        foreach ($schedulingObjectsOfCalendarObjects ?? [] as $object) {
             $entityManager->remove($object);
         }
-
         foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
             $entityManager->remove($object);
         }
