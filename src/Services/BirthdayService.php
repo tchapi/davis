@@ -56,9 +56,9 @@ class BirthdayService
         }
 
         $principalUri = $book->getPrincipalUri();
-        $calendar = $this->ensureBirthdayCalendarExists($principalUri);
+        $calendarInstance = $this->ensureBirthdayCalendarExists($principalUri);
 
-        $this->updateCalendar($cardUri, $cardData, $book, $calendar->getCalendar());
+        $this->updateCalendar($cardUri, $cardData, $book, $calendarInstance);
     }
 
     public function onCardDeleted(int $addressBookId, string $cardUri): void
@@ -70,12 +70,16 @@ class BirthdayService
         }
 
         $principalUri = $book->getPrincipalUri();
-        $calendar = $this->ensureBirthdayCalendarExists($principalUri);
+        $calendarInstance = $this->ensureBirthdayCalendarExists($principalUri);
 
         $objectUri = $book->getUri().'-'.$cardUri.'.ics';
 
+        $calendar = $calendarInstance->getCalendar();
+        // This is the structure that needs to be passed to the backend methods
+        $calendarId = [$calendar->getId(), $calendarInstance->getId()];
+
         $this->calendarBackend->deleteCalendarObject(
-            $calendar->getCalendar()->getId(),
+            $calendarId,
             $objectUri
         );
     }
@@ -318,34 +322,38 @@ class BirthdayService
     /**
      * @throws InvalidDataException
      */
-    private function updateCalendar(string $cardUri, string $cardData, AddressBook $book, Calendar $calendar): void
+    private function updateCalendar(string $cardUri, string $cardData, AddressBook $book, CalendarInstance $calendarInstance): void
     {
         $objectUid = $book->getUri().'-'.$cardUri;
         $objectUri = $objectUid.'.ics';
         $calendarData = $this->buildDataFromContact($cardData);
+
+        $calendar = $calendarInstance->getCalendar();
+        // This is the structure that needs to be passed to the backend methods
+        $calendarId = [$calendar->getId(), $calendarInstance->getId()];
 
         $existing = $this->doctrine->getRepository(CalendarObject::class)->findOneBy(['calendar' => $calendar, 'uri' => $objectUri]);
 
         if (null === $calendarData) {
             if (null !== $existing) {
                 $this->calendarBackend->deleteCalendarObject(
-                    $calendar->getId(),
+                    [$calendar->getId(), $calendarInstance->getId()],
                     $objectUri
                 );
             }
         } else {
             if (null === $existing) {
                 $this->calendarBackend->createCalendarObject(
-                    $calendar->getId(),
+                    [$calendar->getId(), $calendarInstance->getId()],
                     $objectUri,
-                    $calendarData
+                    $calendarData->serialize()
                 );
             } else {
                 if ($this->birthdayEventChanged($existing->getCalendarData(), $calendarData)) {
                     $this->calendarBackend->updateCalendarObject(
-                        $calendar->getId(),
+                        [$calendar->getId(), $calendarInstance->getId()],
                         $objectUri,
-                        $calendarData
+                        $calendarData->serialize()
                     );
                 }
             }
