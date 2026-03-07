@@ -77,15 +77,18 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->getSingleScalarResult() > 0;
     }
 
-    public function findAllSchedulingObjectsForCalendar(int $calendarId): array
+    public function findAllSchedulingObjectsForCalendar(int $calendarId, string $principalUri): array
     {
         $objectRepository = $this->getEntityManager()->getRepository(SchedulingObject::class);
 
         return $objectRepository->createQueryBuilder('s')
             ->leftJoin(CalendarObject::class, 'c', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.uri = s.uri')
             ->where('c.calendarid = :id')
+            // uri is not unique across calendars — two different calendars can have objects with the same uri.
+            // The join should also filter by principaluri as a consequence
             ->andWhere('s.principaluri = :principalUri')
             ->setParameter('id', $calendarId)
+            ->setParameter('principalUri', $principalUri)
             ->getQuery()
             ->getResult();
     }

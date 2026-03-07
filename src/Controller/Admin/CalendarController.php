@@ -239,6 +239,12 @@ class CalendarController extends AbstractController
     #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
     public function calendarDelete(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans): Response
     {
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
@@ -252,7 +258,7 @@ class CalendarController extends AbstractController
         }
 
         // Scheduling objects attached to the calendar objects of the calendar
-        $schedulingObjectsOfCalendarObjects = $doctrine->getRepository(CalendarInstance::class)->findAllSchedulingObjectsForCalendar($instance->getId());
+        $schedulingObjectsOfCalendarObjects = $doctrine->getRepository(CalendarInstance::class)->findAllSchedulingObjectsForCalendar($instance->getId(), $principalUri);
         foreach ($schedulingObjectsOfCalendarObjects ?? [] as $object) {
             $entityManager->remove($object);
         }
