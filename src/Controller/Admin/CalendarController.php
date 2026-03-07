@@ -6,7 +6,6 @@ use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
-use App\Entity\SchedulingObject;
 use App\Entity\User;
 use App\Form\CalendarInstanceType;
 use Doctrine\Persistence\ManagerRegistry;
