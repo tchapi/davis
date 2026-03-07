@@ -87,7 +87,7 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->where('ci.id = :id')
             // uri is not unique across calendars — two different calendars can have objects with the same uri.
             // The join should also filter by principaluri as a consequence
-            ->andWhere('s.principaluri = :principalUri')
+            ->andWhere('s.principalUri = :principalUri')
             ->setParameter('id', $calendarInstanceId)
             ->setParameter('principalUri', $principalUri)
             ->getQuery()
