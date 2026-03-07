@@ -2,7 +2,7 @@
 
 Removes access to a specific shared calendar for a specific user.
 
-**URL** : `/api/v1/calendars/:username/share/:calendar_id/remove`
+**URL** : `/api/v1/calendars/:user_id/share/:calendar_id/remove`
 
 **Method** : `POST`
 
@@ -11,7 +11,7 @@ Removes access to a specific shared calendar for a specific user.
 **Params constraints**
 
 ```
-:username -> "[username in plain text]",
+:user_id -> "[user id as an int]",
 :calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 

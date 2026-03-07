@@ -2,23 +2,23 @@
 
 Deletes a specific calendar for a specific user.
 
-**URL** : `/api/v1/calendars/:username/:calendar_id/delete`
+**URL** : `/api/v1/calendars/:user_id/:calendar_id`
 
-**Method** : `POST`
+**Method** : `DELETE`
 
 **Auth required** : YES
 
 **Params constraints**
 
 ```
-:username -> "[username in plain text]",
+:user_id -> "[user id as an int]",
 :calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 
 **URL example**
 
 ```
-/api/v1/calendars/jdoe/1/delete
+/api/v1/calendars/jdoe/1
 ```
 
 ## Success Response

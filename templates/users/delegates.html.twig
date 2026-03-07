@@ -17,7 +17,7 @@
 {% if delegation %}
     <div class="alert alert-success d-flex justify-content-between mb-4 mt-2" role="alert">
       <div>{{ "delegates.enabled.text"|trans }}<br><small>{{ "delegates.disable.warning"|trans }}</small></div>
-      <a href="{{ path('user_delegation_toggle', {username: principal.username, toggle: 'off'})}}" class="btn btn-sm my-auto btn-outline-danger">{{ "delegates.disable"|trans }}</a>
+      <a href="{{ path('user_delegation_toggle', {userId: userId, toggle: 'off'})}}" class="btn btn-sm my-auto btn-outline-danger">{{ "delegates.disable"|trans }}</a>
     </div>
     {% for delegate in principalProxyRead.delegees %}
         {% include '_partials/delegate_row.html.twig' with {has_write: false} %}
@@ -28,7 +28,7 @@
 
 {% else %}
     <div class="alert alert-warning d-flex justify-content-between mb-4 mt-2" role="alert">
-      {{ "delegates.disabled.text"|trans }}<a href="{{ path('user_delegation_toggle', {username: principal.username, toggle: 'on'})}}" class="btn btn-sm my-auto btn-warning">{{ "delegates.enable"|trans }}</a>
+      {{ "delegates.disabled.text"|trans }}<a href="{{ path('user_delegation_toggle', {userId: userId, toggle: 'on'})}}" class="btn btn-sm my-auto btn-warning">{{ "delegates.enable"|trans }}</a>
     </div>
 {% endif %}
 

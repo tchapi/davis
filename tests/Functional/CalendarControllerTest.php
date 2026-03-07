@@ -2,19 +2,31 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\User;
 use App\Repository\CalendarInstanceRepository;
 use App\Security\AdminUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class CalendarControllerTest extends WebTestCase
 {
+    private function getUserId($client, string $username): int
+    {
+        $userRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $user = $userRepository->findOneByUsername($username);
+
+        return $user->getId();
+    }
+
     public function testCalendarIndex(): void
     {
         $user = new AdminUser('admin', 'test');
 
         $client = static::createClient();
         $client->loginUser($user);
-        $client->request('GET', '/calendars/test_user');
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $client->request('GET', '/calendars/'.$userId);
 
         $this->assertResponseIsSuccessful();
 
@@ -31,10 +43,12 @@ class CalendarControllerTest extends WebTestCase
         $client = static::createClient();
         $client->loginUser($user);
 
+        $userId = $this->getUserId($client, 'test_user');
+
         $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
         $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
 
-        $client->request('GET', '/calendars/test_user/edit/'.$calendar->getId());
+        $client->request('GET', '/calendars/'.$userId.'/edit/'.$calendar->getId());
 
         $this->assertResponseIsSuccessful();
 
@@ -43,7 +57,7 @@ class CalendarControllerTest extends WebTestCase
 
         $client->submitForm('calendar_instance_save');
 
-        $this->assertResponseRedirects('/calendars/test_user');
+        $this->assertResponseRedirects('/calendars/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorTextContains('h5', 'default.calendar.title');
@@ -55,7 +69,10 @@ class CalendarControllerTest extends WebTestCase
 
         $client = static::createClient();
         $client->loginUser($user);
-        $crawler = $client->request('GET', '/calendars/test_user/new');
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $crawler = $client->request('GET', '/calendars/'.$userId.'/new');
 
         $this->assertResponseIsSuccessful();
 
@@ -72,7 +89,7 @@ class CalendarControllerTest extends WebTestCase
             'calendar_instance[calendarColor]' => '#00112233',
         ]);
 
-        $this->assertResponseRedirects('/calendars/test_user');
+        $this->assertResponseRedirects('/calendars/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorTextContains('h5', 'default.calendar.title');
@@ -86,12 +103,14 @@ class CalendarControllerTest extends WebTestCase
         $client = static::createClient();
         $client->loginUser($user);
 
+        $userId = $this->getUserId($client, 'test_user');
+
         $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
         $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
 
-        $client->request('GET', '/calendars/test_user/delete/'.$calendar->getId());
+        $client->request('GET', '/calendars/'.$userId.'/delete/'.$calendar->getId());
 
-        $this->assertResponseRedirects('/calendars/test_user');
+        $this->assertResponseRedirects('/calendars/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorTextNotContains('h5', 'default.calendar.title');

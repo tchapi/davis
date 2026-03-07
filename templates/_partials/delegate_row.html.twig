@@ -12,7 +12,7 @@
         <div class="me-0 text-right d-lg-block d-none">
             <a href="#" 
                 data-bs-toggle="modal" data-bs-target="#deleteModal-delegates"
-                data-href="{{ path('user_delegate_remove',{username: principal.username, principalProxyId: has_write ? principalProxyWrite.id : principalProxyRead.id, delegateId: delegate.id})}}" 
+                data-href="{{ path('user_delegate_remove',{userId: userId, principalProxyId: has_write ? principalProxyWrite.id : principalProxyRead.id, delegateId: delegate.id})}}" 
                 data-flavour="delegates" 
                 class="btn btn-sm btn-outline-danger ms-1 mb-1"
             >⚠&nbsp;{{ "remove"|trans }}</a>
@@ -21,6 +21,6 @@
     <p class="mb-1">{{ "users.username"|trans }} : <code>{{ delegate.username }}</code></p>
     <small>{{ "users.uri"|trans }} : <code>{{ delegate.uri }}</code></small>
     <div class="btn-group btn-group-sm mt-3 d-flex d-lg-none" role="group">
-        <a href="#" data-href="{{ path('user_delegate_remove',{username: principal.username, principalProxyId: has_write ? principalProxyWrite.id : principalProxyRead.id, delegateId: delegate.id})}}" data-flavour="delegates" class="btn btn-outline-danger flex-fill flex-shrink-1 delete-modal"><span class="d-none d-sm-inline">⚠&nbsp;</span>{{ "remove"|trans }}</a>
+        <a href="#" data-href="{{ path('user_delegate_remove',{userId: userId, principalProxyId: has_write ? principalProxyWrite.id : principalProxyRead.id, delegateId: delegate.id})}}" data-flavour="delegates" class="btn btn-outline-danger flex-fill flex-shrink-1 delete-modal"><span class="d-none d-sm-inline">⚠&nbsp;</span>{{ "remove"|trans }}</a>
     </div>
 </div>

@@ -19,11 +19,12 @@ Gets a list of all available users.
 	"status": "success",
 	"data": [
 		{
+			"user_id": 1,
 			"principal_id": 3,
 			"uri": "principals/jdoe",
 			"username": "jdoe"
 		}
-    ],
+	],
 	"timestamp": "2026-01-23T15:01:33+01:00"
 }
 ```

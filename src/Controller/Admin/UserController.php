@@ -25,30 +25,30 @@ class UserController extends AbstractController
     #[Route('/', name: 'index')]
     public function users(ManagerRegistry $doctrine): Response
     {
-        $principals = $doctrine->getRepository(Principal::class)->findByIsMain(true);
+        $results = $doctrine->getRepository(Principal::class)->findAllMainPrincipalsWithUserIds();
 
         return $this->render('users/index.html.twig', [
-            'principals' => $principals,
+            'results' => $results,
         ]);
     }
 
     #[Route('/new', name: 'create')]
-    #[Route('/edit/{username}', name: 'edit')]
-    public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?string $username, TranslatorInterface $trans): Response
+    #[Route('/edit/{userId}', name: 'edit')]
+    public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?int $userId, TranslatorInterface $trans): Response
     {
-        if ($username) {
-            $user = $doctrine->getRepository(User::class)->findOneByUsername($username);
+        if ($userId) {
+            $user = $doctrine->getRepository(User::class)->findOneById($userId);
             if (!$user) {
                 throw $this->createNotFoundException('User not found');
             }
             $oldHash = $user->getPassword();
-            $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+            $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$user->getUsername());
         } else {
             $user = new User();
             $principal = new Principal();
         }
 
-        $form = $this->createForm(UserType::class, $user, ['new' => !$username]);
+        $form = $this->createForm(UserType::class, $user, ['new' => !$userId]);
 
         $form->get('displayName')->setData($principal->getDisplayName());
         $form->get('email')->setData($principal->getEmail());
@@ -62,7 +62,7 @@ class UserController extends AbstractController
             $isAdmin = $form->get('isAdmin')->getData();
 
             // Create password for user
-            if ($username && is_null($user->getPassword())) {
+            if ($userId && is_null($user->getPassword())) {
                 // The user is not new and does not want to change its password
                 $user->setPassword($oldHash);
             } else {
@@ -119,14 +119,15 @@ class UserController extends AbstractController
 
         return $this->render('users/edit.html.twig', [
             'form' => $form->createView(),
-            'username' => $username,
+            'userId' => $userId,
+            'username' => $user->getUsername(),
         ]);
     }
 
-    #[Route('/delete/{username}', name: 'delete')]
-    public function userDelete(ManagerRegistry $doctrine, string $username, TranslatorInterface $trans): Response
+    #[Route('/delete/{userId}', name: 'delete')]
+    public function userDelete(ManagerRegistry $doctrine, int $userId, TranslatorInterface $trans): Response
     {
-        $user = $doctrine->getRepository(User::class)->findOneByUsername($username);
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
@@ -134,7 +135,7 @@ class UserController extends AbstractController
         $entityManager = $doctrine->getManager();
         $entityManager->remove($user);
 
-        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$user->getUsername());
         $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
         $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
 
@@ -142,12 +143,14 @@ class UserController extends AbstractController
         $entityManager->remove($principalProxyRead);
         $entityManager->remove($principalProxyWrite);
 
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
         // Remove calendars and addressbooks
-        $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
         foreach ($calendars ?? [] as $instance) {
             // We're only removing the calendar objects / changes / and calendar if the deleted user is an owner,
             // which means that the underlying calendar instance should not have another principal as owner.
-            $hasDifferentOwner = $doctrine->getRepository(CalendarInstance::class)->hasDifferentOwner($instance->getCalendar()->getId(), Principal::PREFIX.$username);
+            $hasDifferentOwner = $doctrine->getRepository(CalendarInstance::class)->hasDifferentOwner($instance->getCalendar()->getId(), $principalUri);
             if (!$hasDifferentOwner) {
                 foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
                     $entityManager->remove($object);
@@ -163,16 +166,16 @@ class UserController extends AbstractController
             }
             $entityManager->remove($instance);
         }
-        $calendarsSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $calendarsSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($principalUri);
         foreach ($calendarsSubscriptions ?? [] as $subscription) {
             $entityManager->remove($subscription);
         }
-        $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri($principalUri);
         foreach ($schedulingObjects ?? [] as $object) {
             $entityManager->remove($object);
         }
 
-        $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri($principalUri);
         foreach ($addressbooks ?? [] as $addressbook) {
             foreach ($addressbook->getCards() ?? [] as $card) {
                 $entityManager->remove($card);
@@ -189,12 +192,19 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_index');
     }
 
-    #[Route('/delegates/{username}', name: 'delegates')]
-    public function userDelegates(ManagerRegistry $doctrine, string $username): Response
+    #[Route('/delegates/{userId}', name: 'delegates')]
+    public function userDelegates(ManagerRegistry $doctrine, int $userId): Response
     {
-        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
 
-        $allPrincipalsExcept = $doctrine->getRepository(Principal::class)->findAllExceptPrincipal(Principal::PREFIX.$username);
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
+
+        $allPrincipalsExcept = $doctrine->getRepository(Principal::class)->findAllExceptPrincipal($principalUri);
 
         // Get delegates. They are not linked to the principal in itself, but to its proxies
         $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
@@ -202,6 +212,7 @@ class UserController extends AbstractController
 
         return $this->render('users/delegates.html.twig', [
             'principal' => $principal,
+            'userId' => $userId,
             'delegation' => $principalProxyRead && $principalProxyWrite,
             'principalProxyRead' => $principalProxyRead,
             'principalProxyWrite' => $principalProxyWrite,
@@ -209,10 +220,17 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/delegation/{username}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'])]
-    public function userToggleDelegation(ManagerRegistry $doctrine, string $username, string $toggle): Response
+    #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'])]
+    public function userToggleDelegation(ManagerRegistry $doctrine, int $userId, string $toggle): Response
     {
-        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
 
         if (!$principal) {
             throw $this->createNotFoundException('Principal not found');
@@ -243,15 +261,22 @@ class UserController extends AbstractController
 
         $entityManager->flush();
 
-        return $this->redirectToRoute('user_delegates', ['username' => $username]);
+        return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 
-    #[Route('/delegates/{username}/add', name: 'delegate_add')]
-    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, string $username): Response
+    #[Route('/delegates/{userId}/add', name: 'delegate_add')]
+    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, int $userId): Response
     {
         if (!is_numeric($request->get('principalId'))) {
             throw new BadRequestHttpException();
         }
+
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $principalUri = Principal::PREFIX.$user->getUsername();
 
         $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
 
@@ -262,15 +287,15 @@ class UserController extends AbstractController
         // Depending on write access or not, attach to the correct principal
         if ('true' === $request->get('write')) {
             // Let's check that there wasn't a read proxy first
-            $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::READ_PROXY_SUFFIX);
+            $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri.Principal::READ_PROXY_SUFFIX);
             if (!$principalProxyRead) {
                 throw $this->createNotFoundException('Principal linked to this calendar not found');
             }
             $principalProxyRead->removeDelegee($newMemberToAdd);
             // And then add the Write access
-            $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::WRITE_PROXY_SUFFIX);
+            $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri.Principal::WRITE_PROXY_SUFFIX);
         } else {
-            $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username.Principal::READ_PROXY_SUFFIX);
+            $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri.Principal::READ_PROXY_SUFFIX);
         }
 
         if (!$principal) {
@@ -281,12 +306,17 @@ class UserController extends AbstractController
         $entityManager = $doctrine->getManager();
         $entityManager->flush();
 
-        return $this->redirectToRoute('user_delegates', ['username' => $username]);
+        return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 
-    #[Route('/delegates/{username}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"])]
-    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, string $username, int $principalProxyId, int $delegateId): Response
+    #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"])]
+    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, int $userId, int $principalProxyId, int $delegateId): Response
     {
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
         $principalProxy = $doctrine->getRepository(Principal::class)->findOneById($principalProxyId);
         if (!$principalProxy) {
             throw $this->createNotFoundException('Principal linked to this calendar not found');
@@ -301,6 +331,6 @@ class UserController extends AbstractController
         $entityManager = $doctrine->getManager();
         $entityManager->flush();
 
-        return $this->redirectToRoute('user_delegates', ['username' => $username]);
+        return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 }

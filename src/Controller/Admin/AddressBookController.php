@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\AddressBook;
 use App\Entity\Principal;
+use App\Entity\User;
 use App\Form\AddressBookType;
 use App\Services\BirthdayService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,24 +17,40 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[Route('/addressbooks', name: 'addressbook_')]
 class AddressBookController extends AbstractController
 {
-    #[Route('/{username}', name: 'index')]
-    public function addressBooks(ManagerRegistry $doctrine, string $username): Response
+    #[Route('/{userId}', name: 'index')]
+    public function addressBooks(ManagerRegistry $doctrine, int $userId): Response
     {
-        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
-        $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri(Principal::PREFIX.$username);
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $username = $user->getUsername();
+        $principalUri = Principal::PREFIX.$username;
+
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
+        $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri($principalUri);
 
         return $this->render('addressbooks/index.html.twig', [
             'addressbooks' => $addressbooks,
             'principal' => $principal,
-            'username' => $username,
+            'userId' => $userId,
         ]);
     }
 
-    #[Route('/{username}/new', name: 'create')]
-    #[Route('/{username}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
-    public function addressbookCreate(ManagerRegistry $doctrine, Request $request, string $username, ?int $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
+    #[Route('/{userId}/new', name: 'create')]
+    #[Route('/{userId}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
+    public function addressbookCreate(ManagerRegistry $doctrine, Request $request, int $userId, ?int $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
-        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$username);
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $username = $user->getUsername();
+        $principalUri = Principal::PREFIX.$username;
+
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
 
         if (!$principal) {
             throw $this->createNotFoundException('User not found');
@@ -55,7 +72,7 @@ class AddressBookController extends AbstractController
         if ($isBirthdayCalendarEnabled) {
             $form->get('includedInBirthdayCalendar')->setData($addressbook->isIncludedInBirthdayCalendar());
         }
-        $form->get('principalUri')->setData(Principal::PREFIX.$username);
+        $form->get('principalUri')->setData($principalUri);
 
         $form->handleRequest($request);
 
@@ -78,20 +95,25 @@ class AddressBookController extends AbstractController
                 $birthdayService->syncUser($username);
             }
 
-            return $this->redirectToRoute('addressbook_index', ['username' => $username]);
+            return $this->redirectToRoute('addressbook_index', ['userId' => $userId]);
         }
 
         return $this->render('addressbooks/edit.html.twig', [
             'form' => $form->createView(),
             'principal' => $principal,
-            'username' => $username,
+            'userId' => $userId,
             'addressbook' => $addressbook,
         ]);
     }
 
-    #[Route('/{username}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
-    public function addressbookDelete(ManagerRegistry $doctrine, string $username, string $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
+    #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
+    public function addressbookDelete(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
         $addressbook = $doctrine->getRepository(AddressBook::class)->findOneById($id);
         if (!$addressbook) {
             throw $this->createNotFoundException('Address Book not found');
@@ -113,9 +135,9 @@ class AddressBookController extends AbstractController
         $isBirthdayCalendarEnabled = $this->getParameter('caldav_enabled') && $this->getParameter('carddav_enabled');
         if ($isBirthdayCalendarEnabled) {
             // Let's sync the user birthday calendar if needed
-            $birthdayService->syncUser($username);
+            $birthdayService->syncUser($user->getUsername());
         }
 
-        return $this->redirectToRoute('addressbook_index', ['username' => $username]);
+        return $this->redirectToRoute('addressbook_index', ['userId' => $userId]);
     }
 }

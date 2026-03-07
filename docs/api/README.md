@@ -19,17 +19,17 @@ When `API_KEY` is not set, the API endpoints are disabled and will return a 500 
 Each endpoint displays information related to the User:
 
 * [Get Users](v1/users/all.md) : `GET /api/v1/users`
-* [Get User Details](v1/users/details.md) : `GET /api/v1/users/:username`
+* [Get User Details](v1/users/details.md) : `GET /api/v1/users/:user_id`
 
 #### Calendars related
 
 Endpoints for viewing and modifying user calendars.
 
-* [Show All User Calendars](v1/calendars/all.md) : `GET /api/v1/calendars/:username`
-* [Show User Calendar Details](v1/calendars/details.md) : `GET /api/v1/calendars/:username/:calendar_id`
-* [Create User Calendar](v1/calendars/create.md) : `POST /api/v1/calendars/:username/create`
-* [Edit User Calendar](v1/calendars/edit.md) : `POST /api/v1/calendars/:username/:calendar_id/edit`
-* [Delete User Calendar](v1/calendars/delete.md) : `POST /api/v1/calendars/:username/:calendar_id/delete`
-* [Show User Calendar Shares](v1/calendars/shares.md) : `GET /api/v1/calendars/:username/shares/:calendar_id`
-* [Share User Calendar](v1/calendars/share_add.md) : `POST /api/v1/calendars/:username/share/:calendar_id/add`
-* [Remove Share User Calendar](v1/calendars/share_remove.md) : `POST /api/v1/calendars/:username/share/:calendar_id/remove`
+* [Show All User Calendars](v1/calendars/all.md) : `GET /api/v1/calendars/:user_id`
+* [Show User Calendar Details](v1/calendars/details.md) : `GET /api/v1/calendars/:user_id/:calendar_id`
+* [Create User Calendar](v1/calendars/create.md) : `POST /api/v1/calendars/:user_id/create`
+* [Edit User Calendar](v1/calendars/edit.md) : `PUT /api/v1/calendars/:user_id/:calendar_id`
+* [Delete User Calendar](v1/calendars/delete.md) : `DELETE /api/v1/calendars/:user_id/:calendar_id`
+* [Show User Calendar Shares](v1/calendars/shares.md) : `GET /api/v1/calendars/:user_id/shares/:calendar_id`
+* [Share User Calendar](v1/calendars/share_add.md) : `POST /api/v1/calendars/:user_id/share/:calendar_id/add`
+* [Remove Share User Calendar](v1/calendars/share_remove.md) : `POST /api/v1/calendars/:user_id/share/:calendar_id/remove`

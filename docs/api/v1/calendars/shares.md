@@ -2,7 +2,7 @@
 
 Gets a list of all users with whom a specific user calendar is shared.
 
-**URL** : `/api/v1/calendars/:username/shares/:calendar_id`
+**URL** : `/api/v1/calendars/:user_id/shares/:calendar_id`
 
 **Method** : `GET`
 
@@ -11,7 +11,7 @@ Gets a list of all users with whom a specific user calendar is shared.
 **Params constraints**
 
 ```
-:username -> "[username in plain text]",
+:user_id -> "[user id as an int]",
 :calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 
@@ -35,6 +35,7 @@ Gets a list of all users with whom a specific user calendar is shared.
 	"data": [
 		{
 			"username": "adoe",
+			"user_id": 5,
 			"principal_id": 9,
 			"displayname": "Aiden Doe",
 			"email": "adoe@example.org",
@@ -42,6 +43,7 @@ Gets a list of all users with whom a specific user calendar is shared.
 		},
 		{
 			"username": "jdoe",
+			"user_id": 4,
 			"principal_id": 3,
 			"displayname": "John Doe",
 			"email": "jdoe@example.org",

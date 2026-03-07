@@ -2,7 +2,7 @@
 
 Creates a new calendar for a specific user.
 
-**URL** : `/api/v1/calendars/:username/create`
+**URL** : `/api/v1/calendars/:user_id/create`
 
 **Method** : `POST`
 
@@ -11,7 +11,7 @@ Creates a new calendar for a specific user.
 **Params constraints**
 
 ```
-:username -> "[username in plain text]",
+:user_id -> "[user id as an int]",
 ```
 
 **Request Body constraints**

@@ -2,16 +2,16 @@
 
 Edits an existing calendar for a specific user.
 
-**URL** : `/api/v1/calendars/:username/:calendar_id/edit`
+**URL** : `/api/v1/calendars/:user_id/:calendar_id`
 
-**Method** : `POST`
+**Method** : `PUT` or `PATCH`
 
 **Auth required** : YES
 
 **Params constraints**
 
 ```
-:username -> "[username in plain text]",
+:user_id -> "[user id as an int]",
 :calendar_id -> "[numeric id of a calendar owned by the user]",
 ```
 
@@ -30,7 +30,7 @@ Edits an existing calendar for a specific user.
 **URL example**
 
 ```
-/api/v1/calendars/jdoe/1/edit
+/api/v1/calendars/jdoe/1
 ```
 
 **Body example**
