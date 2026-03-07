@@ -3,6 +3,7 @@
 namespace App\Plugins;
 
 use App\Services\BirthdayService;
+use Sabre\CalDAV\Backend\PDO as CalendarBackend;
 use Sabre\CardDAV;
 use Sabre\DAV;
 
@@ -18,9 +19,10 @@ class BirthdayCalendarPlugin extends DAV\ServerPlugin
      */
     protected $server;
 
-    public function __construct(BirthdayService $birthdayService)
+    public function __construct(BirthdayService $birthdayService, CalendarBackend $calendarBackend)
     {
         $this->birthdayService = $birthdayService;
+        $this->birthdayService->setBackend($calendarBackend);
     }
 
     public function initialize(DAV\Server $server)

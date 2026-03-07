@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Entity\User;
 use App\Services\BirthdayService;
 use Doctrine\Persistence\ManagerRegistry;
+use Sabre\CalDAV\Backend\PDO as CalendarBackend;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,6 +19,10 @@ class SyncBirthdayCalendars extends Command
         private BirthdayService $birthdayService,
     ) {
         parent::__construct();
+
+        $em = $doctrine->getManager();
+        $pdo = $em->getConnection()->getNativeConnection();
+        $this->birthdayService->setBackend(new CalendarBackend($pdo));
     }
 
     protected function configure(): void

@@ -31,16 +31,20 @@ use Sabre\VObject\Reader;
 
 class BirthdayService
 {
+    /**
+     * @var CalendarBackend
+     */
+    private $calendarBackend;
+
     public function __construct(
         private ManagerRegistry $doctrine,
         private string $birthdayReminderOffset,
-        private ?CalendarBackend $calendarBackend = null,
     ) {
-        if (!$calendarBackend) {
-            $em = $this->doctrine->getManager();
-            $pdo = $em->getConnection()->getNativeConnection();
-            $this->calendarBackend = new CalendarBackend($pdo);
-        }
+    }
+
+    public function setBackend(CalendarBackend $calendarBackend)
+    {
+        $this->calendarBackend = $calendarBackend;
     }
 
     public function onCardChanged(int $addressBookId, string $cardUri, string $cardData): void

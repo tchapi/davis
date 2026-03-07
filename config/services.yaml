@@ -77,7 +77,6 @@ services:
     App\Services\BirthdayService:
         arguments:
             $birthdayReminderOffset: "%birthday_reminder_offset%"
-            $calendarBackend: null  # will be overridden when instantiated manually
 
     App\Security\ApiKeyAuthenticator:
         arguments:
