@@ -35,6 +35,7 @@ Gets a list of all users with whom a specific user calendar is shared.
 	"data": [
 		{
 			"username": "adoe",
+			"user_id": 5,
 			"principal_id": 9,
 			"displayname": "Aiden Doe",
 			"email": "adoe@example.org",
@@ -42,6 +43,7 @@ Gets a list of all users with whom a specific user calendar is shared.
 		},
 		{
 			"username": "jdoe",
+			"user_id": 4,
 			"principal_id": 3,
 			"displayname": "John Doe",
 			"email": "jdoe@example.org",

@@ -30,6 +30,7 @@ Gets details about a specific user account.
 {
 	"status": "success",
 	"data": {
+		"user_id": 1,
 		"principal_id": 3,
 		"uri": "principals/jdoe",
 		"username": "jdoe",

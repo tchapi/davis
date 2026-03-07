@@ -442,6 +442,8 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals('success', $data['status']);
         $this->assertArrayHasKey('data', $data);
         $this->assertStringContainsString($shareeUsername, $data['data'][0]['username']);
+        $this->assertArrayHasKey('user_id', $data['data'][0]);
+        $this->assertIsNumeric($data['data'][0]['user_id']);
         $this->assertFalse($data['data'][0]['write_access']);
     }
 

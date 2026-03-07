@@ -569,8 +569,12 @@ class ApiController extends AbstractController
         foreach ($instances as $instance) {
             $principalId = $doctrine->getRepository(Principal::class)->findOneByUri($instance[0]['principalUri']);
 
+            $instanceUsername = mb_substr($instance[0]['principalUri'], strlen(Principal::PREFIX));
+            $instanceUserId = $doctrine->getRepository(User::class)->findOneByUsername($instanceUsername)->getId();
+
             $calendars[] = [
-                'username' => mb_substr($instance[0]['principalUri'], strlen(Principal::PREFIX)),
+                'username' => $instanceUsername,
+                'user_id' => $instanceUserId,
                 'principal_id' => $principalId?->getId() ?? null,
                 'displayname' => $instance['displayName'],
                 'email' => $instance['email'],
