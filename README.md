@@ -49,7 +49,7 @@ Comes with already built Docker images in two flavours: [standalone](https://git
 
 # 🔩 Requirements
 
-  - PHP > 8.2 (with `pdo_mysql` [or `pdo_pgsql`, `pdo_sqlite`], `gd` and `intl` extensions), compatible up to PHP 8.3 (_See dependencies table below_)
+  - PHP > 8.2 (with `pdo_mysql` [or `pdo_pgsql`, `pdo_sqlite`], `gd` and `intl` extensions), compatible up to PHP 8.5 (_See dependencies table below_)
   - A compatible database layer, such as MySQL or MariaDB (recommended), PostgreSQL (not extensively tested yet) or SQLite (not extensively tested yet)
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
   - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default except in the Docker image_)
@@ -112,7 +112,7 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 > In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data.
 
 **a. The database driver and url** (_you should already have it configured since you created the database previously_)
-    
+
 ```shell
 DATABASE_DRIVER=mysql # or postgresql, or sqlite
 DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4
@@ -155,7 +155,7 @@ PUBLIC_CALENDARS_ENABLED=true
 **e. Mailer configuration**
 
 It includes:
-  - the mailer uri (`MAILER_DSN`) 
+  - the mailer uri (`MAILER_DSN`)
   - The email address that your invites are going to be sent from
 
 ```shell
@@ -225,7 +225,7 @@ APP_TIMEZONE=Australia/Lord_Howe
 > ```shell
 > APP_TIMEZONE=
 > ```
-> in your environment file if you wish to use the **actual default timezone of the server**, and not enforcing it. 
+> in your environment file if you wish to use the **actual default timezone of the server**, and not enforcing it.
 
 **j. Trusting forwarded headers**
 
@@ -466,7 +466,7 @@ To build the checked out version, just run:
     docker build --pull --file docker/Dockerfile --tag davis:latest --build-arg fpm_user=82:82 .
 
 > [!TIP]
-> 
+>
 > The `fpm_user` build arg allows to set:
 >  - the uid FPM will run with
 >  - the owner of the app folder
@@ -479,7 +479,7 @@ This will build a `davis:latest` image that you can directly use. Do not forget 
 You can use `--platform` to specify the platform to build for. Currently, `arm64` (ARMv8) and `amd64` (x86) are supported.
 
 > [!IMPORTANT]
-> 
+>
 > ⚠ Do not forget to run all the database migrations the first time you run the container :
 >
 >     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
@@ -509,7 +509,7 @@ docker pull ghcr.io/tchapi/davis:edge
 ```
 
 > [!WARNING]
-> 
+>
 > The `edge` image must not be considered stable. **Use only release images for production setups**.
 
 ## Full stack
@@ -525,13 +525,13 @@ You can start the containers with :
 > The default recipe above uses MariaDB.
 
 > [!IMPORTANT]
-> 
+>
 > ⚠ Do not forget to run all the database migrations the first time you run the container :
 >
 >     docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
 
 > [!WARNING]
-> 
+>
 > For SQLite, you must also make sure that the folder the database will reside in AND the database file in itself have the right permissions! You can do for instance:
 > `chown -R www-data: /data` if `/data` is the folder your SQLite database will be in, just after you have run the migrations
 

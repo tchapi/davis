@@ -25,16 +25,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Lint with Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: ${{ matrix.dockerfile }}
           failure-threshold: warning
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Validate Dockerfile syntax
         run: |
           docker buildx build \
@@ -47,30 +47,30 @@ jobs:
     name: Analyze
     runs-on: ubuntu-latest
     container:
-      image: php:8.3-alpine
+      image: php:8.4-alpine
       options: >-
         --tmpfs /tmp:exec
         --tmpfs /var/tmp:exec
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Install GD / ZIP PHP extension
         run: |
           apk add $PHPIZE_DEPS libpng-dev libzip-dev
           docker-php-ext-configure gd
           docker-php-ext-configure zip
           docker-php-ext-install gd zip
-      
+
       - name: Install Composer
         run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-      
+
       - name: Validate Composer
         run: composer validate
-      
+
       - name: Update to highest dependencies with Composer
-        run: composer update --no-interaction --no-progress --ansi
-      
+        run: composer install --no-interaction --no-progress --ansi
+
       - name: Analyze
         run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
 
@@ -98,19 +98,20 @@ jobs:
           --health-retries 5
         ports:
           - 3306:3306
-    
+
     strategy:
       matrix:
         php:
           - '8.2'
           - '8.3'
           - '8.4'
+          - '8.5'
       fail-fast: false
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Install MySQL / GD / ZIP PHP extensions
         run: |
           apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev
@@ -118,13 +119,13 @@ jobs:
           docker-php-ext-configure gd
           docker-php-ext-configure zip
           docker-php-ext-install pdo pdo_mysql intl gd zip
-      
+
       - name: Install Composer
         run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-      
+
       - name: Install dependencies with Composer
         run: composer install --no-progress --no-interaction --ansi
-      
+
       - name: Run tests with PHPUnit
         env:
           DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
@@ -134,11 +135,11 @@ jobs:
     name: Migrations (${{ matrix.database }})
     runs-on: ubuntu-latest
     container:
-      image: php:8.3-alpine
+      image: php:8.4-alpine
       options: >-
         --tmpfs /tmp:exec
         --tmpfs /var/tmp:exec
-    
+
     services:
       mysql:
         image: mariadb:10.11
@@ -152,7 +153,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       postgres:
         image: postgres:15-alpine
         env:
@@ -164,7 +165,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     strategy:
       matrix:
         database:
@@ -172,11 +173,11 @@ jobs:
           - postgresql
           - sqlite
       fail-fast: false
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Install database extensions
         run: |
           apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev postgresql-dev sqlite-dev
@@ -184,13 +185,13 @@ jobs:
           docker-php-ext-configure gd
           docker-php-ext-configure zip
           docker-php-ext-install pdo pdo_mysql pdo_pgsql pdo_sqlite intl gd zip
-      
+
       - name: Install Composer
         run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-      
+
       - name: Install dependencies with Composer
         run: composer install --no-progress --no-interaction --ansi
-      
+
       - name: Run migrations (MySQL)
         if: matrix.database == 'mysql'
         env:
@@ -199,7 +200,7 @@ jobs:
           php bin/console doctrine:database:create --if-not-exists --env=test
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
           php bin/console doctrine:schema:validate --env=test
-      
+
       - name: Run migrations (PostgreSQL)
         if: matrix.database == 'postgresql'
         env:
@@ -208,7 +209,7 @@ jobs:
           php bin/console doctrine:database:create --if-not-exists --env=test
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
           php bin/console doctrine:schema:validate --skip-sync --env=test
-      
+
       - name: Run migrations (SQLite)
         if: matrix.database == 'sqlite'
         env:
@@ -221,11 +222,11 @@ jobs:
     name: Application Smoke Test
     runs-on: ubuntu-latest
     container:
-      image: php:8.3-alpine
+      image: php:8.4-alpine
       options: >-
         --tmpfs /tmp:exec
         --tmpfs /var/tmp:exec
-    
+
     services:
       mysql:
         image: mariadb:10.11
@@ -239,11 +240,11 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Install extensions and curl
         run: |
           apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev curl
@@ -251,13 +252,13 @@ jobs:
           docker-php-ext-configure gd
           docker-php-ext-configure zip
           docker-php-ext-install pdo pdo_mysql intl gd zip
-      
+
       - name: Install Composer
         run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-      
+
       - name: Install dependencies with Composer
         run: composer install --no-progress --no-interaction --ansi --optimize-autoloader
-      
+
       - name: Prepare application
         env:
           DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
@@ -266,7 +267,7 @@ jobs:
           php bin/console doctrine:database:create --if-not-exists --env=test
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
           php bin/console cache:clear --env=test
-      
+
       - name: Start Symfony server in background
         env:
           DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
@@ -275,7 +276,7 @@ jobs:
           php -S 127.0.0.1:8000 -t public/ &
           echo $! > server.pid
           sleep 3
-      
+
       - name: Test application responds
         run: |
           # Test that the app responds with a successful HTTP status
@@ -287,12 +288,12 @@ jobs:
             echo "❌ Application returned unexpected status code: $RESPONSE"
             exit 1
           fi
-      
+
       - name: Test dashboard
         continue-on-error: true
         run: |
           curl -f http://127.0.0.1:8000/dashboard || echo "No health endpoint available"
-      
+
       - name: Stop server
         if: always()
         run: |
