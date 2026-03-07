@@ -72,7 +72,7 @@ jobs:
         run: composer install --no-interaction --no-progress --ansi
 
       - name: Analyze
-        run: PHP_CS_FIXER_IGNORE_ENV=True vendor/bin/php-cs-fixer fix --ansi
+        run: vendor/bin/php-cs-fixer fix --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
