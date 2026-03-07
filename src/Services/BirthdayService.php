@@ -19,8 +19,8 @@ use App\Entity\CalendarObject;
 use App\Entity\Card;
 use App\Entity\Principal;
 use Doctrine\Persistence\ManagerRegistry;
-use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Sabre\CalDAV\Backend\PDO as CalendarBackend;
+use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VCard;
 use Sabre\VObject\DateTimeParser;
@@ -34,8 +34,13 @@ class BirthdayService
     public function __construct(
         private ManagerRegistry $doctrine,
         private string $birthdayReminderOffset,
-        private CalendarBackend $calendarBackend,
+        private ?CalendarBackend $calendarBackend = null,
     ) {
+        if (!$calendarBackend) {
+            $em = $this->doctrine->getManager();
+            $pdo = $em->getConnection()->getNativeConnection();
+            $this->calendarBackend = new CalendarBackend($pdo);
+        }
     }
 
     public function onCardChanged(int $addressBookId, string $cardUri, string $cardData): void
