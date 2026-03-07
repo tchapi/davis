@@ -17,6 +17,7 @@ return (new PhpCsFixer\Config())
         'phpdoc_add_missing_param_annotation' => true,
         'single_trait_insert_per_statement' => false
     ])
+    ->setUnsupportedPhpVersionAllowed(true)
     ->setUsingCache(false)
     ->setFinder($finder)
 ;
