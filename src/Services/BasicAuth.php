@@ -39,9 +39,9 @@ final class BasicAuth extends AbstractBasic
         if ('$2y$' === substr($user->getPassword(), 0, 4)) {
             // Use password_verify with secure passwords
             return password_verify($password, $user->getPassword());
-        } else {
-            // Use unsecure legacy password hashing (from legacy sabre/dav implementation)
-            return $user->getPassword() === $this->utils->hashPassword($username, $password);
         }
+
+        // Use unsecure legacy password hashing (from legacy sabre/dav implementation)
+        return $user->getPassword() === $this->utils->hashPassword($username, $password);
     }
 }

@@ -82,11 +82,10 @@ class ApiControllerTest extends WebTestCase
             $this->assertMatchesRegularExpression('/^\d+$/', $data['data']['user_calendars'][0]['id']);
 
             return $data['data']['user_calendars'][0]['id'];
-        } else {
-            $this->assertMatchesRegularExpression('/^\d+$/', $data['data']['user_calendars'][1]['id']);
-
-            return $data['data']['user_calendars'][1]['id'];
         }
+        $this->assertMatchesRegularExpression('/^\d+$/', $data['data']['user_calendars'][1]['id']);
+
+        return $data['data']['user_calendars'][1]['id'];
     }
 
     /*
