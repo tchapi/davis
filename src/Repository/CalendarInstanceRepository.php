@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
+use App\Entity\CalendarObject;
 use App\Entity\Principal;
+use App\Entity\SchedulingObject;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -37,11 +40,11 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             return $query->addSelect('p.displayName', 'p.email')
                 ->getQuery()
                 ->getArrayResult();
-        } else {
-            // Returns CalendarInstances as objects
-            return $query->getQuery()
-                ->getResult();
         }
+
+        // Returns CalendarInstances as objects
+        return $query->getQuery()
+            ->getResult();
     }
 
     /**
@@ -74,6 +77,23 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->getSingleScalarResult() > 0;
     }
 
+
+    public function findAllSchedulingObjectsForCalendar(int $calendarInstanceId, string $principalUri): array
+    {
+        $objectRepository = $this->getEntityManager()->getRepository(SchedulingObject::class);
+        return $objectRepository->createQueryBuilder('s')
+            ->leftJoin(CalendarObject::class, 'c', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.uri = s.uri')
+            ->leftJoin(CalendarInstance::class, 'ci', \Doctrine\ORM\Query\Expr\Join::WITH, 'ci.calendar = c.calendar')
+            ->where('ci.id = :id')
+            // uri is not unique across calendars — two different calendars can have objects with the same uri.
+            // The join should also filter by principaluri as a consequence
+            ->andWhere('s.principalUri = :principalUri')
+            ->setParameter('id', $calendarInstanceId)
+            ->setParameter('principalUri', $principalUri)
+            ->getQuery()
+            ->getResult();
+    }
+
     /**
      * Get counts of calendar objects by component type for a calendar instance.
      *
@@ -83,7 +103,7 @@ class CalendarInstanceRepository extends ServiceEntityRepository
      */
     public function getObjectCountsByComponentType(int $calendarId): array
     {
-        $objectRepository = $this->getEntityManager()->getRepository(\App\Entity\CalendarObject::class);
+        $objectRepository = $this->getEntityManager()->getRepository(CalendarObject::class);
 
         // Instead of three separate queries, get all counts in a single query
         $results = $objectRepository->createQueryBuilder('o')
@@ -95,9 +115,9 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->getResult();
 
         $componentTypeMap = [
-            \App\Entity\Calendar::COMPONENT_EVENTS => 'events',
-            \App\Entity\Calendar::COMPONENT_NOTES => 'notes',
-            \App\Entity\Calendar::COMPONENT_TODOS => 'tasks',
+            Calendar::COMPONENT_EVENTS => 'events',
+            Calendar::COMPONENT_NOTES => 'notes',
+            Calendar::COMPONENT_TODOS => 'tasks',
         ];
 
         $counts = [
