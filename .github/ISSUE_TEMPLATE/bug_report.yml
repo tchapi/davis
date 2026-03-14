@@ -1,6 +1,6 @@
 name: Bug Report
 description: Something is not working as expected
-labels: ["bug", "triage"]
+labels: ["bug"]
 body:
   - type: markdown
     attributes:
@@ -60,7 +60,7 @@ body:
         - None (standalone Docker with Caddy)
         - Nginx
         - Apache
-        - Caddy (custom)
+        - Caddy
         - Traefik
         - Other
     validations:
@@ -151,7 +151,7 @@ body:
       description: |
         Paste the relevant section of `./var/log/prod.log` (relative to your Davis installation root, **not** `/var/log`).
         Also include web server / reverse proxy error logs if applicable.
-        Set `APP_ENV=dev` temporarily to get verbose output if `prod.log` is empty.
+        Set `APP_ENV=dev` temporarily to get verbose output if `prod.log` is empty (you need to install dev dependencies with composer).
       render: text
 
   - type: textarea

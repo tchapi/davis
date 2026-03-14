@@ -1,11 +1,11 @@
 name: Feature Request
 description: Suggest an improvement or new functionality
-labels: ["enhancement"]
+labels: ["feature request"]
 body:
   - type: markdown
     attributes:
       value: |
-        Please check [existing issues](https://github.com/tchapi/davis/issues?q=is%3Aissue+label%3Aenhancement) first to avoid duplicates.
+        Please check [existing issues](https://github.com/tchapi/davis/issues) and the [Davis roadmap](https://github.com/users/tchapi/projects/1) first to avoid duplicates.
 
   - type: textarea
     id: problem
