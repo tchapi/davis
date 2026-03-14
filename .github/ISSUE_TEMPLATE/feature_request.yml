@@ -1,0 +1,54 @@
+name: Feature Request
+description: Suggest an improvement or new functionality
+labels: ["feature request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check [existing issues](https://github.com/tchapi/davis/issues) and the [Davis roadmap](https://github.com/users/tchapi/projects/1) first to avoid duplicates.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What are you trying to do, and why is it currently not possible or inconvenient?
+      placeholder: "e.g. I cannot do X, which forces me to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature you have in mind. Be as specific as possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you have thought of or tried, and why they fall short.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CalDAV
+        - CardDAV
+        - WebDAV
+        - Admin dashboard
+        - API
+        - Authentication (IMAP / LDAP / internal)
+        - Docker / deployment
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Links, screenshots, references to relevant RFCs or client behaviour, etc.

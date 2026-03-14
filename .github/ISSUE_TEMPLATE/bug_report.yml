@@ -1,0 +1,161 @@
+name: Bug Report
+description: Something is not working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening an issue, please:
+        - Check `./var/log/prod.log` for errors (only written when errors occur, thanks to the `fingers_crossed` filter)
+        - Check your web server / reverse proxy logs
+        - Read the [Troubleshooting section of the README](https://github.com/tchapi/davis/blob/main/README.md#troubleshooting)
+
+  - type: input
+    id: davis_version
+    attributes:
+      label: Davis version
+      description: Tag or commit SHA. Found on the `/` status page or via `git describe --tags`.
+      placeholder: "e.g. v5.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: Installation method
+      options:
+        - Docker – standalone (with Caddy)
+        - Docker – barebone (no reverse proxy)
+        - Bare metal / manual
+        - NixOS module
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: input
+    id: php_version
+    attributes:
+      label: PHP version (bare metal only)
+      description: Output of `php --version`. Skip if using Docker.
+      placeholder: "e.g. 8.2.18"
+
+  - type: dropdown
+    id: database
+    attributes:
+      label: Database
+      options:
+        - MySQL
+        - MariaDB
+        - PostgreSQL
+        - SQLite
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reverse_proxy
+    attributes:
+      label: Reverse proxy
+      options:
+        - None (standalone Docker with Caddy)
+        - Nginx
+        - Apache
+        - Caddy
+        - Traefik
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: auth_method
+    attributes:
+      label: Authentication method
+      options:
+        - Internal (ADMIN_LOGIN / ADMIN_PASSWORD)
+        - IMAP
+        - LDAP
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: protocols
+    attributes:
+      label: Affected protocol(s)
+      options:
+        - label: CalDAV
+        - label: CardDAV
+        - label: WebDAV
+        - label: Admin dashboard
+        - label: API
+
+  - type: textarea
+    id: client
+    attributes:
+      label: Client(s) exhibiting the issue
+      description: Name, version, OS/platform. Add multiple if relevant.
+      placeholder: |
+        - DAVx⁵ 4.3.14 on Android 14
+        - Apple Calendar on macOS 14.4
+        - Thunderbird 115.10 on Ubuntu 22.04
+    validations:
+      required: true
+
+  - type: textarea
+    id: env_vars
+    attributes:
+      label: Relevant environment variables
+      description: |
+        Sanitize secrets (APP_SECRET, DATABASE_URL password, API_KEY, etc.).
+        Include at minimum: APP_ENV, CALDAV_ENABLED, CARDDAV_ENABLED, WEBDAV_ENABLED, AUTH_METHOD, and any env vars you think are relevant.
+      render: shell
+      placeholder: |
+        APP_ENV=prod
+        AUTH_METHOD=...
+        CALDAV_ENABLED=true
+        CARDDAV_ENABLED=true
+        WEBDAV_ENABLED=false
+        DATABASE_URL=mysql://user:***@host:3306/davis
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Configure client with URL https://dav.example.com/dav
+        2. ...
+        3. Observe error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include any error messages shown in the UI or client.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Paste the relevant section of `./var/log/prod.log` (relative to your Davis installation root, **not** `/var/log`).
+        Also include web server / reverse proxy error logs if applicable.
+        Set `APP_ENV=dev` temporarily to get verbose output if `prod.log` is empty (you need to install dev dependencies with composer).
+      render: text
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Anything else that might be relevant (docker-compose snippet, nginx config excerpt, network topology, etc.).
