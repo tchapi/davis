@@ -6,7 +6,6 @@ use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
-use App\Entity\SchedulingObject;
 use App\Entity\User;
 use App\Form\CalendarInstanceType;
 use Doctrine\Persistence\ManagerRegistry;
@@ -240,6 +239,12 @@ class CalendarController extends AbstractController
     #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
     public function calendarDelete(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans): Response
     {
+        $user = $doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+        $principalUri = Principal::PREFIX.$user->getUsername();
+
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
@@ -247,11 +252,11 @@ class CalendarController extends AbstractController
 
         $entityManager = $doctrine->getManager();
 
-        $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri($instance->getPrincipalUri());
-        foreach ($schedulingObjects ?? [] as $object) {
+        // Scheduling objects attached to the calendar objects of the calendar
+        $schedulingObjectsOfCalendarObjects = $doctrine->getRepository(CalendarInstance::class)->findAllSchedulingObjectsForCalendar($instance->getId(), $principalUri);
+        foreach ($schedulingObjectsOfCalendarObjects ?? [] as $object) {
             $entityManager->remove($object);
         }
-
         foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
             $entityManager->remove($object);
         }
