@@ -312,8 +312,20 @@ class DAVController extends AbstractController
         });
     }
 
+    #[Route('/dav.php/{path?}', name: 'dav-old', requirements: ['path' => '.*'])]
+    public function davLegacy(Request $request, ?string $path): Response
+    {
+        return $this->redirect($this->generateUrl('dav', ['path' => $path ?? '']).$this->buildQueryString($request), 301);
+    }
+
+    private function buildQueryString(Request $request): string
+    {
+        $qs = $request->getQueryString();
+
+        return $qs ? '?'.$qs : '';
+    }
+
     #[Route('/dav/{path}', name: 'dav', requirements: ['path' => '.*'])]
-    #[Route('/dav.php/{path}', name: 'dav-old', requirements: ['path' => '.*'])]
     public function dav(Request $request, ?string $path, ?Profiler $profiler = null)
     {
         // We don't want the toolbar on the /dav/* routes
