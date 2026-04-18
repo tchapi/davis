@@ -17,20 +17,20 @@ class DashboardController extends AbstractController
     #[Route('/dashboard', name: 'dashboard')]
     public function dashboard(ManagerRegistry $doctrine): Response
     {
-        $users = $doctrine->getRepository(User::class)->findAll();
-        $calendars = $doctrine->getRepository(CalendarInstance::class)->findAll();
-        $addressbooks = $doctrine->getRepository(AddressBook::class)->findAll();
-        $events = $doctrine->getRepository(CalendarObject::class)->findAll();
-        $contacts = $doctrine->getRepository(Card::class)->findAll();
+        $usersCount = $doctrine->getRepository(User::class)->count([]);
+        $calendarsCount = $doctrine->getRepository(CalendarInstance::class)->count([]);
+        $addressbooksCount = $doctrine->getRepository(AddressBook::class)->count([]);
+        $eventsCount = $doctrine->getRepository(CalendarObject::class)->count([]);
+        $contactsCount = $doctrine->getRepository(Card::class)->count([]);
 
         $timezoneParameter = $this->getParameter('timezone');
 
         return $this->render('dashboard.html.twig', [
-            'users' => $users,
-            'calendars' => $calendars,
-            'addressbooks' => $addressbooks,
-            'events' => $events,
-            'contacts' => $contacts,
+            'users' => $usersCount,
+            'calendars' => $calendarsCount,
+            'addressbooks' => $addressbooksCount,
+            'events' => $eventsCount,
+            'contacts' => $contactsCount,
             'timezone' => [
                 'actual_default' => date_default_timezone_get(),
                 'not_set_in_app' => '' === $timezoneParameter,
