@@ -314,7 +314,6 @@ class DAVController extends AbstractController
 
     #[Route('/dav/{path}', name: 'dav', requirements: ['path' => '.*'])]
     #[Route('/dav.php/{path}', name: 'dav-old', requirements: ['path' => '.*'])]
-    #[Route('/dav.php', name: 'dav-old2', requirements: ['path' => '.*'])]
     public function dav(Request $request, ?string $path, ?Profiler $profiler = null)
     {
         // We don't want the toolbar on the /dav/* routes
