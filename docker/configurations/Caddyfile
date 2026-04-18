@@ -10,7 +10,6 @@
 	@davphp {
       path_regexp dav ^/dav\.php(/(.*))?$
    }
-   # Samotný rewrite s využitím zachycené skupiny
    rewrite @davphp /dav/{re.dav.2}
 
         root * /var/www/davis/public
