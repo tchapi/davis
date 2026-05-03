@@ -7,11 +7,6 @@
 	redir /.well-known/caldav  /dav/
 	redir /.well-known/carddav /dav/
 
-	@davphp {
-      path_regexp dav ^/dav\.php(/(.*))?$
-   }
-   rewrite @davphp /dav/{re.dav.2}
-
         root * /var/www/davis/public
         php_fastcgi unix//var/run/php-fpm/php-fpm.sock {
                 # Preserve the original X-Forwarded-Proto from upstream, as it might be HTTPS
