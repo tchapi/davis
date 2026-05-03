@@ -57,19 +57,19 @@
 
     <ul class="list-group mb-5">
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ "dashboard.users"|trans }} <span class="badge bg-primary rounded-pill">{{ users|length }}</span>
+        {{ "dashboard.users"|trans }} <span class="badge bg-primary rounded-pill">{{ usersCount }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>{{ "dashboard.calendars"|trans }}&nbsp;<span class="small text-muted ms-1 me-auto">{{ "dashboard.calendars.help"|trans }}</span></div> <span class="badge bg-primary rounded-pill">{{ calendars|length }}</span>
+        <div>{{ "dashboard.calendars"|trans }}&nbsp;<span class="small text-muted ms-1 me-auto">{{ "dashboard.calendars.help"|trans }}</span></div> <span class="badge bg-primary rounded-pill">{{ calendarsCount }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        ↳ {{ "dashboard.events"|trans }} <span class="badge bg-secondary rounded-pill">{{ events|length }}</span>
+        ↳ {{ "dashboard.events"|trans }} <span class="badge bg-secondary rounded-pill">{{ eventsCount }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ "dashboard.address_books"|trans }} <span class="badge bg-primary rounded-pill">{{ addressbooks|length }}</span>
+        {{ "dashboard.address_books"|trans }} <span class="badge bg-primary rounded-pill">{{ addressBooksCount }}</span>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        ↳ {{ "dashboard.contacts"|trans }} <span class="badge bg-secondary rounded-pill">{{ contacts|length }}</span>
+        ↳ {{ "dashboard.contacts"|trans }} <span class="badge bg-secondary rounded-pill">{{ contactsCount }}</span>
       </li>
     </ul>
   </div>

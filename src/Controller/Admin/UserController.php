@@ -140,8 +140,14 @@ class UserController extends AbstractController
         $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
 
         $entityManager->remove($principal);
-        $entityManager->remove($principalProxyRead);
-        $entityManager->remove($principalProxyWrite);
+
+        if ($principalProxyRead) {
+            $entityManager->remove($principalProxyRead);
+        }
+
+        if ($principalProxyWrite) {
+            $entityManager->remove($principalProxyWrite);
+        }
 
         $principalUri = Principal::PREFIX.$user->getUsername();
 
