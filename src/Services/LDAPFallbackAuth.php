@@ -53,7 +53,7 @@ final class LDAPFallbackAuth extends AbstractBasic
     }
 
     /**
-     * Validates a username and password by trying to authenticate against LDAP.
+     * Validates a username and password by trying to authenticate against LDAP and local database.
      *
      * @param string $username
      * @param string $password
