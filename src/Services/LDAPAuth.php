@@ -172,12 +172,30 @@ final class LDAPAuth extends AbstractBasic
         }
 
         if ($success && $this->autoCreate) {
-            $user = $this->doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
+            // First, we'll be asking the LDAP server to give us the user name back, in case the LDAP server is case-insensitive
+            // See https://github.com/tchapi/davis/issues/167
+            $realUsername = $username;
+
+            try {
+                $search_results = ldap_read($ldap, $dn, '(objectclass=*)', ['uid']);
+            } catch (\Exception $e) {
+                // Probably a "No such object" error, ignore and use available credentials (username)
+            }
+
+            if (false !== $search_results) {
+                $entry = ldap_get_entries($ldap, $search_results);
+
+                if (false !== $entry && !empty($entry[0]['uid'])) {
+                    $realUsername = $entry[0]['uid'][0];
+                }
+            }
+
+            $user = $this->doctrine->getRepository(User::class)->findOneBy(['username' => $realUsername]);
 
             if (!$user) {
                 // Default fallback values
-                $displayName = $username;
-                $email = $username;
+                $displayName = $realUsername;
+                $email = $realUsername;
 
                 // Try to extract display name and email for this user.
                 // NB: We suppose display name is `cn` (email is configurable, generally `mail`)
@@ -201,7 +219,7 @@ final class LDAPAuth extends AbstractBasic
                     }
                 }
 
-                $this->utils->createPasswordlessUserWithDefaultObjects($username, $displayName, $email);
+                $this->utils->createPasswordlessUserWithDefaultObjects($realUsername, $displayName, $email);
 
                 $em = $this->doctrine->getManager();
 
