@@ -82,8 +82,8 @@ class CalendarInstanceRepository extends ServiceEntityRepository
     {
         $objectRepository = $this->getEntityManager()->getRepository(SchedulingObject::class);
         return $objectRepository->createQueryBuilder('s')
-            ->leftJoin(CalendarObject::class, 'c', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.uri = s.uri')
-            ->leftJoin(CalendarInstance::class, 'ci', \Doctrine\ORM\Query\Expr\Join::WITH, 'ci.calendar = c.calendar')
+            ->innerJoin(CalendarObject::class, 'c', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.uri = s.uri')
+            ->innerJoin(CalendarInstance::class, 'ci', \Doctrine\ORM\Query\Expr\Join::WITH, 'ci.calendar = c.calendar')
             ->where('ci.id = :id')
             // uri is not unique across calendars — two different calendars can have objects with the same uri.
             // The join should also filter by principaluri as a consequence
