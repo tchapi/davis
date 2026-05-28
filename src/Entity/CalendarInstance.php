@@ -140,7 +140,7 @@ class CalendarInstance
 
     public function isAutomaticallyGenerated(): bool
     {
-        return in_array($this->uri, [Constants::BIRTHDAY_CALENDAR_URI]);
+        return $this->uri === Constants::BIRTHDAY_CALENDAR_URI || str_ends_with($this->uri, '.ics');
     }
 
     public function getDisplayName(): ?string
