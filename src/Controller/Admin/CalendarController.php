@@ -224,6 +224,7 @@ class CalendarController extends AbstractController
                      ->setShareHref('mailto:'.$newShareeToAdd->getEmail())
                      ->setDescription($instance->getDescription())
                      ->setDisplayName($instance->getDisplayName())
+                     ->setCalendarColor($instance->getCalendarColor())
                      ->setUri(\Sabre\DAV\UUIDUtil::getUUID())
                      ->setPrincipalUri($newShareeToAdd->getUri())
                      ->setAccess($writeAccess);
