@@ -29,6 +29,6 @@ security:
         - { path: ^/dashboard, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
         - { path: ^/users, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
         - { path: ^/calendars, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
-        - { path: ^/adressbooks, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
+        - { path: ^/addressbooks, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
         - { path: ^/api/v1/health$, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED }
