@@ -1,13 +1,13 @@
 Davis
 ---
 
-[![Build Status][ci_badge]][ci_link]
+[![Build Status](https://github.com/tchapi/davis/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/tchapi/davis/actions/workflows/ci.yml)
 [![Publish Docker image](https://github.com/tchapi/davis/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/tchapi/davis/actions/workflows/main.yml)
-[![Latest release][release_badge]][release_link]
-[![License](https://img.shields.io/github/license/tchapi/davis)](https://github.com/tchapi/davis/blob/main/LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/tchapi/davis?cacheSeconds=3600)](https://github.com/tchapi/davis/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/tchapi/davis/blob/main/LICENSE)
 ![Platform](https://img.shields.io/badge/platform-amd64%20%7C%20arm64-blue?logo=docker)
 ![PHP Version](https://img.shields.io/badge/php-8.2%20%7C%208.3%20%7C%208.4-777BB4?logo=php&logoColor=white)
-[![Sponsor me][sponsor_badge]][sponsor_link]
+[![Sponsor me](https://img.shields.io/badge/sponsor%20me-🙏-blue?logo=paypal)](https://paypal.me/tchap)
 
 A modern, simple, feature-packed, fully translatable DAV server, admin interface and frontend based on `sabre/dav`, built with [Symfony 7](https://symfony.com/) and [Bootstrap 5](https://getbootstrap.com/), initially inspired by [Baïkal](https://github.com/sabre-io/Baikal) (_see dependencies table below for more detail_)
 
@@ -686,12 +686,3 @@ _This project does not use any pipeline for the assets since the frontend side i
 # ⚖️ Licence
 
 This project is release under the MIT licence. See the LICENCE file
-
-[ci_badge]: https://github.com/tchapi/davis/workflows/CI/badge.svg
-[ci_link]: https://github.com/tchapi/davis/actions?query=workflow%3ACI
-
-[sponsor_badge]: https://img.shields.io/badge/sponsor%20me-🙏-blue?logo=paypal
-[sponsor_link]: https://paypal.me/tchap
-
-[release_badge]: https://img.shields.io/github/v/release/tchapi/davis
-[release_link]: https://github.com/tchapi/davis/releases
