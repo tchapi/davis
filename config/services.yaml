@@ -82,6 +82,10 @@ services:
         arguments:
             $apiKey: "%env(API_KEY)%"
 
+    App\Security\OidcAuthenticator:
+        arguments:
+            $adminAuthMethod: '%env(ADMIN_AUTH_METHOD)%'
+
 when@dev:
     services:
         Symfony\Component\HttpKernel\Profiler\Profiler: '@profiler'
