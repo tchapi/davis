@@ -49,8 +49,8 @@ Comes with already built Docker images in two flavours: [standalone](https://git
 
 # 🔩 Requirements
 
-  - PHP > 8.2 (with `pdo_mysql` [or `pdo_pgsql`, `pdo_sqlite`], `gd` and `intl` extensions), compatible up to PHP 8.5 (_See dependencies table below_)
-  - A compatible database layer, such as MySQL or MariaDB (recommended), PostgreSQL (not extensively tested yet) or SQLite (not extensively tested yet)
+  - PHP >= 8.2 (with `pdo_sqlite`, `pdo_mysql` or `pdo_pgsql`, plus the `gd` and `intl` extensions), compatible up to PHP 8.5 (_See dependencies table below_)
+  - SQLite, MySQL/MariaDB or PostgreSQL. SQLite is the simplest option for a standalone installation and is covered by the full test suite; PostgreSQL is not extensively tested yet.
   - Composer > 2 (_The last release compatible with Composer 1 is [v1.6.2](https://github.com/tchapi/davis/releases/tag/v1.6.2)_)
   - The [`imap`](https://www.php.net/manual/en/imap.installation.php) and [`ldap`](https://www.php.net/manual/en/ldap.installation.php) PHP extensions if you want to use either authentication methods (_these are not enabled / compiled by default except in the Docker image_)
 
@@ -85,7 +85,7 @@ Dependencies
    And set `APP_ENV=prod` in your `.env.local` file (see below)
 
 
-3. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
+3. Configure the database driver and URL in your `.env.local` file.
 
 4. Run the migrations to create all the necessary tables:
 
@@ -111,11 +111,20 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 >
 > In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data.
 
-**a. The database driver and url** (_you should already have it configured since you created the database previously_)
+**a. The database driver and URL**
 
 ```shell
-DATABASE_DRIVER=mysql # or postgresql, or sqlite
-DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4
+# SQLite
+DATABASE_DRIVER=sqlite
+DATABASE_URL=sqlite:///%kernel.project_dir%/var/data.db
+
+# MySQL/MariaDB
+# DATABASE_DRIVER=mysql
+# DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4
+
+# PostgreSQL
+# DATABASE_DRIVER=pgsql
+# DATABASE_URL=postgresql://db_user:db_pass@host:5432/db_name
 ```
 
 **b. The admin password for the backend**

@@ -75,10 +75,51 @@ jobs:
         run: vendor/bin/php-cs-fixer fix --ansi
 
   phpunit:
-    name: PHPUnit (PHP ${{ matrix.php }})
+    name: PHPUnit / SQLite (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     container:
       image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+          - '8.3'
+          - '8.4'
+          - '8.5'
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install SQLite / GD / ZIP PHP extensions
+        run: |
+          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev sqlite-dev
+          docker-php-ext-configure intl
+          docker-php-ext-configure gd
+          docker-php-ext-configure zip
+          docker-php-ext-install pdo pdo_sqlite intl gd zip
+
+      - name: Install Composer
+        run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+
+      - name: Install dependencies with Composer
+        run: composer install --no-progress --no-interaction --ansi
+
+      - name: Run tests with PHPUnit
+        env:
+          DATABASE_DRIVER: sqlite
+          DATABASE_URL: sqlite:///%kernel.project_dir%/var/data_test.db
+        run: vendor/bin/phpunit --colors=always
+
+  phpunit-mariadb:
+    name: PHPUnit / MariaDB (PHP 8.4)
+    runs-on: ubuntu-latest
+    container:
+      image: php:8.4-alpine
       options: >-
         --tmpfs /tmp:exec
         --tmpfs /var/tmp:exec
@@ -86,7 +127,6 @@ jobs:
       mysql:
         image: mariadb:10.11
         env:
-          # Corresponds to what is in .env.test
           MYSQL_DATABASE: davis_test
           MYSQL_USER: davis
           MYSQL_PASSWORD: davis
@@ -96,17 +136,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
-          - 3306:3306
-
-    strategy:
-      matrix:
-        php:
-          - '8.2'
-          - '8.3'
-          - '8.4'
-          - '8.5'
-      fail-fast: false
 
     steps:
       - name: Checkout
@@ -128,8 +157,9 @@ jobs:
 
       - name: Run tests with PHPUnit
         env:
+          DATABASE_DRIVER: mysql
           DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
-        run: vendor/bin/phpunit --process-isolation --colors=always
+        run: vendor/bin/phpunit --colors=always
 
   migrations:
     name: Migrations (${{ matrix.database }})
@@ -195,6 +225,7 @@ jobs:
       - name: Run migrations (MySQL)
         if: matrix.database == 'mysql'
         env:
+          DATABASE_DRIVER: mysql
           DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
         run: |
           php bin/console doctrine:database:create --if-not-exists --env=test
@@ -204,6 +235,7 @@ jobs:
       - name: Run migrations (PostgreSQL)
         if: matrix.database == 'postgresql'
         env:
+          DATABASE_DRIVER: pgsql
           DATABASE_URL: postgresql://davis:davis@postgres:5432/davis_test?serverVersion=15&charset=utf8
         run: |
           php bin/console doctrine:database:create --if-not-exists --env=test
@@ -213,33 +245,24 @@ jobs:
       - name: Run migrations (SQLite)
         if: matrix.database == 'sqlite'
         env:
+          DATABASE_DRIVER: sqlite
           DATABASE_URL: sqlite:///%kernel.project_dir%/var/data_test.db
         run: |
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
           php bin/console doctrine:schema:validate --skip-sync --env=test
 
   smoke-test:
-    name: Application Smoke Test
+    name: SQLite DAV Smoke Test
     runs-on: ubuntu-latest
     container:
       image: php:8.4-alpine
       options: >-
         --tmpfs /tmp:exec
         --tmpfs /var/tmp:exec
-
-    services:
-      mysql:
-        image: mariadb:10.11
-        env:
-          MYSQL_DATABASE: davis_test
-          MYSQL_USER: davis
-          MYSQL_PASSWORD: davis
-          MYSQL_ROOT_PASSWORD: root
-        options: >-
-          --health-cmd "mysqladmin ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    env:
+      APP_ENV: test
+      DATABASE_DRIVER: sqlite
+      DATABASE_URL: sqlite:///%kernel.project_dir%/var/smoke_test.db
 
     steps:
       - name: Checkout
@@ -247,11 +270,11 @@ jobs:
 
       - name: Install extensions and curl
         run: |
-          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev curl
+          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev sqlite-dev curl
           docker-php-ext-configure intl
           docker-php-ext-configure gd
           docker-php-ext-configure zip
-          docker-php-ext-install pdo pdo_mysql intl gd zip
+          docker-php-ext-install pdo pdo_sqlite intl gd zip
 
       - name: Install Composer
         run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
@@ -260,39 +283,23 @@ jobs:
         run: composer install --no-progress --no-interaction --ansi --optimize-autoloader
 
       - name: Prepare application
-        env:
-          DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
-          APP_ENV: test
         run: |
-          php bin/console doctrine:database:create --if-not-exists --env=test
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
+          php bin/console doctrine:fixtures:load --no-interaction --env=test
           php bin/console cache:clear --env=test
 
       - name: Start Symfony server in background
-        env:
-          DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test
-          APP_ENV: test
         run: |
-          php -S 127.0.0.1:8000 -t public/ &
+          php -S 127.0.0.1:8000 -t public/ public/index.php &
           echo $! > server.pid
-          sleep 3
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            curl --silent --fail http://127.0.0.1:8000/ > /dev/null && exit 0
+            sleep 1
+          done
+          exit 1
 
-      - name: Test application responds
-        run: |
-          # Test that the app responds with a successful HTTP status
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/)
-          echo "HTTP Response code: $RESPONSE"
-          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 400 ]; then
-            echo "✅ Application is responding correctly"
-          else
-            echo "❌ Application returned unexpected status code: $RESPONSE"
-            exit 1
-          fi
-
-      - name: Test dashboard
-        continue-on-error: true
-        run: |
-          curl -f http://127.0.0.1:8000/dashboard || echo "No health endpoint available"
+      - name: Exercise CalDAV and CardDAV
+        run: tests/smoke-dav.sh
 
       - name: Stop server
         if: always()
