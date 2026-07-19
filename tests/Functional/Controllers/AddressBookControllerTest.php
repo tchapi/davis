@@ -107,7 +107,12 @@ class AddressBookControllerTest extends WebTestCase
         $addressbookRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(AddressBook::class);
         $addressbook = $addressbookRepository->findOneByDisplayName('default.addressbook.title');
 
-        $client->request('GET', '/addressbooks/'.$userId.'/delete/'.$addressbook->getId());
+        $crawler = $client->request('GET', '/addressbooks/'.$userId);
+        $csrfToken = $crawler->filter('#deleteModal-addressbooks-form input[name="_token"]')->attr('value');
+
+        $client->request('POST', '/addressbooks/'.$userId.'/delete/'.$addressbook->getId(), [
+            '_token' => $csrfToken,
+        ]);
 
         $this->assertResponseRedirects('/addressbooks/'.$userId);
         $client->followRedirect();

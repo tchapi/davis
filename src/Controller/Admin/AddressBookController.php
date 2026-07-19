@@ -12,12 +12,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/addressbooks', name: 'addressbook_')]
 class AddressBookController extends AbstractController
 {
-    #[Route('/{userId}', name: 'index')]
+    #[Route('/{userId}', name: 'index', methods: ['GET'])]
     public function addressBooks(ManagerRegistry $doctrine, int $userId): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
@@ -38,8 +39,8 @@ class AddressBookController extends AbstractController
         ]);
     }
 
-    #[Route('/{userId}/new', name: 'create')]
-    #[Route('/{userId}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
+    #[Route('/{userId}/new', name: 'create', methods: ['GET', 'POST'])]
+    #[Route('/{userId}/edit/{id}', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => "\d+"])]
     public function addressbookCreate(ManagerRegistry $doctrine, Request $request, int $userId, ?int $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
@@ -106,7 +107,8 @@ class AddressBookController extends AbstractController
         ]);
     }
 
-    #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
+    #[Route('/{userId}/delete/{id}', name: 'delete', methods: ['POST'], requirements: ['id' => "\d+"])]
+    #[IsCsrfTokenValid('delete-addressbooks')]
     public function addressbookDelete(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);

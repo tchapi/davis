@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {
-    #[Route('/dashboard', name: 'dashboard')]
+    #[Route('/dashboard', name: 'dashboard', methods: ['GET'])]
     public function dashboard(ManagerRegistry $doctrine): Response
     {
         $usersCount = $doctrine->getRepository(User::class)->count([]);

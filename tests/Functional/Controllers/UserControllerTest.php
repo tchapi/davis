@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\Principal;
 use App\Entity\User;
 use App\Security\AdminUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -98,14 +99,21 @@ class UserControllerTest extends WebTestCase
         $userId1 = $this->getUserId($client, 'test_user');
         $userId2 = $this->getUserId($client, 'test_user2');
 
-        $client->request('GET', '/users/delete/'.$userId1);
+        $crawler = $client->request('GET', '/users/');
+        $csrfToken = $crawler->filter('#deleteModal-users-form input[name="_token"]')->attr('value');
+
+        $client->request('POST', '/users/delete/'.$userId1, [
+            '_token' => $csrfToken,
+        ]);
 
         $this->assertResponseRedirects('/users/');
         $client->followRedirect();
 
         $this->assertAnySelectorTextContains('h5', 'Test User 2');
 
-        $client->request('GET', '/users/delete/'.$userId2);
+        $client->request('POST', '/users/delete/'.$userId2, [
+            '_token' => $csrfToken,
+        ]);
 
         $this->assertResponseRedirects('/users/');
         $client->followRedirect();
@@ -128,19 +136,56 @@ class UserControllerTest extends WebTestCase
 
         $this->assertSelectorExists('nav.navbar');
         $this->assertSelectorTextContains('h1', 'Delegates for Test User');
-        $this->assertSelectorTextContains('a.btn', '+ Add a delegate');
+        $this->assertSelectorTextContains('a[data-bs-target="#addDelegateModal"]', '+ Add a delegate');
         $this->assertAnySelectorTextContains('div', 'Delegation is enabled for this account.');
-        $this->assertAnySelectorTextContains('a.btn', 'Disable it');
+        $this->assertAnySelectorTextContains('button.btn', 'Disable it');
 
-        $client->clickLink('Disable it');
+        $client->submitForm('Disable it');
 
         $this->assertResponseRedirects('/users/delegates/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorExists('nav.navbar');
         $this->assertSelectorTextContains('h1', 'Delegates for Test User');
-        $this->assertSelectorTextNotContains('a.btn', '+ Add a delegate');
+        $this->assertSelectorNotExists('a[data-bs-target="#addDelegateModal"]');
         $this->assertAnySelectorTextContains('div', 'Delegation is not enabled for this account.');
-        $this->assertAnySelectorTextContains('a.btn', 'Enable it');
+        $this->assertAnySelectorTextContains('button.btn', 'Enable it');
+    }
+
+    public function testDelegateAdditionAndRemoval(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $principalRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(Principal::class);
+        $principal = $principalRepository->findOneByUri(Principal::PREFIX.'test_user');
+        $delegate = $principalRepository->findOneByUri(Principal::PREFIX.'test_user2');
+        $readProxy = $principalRepository->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
+
+        $crawler = $client->request('GET', '/users/delegates/'.$userId);
+        $addToken = $crawler->filter('#addDelegateModal-form input[name="_token"]')->attr('value');
+        $removeToken = $crawler->filter('#deleteModal-delegates-form input[name="_token"]')->attr('value');
+
+        $client->request('POST', '/users/delegates/'.$userId.'/add', [
+            '_token' => $addToken,
+            'principalId' => $delegate->getId(),
+        ]);
+        $this->assertResponseRedirects('/users/delegates/'.$userId);
+
+        $principalRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(Principal::class);
+        $readProxy = $principalRepository->find($readProxy->getId());
+        $delegate = $principalRepository->find($delegate->getId());
+        $this->assertTrue($readProxy->getDelegees()->contains($delegate));
+
+        $client->request('POST', '/users/delegates/'.$userId.'/remove/'.$readProxy->getId().'/'.$delegate->getId(), [
+            '_token' => $removeToken,
+        ]);
+        $this->assertResponseRedirects('/users/delegates/'.$userId);
+
+        $principalRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(Principal::class);
+        $readProxy = $principalRepository->find($readProxy->getId());
+        $delegate = $principalRepository->find($delegate->getId());
+        $this->assertFalse($readProxy->getDelegees()->contains($delegate));
     }
 }

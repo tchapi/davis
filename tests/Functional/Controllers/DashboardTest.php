@@ -2,7 +2,9 @@
 
 namespace App\Tests\Functional;
 
+use App\Security\AdminUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Routing\RouterInterface;
 
 class DashboardTest extends WebTestCase
 {
@@ -90,5 +92,23 @@ class DashboardTest extends WebTestCase
         $this->assertSelectorTextContains('h3.objects', 'Objects');
         $this->assertSelectorTextContains('h3.environment', 'Configured environment');
         $this->assertSelectorExists('nav.navbar');
+    }
+
+    public function testLogoutRequiresPostAndCsrfProtection(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $route = static::getContainer()->get(RouterInterface::class)->getRouteCollection()->get('app_logout');
+        $this->assertSame(['POST'], $route->getMethods());
+
+        $crawler = $client->request('GET', '/dashboard');
+        $csrfToken = $crawler->filter('form[action="/logout"] input[name="_csrf_token"]')->attr('value');
+
+        $client->request('POST', '/logout');
+        $this->assertResponseStatusCodeSame(403);
+
+        $client->request('POST', '/logout', ['_csrf_token' => $csrfToken]);
+        $this->assertResponseRedirects('/dashboard');
     }
 }

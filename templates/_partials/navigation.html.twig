@@ -22,7 +22,10 @@
             👤 {{ app.user.username }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navUserMenu">
-            <a class="dropdown-item" href="{{ path('app_logout') }}">{{ "logout"|trans }}</a>
+            <form method="post" action="{{ path('app_logout') }}">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+              <button type="submit" class="dropdown-item">{{ "logout"|trans }}</button>
+            </form>
           </div>
         </li>
         <li class="nav-item dropdown">

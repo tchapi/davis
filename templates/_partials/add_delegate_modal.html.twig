@@ -6,10 +6,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ "close"|trans }}"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form method="post" action="{{ path('user_delegate_add', {userId: userId}) }}" id="addDelegateModal-form">
+          <input type="hidden" name="_token" value="{{ csrf_token('delegate-add') }}">
           <div class="form-group">
-            <label for="member" class="col-form-label">{{ "calendars.delegates.member"|trans }}</label>
-            <select class="form-control" id="addDelegateModal-member">
+            <label for="addDelegateModal-member" class="col-form-label">{{ "calendars.delegates.member"|trans }}</label>
+            <select class="form-control" id="addDelegateModal-member" name="principalId">
               {% for principal in principals %}
                 <option value="{{ principal.id}}">{{ principal.displayName }} ({{ principal.email }})</option>
               {% endfor %}
@@ -17,8 +18,8 @@
             <small class="form-text text-muted">{{ "delegates.member.help"|trans }}</small>
           </div>
           <div class="form-check form-switch mt-2">
-            <input class="form-check-input" type="checkbox" value="" id="addDelegateModal-writeAccess">
-            <label class="form-check-label" for="write">
+            <input class="form-check-input" type="checkbox" name="write" value="true" id="addDelegateModal-writeAccess">
+            <label class="form-check-label" for="addDelegateModal-writeAccess">
               {{ "calendars.delegates.write.give"|trans }}
             </label>
           </div>
@@ -26,7 +27,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ "cancel"|trans }}</button>
-        <a data-href="{{ path('user_delegate_add', {userId: userId}) }}" href="#" class="btn btn-primary" id="addDelegateModal-cta">{{ "add"|trans }}</a>
+        <button type="submit" form="addDelegateModal-form" class="btn btn-primary">{{ "add"|trans }}</button>
       </div>
     </div>
   </div>

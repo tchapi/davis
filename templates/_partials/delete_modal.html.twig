@@ -10,7 +10,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ "cancel"|trans }}</button>
-        <a href="#" type="button" class="btn btn-primary" id="deleteModal-{{ flavour }}-cta">{{ "yes"|trans }}</a>
+        <form method="post" id="deleteModal-{{ flavour }}-form">
+          <input type="hidden" name="_token" value="{{ csrf_token('delete-' ~ flavour) }}">
+          <button type="submit" class="btn btn-primary">{{ "yes"|trans }}</button>
+        </form>
       </div>
     </div>
   </div>

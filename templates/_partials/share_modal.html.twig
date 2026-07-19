@@ -13,15 +13,19 @@
                     <span class="name"></span>
                     <span class="badge bg-info rounded-pill ms-2"></span>
                 </div>
-                <a href="#" class="btn btn-sm btn-danger revoke">{{ "revoke"|trans }}</a>
+                <form method="post" class="revoke">
+                  <input type="hidden" name="_token" value="{{ csrf_token('delete-revoke') }}">
+                  <button type="submit" class="btn btn-sm btn-danger">{{ "revoke"|trans }}</button>
+                </form>
             </div>
         </template>
         <span class="d-none" id="shareModal-none"><em>{{ "calendars.delegates.none"|trans }}</em></span>
         <ul class="list-group" id="shareModal-shares"></ul>
-        <form class="mt-2">
+        <form method="post" class="mt-2" id="shareModal-addForm">
+          <input type="hidden" name="_token" value="{{ csrf_token('calendar-share') }}">
           <div class="form-group">
-            <label for="member" class="col-form-label">{{ "calendars.delegates.member.add"|trans }}</label>
-            <select class="form-control" id="shareModal-member" {% if principals|length == 0 %}disabled="disabled"{% endif %}>
+            <label for="shareModal-member" class="col-form-label">{{ "calendars.delegates.member.add"|trans }}</label>
+            <select class="form-control" id="shareModal-member" name="principalId" {% if principals|length == 0 %}disabled="disabled"{% endif %}>
               {% for principal in principals %}
                 <option value="{{ principal.id}}">{{ principal.displayName }} ({{ principal.email }})</option>
               {% endfor %}
@@ -35,8 +39,8 @@
             </small>
           </div>
           <div class="form-check form-switch mt-2">
-            <input class="form-check-input" type="checkbox" role="switch" value="" id="shareModal-writeAccess" {% if principals|length == 0 %}disabled="disabled"{% endif %}>
-            <label class="form-check-label" for="write">
+            <input class="form-check-input" type="checkbox" role="switch" name="write" value="true" id="shareModal-writeAccess" {% if principals|length == 0 %}disabled="disabled"{% endif %}>
+            <label class="form-check-label" for="shareModal-writeAccess">
               {{ "calendars.delegates.write.give"|trans }}
             </label>
           </div>
@@ -44,7 +48,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ "cancel"|trans }}</button>
-        <a href="#" id="shareModal-addSharee" class="btn btn-primary{% if principals|length == 0 %} disabled{% endif %}">{{ "add"|trans }}</a>
+        <button type="submit" form="shareModal-addForm" class="btn btn-primary" {% if principals|length == 0 %}disabled{% endif %}>{{ "add"|trans }}</button>
       </div>
     </div>
   </div>

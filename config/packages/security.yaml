@@ -21,6 +21,7 @@ security:
             logout:
                 path: app_logout
                 target: dashboard
+                enable_csrf: true
             
 
     access_control:

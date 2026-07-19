@@ -7,19 +7,10 @@ if (shareModal) {
         // Button that triggered the modal
         const button = event.relatedTarget
 
-        // Grab calendar shares url and add url
+        // Grab calendar shares URL and share target.
         let shareesUrl = button.getAttribute('data-sharees-href');
         let targetUrl = button.getAttribute('data-href');
-
-        // When adding the sharee, catch the click to add the query parameter
-        const addShareeButton = document.getElementById('shareModal-addSharee');
-        addShareeButton.addEventListener("click", function(e) {
-            const writeAccess = document.getElementById('shareModal-writeAccess').checked ? 'true' : 'false';
-            const principalId = document.getElementById('shareModal-member').value;
-
-            e.preventDefault()
-            window.location = targetUrl + "?principalId=" + principalId + "&write=" + writeAccess
-        });
+        document.getElementById('shareModal-addForm').setAttribute('action', targetUrl)
 
         const noneElement = document.getElementById('shareModal-none')
 
@@ -53,8 +44,8 @@ if (shareModal) {
                         badge[0].classList.add('bg-success')
                         badge[0].classList.remove('bg-info')
                     }
-                    let revokeButton = clone.querySelectorAll("a.revoke");
-                    revokeButton[0].href = element.revokeUrl;
+                    let revokeForm = clone.querySelectorAll("form.revoke");
+                    revokeForm[0].setAttribute('action', element.revokeUrl);
 
                     shares.appendChild(clone);
                 });
@@ -71,36 +62,15 @@ deleteModals.forEach(element => {
         // Button that triggered the modal
         const button = event.relatedTarget
 
-        // Grab real target url for deletion
+        // Grab the target URL for deletion.
         let targetUrl = button.getAttribute('data-href');
         let modalFlavour = button.getAttribute('data-flavour');
 
-        // Put it into the modal's OK button
-        const deleteCTA = document.getElementById(`deleteModal-${modalFlavour}-cta`);
-        console.log("setting href to " + targetUrl)
-        deleteCTA.setAttribute('href', targetUrl);
+        // Put it into the modal's confirmation form.
+        const deleteForm = document.getElementById(`deleteModal-${modalFlavour}-form`);
+        deleteForm.setAttribute('action', targetUrl);
     })
 })
-
-
-
-// Global account delegation modal
-const addDelegateModal = document.getElementById('addDelegateModal')
-if (addDelegateModal) {
-    addDelegateModal.addEventListener('show.bs.modal', event => {
-        // When adding the sharee, catch the click to add the query parameter
-        const addDelegateButton = document.getElementById('addDelegateModal-cta');
-        addDelegateButton.addEventListener("click", function(e) {
-            const targetUrl = addDelegateButton.getAttribute('data-href');
-            const writeAccess = document.getElementById('addDelegateModal-writeAccess').checked ? 'true' : 'false';
-            const principalId = document.getElementById('addDelegateModal-member').value;
-
-            e.preventDefault()
-            window.location = targetUrl + "?principalId=" + principalId + "&write=" + writeAccess
-        });
-
-    })
-}
 
 // Color swatch: update it live (not working in IE ¯\_(ツ)_/¯ but it's just a nice to have)
 const colorPicker = document.getElementById('calendar_instance_calendarColor');

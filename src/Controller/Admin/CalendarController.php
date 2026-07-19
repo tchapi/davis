@@ -17,12 +17,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/calendars', name: 'calendar_')]
 class CalendarController extends AbstractController
 {
-    #[Route('/{userId}', name: 'index')]
+    #[Route('/{userId}', name: 'index', methods: ['GET'])]
     public function calendars(ManagerRegistry $doctrine, UrlGeneratorInterface $router, int $userId): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
@@ -75,8 +76,8 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route('/{userId}/new', name: 'create')]
-    #[Route('/{userId}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
+    #[Route('/{userId}/new', name: 'create', methods: ['GET', 'POST'])]
+    #[Route('/{userId}/edit/{id}', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => "\d+"])]
     public function calendarEdit(ManagerRegistry $doctrine, Request $request, int $userId, ?int $id, TranslatorInterface $trans): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
@@ -170,7 +171,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route('/{userId}/shares/{calendarid}', name: 'shares', requirements: ['calendarid' => "\d+"])]
+    #[Route('/{userId}/shares/{calendarid}', name: 'shares', methods: ['GET'], requirements: ['calendarid' => "\d+"])]
     public function calendarShares(ManagerRegistry $doctrine, int $userId, string $calendarid, TranslatorInterface $trans): Response
     {
         $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarid, true);
@@ -190,7 +191,8 @@ class CalendarController extends AbstractController
         return new JsonResponse($response);
     }
 
-    #[Route('/{userId}/share/{instanceid}', name: 'share_add', requirements: ['instanceid' => "\d+"])]
+    #[Route('/{userId}/share/{instanceid}', name: 'share_add', methods: ['POST'], requirements: ['instanceid' => "\d+"])]
+    #[IsCsrfTokenValid('calendar-share')]
     public function calendarShareAdd(ManagerRegistry $doctrine, Request $request, int $userId, string $instanceid, TranslatorInterface $trans): Response
     {
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($instanceid);
@@ -198,11 +200,11 @@ class CalendarController extends AbstractController
             throw $this->createNotFoundException('Calendar not found');
         }
 
-        if (!is_numeric($request->get('principalId'))) {
+        if (!is_numeric($request->request->get('principalId'))) {
             throw new BadRequestHttpException();
         }
 
-        $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
+        $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
         if (!$newShareeToAdd) {
             throw $this->createNotFoundException('Member not found');
         }
@@ -211,7 +213,7 @@ class CalendarController extends AbstractController
         // already existing first, so we can update it:
         $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
 
-        $writeAccess = ('true' === $request->get('write') ? SharingPlugin::ACCESS_READWRITE : SharingPlugin::ACCESS_READ);
+        $writeAccess = ('true' === $request->request->get('write') ? SharingPlugin::ACCESS_READWRITE : SharingPlugin::ACCESS_READ);
 
         $entityManager = $doctrine->getManager();
 
@@ -237,7 +239,8 @@ class CalendarController extends AbstractController
         return $this->redirectToRoute('calendar_index', ['userId' => $userId]);
     }
 
-    #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
+    #[Route('/{userId}/delete/{id}', name: 'delete', methods: ['POST'], requirements: ['id' => "\d+"])]
+    #[IsCsrfTokenValid('delete-calendars')]
     public function calendarDelete(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
@@ -283,7 +286,8 @@ class CalendarController extends AbstractController
         return $this->redirectToRoute('calendar_index', ['userId' => $userId]);
     }
 
-    #[Route('/{userId}/revoke/{id}', name: 'revoke', requirements: ['id' => "\d+"])]
+    #[Route('/{userId}/revoke/{id}', name: 'revoke', methods: ['POST'], requirements: ['id' => "\d+"])]
+    #[IsCsrfTokenValid('delete-revoke')]
     public function calendarRevoke(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans): Response
     {
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);

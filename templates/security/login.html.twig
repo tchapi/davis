@@ -5,7 +5,11 @@
 
 {% if app.user %}
     <div class="mb-3">
-        {{ "login.already"|trans({username: app.user.username}) }}, <a href="{{ path('app_logout') }}">{{ "logout"|trans }}</a>
+        {{ "login.already"|trans({username: app.user.username}) }},
+        <form method="post" action="{{ path('app_logout') }}" class="d-inline">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+            <button type="submit" class="btn btn-link p-0 align-baseline">{{ "logout"|trans }}</button>
+        </form>
     </div>
 {% else %}
     <div class="row justify-content-md-center">

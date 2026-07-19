@@ -17,12 +17,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/users', name: 'user_')]
 class UserController extends AbstractController
 {
-    #[Route('/', name: 'index')]
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function users(ManagerRegistry $doctrine): Response
     {
         $results = $doctrine->getRepository(Principal::class)->findAllMainPrincipalsWithUserIds();
@@ -32,8 +33,8 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'create')]
-    #[Route('/edit/{userId}', name: 'edit')]
+    #[Route('/new', name: 'create', methods: ['GET', 'POST'])]
+    #[Route('/edit/{userId}', name: 'edit', methods: ['GET', 'POST'])]
     public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?int $userId, TranslatorInterface $trans): Response
     {
         if ($userId) {
@@ -124,7 +125,8 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{userId}', name: 'delete')]
+    #[Route('/delete/{userId}', name: 'delete', methods: ['POST'])]
+    #[IsCsrfTokenValid('delete-users')]
     public function userDelete(ManagerRegistry $doctrine, int $userId, TranslatorInterface $trans): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
@@ -198,7 +200,7 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_index');
     }
 
-    #[Route('/delegates/{userId}', name: 'delegates')]
+    #[Route('/delegates/{userId}', name: 'delegates', methods: ['GET'])]
     public function userDelegates(ManagerRegistry $doctrine, int $userId): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
@@ -226,7 +228,8 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'])]
+    #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', methods: ['POST'], requirements: ['toggle' => '(on|off)'])]
+    #[IsCsrfTokenValid('delegation-toggle')]
     public function userToggleDelegation(ManagerRegistry $doctrine, int $userId, string $toggle): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
@@ -270,10 +273,11 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 
-    #[Route('/delegates/{userId}/add', name: 'delegate_add')]
+    #[Route('/delegates/{userId}/add', name: 'delegate_add', methods: ['POST'])]
+    #[IsCsrfTokenValid('delegate-add')]
     public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, int $userId): Response
     {
-        if (!is_numeric($request->get('principalId'))) {
+        if (!is_numeric($request->request->get('principalId'))) {
             throw new BadRequestHttpException();
         }
 
@@ -284,14 +288,14 @@ class UserController extends AbstractController
 
         $principalUri = Principal::PREFIX.$user->getUsername();
 
-        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
+        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
 
         if (!$newMemberToAdd) {
             throw $this->createNotFoundException('Member not found');
         }
 
         // Depending on write access or not, attach to the correct principal
-        if ('true' === $request->get('write')) {
+        if ('true' === $request->request->get('write')) {
             // Let's check that there wasn't a read proxy first
             $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri.Principal::READ_PROXY_SUFFIX);
             if (!$principalProxyRead) {
@@ -315,8 +319,9 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 
-    #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"])]
-    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, int $userId, int $principalProxyId, int $delegateId): Response
+    #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', methods: ['POST'], requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"])]
+    #[IsCsrfTokenValid('delete-delegates')]
+    public function userDelegateRemove(ManagerRegistry $doctrine, int $userId, int $principalProxyId, int $delegateId): Response
     {
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
