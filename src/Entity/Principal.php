@@ -46,8 +46,8 @@ class Principal
 
     #[ORM\ManyToMany(targetEntity: 'Principal')]
     #[ORM\JoinTable(name: 'groupmembers')]
-    #[ORM\JoinColumn(name: 'principal_id', referencedColumnName: 'id')]
-    #[ORM\InverseJoinColumn(name: 'member_id', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'principal_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'member_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private $delegees;
 
     public function __construct()

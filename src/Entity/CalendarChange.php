@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'calendarchanges')]
+#[ORM\Index(name: 'idx_calendarchanges_calendar_sync', columns: ['calendarid', 'synctoken'])]
 class CalendarChange
 {
     #[ORM\Id]
@@ -20,7 +21,7 @@ class CalendarChange
     private $synctoken;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", inversedBy: 'changes')]
-    #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
+    #[ORM\JoinColumn(name: 'calendarid', nullable: false, onDelete: 'CASCADE')]
     private $calendar;
 
     #[ORM\Column(type: 'smallint')]

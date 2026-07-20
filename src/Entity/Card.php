@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'cards')]
+#[ORM\UniqueConstraint(name: 'uniq_cards_addressbook_uri', columns: ['addressbookid', 'uri'])]
 class Card
 {
     #[ORM\Id]
@@ -14,7 +15,7 @@ class Card
     private $id;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\AddressBook", inversedBy: 'cards')]
-    #[ORM\JoinColumn(name: 'addressbookid', nullable: false)]
+    #[ORM\JoinColumn(name: 'addressbookid', nullable: false, onDelete: 'CASCADE')]
     private $addressBook;
 
     /**

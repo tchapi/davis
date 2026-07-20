@@ -10,6 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: "App\Repository\CalendarInstanceRepository")]
 #[ORM\Table(name: 'calendarinstances')]
+#[ORM\UniqueConstraint(name: 'uniq_calendarinstances_principal_uri', columns: ['principaluri', 'uri'])]
+#[ORM\UniqueConstraint(name: 'uniq_calendarinstances_calendar_principal', columns: ['calendarid', 'principaluri'])]
+#[ORM\UniqueConstraint(name: 'uniq_calendarinstances_calendar_share', columns: ['calendarid', 'share_href'])]
 #[UniqueEntity(fields: ['principalUri', 'uri'], errorPath: 'uri', message: 'form.uri.unique')]
 class CalendarInstance
 {
@@ -27,7 +30,7 @@ class CalendarInstance
     private $id;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", cascade: ['persist'], inversedBy: 'instances')]
-    #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
+    #[ORM\JoinColumn(name: 'calendarid', nullable: false, onDelete: 'CASCADE')]
     private $calendar;
 
     #[ORM\Column(name: 'principaluri', type: 'string', length: 255, nullable: true)]

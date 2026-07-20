@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'addressbooks')]
+#[ORM\UniqueConstraint(name: 'uniq_addressbooks_principal_uri', columns: ['principaluri', 'uri'])]
 #[UniqueEntity(fields: ['principalUri', 'uri'], errorPath: 'uri', message: 'form.uri.unique')]
 class AddressBook
 {

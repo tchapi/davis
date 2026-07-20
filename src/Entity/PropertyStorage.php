@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'propertystorage')]
+#[ORM\UniqueConstraint(name: 'uniq_propertystorage_path_name', columns: ['path', 'name'])]
 class PropertyStorage
 {
     #[ORM\Id]

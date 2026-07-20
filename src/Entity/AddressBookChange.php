@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'addressbookchanges')]
+#[ORM\Index(name: 'idx_addressbookchanges_book_sync', columns: ['addressbookid', 'synctoken'])]
 class AddressBookChange
 {
     #[ORM\Id]
@@ -20,7 +21,7 @@ class AddressBookChange
     private $synctoken;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\AddressBook", inversedBy: 'changes')]
-    #[ORM\JoinColumn(name: 'addressbookid', nullable: false)]
+    #[ORM\JoinColumn(name: 'addressbookid', nullable: false, onDelete: 'CASCADE')]
     private $addressBook;
 
     #[ORM\Column(type: 'integer')]

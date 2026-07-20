@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'calendarsubscriptions')]
+#[ORM\UniqueConstraint(name: 'uniq_calendarsubscriptions_principal_uri', columns: ['principaluri', 'uri'])]
 class CalendarSubscription
 {
     #[ORM\Id]

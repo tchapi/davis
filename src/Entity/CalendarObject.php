@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'calendarobjects')]
+#[ORM\UniqueConstraint(name: 'uniq_calendarobjects_calendar_uri', columns: ['calendarid', 'uri'])]
 class CalendarObject
 {
     #[ORM\Id]
@@ -23,7 +24,7 @@ class CalendarObject
     private $uri;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", inversedBy: 'objects')]
-    #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
+    #[ORM\JoinColumn(name: 'calendarid', nullable: false, onDelete: 'CASCADE')]
     private $calendar;
 
     #[ORM\Column(name: 'lastmodified', type: 'bigint', nullable: true)]

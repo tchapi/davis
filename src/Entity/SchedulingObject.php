@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'schedulingobjects')]
+#[ORM\UniqueConstraint(name: 'uniq_schedulingobjects_principal_uri', columns: ['principaluri', 'uri'])]
 class SchedulingObject
 {
     #[ORM\Id]

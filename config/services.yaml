@@ -26,6 +26,11 @@ services:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
+    App\Doctrine\SQLiteForeignKeyMiddleware:
+        autoconfigure: false
+        tags:
+            - { name: doctrine.middleware, priority: 100 }
+
     App\Services\Utils:
         arguments:
             $authRealm: "%env(AUTH_REALM)%"
