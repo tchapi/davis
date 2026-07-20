@@ -118,6 +118,10 @@ DATABASE_DRIVER=mysql # or postgresql, or sqlite
 DATABASE_URL=mysql://db_user:db_pass@host:3306/db_name?serverVersion=10.9.3-MariaDB&charset=utf8mb4
 ```
 
+SQLite databases use WAL journaling, full synchronous writes, and a 60-second busy timeout by default. WAL requires the database and its auxiliary files to reside on a local filesystem. Set `SQLITE_JOURNAL_MODE=DELETE` when WAL is unavailable.
+
+Keep SQLite patched: SQLite reports a rare multi-connection [WAL-reset bug](https://www.sqlite.org/wal.html#the_wal_reset_bug) as likely present from 3.7.0 through 3.51.2, with fixes in 3.51.3 and the documented backports. The `-wal` file is part of a live database's state, so use SQLite's backup API or stop Davis and checkpoint before copying the database file.
+
 **b. The admin password for the backend**
 
 ```shell

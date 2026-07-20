@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     default_database_driver: "mysql"
+    default_sqlite_journal_mode: "WAL"
     default_admin_auth_bypass: "false"
     timezone: '%env(APP_TIMEZONE)%'
     public_calendars_enabled: '%env(default:default_public_calendars_enabled:bool:PUBLIC_CALENDARS_ENABLED)%'
@@ -29,6 +30,13 @@ services:
     App\Services\Utils:
         arguments:
             $authRealm: "%env(AUTH_REALM)%"
+
+    App\Doctrine\SQLiteConnectionMiddleware:
+        autoconfigure: false
+        arguments:
+            $journalMode: "%env(default:default_sqlite_journal_mode:SQLITE_JOURNAL_MODE)%"
+        tags:
+            - { name: doctrine.middleware, priority: 100 }
 
     App\Services\IMAPAuth:
         arguments:
