@@ -31,7 +31,7 @@ class AddressBook
     #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'integer', options: ['default' => 1])]
     private $synctoken;
 
     #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => false])]
@@ -116,12 +116,12 @@ class AddressBook
         return $this;
     }
 
-    public function getSynctoken(): ?string
+    public function getSynctoken(): ?int
     {
         return $this->synctoken;
     }
 
-    public function setSynctoken(string $synctoken): self
+    public function setSynctoken(int $synctoken): self
     {
         $this->synctoken = $synctoken;
 

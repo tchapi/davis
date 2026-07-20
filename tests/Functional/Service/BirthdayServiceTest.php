@@ -54,7 +54,7 @@ class BirthdayServiceTest extends KernelTestCase
             ->setUri('default')
             ->setDisplayName('Default')
             ->setDescription('')
-            ->setSynctoken('1')
+            ->setSynctoken(1)
             ->setIncludedInBirthdayCalendar($includedInBirthdayCalendar);
         $this->em->persist($addressBook);
         $this->em->flush();

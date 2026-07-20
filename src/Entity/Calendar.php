@@ -19,7 +19,7 @@ class Calendar
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'integer', options: ['default' => 1])]
     private $synctoken;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -47,12 +47,12 @@ class Calendar
         return $this->id;
     }
 
-    public function getSynctoken(): ?string
+    public function getSynctoken(): ?int
     {
         return $this->synctoken;
     }
 
-    public function setSynctoken(string $synctoken): self
+    public function setSynctoken(int $synctoken): self
     {
         $this->synctoken = $synctoken;
 

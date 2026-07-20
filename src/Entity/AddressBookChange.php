@@ -16,7 +16,7 @@ class AddressBookChange
     #[ORM\Column(type: 'string', length: 255)]
     private $uri;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'integer', options: ['default' => 1])]
     private $synctoken;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\AddressBook", inversedBy: 'changes')]
@@ -43,12 +43,12 @@ class AddressBookChange
         return $this;
     }
 
-    public function getSynctoken(): ?string
+    public function getSynctoken(): ?int
     {
         return $this->synctoken;
     }
 
-    public function setSynctoken(string $synctoken): self
+    public function setSynctoken(int $synctoken): self
     {
         $this->synctoken = $synctoken;
 

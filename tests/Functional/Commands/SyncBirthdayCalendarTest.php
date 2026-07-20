@@ -71,7 +71,7 @@ class SyncBirthdayCalendarTest extends KernelTestCase
             ->setUri('default')
             ->setDisplayName('Default')
             ->setDescription('')
-            ->setSynctoken('1')
+            ->setSynctoken(1)
             ->setIncludedInBirthdayCalendar(true);
         $this->em->persist($addressBook);
 
