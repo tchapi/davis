@@ -1,6 +1,10 @@
 {% extends 'base.html.twig' %}
 {% set menu = 'resources' %}
 
+{% macro color_badge(color) %}
+    <span class="badge badge-indicator"{% if color matches '/\\A#[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?\\z/' %} style="background-color: {{ color }}"{% endif %}>&nbsp;</span>
+{% endmacro %}
+
 {% block body %}
 
 {% include '_partials/back_button.html.twig' with { url: path('user_index'), text: "users.back"|trans } %}
@@ -19,7 +23,7 @@
                     <span class="badge bg-success ml-1">{{ ('calendar.public')|trans }}</span>
                 {% endif %}
                 <a href="#" tabindex="0" class="badge badge-indicator" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ calendar.uri }}</code><br />Absolute path: <code>{{ davUri }}</code>">ⓘ</a>
-                <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
+                {{ _self.color_badge(calendar.calendarColor) }}
             </h5>
             <div class="me-0 text-right d-md-block d-none">
                 {% if not calendar.isPublic() %}
@@ -85,7 +89,7 @@
                         <span class="badge bg-info ms-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
                     {% endif %}
                     <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ calendar.uri }}</code><br />Absolute path: <code>{{ davUri }}</code>">ⓘ</a>
-                    <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
+                    {{ _self.color_badge(calendar.calendarColor) }}
                 </h5>
                 <div class="me-0 text-right d-md-block d-none">
                     <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
@@ -135,7 +139,7 @@
                     {{ calendar.displayName }}
                     <span class="badge bg-warning ms-1">{{ ('calendar.auto')|trans }}</span>
                     <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ calendar.uri }}</code><br />Absolute path: <code>{{ davUri }}</code>">ⓘ</a>
-                    <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
+                    {{ _self.color_badge(calendar.calendarColor) }}
                 </h5>
                 <div class="me-0 text-right d-md-block d-none">
                     <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
@@ -168,7 +172,7 @@
                     {{ subscription.displayName }}
                     <span class="badge bg-info ms-1">{{ ('calendar.subscription')|trans }}</span>
                     <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ subscription.uri }}</code>">ⓘ</a>
-                    <span class="badge badge-indicator" style="background-color: {{ subscription.calendarColor }}">&nbsp;</span>
+                    {{ _self.color_badge(subscription.calendarColor) }}
                 </h5>
             </div>
             <code class="mb-1">{{ subscription.source }}</code>

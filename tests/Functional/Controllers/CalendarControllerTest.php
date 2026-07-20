@@ -2,6 +2,8 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\Calendar;
+use App\Entity\CalendarInstance;
 use App\Entity\Principal;
 use App\Entity\User;
 use App\Repository\CalendarInstanceRepository;
@@ -36,6 +38,35 @@ class CalendarControllerTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Calendars for Test User');
         $this->assertSelectorTextContains('a.btn', '+ New Calendar');
         $this->assertSelectorTextContains('h5', 'default.calendar.title');
+    }
+
+    public function testCalendarColorsAreSafelyRendered(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $entityManager = static::getContainer()->get('doctrine.orm.entity_manager');
+        $calendarRepository = $entityManager->getRepository(CalendarInstance::class);
+
+        $calendarRepository->findOneByDisplayName('default.calendar.title')
+            ->setCalendarColor('#00112233');
+
+        $unsafeCalendar = (new CalendarInstance())
+            ->setPrincipalUri(Principal::PREFIX.'test_user')
+            ->setUri('unsafe-color')
+            ->setDisplayName('Unsafe color')
+            ->setCalendarColor('#000;top:0')
+            ->setCalendar(new Calendar());
+        $entityManager->persist($unsafeCalendar);
+        $entityManager->flush();
+
+        $client->request('GET', '/calendars/'.$userId);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('span.badge-indicator[style="background-color: #00112233"]');
+        $this->assertSelectorCount(1, 'span.badge-indicator[style]');
+        $this->assertStringNotContainsString('#000;top:0', $client->getResponse()->getContent());
     }
 
     public function testCalendarEdit(): void
