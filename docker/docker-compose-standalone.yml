@@ -18,9 +18,9 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile-standalone
-    image: davis:latest
+    image: davis-standalone:latest
     # If you want to use a prebuilt image from Github
-    # image: ghcr.io/tchapi/davis-standalone:edge
+    # image: ghcr.io/tchapi/davis-standalone:latest
     container_name: davis-standalone
     env_file: .env
     environment:
