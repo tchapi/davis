@@ -259,6 +259,28 @@ jobs:
       - name: Install dependencies with Composer
         run: composer install --no-progress --no-interaction --ansi --optimize-autoloader
 
+      # Regression check for #282: a `framework.profiler` block placed outside `when@dev` / `when@test`
+      # silently enables the Symfony profiler in *every* environment (any child key flips `enabled` to true).
+      # In production that writes a profile to var/cache/prod on every request and, when that directory
+      # is not writable (root-owned var/ in a Docker image), turns every request into a 500 with no log.
+      # We boot the real prod configuration and assert that neither the config nor the compiled container
+      # carries the profiler. The profiler must only ever be configured in config/packages/{dev,test}/.
+      - name: Check that the profiler is disabled in production
+        env:
+          APP_ENV: prod
+          APP_DEBUG: "0"
+        run: |
+          php bin/console debug:config framework profiler | tee /tmp/profiler-config.txt
+          if ! grep -q '^enabled: false' /tmp/profiler-config.txt; then
+            echo "❌ framework.profiler is enabled in the prod environment (see config/packages/framework.yaml)"
+            exit 1
+          fi
+          if php bin/console debug:container --tag=kernel.event_subscriber | grep -qi 'ProfilerListener'; then
+            echo "❌ The ProfilerListener is registered in the prod container"
+            exit 1
+          fi
+          echo "✅ Profiler disabled in production"
+
       - name: Prepare application
         env:
           DATABASE_URL: mysql://davis:davis@mysql:3306/davis_test

@@ -635,7 +635,7 @@ In a shell, if you run Davis locally:
 
 ### I have a 500 and a log about `Uncaught Error: Class "Symfony\Bundle\WebProfilerBundle\WebProfilerBundle" not found`
 
-You are running the app in dev mode, but you haven't installed the dev dependencies. Either:
+You are running the app in dev mode, but you haven't installed the dev dependencies (the Docker images default to `APP_ENV=prod`, so this only happens if you override it). Either:
 
 a. Set `APP_ENV=prod` in your local env file (See configuration above)
 
