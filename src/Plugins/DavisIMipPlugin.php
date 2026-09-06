@@ -76,6 +76,19 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         $senderName = $itip->senderName ?? $senderEmail;
         $recipientName = $itip->recipientName;
 
+        // For a REPLY, the attendee is the sender. If the stored event had no CN for
+        // them, the Broker leaves it out of the iTIP payload and some mail clients
+        // (Apple Mail for instance) render the attendee name as "(null)".
+        // We put the fallback name in the payload too. A REPLY can carry one VEVENT
+        // per recurrence instance, so we go through all of them.
+        if ('REPLY' === strtoupper($itip->method)) {
+            foreach ($itip->message->VEVENT as $vevent) {
+                if (isset($vevent->ATTENDEE) && !isset($vevent->ATTENDEE['CN'])) {
+                    $vevent->ATTENDEE['CN'] = $senderName;
+                }
+            }
+        }
+
         $subject = 'CalDAV message';
         switch (strtoupper($itip->method)) {
             case 'REPLY':
