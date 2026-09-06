@@ -2,6 +2,13 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\Calendar;
+use App\Entity\CalendarInstance;
+use App\Entity\CalendarObject;
+use App\Entity\CalendarSubscription;
+use App\Entity\Principal;
+use App\Entity\SchedulingObject;
+use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ApiControllerTest extends WebTestCase
@@ -582,5 +589,148 @@ class ApiControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('success', $data['status']);
         $this->assertEmpty($data['data']);
+    }
+
+    private function apiHeaders(): array
+    {
+        return [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ];
+    }
+
+    /**
+     * Shares test_user's default calendar with test_user2 (directly in the database) and
+     * adds one event to it. Returns [ownerInstanceId, sharedInstanceId, calendarId].
+     */
+    private function seedSharedCalendar(): array
+    {
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        $ownerInstance = $em->getRepository(CalendarInstance::class)->findOneBy(['principalUri' => Principal::PREFIX.'test_user', 'uri' => 'default']);
+        $calendar = $ownerInstance->getCalendar();
+
+        $object = (new CalendarObject())->setCalendar($calendar)->setUri('event.ics')->setCalendarData("BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n")
+            ->setEtag('e')->setSize(30)->setComponentType('VEVENT')->setUid('event-1')->setLastModified(time());
+        $em->persist($object);
+        $shared = (new CalendarInstance())->setCalendar($calendar)->setPrincipalUri(Principal::PREFIX.'test_user2')->setUri('shared-uuid')
+            ->setAccess(SharingPlugin::ACCESS_READWRITE)->setDisplayName('Shared with me');
+        $em->persist($shared);
+        $em->flush();
+
+        $ids = [$ownerInstance->getId(), $shared->getId(), $calendar->getId()];
+        $em->clear();
+
+        return $ids;
+    }
+
+    public function testDeleteUserCalendarKeepsSubscriptionsAndUnrelatedSchedulingObjects(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        $subscription = (new CalendarSubscription())->setPrincipalUri(Principal::PREFIX.'test_user')->setUri('holidays')
+            ->setSource('https://example.org/holidays.ics')->setDisplayName('Holidays')->setCalendarOrder(0)->setLastModified(time());
+        $em->persist($subscription);
+        $inboxItem = (new SchedulingObject())->setPrincipalUri(Principal::PREFIX.'test_user')->setUri('invite.ics')
+            ->setCalendarData("BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n")->setEtag('e')->setSize(30)->setLastModified(time());
+        $em->persist($inboxItem);
+        $em->flush();
+        $em->clear();
+
+        $userId = $this->getUserId($client, 0);
+        $calendarId = $this->getCalendarId($client, $userId, true);
+
+        $client->request('DELETE', '/api/v1/calendars/'.$userId.'/'.$calendarId, [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+
+        $em->clear();
+        $this->assertSame(1, $em->getRepository(CalendarSubscription::class)->count(['principalUri' => Principal::PREFIX.'test_user']), 'Subscriptions must survive a calendar deletion');
+        $this->assertSame(1, $em->getRepository(SchedulingObject::class)->count(['principalUri' => Principal::PREFIX.'test_user']), 'Unrelated inbox items must survive a calendar deletion');
+    }
+
+    public function testDeleteSharedCalendarInstanceOnlyRemovesTheShare(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        [$ownerInstanceId, $sharedId, $calendarId] = $this->seedSharedCalendar();
+
+        $shareeUserId = $this->getUserId($client, 1);
+
+        $client->request('DELETE', '/api/v1/calendars/'.$shareeUserId.'/'.$sharedId, [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+        $this->assertEquals('success', json_decode($client->getResponse()->getContent(), true)['status']);
+
+        $em->clear();
+        $this->assertNull($em->getRepository(CalendarInstance::class)->find($sharedId), 'The share is gone');
+        $this->assertNotNull($em->getRepository(CalendarInstance::class)->find($ownerInstanceId), 'The owner still has the calendar');
+        $this->assertNotNull($em->getRepository(Calendar::class)->find($calendarId), 'The calendar row still exists');
+        $this->assertSame(1, $em->getRepository(CalendarObject::class)->count(['calendar' => $calendarId]), 'The owner\'s events are intact');
+    }
+
+    public function testSharedCalendarInstanceCannotBeEditedOrReSharedBySharee(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        [, $sharedId, $calendarId] = $this->seedSharedCalendar();
+
+        $shareeUserId = $this->getUserId($client, 1);
+
+        $client->request('PUT', '/api/v1/calendars/'.$shareeUserId.'/'.$sharedId, [], [], $this->apiHeaders(), json_encode(['name' => 'Hijacked', 'events_support' => false, 'tasks_support' => true]));
+        $this->assertResponseStatusCodeSame(400);
+
+        $client->request('GET', '/api/v1/calendars/'.$shareeUserId.'/shares/'.$sharedId, [], [], $this->apiHeaders());
+        $this->assertResponseStatusCodeSame(400);
+
+        $client->request('POST', '/api/v1/calendars/'.$shareeUserId.'/share/'.$sharedId.'/add', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user2', 'write_access' => true]));
+        $this->assertResponseStatusCodeSame(400);
+
+        $client->request('POST', '/api/v1/calendars/'.$shareeUserId.'/share/'.$sharedId.'/remove', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user2']));
+        $this->assertResponseStatusCodeSame(400);
+
+        $em->clear();
+        $this->assertSame('VEVENT', $em->getRepository(Calendar::class)->find($calendarId)->getComponents(), 'Components of the shared calendar are unchanged');
+        $this->assertNotNull($em->getRepository(CalendarInstance::class)->find($sharedId), 'The share still exists');
+    }
+
+    public function testShareCalendarWithItsOwnerIsRejected(): void
+    {
+        $client = static::createClient();
+        $userId = $this->getUserId($client, 0);
+        $calendarId = $this->getCalendarId($client, $userId, true);
+
+        $client->request('POST', '/api/v1/calendars/'.$userId.'/share/'.$calendarId.'/add', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user', 'write_access' => true]));
+        $this->assertResponseStatusCodeSame(400);
+
+        $client->request('GET', '/api/v1/calendars/'.$userId.'/shares/'.$calendarId, [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+        $this->assertSame([], json_decode($client->getResponse()->getContent(), true)['data']);
+    }
+
+    public function testSharesListToleratesAPrincipalWithoutUser(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // A principal that has no matching row in `users` (e.g. a deleted user)
+        $ghost = (new Principal())->setUri(Principal::PREFIX.'ghost')->setEmail('ghost@test.com')->setDisplayName('Ghost')->setIsAdmin(false);
+        $em->persist($ghost);
+        $ownerInstance = $em->getRepository(CalendarInstance::class)->findOneBy(['principalUri' => Principal::PREFIX.'test_user', 'uri' => 'default']);
+        $shared = (new CalendarInstance())->setCalendar($ownerInstance->getCalendar())->setPrincipalUri(Principal::PREFIX.'ghost')->setUri('ghost-uuid')
+            ->setAccess(SharingPlugin::ACCESS_READ)->setDisplayName('x');
+        $em->persist($shared);
+        $em->flush();
+        $ownerInstanceId = $ownerInstance->getId();
+        $em->clear();
+
+        $userId = $this->getUserId($client, 0);
+        $client->request('GET', '/api/v1/calendars/'.$userId.'/shares/'.$ownerInstanceId, [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertCount(1, $data['data']);
+        $this->assertSame('ghost', $data['data'][0]['username']);
+        $this->assertNull($data['data'][0]['user_id']);
     }
 }

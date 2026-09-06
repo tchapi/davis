@@ -212,4 +212,20 @@ class UserControllerTest extends WebTestCase
 
         $this->assertNotNull(static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class)->findOneByUsername('test_user'));
     }
+
+    public function testDelegateRemoveThroughAnotherUsersProxyIs404(): void
+    {
+        $user = new AdminUser('admin', 'test');
+
+        $client = static::createClient();
+        $client->loginUser($user);
+
+        $userId = $this->getUserId($client, 'test_user');
+        $principalRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(Principal::class);
+        $delegate = $principalRepository->findOneByUri(Principal::PREFIX.'test_user2');
+        $foreignProxy = $principalRepository->findOneByUri(Principal::PREFIX.'test_user2'.Principal::READ_PROXY_SUFFIX);
+
+        $this->postAdmin($client, '/users/delegates/'.$userId.'/remove/'.$foreignProxy->getId().'/'.$delegate->getId());
+        $this->assertResponseStatusCodeSame(404);
+    }
 }

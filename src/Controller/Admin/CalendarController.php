@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Form\CalendarInstanceType;
 use Doctrine\Persistence\ManagerRegistry;
 use Sabre\DAV\Sharing\Plugin as SharingPlugin;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,15 +24,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CalendarController extends AbstractController
 {
     #[Route('/{userId}', name: 'index')]
-    public function calendars(ManagerRegistry $doctrine, UrlGeneratorInterface $router, int $userId): Response
+    public function calendars(ManagerRegistry $doctrine, UrlGeneratorInterface $router, #[MapEntity(id: 'userId')] User $user, int $userId): Response
     {
-        $user = $doctrine->getRepository(User::class)->findOneById($userId);
-        if (!$user) {
-            throw $this->createNotFoundException('User not found');
-        }
-
         $username = $user->getUsername();
-        $principalUri = Principal::PREFIX.$username;
+        $principalUri = $user->getPrincipalUri();
 
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
         $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
@@ -77,15 +73,9 @@ class CalendarController extends AbstractController
 
     #[Route('/{userId}/new', name: 'create')]
     #[Route('/{userId}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
-    public function calendarEdit(ManagerRegistry $doctrine, Request $request, int $userId, ?int $id, TranslatorInterface $trans): Response
+    public function calendarEdit(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, ?int $id, TranslatorInterface $trans): Response
     {
-        $user = $doctrine->getRepository(User::class)->findOneById($userId);
-        if (!$user) {
-            throw $this->createNotFoundException('User not found');
-        }
-
-        $username = $user->getUsername();
-        $principalUri = Principal::PREFIX.$username;
+        $principalUri = $user->getPrincipalUri();
 
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
 
@@ -94,7 +84,7 @@ class CalendarController extends AbstractController
         }
 
         if ($id) {
-            $calendarInstance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
+            $calendarInstance = $doctrine->getRepository(CalendarInstance::class)->findOneForPrincipal($id, $principalUri);
             if (!$calendarInstance) {
                 throw $this->createNotFoundException('Calendar not found');
             }
@@ -102,6 +92,8 @@ class CalendarController extends AbstractController
             $calendarInstance = new CalendarInstance();
             $calendar = new Calendar();
             $calendarInstance->setCalendar($calendar);
+            // The owner is given by the URL, never by the submitted form
+            $calendarInstance->setPrincipalUri($principalUri);
         }
 
         $arePublicCalendarsEnabled = $this->getParameter('public_calendars_enabled');
@@ -117,7 +109,6 @@ class CalendarController extends AbstractController
         $form->get('events')->setData(in_array(Calendar::COMPONENT_EVENTS, $components));
         $form->get('todos')->setData(in_array(Calendar::COMPONENT_TODOS, $components));
         $form->get('notes')->setData(in_array(Calendar::COMPONENT_NOTES, $components));
-        $form->get('principalUri')->setData($principalUri);
 
         $form->handleRequest($request);
 
@@ -171,8 +162,14 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/{userId}/shares/{calendarid}', name: 'shares', requirements: ['calendarid' => "\d+"])]
-    public function calendarShares(ManagerRegistry $doctrine, int $userId, string $calendarid, TranslatorInterface $trans): Response
+    public function calendarShares(ManagerRegistry $doctrine, #[MapEntity(id: 'userId')] User $user, int $userId, string $calendarid, TranslatorInterface $trans): Response
     {
+        $principalUri = $user->getPrincipalUri();
+
+        if (!$doctrine->getRepository(CalendarInstance::class)->findOwnerInstanceOfCalendarForPrincipal((int) $calendarid, $principalUri)) {
+            throw $this->createNotFoundException('Calendar not found');
+        }
+
         $instances = $doctrine->getRepository(CalendarInstance::class)->findSharedInstancesOfInstance($calendarid, true);
 
         $response = [];
@@ -191,14 +188,17 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/{userId}/share/{instanceid}', name: 'share_add', requirements: ['instanceid' => "\d+"], methods: ['POST'])]
-    public function calendarShareAdd(ManagerRegistry $doctrine, Request $request, int $userId, string $instanceid, TranslatorInterface $trans): Response
+    public function calendarShareAdd(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $instanceid, TranslatorInterface $trans): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($instanceid);
-        if (!$instance) {
+        $principalUri = $user->getPrincipalUri();
+
+        // Only the owner of a calendar can share it
+        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneForPrincipal((int) $instanceid, $principalUri);
+        if (!$instance || $instance->isShared()) {
             throw $this->createNotFoundException('Calendar not found');
         }
 
@@ -209,6 +209,9 @@ class CalendarController extends AbstractController
         $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
         if (!$newShareeToAdd) {
             throw $this->createNotFoundException('Member not found');
+        }
+        if ($newShareeToAdd->getUri() === $principalUri) {
+            throw new BadRequestHttpException('A calendar cannot be shared with its owner');
         }
 
         // Let's check that there wasn't another instance
@@ -242,24 +245,29 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"], methods: ['POST'])]
-    public function calendarDelete(ManagerRegistry $doctrine, Request $request, int $userId, string $id, TranslatorInterface $trans): Response
+    public function calendarDelete(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $id, TranslatorInterface $trans): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        $user = $doctrine->getRepository(User::class)->findOneById($userId);
-        if (!$user) {
-            throw $this->createNotFoundException('User not found');
-        }
-        $principalUri = Principal::PREFIX.$user->getUsername();
+        $principalUri = $user->getPrincipalUri();
 
-        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
+        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneForPrincipal((int) $id, $principalUri);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
         }
 
         $entityManager = $doctrine->getManager();
+
+        // A calendar shared *with* this user is not theirs to delete: only drop their access to it
+        if ($instance->isShared()) {
+            $entityManager->remove($instance);
+            $entityManager->flush();
+            $this->addFlash('success', $trans->trans('calendar.revoked'));
+
+            return $this->redirectToRoute('calendar_index', ['userId' => $userId]);
+        }
 
         // Scheduling objects attached to the calendar objects of the calendar
         $schedulingObjectsOfCalendarObjects = $doctrine->getRepository(CalendarInstance::class)->findAllSchedulingObjectsForCalendar($instance->getId(), $principalUri);
@@ -292,15 +300,30 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/{userId}/revoke/{id}', name: 'revoke', requirements: ['id' => "\d+"], methods: ['POST'])]
-    public function calendarRevoke(ManagerRegistry $doctrine, Request $request, int $userId, string $id, TranslatorInterface $trans): Response
+    public function calendarRevoke(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $id, TranslatorInterface $trans): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
+        $principalUri = $user->getPrincipalUri();
+
+        $repository = $doctrine->getRepository(CalendarInstance::class);
+        $instance = $repository->find((int) $id);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
+        }
+
+        // A share can be revoked by the sharee (from their own page) or by an owner of the calendar
+        $isSharee = $instance->getPrincipalUri() === $principalUri;
+        $isOwner = null !== $repository->findOwnerInstanceOfCalendarForPrincipal($instance->getCalendar()->getId(), $principalUri);
+        if (!$isSharee && !$isOwner) {
+            throw $this->createNotFoundException('Calendar not found');
+        }
+
+        // Revoking an owner's own instance would orphan the calendar
+        if (!$instance->isShared()) {
+            throw new BadRequestHttpException('Only a shared calendar can be revoked');
         }
 
         $entityManager = $doctrine->getManager();

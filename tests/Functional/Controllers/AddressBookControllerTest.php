@@ -137,4 +137,50 @@ class AddressBookControllerTest extends WebTestCase
 
         $this->assertNotNull($addressbookRepository->find($addressbook->getId()));
     }
+
+    public function testAddressBookActionsOnAnotherUsersBookAre404(): void
+    {
+        $user = new AdminUser('admin', 'test');
+
+        $client = static::createClient();
+        $client->loginUser($user);
+
+        $otherId = $this->getUserId($client, 'test_user2');
+
+        $addressbookRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(AddressBook::class);
+        $addressbook = $addressbookRepository->findOneByDisplayName('default.addressbook.title');
+
+        $client->request('GET', '/addressbooks/'.$otherId.'/edit/'.$addressbook->getId());
+        $this->assertResponseStatusCodeSame(404);
+
+        $this->postAdmin($client, '/addressbooks/'.$otherId.'/delete/'.$addressbook->getId());
+        $this->assertResponseStatusCodeSame(404);
+
+        $this->assertNotNull($addressbookRepository->find($addressbook->getId()));
+    }
+
+    public function testAddressBookNewIgnoresASubmittedOwner(): void
+    {
+        $user = new AdminUser('admin', 'test');
+
+        $client = static::createClient();
+        $client->loginUser($user);
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $crawler = $client->request('GET', '/addressbooks/'.$userId.'/new');
+        $this->assertSelectorNotExists('input[name="address_book[principalUri]"]');
+
+        $form = $crawler->selectButton('address_book_save')->form();
+        $values = $form->getPhpValues();
+        $values['address_book']['uri'] = 'hijack';
+        $values['address_book']['displayName'] = 'Hijack';
+        $values['address_book']['principalUri'] = 'principals/test_user2';
+
+        $client->request($form->getMethod(), $form->getUri(), $values);
+
+        $this->assertResponseIsSuccessful();
+        $addressbookRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(AddressBook::class);
+        $this->assertNull($addressbookRepository->findOneBy(['uri' => 'hijack']));
+    }
 }

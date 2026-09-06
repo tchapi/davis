@@ -12,8 +12,15 @@ Deletes a specific calendar for a specific user.
 
 ```
 :user_id -> "[user id as an int]",
-:calendar_id -> "[numeric id of a calendar owned by the user]",
+:calendar_id -> "[numeric id of a calendar instance belonging to the user]",
 ```
+
+If the calendar is owned by the user, the calendar, its events, its change log, its scheduling objects and every
+instance shared with other users are deleted. The user's calendar subscriptions and unrelated inbox items are left
+untouched.
+
+If the calendar was merely *shared with* the user, only the user's access to it is removed (the owner's calendar
+and events are kept).
 
 **URL example**
 

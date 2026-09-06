@@ -30,6 +30,14 @@ class User
         return $this->id;
     }
 
+    /**
+     * A user's principal is always `principals/<username>`.
+     */
+    public function getPrincipalUri(): string
+    {
+        return Principal::PREFIX.$this->username;
+    }
+
     public function getUsername(): ?string
     {
         return $this->username;
