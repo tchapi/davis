@@ -97,6 +97,15 @@ class DavTest extends WebTestCase
         $this->assertResponseStatusCodeSame(401);
     }
 
+    public function testEmptyPasswordIsRejected(): void
+    {
+        $client = static::createClient();
+
+        static::requestDav($client, 'GET', '/dav/', 'test_user:');
+
+        $this->assertResponseStatusCodeSame(401);
+    }
+
     public function testAuthenticatedUserCanReadOwnCalendarObject(): void
     {
         $client = static::createClient();

@@ -4,11 +4,10 @@ namespace App\Services;
 
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
-use Sabre\DAV\Auth\Backend\AbstractBasic;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
 
-final class IMAPAuth extends AbstractBasic
+final class IMAPAuth extends AbstractAuth
 {
     /**
      * Doctrine registry.
@@ -150,7 +149,7 @@ final class IMAPAuth extends AbstractBasic
     /**
      * Validates a username and password by trying to authenticate against IMAP.
      */
-    protected function validateUserPass($username, $password): bool
+    protected function checkCredentials(string $username, string $password): bool
     {
         return $this->imapOpen($username, $password);
     }
