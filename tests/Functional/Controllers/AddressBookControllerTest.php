@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AddressBookControllerTest extends WebTestCase
 {
+    use AdminPostTrait;
+
     private function getUserId($client, string $username): int
     {
         $userRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
@@ -107,11 +109,32 @@ class AddressBookControllerTest extends WebTestCase
         $addressbookRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(AddressBook::class);
         $addressbook = $addressbookRepository->findOneByDisplayName('default.addressbook.title');
 
-        $client->request('GET', '/addressbooks/'.$userId.'/delete/'.$addressbook->getId());
+        $this->postAdmin($client, '/addressbooks/'.$userId.'/delete/'.$addressbook->getId());
 
         $this->assertResponseRedirects('/addressbooks/'.$userId);
         $client->followRedirect();
 
         $this->assertSelectorTextNotContains('h5', 'default.addressbook.title');
+    }
+
+    public function testAddressBookDeleteRejectsGetAndInvalidCsrfToken(): void
+    {
+        $user = new AdminUser('admin', 'test');
+
+        $client = static::createClient();
+        $client->loginUser($user);
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $addressbookRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(AddressBook::class);
+        $addressbook = $addressbookRepository->findOneByDisplayName('default.addressbook.title');
+
+        $client->request('GET', '/addressbooks/'.$userId.'/delete/'.$addressbook->getId());
+        $this->assertResponseStatusCodeSame(405);
+
+        $client->request('POST', '/addressbooks/'.$userId.'/delete/'.$addressbook->getId(), ['_token' => 'not-the-token']);
+        $this->assertResponseStatusCodeSame(403);
+
+        $this->assertNotNull($addressbookRepository->find($addressbook->getId()));
     }
 }

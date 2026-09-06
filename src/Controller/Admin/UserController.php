@@ -124,9 +124,13 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{userId}', name: 'delete')]
-    public function userDelete(ManagerRegistry $doctrine, int $userId, TranslatorInterface $trans): Response
+    #[Route('/delete/{userId}', name: 'delete', methods: ['POST'])]
+    public function userDelete(ManagerRegistry $doctrine, Request $request, int $userId, TranslatorInterface $trans): Response
     {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
@@ -226,9 +230,13 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'])]
-    public function userToggleDelegation(ManagerRegistry $doctrine, int $userId, string $toggle): Response
+    #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'], methods: ['POST'])]
+    public function userToggleDelegation(ManagerRegistry $doctrine, Request $request, int $userId, string $toggle): Response
     {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
@@ -270,10 +278,14 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 
-    #[Route('/delegates/{userId}/add', name: 'delegate_add')]
+    #[Route('/delegates/{userId}/add', name: 'delegate_add', methods: ['POST'])]
     public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, int $userId): Response
     {
-        if (!is_numeric($request->get('principalId'))) {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        if (!is_numeric($request->request->get('principalId'))) {
             throw new BadRequestHttpException();
         }
 
@@ -284,14 +296,14 @@ class UserController extends AbstractController
 
         $principalUri = Principal::PREFIX.$user->getUsername();
 
-        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
+        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
 
         if (!$newMemberToAdd) {
             throw $this->createNotFoundException('Member not found');
         }
 
         // Depending on write access or not, attach to the correct principal
-        if ('true' === $request->get('write')) {
+        if ('true' === $request->request->get('write')) {
             // Let's check that there wasn't a read proxy first
             $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri.Principal::READ_PROXY_SUFFIX);
             if (!$principalProxyRead) {
@@ -315,9 +327,13 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 
-    #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"])]
+    #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"], methods: ['POST'])]
     public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, int $userId, int $principalProxyId, int $delegateId): Response
     {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
             throw $this->createNotFoundException('User not found');

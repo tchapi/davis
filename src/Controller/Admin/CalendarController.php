@@ -190,19 +190,23 @@ class CalendarController extends AbstractController
         return new JsonResponse($response);
     }
 
-    #[Route('/{userId}/share/{instanceid}', name: 'share_add', requirements: ['instanceid' => "\d+"])]
+    #[Route('/{userId}/share/{instanceid}', name: 'share_add', requirements: ['instanceid' => "\d+"], methods: ['POST'])]
     public function calendarShareAdd(ManagerRegistry $doctrine, Request $request, int $userId, string $instanceid, TranslatorInterface $trans): Response
     {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($instanceid);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');
         }
 
-        if (!is_numeric($request->get('principalId'))) {
+        if (!is_numeric($request->request->get('principalId'))) {
             throw new BadRequestHttpException();
         }
 
-        $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
+        $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
         if (!$newShareeToAdd) {
             throw $this->createNotFoundException('Member not found');
         }
@@ -211,7 +215,7 @@ class CalendarController extends AbstractController
         // already existing first, so we can update it:
         $existingSharedInstance = $doctrine->getRepository(CalendarInstance::class)->findSharedInstanceOfInstanceFor($instance->getCalendar()->getId(), $newShareeToAdd->getUri());
 
-        $writeAccess = ('true' === $request->get('write') ? SharingPlugin::ACCESS_READWRITE : SharingPlugin::ACCESS_READ);
+        $writeAccess = ('true' === $request->request->get('write') ? SharingPlugin::ACCESS_READWRITE : SharingPlugin::ACCESS_READ);
 
         $entityManager = $doctrine->getManager();
 
@@ -237,9 +241,13 @@ class CalendarController extends AbstractController
         return $this->redirectToRoute('calendar_index', ['userId' => $userId]);
     }
 
-    #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
-    public function calendarDelete(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans): Response
+    #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"], methods: ['POST'])]
+    public function calendarDelete(ManagerRegistry $doctrine, Request $request, int $userId, string $id, TranslatorInterface $trans): Response
     {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
@@ -283,9 +291,13 @@ class CalendarController extends AbstractController
         return $this->redirectToRoute('calendar_index', ['userId' => $userId]);
     }
 
-    #[Route('/{userId}/revoke/{id}', name: 'revoke', requirements: ['id' => "\d+"])]
-    public function calendarRevoke(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans): Response
+    #[Route('/{userId}/revoke/{id}', name: 'revoke', requirements: ['id' => "\d+"], methods: ['POST'])]
+    public function calendarRevoke(ManagerRegistry $doctrine, Request $request, int $userId, string $id, TranslatorInterface $trans): Response
     {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $instance = $doctrine->getRepository(CalendarInstance::class)->findOneById($id);
         if (!$instance) {
             throw $this->createNotFoundException('Calendar not found');

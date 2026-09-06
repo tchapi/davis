@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="csrf-token" content="{{ csrf_token('admin_action') }}">
         <title>{% block title %}Davis{% endblock %}</title>
         <script type="text/javascript" src="/js/color.mode.toggler.js"></script>
         <link rel="stylesheet" href="/css/bootstrap.min.css" />

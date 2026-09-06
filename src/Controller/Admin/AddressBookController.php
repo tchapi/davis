@@ -106,9 +106,13 @@ class AddressBookController extends AbstractController
         ]);
     }
 
-    #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"])]
-    public function addressbookDelete(ManagerRegistry $doctrine, int $userId, string $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
+    #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"], methods: ['POST'])]
+    public function addressbookDelete(ManagerRegistry $doctrine, Request $request, int $userId, string $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $user = $doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
