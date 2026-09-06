@@ -4,9 +4,8 @@ namespace App\Services;
 
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
-use Sabre\DAV\Auth\Backend\AbstractBasic;
 
-final class LDAPAuth extends AbstractBasic
+final class LDAPAuth extends AbstractAuth
 {
     /**
      * LDAP server uri.
@@ -222,11 +221,8 @@ final class LDAPAuth extends AbstractBasic
 
     /**
      * Validates a username and password by trying to authenticate against LDAP.
-     *
-     * @param string $username
-     * @param string $password
      */
-    protected function validateUserPass($username, $password): bool
+    protected function checkCredentials(string $username, string $password): bool
     {
         return $this->ldapOpen($username, $password);
     }

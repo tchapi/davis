@@ -4,9 +4,8 @@ namespace App\Services;
 
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
-use Sabre\DAV\Auth\Backend\AbstractBasic;
 
-final class BasicAuth extends AbstractBasic
+final class BasicAuth extends AbstractAuth
 {
     /**
      * Utils class.
@@ -28,7 +27,7 @@ final class BasicAuth extends AbstractBasic
         $this->doctrine = $doctrine;
     }
 
-    protected function validateUserPass($username, $password): bool
+    protected function checkCredentials(string $username, string $password): bool
     {
         $user = $this->doctrine->getRepository(User::class)->findOneByUsername($username);
 

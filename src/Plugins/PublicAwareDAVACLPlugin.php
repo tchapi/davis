@@ -28,11 +28,20 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
     /**
      * We override this method so that public objects can be seen correctly in the browser,
      * with the assets (css, images).
+     *
+     * The browser plugin always builds asset URLs against the server base URI
+     * (see \Sabre\DAV\Browser\Plugin::getAssetUrl), i.e. `GET /dav/?sabreAction=asset&assetName=...`.
+     * The root collection is only readable by authenticated principals, so we skip the ACL
+     * check for that exact case only. Every other method or path (e.g. a GET or PUT on a
+     * calendar object with `?sabreAction=asset` appended) must go through the regular checks:
+     * this method is the only place where `{DAV:}read` and `{DAV:}write-content` are enforced.
      */
     public function beforeMethod(RequestInterface $request, ResponseInterface $response)
     {
         $params = $request->getQueryParameters();
-        if (isset($params['sabreAction']) && 'asset' === $params['sabreAction']) {
+        if (isset($params['sabreAction']) && 'asset' === $params['sabreAction']
+            && in_array($request->getMethod(), ['GET', 'HEAD'], true)
+            && '' === $request->getPath()) {
             return;
         }
 

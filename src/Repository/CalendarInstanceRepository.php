@@ -63,6 +63,30 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * Returns the instance only if it belongs to the given principal (owner or sharee).
+     */
+    public function findOneForPrincipal(int $id, string $principalUri): ?CalendarInstance
+    {
+        return $this->findOneBy(['id' => $id, 'principalUri' => $principalUri]);
+    }
+
+    /**
+     * Returns the principal's *owner* instance of the given calendar, if any.
+     */
+    public function findOwnerInstanceOfCalendarForPrincipal(int $calendarId, string $principalUri): ?CalendarInstance
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.calendar = :id')
+            ->setParameter('id', $calendarId)
+            ->andWhere('c.principalUri = :principalUri')
+            ->setParameter('principalUri', $principalUri)
+            ->andWhere('c.access IN (:ownerAccess)')
+            ->setParameter('ownerAccess', CalendarInstance::getOwnerAccesses())
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function hasDifferentOwner(int $calendarId, string $principalUri): bool
     {
         return $this->createQueryBuilder('c')
@@ -77,10 +101,10 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             ->getSingleScalarResult() > 0;
     }
 
-
     public function findAllSchedulingObjectsForCalendar(int $calendarInstanceId, string $principalUri): array
     {
         $objectRepository = $this->getEntityManager()->getRepository(SchedulingObject::class);
+
         return $objectRepository->createQueryBuilder('s')
             ->innerJoin(CalendarObject::class, 'c', \Doctrine\ORM\Query\Expr\Join::WITH, 'c.uri = s.uri')
             ->innerJoin(CalendarInstance::class, 'ci', \Doctrine\ORM\Query\Expr\Join::WITH, 'ci.calendar = c.calendar')

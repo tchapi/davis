@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Services\Utils;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,7 +43,7 @@ class UserController extends AbstractController
                 throw $this->createNotFoundException('User not found');
             }
             $oldHash = $user->getPassword();
-            $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$user->getUsername());
+            $principal = $doctrine->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
         } else {
             $user = new User();
             $principal = new Principal();
@@ -74,11 +75,11 @@ class UserController extends AbstractController
 
             // If it's a new user, create default calendar and address book, and principal
             if (null === $user->getId()) {
-                $principal->setUri(Principal::PREFIX.$user->getUsername());
+                $principal->setUri($user->getPrincipalUri());
 
                 $calendarInstance = new CalendarInstance();
                 $calendar = new Calendar();
-                $calendarInstance->setPrincipalUri(Principal::PREFIX.$user->getUsername())
+                $calendarInstance->setPrincipalUri($user->getPrincipalUri())
                          ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
                          ->setDisplayName($trans->trans('default.calendar.title'))
                          ->setDescription($trans->trans('default.calendar.description', ['user' => $displayName]))
@@ -96,7 +97,7 @@ class UserController extends AbstractController
                 $entityManager->persist($principalProxyWrite);
 
                 $addressbook = new AddressBook();
-                $addressbook->setPrincipalUri(Principal::PREFIX.$user->getUsername())
+                $addressbook->setPrincipalUri($user->getPrincipalUri())
                          ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
                          ->setDisplayName($trans->trans('default.addressbook.title'))
                          ->setDescription($trans->trans('default.addressbook.description', ['user' => $displayName]));
@@ -124,18 +125,17 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{userId}', name: 'delete')]
-    public function userDelete(ManagerRegistry $doctrine, int $userId, TranslatorInterface $trans): Response
+    #[Route('/delete/{userId}', name: 'delete', methods: ['POST'])]
+    public function userDelete(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, TranslatorInterface $trans): Response
     {
-        $user = $doctrine->getRepository(User::class)->findOneById($userId);
-        if (!$user) {
-            throw $this->createNotFoundException('User not found');
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
         $entityManager = $doctrine->getManager();
         $entityManager->remove($user);
 
-        $principal = $doctrine->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.$user->getUsername());
+        $principal = $doctrine->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
         $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
         $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
 
@@ -149,7 +149,7 @@ class UserController extends AbstractController
             $entityManager->remove($principalProxyWrite);
         }
 
-        $principalUri = Principal::PREFIX.$user->getUsername();
+        $principalUri = $user->getPrincipalUri();
 
         // Remove calendars and addressbooks
         $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
@@ -199,14 +199,9 @@ class UserController extends AbstractController
     }
 
     #[Route('/delegates/{userId}', name: 'delegates')]
-    public function userDelegates(ManagerRegistry $doctrine, int $userId): Response
+    public function userDelegates(ManagerRegistry $doctrine, #[MapEntity(id: 'userId')] User $user, int $userId): Response
     {
-        $user = $doctrine->getRepository(User::class)->findOneById($userId);
-        if (!$user) {
-            throw $this->createNotFoundException('User not found');
-        }
-
-        $principalUri = Principal::PREFIX.$user->getUsername();
+        $principalUri = $user->getPrincipalUri();
 
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
 
@@ -226,15 +221,14 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'])]
-    public function userToggleDelegation(ManagerRegistry $doctrine, int $userId, string $toggle): Response
+    #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'], methods: ['POST'])]
+    public function userToggleDelegation(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $toggle): Response
     {
-        $user = $doctrine->getRepository(User::class)->findOneById($userId);
-        if (!$user) {
-            throw $this->createNotFoundException('User not found');
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        $principalUri = Principal::PREFIX.$user->getUsername();
+        $principalUri = $user->getPrincipalUri();
 
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
 
@@ -270,28 +264,27 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 
-    #[Route('/delegates/{userId}/add', name: 'delegate_add')]
-    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, int $userId): Response
+    #[Route('/delegates/{userId}/add', name: 'delegate_add', methods: ['POST'])]
+    public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId): Response
     {
-        if (!is_numeric($request->get('principalId'))) {
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        if (!is_numeric($request->request->get('principalId'))) {
             throw new BadRequestHttpException();
         }
 
-        $user = $doctrine->getRepository(User::class)->findOneById($userId);
-        if (!$user) {
-            throw $this->createNotFoundException('User not found');
-        }
+        $principalUri = $user->getPrincipalUri();
 
-        $principalUri = Principal::PREFIX.$user->getUsername();
-
-        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->get('principalId'));
+        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
 
         if (!$newMemberToAdd) {
             throw $this->createNotFoundException('Member not found');
         }
 
         // Depending on write access or not, attach to the correct principal
-        if ('true' === $request->get('write')) {
+        if ('true' === $request->request->get('write')) {
             // Let's check that there wasn't a read proxy first
             $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri.Principal::READ_PROXY_SUFFIX);
             if (!$principalProxyRead) {
@@ -315,16 +308,17 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
     }
 
-    #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"])]
-    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, int $userId, int $principalProxyId, int $delegateId): Response
+    #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"], methods: ['POST'])]
+    public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, int $principalProxyId, int $delegateId): Response
     {
-        $user = $doctrine->getRepository(User::class)->findOneById($userId);
-        if (!$user) {
-            throw $this->createNotFoundException('User not found');
+        if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
+        $principalUri = $user->getPrincipalUri();
+
         $principalProxy = $doctrine->getRepository(Principal::class)->findOneById($principalProxyId);
-        if (!$principalProxy) {
+        if (!$principalProxy || !in_array($principalProxy->getUri(), [$principalUri.Principal::READ_PROXY_SUFFIX, $principalUri.Principal::WRITE_PROXY_SUFFIX], true)) {
             throw $this->createNotFoundException('Principal linked to this calendar not found');
         }
 
