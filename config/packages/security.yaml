@@ -21,7 +21,13 @@ security:
             logout:
                 path: app_logout
                 target: dashboard
-            
+        dashboard:
+            entry_point: App\Security\OidcAuthenticator
+            custom_authenticators:
+                - App\Security\OidcAuthenticator
+            form_login:
+                login_path: login
+                check_path: login
 
     access_control:
         - { path: ^/$, roles: PUBLIC_ACCESS }

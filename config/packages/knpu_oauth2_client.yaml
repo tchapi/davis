@@ -1,0 +1,14 @@
+knpu_oauth2_client:
+        clients:
+            oidc:
+                type: generic
+                provider_class: League\OAuth2\Client\Provider\GenericProvider
+                provider_options:
+                    urlAuthorize: '%env(OIDC_URL_AUTHORIZE)%'
+                    urlAccessToken: '%env(OIDC_URL_ACCESS_TOKEN)%'
+                    urlResourceOwnerDetails: '%env(OIDC_URL_RESOURCE_OWNER)%'
+                    # Request the openid scope so we get an id_token with claims
+                    scopes: '%env(OIDC_SCOPES)%'
+                client_id: '%env(OIDC_CLIENT_ID)%'
+                client_secret: '%env(OIDC_CLIENT_SECRET)%'
+                redirect_route: app_oidc_check

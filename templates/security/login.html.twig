@@ -8,29 +8,37 @@
         {{ "login.already"|trans({username: app.user.username}) }}, <a href="{{ path('app_logout') }}">{{ "logout"|trans }}</a>
     </div>
 {% else %}
-    <div class="row justify-content-md-center">
-        <div class="col-md-6 col-lg-4">
-            <form action="{{ path('app_login') }}" method="post">
-                {% if error %}
-                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                {% endif %}
+    {% if app.request.server.get('ADMIN_AUTH_METHOD') == 'oidc' %}
+        {# Show OIDC button, optionally hide the local form #}
+        <a href="{{ path('app_oidc_connect') }}" class="btn btn-primary w-100">
+            {{ 'login.oidc_button'|trans }}
+        </a>
+        {# Optionally show local form as fallback, or hide entirely #}
+    {% else %}
+        <div class="row justify-content-md-center">
+            <div class="col-md-6 col-lg-4">
+                <form action="{{ path('app_login') }}" method="post">
+                    {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
 
-                <h1 class="h3 mb-3 font-weight-normal">{{ "login.signin"|trans }}</h1>
+                    <h1 class="h3 mb-3 font-weight-normal">{{ "login.signin"|trans }}</h1>
 
-                <div class="mb-3">
-                    <label for="inputUsername" class="form-label sr-only">{{ "login.username"|trans }}</label>
-                    <input type="text" value="{{ last_username }}" name="_username" id="inputUsername" class="form-control" placeholder="{{ "login.username"|trans }}" required autofocus>
-                </div>
-                <div class="mb-3">
-                    <label for="inputPassword" class="form-label sr-only">{{ "login.password"|trans }}</label>
-                    <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="{{ "login.password"|trans }}" required>
-                </div>
-                <button type="submit" class="btn btn-primary">{{ "login.submit"|trans }}</button>
+                    <div class="mb-3">
+                        <label for="inputUsername" class="form-label sr-only">{{ "login.username"|trans }}</label>
+                        <input type="text" value="{{ last_username }}" name="_username" id="inputUsername" class="form-control" placeholder="{{ "login.username"|trans }}" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputPassword" class="form-label sr-only">{{ "login.password"|trans }}</label>
+                        <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="{{ "login.password"|trans }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ "login.submit"|trans }}</button>
 
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            </form>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                </form>
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endif %}
 
 {% endblock %}
