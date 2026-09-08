@@ -28,6 +28,8 @@ final class Version20191202091507 extends AbstractMigration
     {
         $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
 
-        $this->addSql('ALTER TABLE calendarinstances CHANGE access access SMALLINT NOT NULL, CHANGE share_invitestatus share_invitestatus INT NOT NULL, CHANGE timezone timezone LONGTEXT DEFAULT NULL, CHANGE timezone timezone VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT \'NULL\' COLLATE `utf8mb4_unicode_ci`');
+        // NB: `timezone` is restored to its original VARCHAR(255); a VTIMEZONE blob longer than
+        // that would be rejected by MySQL rather than silently truncated.
+        $this->addSql('ALTER TABLE calendarinstances CHANGE access access SMALLINT NOT NULL, CHANGE share_invitestatus share_invitestatus INT NOT NULL, CHANGE timezone timezone VARCHAR(255) DEFAULT NULL');
     }
 }

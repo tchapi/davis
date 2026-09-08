@@ -28,6 +28,9 @@ final class Version20191203111729 extends AbstractMigration
     {
         $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
 
-        $this->addSql('ALTER TABLE addressbooks CHANGE description description LONGTEXT CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`');
+        // Since up() made the column nullable, address books created in the meantime may have
+        // no description at all; they would violate the restored NOT NULL.
+        $this->addSql("UPDATE addressbooks SET description = '' WHERE description IS NULL");
+        $this->addSql('ALTER TABLE addressbooks CHANGE description description LONGTEXT NOT NULL');
     }
 }

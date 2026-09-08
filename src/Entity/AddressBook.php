@@ -21,7 +21,7 @@ class AddressBook
     #[ORM\Column(name: 'principaluri', type: 'string', length: 255)]
     private $principalUri;
 
-    #[ORM\Column(name: 'displayname', type: 'string', length: 255)]
+    #[ORM\Column(name: 'displayname', type: 'string', length: 255, nullable: true)]
     private $displayName;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -73,7 +73,7 @@ class AddressBook
         return $this->displayName;
     }
 
-    public function setDisplayName(string $displayName): self
+    public function setDisplayName(?string $displayName): self
     {
         $this->displayName = $displayName;
 
