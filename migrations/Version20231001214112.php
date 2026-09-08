@@ -30,8 +30,8 @@ final class Version20231001214112 extends AbstractMigration
     {
         $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'postgresql\'. Skipping it is fine.');
 
-        $this->addSql("ALTER TABLE calendarobjects ALTER COLUMN calendardata TYPE BYTEA DEFAULT NULL USING convert_from(calendardata, 'utf8')");
-        $this->addSql("ALTER TABLE cards ALTER COLUMN carddata TYPE BYTEA DEFAULT NULL USING convert_from(carddata, 'utf8')");
-        $this->addSql("ALTER TABLE schedulingobjects ALTER COLUMN calendardata TYPE BYTEA DEFAULT NULL USING convert_from(calendardata, 'utf8')");
+        $this->addSql("ALTER TABLE calendarobjects ALTER COLUMN calendardata TYPE BYTEA USING convert_to(calendardata, 'utf8')");
+        $this->addSql("ALTER TABLE cards ALTER COLUMN carddata TYPE BYTEA USING convert_to(carddata, 'utf8')");
+        $this->addSql("ALTER TABLE schedulingobjects ALTER COLUMN calendardata TYPE BYTEA USING convert_to(calendardata, 'utf8')");
     }
 }

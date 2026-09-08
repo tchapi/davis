@@ -200,6 +200,13 @@ jobs:
           php bin/console doctrine:database:create --if-not-exists --env=test
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
           php bin/console doctrine:schema:validate --env=test
+          # Full chain check: roll every migration back down, then all the way up again.
+          # Nothing else ever runs the down() methods, so a broken rollback (wrong column
+          # name, duplicated ALTER clause, invalid cast) stays invisible until an operator
+          # actually needs to roll back.
+          php bin/console doctrine:migrations:migrate first --no-interaction --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+          php bin/console doctrine:schema:validate --env=test
 
       - name: Run migrations (PostgreSQL)
         if: matrix.database == 'postgresql'
@@ -209,12 +216,26 @@ jobs:
           php bin/console doctrine:database:create --if-not-exists --env=test
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
           php bin/console doctrine:schema:validate --skip-sync --env=test
+          # Full chain check: roll every migration back down, then all the way up again.
+          # Nothing else ever runs the down() methods, so a broken rollback (wrong column
+          # name, duplicated ALTER clause, invalid cast) stays invisible until an operator
+          # actually needs to roll back.
+          php bin/console doctrine:migrations:migrate first --no-interaction --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+          php bin/console doctrine:schema:validate --skip-sync --env=test
 
       - name: Run migrations (SQLite)
         if: matrix.database == 'sqlite'
         env:
           DATABASE_URL: sqlite:///%kernel.project_dir%/var/data_test.db
         run: |
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+          php bin/console doctrine:schema:validate --skip-sync --env=test
+          # Full chain check: roll every migration back down, then all the way up again.
+          # Nothing else ever runs the down() methods, so a broken rollback (wrong column
+          # name, duplicated ALTER clause, invalid cast) stays invisible until an operator
+          # actually needs to roll back.
+          php bin/console doctrine:migrations:migrate first --no-interaction --env=test
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
           php bin/console doctrine:schema:validate --skip-sync --env=test
 
