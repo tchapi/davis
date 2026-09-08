@@ -11,7 +11,7 @@
 {% for addressbook in addressbooks %}
     <div class="list-group-item p-3">
         <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1 me-auto">{{ addressbook.displayName }}</h5>
+            <h5 class="mb-1 me-auto">{{ addressbook.displayName ?? addressbook.uri }}</h5>
             <div class="me-0 text-right d-md-block d-none">
                 <a href="{{ path('addressbook_edit',{userId: userId, id: addressbook.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
                 <a href="#"

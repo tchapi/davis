@@ -24,6 +24,8 @@ class AddressBookType extends AbstractType
             ->add('displayName', TextType::class, [
                 'label' => 'form.displayName',
                 'help' => 'form.name.help.carddav',
+                // Optional in CardDAV: clients may create an address book without one
+                'required' => false,
             ])
             ->add('includedInBirthdayCalendar', ChoiceType::class, [
                 'label' => 'form.includedInBirthdayCalendar',

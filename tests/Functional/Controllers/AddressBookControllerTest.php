@@ -183,4 +183,27 @@ class AddressBookControllerTest extends WebTestCase
         $addressbookRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(AddressBook::class);
         $this->assertNull($addressbookRepository->findOneBy(['uri' => 'hijack']));
     }
+
+    public function testAddressBookWithoutADisplayNameFallsBackToItsUri(): void
+    {
+        $user = new AdminUser('admin', 'test');
+
+        $client = static::createClient();
+        $client->loginUser($user);
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $nameless = (new AddressBook())
+            ->setPrincipalUri('principals/test_user')
+            ->setUri('nameless-book')
+            ->setDisplayName(null);
+        $em->persist($nameless);
+        $em->flush();
+
+        $client->request('GET', '/addressbooks/'.$userId);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertAnySelectorTextContains('h5', 'nameless-book');
+    }
 }
