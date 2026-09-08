@@ -28,8 +28,8 @@ class CalendarSubscription
     #[ORM\Column(name: 'refreshrate', type: 'string', length: 10, nullable: true)]
     private $refreshRate;
 
-    #[ORM\Column(name: 'calendarorder', type: 'integer')]
-    private $calendarOrder;
+    #[ORM\Column(name: 'calendarorder', type: 'integer', options: ['default' => 0])]
+    private $calendarOrder = 0;
 
     #[ORM\Column(name: 'calendarcolor', type: 'string', length: 10, nullable: true)]
     private $calendarColor;
