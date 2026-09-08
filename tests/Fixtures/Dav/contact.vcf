@@ -1,0 +1,7 @@
+BEGIN:VCARD
+VERSION:3.0
+UID:davis-smoke-contact
+FN:Davis CardDAV Smoke Test
+N:Smoke Test;Davis;;;
+EMAIL:davis@example.invalid
+END:VCARD
