@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'addressbookchanges')]
+// sync-collection filters on the collection and orders by synctoken
+#[ORM\Index(name: 'idx_addressbookchanges_book_sync', columns: ['addressbookid', 'synctoken'])]
 class AddressBookChange
 {
     #[ORM\Id]
