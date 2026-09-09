@@ -70,6 +70,9 @@ FROM base-image
 ARG fpm_user=82:82
 ENV FPM_USER=${fpm_user}
 
+# Production by default: the dev bundles are not installed in the image (composer --no-dev)
+ENV APP_ENV=prod
+
 ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
 
@@ -99,6 +102,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader \
     && php ./vendor/symfony/intl/Resources/bin/compress \
     && rm -rf /var/www/davis/docker
+
+# composer install (and its cache warmup) ran as root: give the runtime directories back to the FPM user,
+# otherwise PHP-FPM can neither write its cache nor its logs (500 on every request, and no log to tell)
+RUN mkdir -p var/log var/cache && chown -R ${FPM_USER} var
 
 USER $FPM_USER
 

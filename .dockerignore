@@ -13,3 +13,6 @@ phpunit.xml.dist
 .dockerignore
 var/cache/*
 var/log/*
+var/*.db
+var/webdav
+var/tmp

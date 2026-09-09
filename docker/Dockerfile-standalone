@@ -66,6 +66,9 @@ COPY ./docker/configurations/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 # Final image ————————————————————————————————————————————————————————————————————
 FROM base-image
 
+# Production by default: the dev bundles are not installed in the image (composer --no-dev)
+ENV APP_ENV=prod
+
 ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
 

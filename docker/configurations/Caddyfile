@@ -29,10 +29,16 @@
                 -X-Powered-By
 
                 # keep referrer data off of HTTP connections
-                Referrer-Policy no-referrer-when-downgrade
+                Referrer-Policy strict-origin-when-cross-origin
 
                 # disable clients from sniffing the media type
                 X-Content-Type-Options nosniff
+
+                # the admin UI is never meant to be framed
+                X-Frame-Options DENY
+
+                # no browser feature is needed
+                Permissions-Policy "camera=(), microphone=(), geolocation=()"
         }
 
 }
