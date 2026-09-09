@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'propertystorage')]
+// sabre/dav upserts dead properties on (path, name); without this key it cannot replace them
+#[ORM\UniqueConstraint(name: 'propertystorage_path_name', columns: ['path', 'name'])]
 class PropertyStorage
 {
     #[ORM\Id]
