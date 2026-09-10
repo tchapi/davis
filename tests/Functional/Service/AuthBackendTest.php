@@ -130,4 +130,65 @@ class AuthBackendTest extends KernelTestCase
         $this->assertTrue($ok);
         $this->assertSame('principals/first.last+tag@example.org', $principal);
     }
+
+    /**
+     * A backend may report the username as the directory spells it; the principal must then be
+     * built from that, otherwise a case-variant login lands on a principal that does not exist.
+     */
+    public function testACanonicalUsernameBecomesThePrincipal(): void
+    {
+        $backend = new class extends AbstractAuth {
+            protected function checkCredentials(string $username, string $password): bool
+            {
+                $this->setCanonicalUsername(strtolower($username));
+
+                return true;
+            }
+        };
+
+        [$ok, $principal] = self::check($backend, 'ALICE:password');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice', $principal);
+    }
+
+    public function testACanonicalUsernameThatWouldBreakThePrincipalUriIsIgnored(): void
+    {
+        $backend = new class extends AbstractAuth {
+            protected function checkCredentials(string $username, string $password): bool
+            {
+                $this->setCanonicalUsername('some/other/path');
+
+                return true;
+            }
+        };
+
+        [$ok, $principal] = self::check($backend, 'alice:password');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice', $principal, 'It must fall back to the name the client sent');
+    }
+
+    public function testTheCanonicalUsernameDoesNotLeakBetweenAttempts(): void
+    {
+        $backend = new class extends AbstractAuth {
+            public bool $canonicalise = true;
+
+            protected function checkCredentials(string $username, string $password): bool
+            {
+                if ($this->canonicalise) {
+                    $this->setCanonicalUsername('canonical');
+                }
+
+                return true;
+            }
+        };
+
+        [, $first] = self::check($backend, 'ALICE:password');
+        $this->assertSame('principals/canonical', $first);
+
+        $backend->canonicalise = false;
+        [, $second] = self::check($backend, 'BOB:password');
+        $this->assertSame('principals/BOB', $second, 'A later attempt must not reuse the previous canonical name');
+    }
 }

@@ -83,6 +83,34 @@ final class LDAPAuth extends AbstractAuth
     }
 
     /**
+     * Returns the username as the directory spells it, or null when it cannot be determined.
+     */
+    private function canonicalUsernameFor($ldap, string $dn): ?string
+    {
+        try {
+            $read = ldap_read($ldap, $dn, '(objectclass=*)', ['dn']);
+        } catch (\Exception $e) {
+            $read = false;
+        }
+
+        if (false === $read) {
+            return null;
+        }
+
+        $entries = ldap_get_entries($ldap, $read);
+        $matchedDn = $entries[0]['dn'] ?? null;
+
+        if (!is_string($matchedDn) || '' === $matchedDn) {
+            return null;
+        }
+
+        // With the second argument set, only the values are returned, not the attribute names
+        $rdns = ldap_explode_dn($matchedDn, 1);
+
+        return (false !== $rdns && isset($rdns[0]) && '' !== $rdns[0]) ? $rdns[0] : null;
+    }
+
+    /**
      * Builds the bind DN for a username by filling the placeholders of LDAP_DN_PATTERN.
      *
      * Every substituted value is escaped for a DN context: without that, a username such as
@@ -183,6 +211,20 @@ final class LDAPAuth extends AbstractAuth
             }
         } catch (\Exception $e) {
             error_log('LDAP Error (ldap_bind to '.$this->LDAPAuthUrl.'): '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
+        }
+
+        if ($success) {
+            // Directories match names case-insensitively, so `ALICE` binds against `uid=alice`
+            // just as well as `alice` does. Take the spelling the server actually matched:
+            // read the entry back and use the value of the first RDN of the DN it returns.
+            // Deriving it from the DN rather than from a fixed attribute keeps this working
+            // whatever LDAP_DN_PATTERN is built on (uid, cn, sAMAccountName, mail...).
+            $canonical = $this->canonicalUsernameFor($ldap, $dn);
+
+            if (null !== $canonical) {
+                $this->setCanonicalUsername($canonical);
+                $username = $canonical;
+            }
         }
 
         if ($success && $this->autoCreate) {
