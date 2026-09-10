@@ -103,4 +103,92 @@ class AuthBackendTest extends KernelTestCase
         [$ok] = self::check($backend, 'test_user:wrong');
         $this->assertFalse($ok);
     }
+
+    /**
+     * A username becomes the principal URI (`principals/<username>`), so one containing a
+     * slash would address a different node — `alice/calendar-proxy-write` is exactly the URI
+     * Davis uses for alice's delegation proxy.
+     */
+    public function testUsernamesThatWouldBreakThePrincipalUriAreRejected(): void
+    {
+        foreach (['alice/calendar-proxy-write', 'alice\\bob', 'alice bob', "alice\tbob", "alice\nbob"] as $username) {
+            $backend = self::acceptAllBackend();
+
+            [$ok] = self::check($backend, $username.':password');
+
+            $this->assertFalse($ok, sprintf('%s must not authenticate', var_export($username, true)));
+            $this->assertSame([], $backend->seen, 'The backend must not even be consulted');
+        }
+    }
+
+    public function testAnUnusualButStructurallySoundUsernameStillAuthenticates(): void
+    {
+        $backend = self::acceptAllBackend();
+
+        [$ok, $principal] = self::check($backend, 'first.last+tag@example.org:password');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/first.last+tag@example.org', $principal);
+    }
+
+    /**
+     * A backend may report the username as the directory spells it; the principal must then be
+     * built from that, otherwise a case-variant login lands on a principal that does not exist.
+     */
+    public function testACanonicalUsernameBecomesThePrincipal(): void
+    {
+        $backend = new class extends AbstractAuth {
+            protected function checkCredentials(string $username, string $password): bool
+            {
+                $this->setCanonicalUsername(strtolower($username));
+
+                return true;
+            }
+        };
+
+        [$ok, $principal] = self::check($backend, 'ALICE:password');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice', $principal);
+    }
+
+    public function testACanonicalUsernameThatWouldBreakThePrincipalUriIsIgnored(): void
+    {
+        $backend = new class extends AbstractAuth {
+            protected function checkCredentials(string $username, string $password): bool
+            {
+                $this->setCanonicalUsername('some/other/path');
+
+                return true;
+            }
+        };
+
+        [$ok, $principal] = self::check($backend, 'alice:password');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice', $principal, 'It must fall back to the name the client sent');
+    }
+
+    public function testTheCanonicalUsernameDoesNotLeakBetweenAttempts(): void
+    {
+        $backend = new class extends AbstractAuth {
+            public bool $canonicalise = true;
+
+            protected function checkCredentials(string $username, string $password): bool
+            {
+                if ($this->canonicalise) {
+                    $this->setCanonicalUsername('canonical');
+                }
+
+                return true;
+            }
+        };
+
+        [, $first] = self::check($backend, 'ALICE:password');
+        $this->assertSame('principals/canonical', $first);
+
+        $backend->canonicalise = false;
+        [, $second] = self::check($backend, 'BOB:password');
+        $this->assertSame('principals/BOB', $second, 'A later attempt must not reuse the previous canonical name');
+    }
 }

@@ -385,6 +385,10 @@
         <source>form.uri.unique</source>
         <target>This URI is already used with this principal. Please choose another one.</target>
       </trans-unit>
+      <trans-unit id="9gDpv.10" resname="form.username.invalid">
+        <source>form.username.invalid</source>
+        <target>A username may only contain letters, digits and the characters "_", ".", "@", "+", "'" and "-".</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

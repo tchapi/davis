@@ -83,6 +83,67 @@ final class LDAPAuth extends AbstractAuth
     }
 
     /**
+     * Returns the username as the directory spells it, or null when it cannot be determined.
+     */
+    private function canonicalUsernameFor($ldap, string $dn): ?string
+    {
+        try {
+            $read = ldap_read($ldap, $dn, '(objectclass=*)', ['dn']);
+        } catch (\Exception $e) {
+            $read = false;
+        }
+
+        if (false === $read) {
+            return null;
+        }
+
+        $entries = ldap_get_entries($ldap, $read);
+        $matchedDn = $entries[0]['dn'] ?? null;
+
+        if (!is_string($matchedDn) || '' === $matchedDn) {
+            return null;
+        }
+
+        // With the second argument set, only the values are returned, not the attribute names
+        $rdns = ldap_explode_dn($matchedDn, 1);
+
+        return (false !== $rdns && isset($rdns[0]) && '' !== $rdns[0]) ? $rdns[0] : null;
+    }
+
+    /**
+     * Builds the bind DN for a username by filling the placeholders of LDAP_DN_PATTERN.
+     *
+     * Every substituted value is escaped for a DN context: without that, a username such as
+     * `someone,ou=admins` would not be a value inside the DN but extra structure, changing
+     * which entry we bind against.
+     */
+    protected function buildDn(string $username): string
+    {
+        $escape = static fn (string $value): string => ldap_escape($value, '', LDAP_ESCAPE_DN);
+
+        // Extract user and domain from username (in the form user@domain.org)
+        $user_parts = explode('@', $username, 2);
+
+        $ldap_user = $user_parts[0];
+        $ldap_domain = $user_parts[1] ?? '';
+
+        // Replace common placeholders
+        $dn = str_replace(
+            ['%u', '%U', '%d'],
+            [$escape($username), $escape($ldap_user), $escape($ldap_domain)],
+            $this->LDAPDnPattern
+        );
+
+        // Replace domain parts
+        $domain_split = array_reverse(explode('.', $ldap_domain));
+        for ($i = 1; $i <= count($domain_split) and $i <= 9; ++$i) {
+            $dn = str_replace('%'.$i, $escape($domain_split[$i - 1]), $dn);
+        }
+
+        return $dn;
+    }
+
+    /**
      * Connects to an LDAP server and tries to authenticate.
      *
      * @param string $username
@@ -140,25 +201,7 @@ final class LDAPAuth extends AbstractAuth
             return false;
         }
 
-        // Extract user and domain from username (in the form user@domain.org)
-        $user_parts = explode('@', $username, 2);
-
-        $ldap_user = $user_parts[0];
-
-        if (count($user_parts) > 1) {
-            $ldap_domain = $user_parts[1];
-        } else {
-            $ldap_domain = '';
-        }
-
-        // Replace common placeholders
-        $dn = str_replace(['%u', '%U', '%d'], [$username, $ldap_user, $ldap_domain], $this->LDAPDnPattern);
-
-        // Replace domain parts
-        $domain_split = array_reverse(explode('.', $ldap_domain));
-        for ($i = 1; $i <= count($domain_split) and $i <= 9; ++$i) {
-            $dn = str_replace('%'.$i, $domain_split[$i - 1], $dn);
-        }
+        $dn = $this->buildDn($username);
 
         $success = false;
         try {
@@ -168,6 +211,20 @@ final class LDAPAuth extends AbstractAuth
             }
         } catch (\Exception $e) {
             error_log('LDAP Error (ldap_bind to '.$this->LDAPAuthUrl.'): '.ldap_error($ldap).' ('.ldap_errno($ldap).')');
+        }
+
+        if ($success) {
+            // Directories match names case-insensitively, so `ALICE` binds against `uid=alice`
+            // just as well as `alice` does. Take the spelling the server actually matched:
+            // read the entry back and use the value of the first RDN of the DN it returns.
+            // Deriving it from the DN rather than from a fixed attribute keeps this working
+            // whatever LDAP_DN_PATTERN is built on (uid, cn, sAMAccountName, mail...).
+            $canonical = $this->canonicalUsernameFor($ldap, $dn);
+
+            if (null !== $canonical) {
+                $this->setCanonicalUsername($canonical);
+                $username = $canonical;
+            }
         }
 
         if ($success && $this->autoCreate) {
@@ -200,14 +257,16 @@ final class LDAPAuth extends AbstractAuth
                     }
                 }
 
-                $this->utils->createPasswordlessUserWithDefaultObjects($username, $displayName, $email);
-
-                $em = $this->doctrine->getManager();
-
                 try {
-                    $em->flush();
-                } catch (\Exception $e) {
-                    error_log('LDAP Error (flush): '.$e->getMessage());
+                    $this->utils->createPasswordlessUserWithDefaultObjects($username, $displayName, $email);
+                    $this->doctrine->getManager()->flush();
+                } catch (\Throwable $e) {
+                    // Letting the login through without a principal would leave the account
+                    // authenticated but unusable: no calendar home, so clients fall back to the
+                    // server root and every write is refused.
+                    error_log('LDAP Error (could not create the user "'.$username.'"): '.$e->getMessage());
+
+                    $success = false;
                 }
             }
         }

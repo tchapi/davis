@@ -312,6 +312,20 @@ class DAVController extends AbstractController
         });
     }
 
+    /**
+     * Service discovery (RFC 6764).
+     *
+     * This lives in the application rather than in each web server's configuration so that
+     * the redirect is built from the real base path: a hard-coded `/dav/` sends clients to
+     * the wrong place whenever Davis is installed under a sub-directory.
+     */
+    #[Route('/.well-known/caldav', name: 'well_known_caldav')]
+    #[Route('/.well-known/carddav', name: 'well_known_carddav')]
+    public function wellKnown(): Response
+    {
+        return $this->redirectToRoute('dav', ['path' => ''], Response::HTTP_MOVED_PERMANENTLY);
+    }
+
     #[Route('/dav/{path}', name: 'dav', requirements: ['path' => '.*'])]
     public function dav(Request $request, ?string $path, ?Profiler $profiler = null)
     {
@@ -327,7 +341,16 @@ class DAVController extends AbstractController
 
             // Adapted from CorePlugin's httpOptions()
             // https://github.com/sabre-io/dav/blob/master/lib/DAV/CorePlugin.php#L210
-            $methods = $this->server->getAllowedMethods('');
+            //
+            // The methods depend on the node being asked about: MKCALENDAR, for instance, is
+            // only offered inside a calendar home. Answering for the root instead of the
+            // requested path told every client the same, incomplete story.
+            try {
+                $methods = $this->server->getAllowedMethods($path ?? '');
+            } catch (\Throwable $e) {
+                // An unresolvable path should still get a usable answer
+                $methods = $this->server->getAllowedMethods('');
+            }
 
             $response->headers->set('Allow', strtoupper(implode(', ', $methods)));
             $features = ['1', '3', 'extended-mkcol'];

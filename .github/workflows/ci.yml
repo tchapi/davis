@@ -112,13 +112,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install MySQL / GD / ZIP PHP extensions
+      - name: Install MySQL / GD / ZIP / LDAP PHP extensions
         run: |
-          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev
+          apk add $PHPIZE_DEPS icu-libs icu-dev libpng-dev libzip-dev openldap-dev
           docker-php-ext-configure intl
           docker-php-ext-configure gd
           docker-php-ext-configure zip
-          docker-php-ext-install pdo pdo_mysql intl gd zip
+          # ext-ldap is optional for Davis (only AUTH_METHOD=LDAP needs it) but the LDAP tests
+          # skip themselves without it, and we would rather run them
+          docker-php-ext-install pdo pdo_mysql intl gd zip ldap
 
       - name: Install Composer
         run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet

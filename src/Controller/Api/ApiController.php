@@ -7,6 +7,7 @@ use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
 use App\Entity\User;
+use App\Services\Utils;
 use Doctrine\Persistence\ManagerRegistry;
 use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +27,7 @@ class ApiController extends AbstractController
      */
     private function validateUsername(string $username): bool
     {
-        return !empty($username) && is_string($username) && !preg_match('/[^a-zA-Z0-9_.@-]/', $username);
+        return Utils::isValidUsername($username);
     }
 
     /**
