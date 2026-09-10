@@ -194,4 +194,43 @@ class DavTest extends WebTestCase
             $client->getResponse()->getContent()
         );
     }
+
+    public function testWellKnownUrlsRedirectToTheDavEndpoint(): void
+    {
+        $client = static::createClient();
+
+        foreach (['/.well-known/caldav', '/.well-known/carddav'] as $wellKnown) {
+            $client->request('GET', $wellKnown);
+
+            $this->assertResponseStatusCodeSame(301, $wellKnown.' should redirect');
+            $this->assertResponseRedirects('/dav/');
+        }
+    }
+
+    /**
+     * OPTIONS used to answer for the server root whatever was asked, so it never advertised
+     * the methods that only exist deeper in the tree, MKCALENDAR being the obvious one.
+     */
+    public function testOptionsDescribesTheRequestedPath(): void
+    {
+        $client = static::createClient();
+
+        static::requestDav($client, 'OPTIONS', '/dav/');
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('MKCALENDAR', (string) $client->getResponse()->headers->get('Allow'));
+
+        static::requestDav($client, 'OPTIONS', '/dav/calendars/test_user/new-calendar');
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('MKCALENDAR', (string) $client->getResponse()->headers->get('Allow'));
+    }
+
+    public function testOptionsOnAnUnresolvablePathStillAnswers(): void
+    {
+        $client = static::createClient();
+
+        static::requestDav($client, 'OPTIONS', '/dav/calendars/nope/nope/nope');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('PROPFIND', (string) $client->getResponse()->headers->get('Allow'));
+    }
 }
