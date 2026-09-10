@@ -11,6 +11,7 @@ use App\Services\BasicAuth;
 use App\Services\BirthdayService;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
+use App\Services\LDAPFallbackAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Psr\Log\LoggerInterface;
@@ -27,6 +28,7 @@ class DAVController extends AbstractController
     public const AUTH_BASIC = 'Basic';
     public const AUTH_IMAP = 'IMAP';
     public const AUTH_LDAP = 'LDAP';
+    public const AUTH_LDAP_AND_BASIC = 'BasicAndLDAP';
 
     /**
      * Is CalDAV enabled?
@@ -136,6 +138,13 @@ class DAVController extends AbstractController
     protected $LDAPAuthBackend;
 
     /**
+     * LDAP with Fallback Auth Backend class.
+     *
+     * @var LDAPFallbackAuth
+     */
+    protected $LDAPFallbackAuthBackend;
+
+    /**
      * Logger for exceptions.
      *
      * @var Psr\Log\LoggerInterface;
@@ -149,7 +158,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, BirthdayService $birthdayService, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, bool $publicCalendarsEnabled = true, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, LDAPFallbackAuth $LDAPFallbackAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, BirthdayService $birthdayService, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, bool $publicCalendarsEnabled = true, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null)
     {
         $this->publicDir = $publicDir;
 
@@ -172,6 +181,7 @@ class DAVController extends AbstractController
         $this->basicAuthBackend = $basicAuthBackend;
         $this->IMAPAuthBackend = $IMAPAuthBackend;
         $this->LDAPAuthBackend = $LDAPAuthBackend;
+        $this->LDAPFallbackAuthBackend = $LDAPFallbackAuthBackend;
 
         $this->initServer($authMethod, $authRealm);
         $this->initExceptionListener();
@@ -199,6 +209,9 @@ class DAVController extends AbstractController
                 break;
             case self::AUTH_LDAP:
                 $authBackend = $this->LDAPAuthBackend;
+                break;
+            case self::AUTH_LDAP_AND_BASIC:
+                $authBackend = $this->LDAPFallbackAuthBackend;
                 break;
             case self::AUTH_BASIC:
             default:
