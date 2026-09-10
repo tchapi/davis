@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'addressbookchanges')]
+// sync-collection filters on the collection and orders by synctoken
+#[ORM\Index(name: 'idx_addressbookchanges_book_sync', columns: ['addressbookid', 'synctoken'])]
 class AddressBookChange
 {
     #[ORM\Id]
@@ -16,8 +18,8 @@ class AddressBookChange
     #[ORM\Column(type: 'string', length: 255)]
     private $uri;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private $synctoken;
+    #[ORM\Column(type: 'integer', options: ['default' => 1])]
+    private $synctoken = 1;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\AddressBook", inversedBy: 'changes')]
     #[ORM\JoinColumn(name: 'addressbookid', nullable: false)]
@@ -43,12 +45,12 @@ class AddressBookChange
         return $this;
     }
 
-    public function getSynctoken(): ?string
+    public function getSynctoken(): ?int
     {
         return $this->synctoken;
     }
 
-    public function setSynctoken(string $synctoken): self
+    public function setSynctoken(int $synctoken): self
     {
         $this->synctoken = $synctoken;
 
