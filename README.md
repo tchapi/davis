@@ -438,24 +438,11 @@ More examples and information [here](https://symfony.com/doc/current/setup/web_s
 
 Web-based protocols like CalDAV and CardDAV can be found using a discovery service. Some clients require that you implement a path prefix to point to the correct location for your service. See [here](https://en.wikipedia.org/wiki/List_of_/.well-known/_services_offered_by_webservers) for more info.
 
-If you use Apache as your webserver, you can enable the redirections with:
+Davis answers `/.well-known/caldav` and `/.well-known/carddav` itself and redirects them to its DAV endpoint, so **no web server configuration is needed**. Because the redirect is built from the application's own base path, it also works when Davis is installed in a sub-directory (`https://example.org/davis/`), which a hard-coded `/dav/` rewrite does not.
 
-```apache
-RewriteEngine On
-RewriteRule ^\.well-known/carddav /dav/ [R=301,L]
-RewriteRule ^\.well-known/caldav /dav/ [R=301,L]
-```
-
-Make sure that `mod_rewrite` is enabled on your installation beforehand.
-
-If you use Nginx, you can add this to your configuration:
-
-```nginx
-location / {
-    rewrite ^/.well-known/carddav /dav/ redirect;
-    rewrite ^/.well-known/caldav /dav/ redirect;
-}
-```
+> [!NOTE]
+>
+> If your web server still rewrites these two paths itself (earlier versions of this README suggested doing so), you can remove those rules: they take precedence over Davis and will send clients to the wrong place on a sub-directory installation.
 
 # 🐳 Dockerized installation
 

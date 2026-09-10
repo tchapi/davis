@@ -3,10 +3,6 @@
 }
 
 :9000 {
-	# Redirect .well-known
-	redir /.well-known/caldav  /dav/
-	redir /.well-known/carddav /dav/
-
         root * /var/www/davis/public
         php_fastcgi unix//var/run/php-fpm/php-fpm.sock {
                 # Preserve the original X-Forwarded-Proto from upstream, as it might be HTTPS
