@@ -194,8 +194,13 @@ BIRTHDAY_REMINDER_OFFSET=false
 ```shell
 WEBDAV_TMP_DIR=/webdav/tmp
 WEBDAV_PUBLIC_DIR=/webdav/public
+WEBDAV_PUBLIC_DIR_WRITABLE=false
 WEBDAV_HOMES_DIR=
 ```
+
+> [!NOTE]
+>
+> The public directory (served at `/dav/public`) is readable by every authenticated user. By default only users flagged as admins in the dashboard can create, modify or delete files in it; set `WEBDAV_PUBLIC_DIR_WRITABLE=true` to let every authenticated user write to it. Directories must be absolute paths and must not live inside the web root.
 
 > [!NOTE]
 >
