@@ -103,4 +103,31 @@ class AuthBackendTest extends KernelTestCase
         [$ok] = self::check($backend, 'test_user:wrong');
         $this->assertFalse($ok);
     }
+
+    /**
+     * A username becomes the principal URI (`principals/<username>`), so one containing a
+     * slash would address a different node — `alice/calendar-proxy-write` is exactly the URI
+     * Davis uses for alice's delegation proxy.
+     */
+    public function testUsernamesThatWouldBreakThePrincipalUriAreRejected(): void
+    {
+        foreach (['alice/calendar-proxy-write', 'alice\\bob', 'alice bob', "alice\tbob", "alice\nbob"] as $username) {
+            $backend = self::acceptAllBackend();
+
+            [$ok] = self::check($backend, $username.':password');
+
+            $this->assertFalse($ok, sprintf('%s must not authenticate', var_export($username, true)));
+            $this->assertSame([], $backend->seen, 'The backend must not even be consulted');
+        }
+    }
+
+    public function testAnUnusualButStructurallySoundUsernameStillAuthenticates(): void
+    {
+        $backend = self::acceptAllBackend();
+
+        [$ok, $principal] = self::check($backend, 'first.last+tag@example.org:password');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/first.last+tag@example.org', $principal);
+    }
 }

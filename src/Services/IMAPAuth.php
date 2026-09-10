@@ -130,15 +130,17 @@ final class IMAPAuth extends AbstractAuth
             $user = $this->doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
 
             if (!$user) {
-                // We only have a username, so we use it for displayname and email
-                $this->utils->createPasswordlessUserWithDefaultObjects($username, $username, $username);
-
-                $em = $this->doctrine->getManager();
-
                 try {
-                    $em->flush();
-                } catch (\Exception $e) {
-                    error_log('IMAP Error (flush): '.$e->getMessage());
+                    // We only have a username, so we use it for displayname and email
+                    $this->utils->createPasswordlessUserWithDefaultObjects($username, $username, $username);
+                    $this->doctrine->getManager()->flush();
+                } catch (\Throwable $e) {
+                    // Letting the login through without a principal would leave the account
+                    // authenticated but unusable: no calendar home, so clients fall back to the
+                    // server root and every write is refused.
+                    error_log('IMAP Error (could not create the user "'.$username.'"): '.$e->getMessage());
+
+                    return false;
                 }
             }
         }

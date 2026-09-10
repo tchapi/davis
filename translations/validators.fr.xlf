@@ -558,6 +558,10 @@
                 <source>form.uri.unique</source>
                 <target>Cette URI est déjà utilisée avec ce principal. Veuillez en choisir une autre.</target>
             </trans-unit>
+            <trans-unit id="9gDpv.10" resname="form.username.invalid">
+              <source>form.username.invalid</source>
+              <target>Un nom d'utilisateur ne peut contenir que des lettres, des chiffres et les caractères "_", ".", "@", "+", "'" et "-".</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

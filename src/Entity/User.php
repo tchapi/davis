@@ -18,8 +18,18 @@ class User
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    /**
+     * A username ends up in the principal URI (`principals/<username>`), so it must not carry
+     * anything that would change that path's structure. Letters, digits and `_ . @ + ' -` are allowed:
+     * the punctuation is what shows up in mail-derived login names. Enforced when a user is created; existing
+     * accounts are left alone so that an odd username created before this rule stays editable.
+     */
+    public const USERNAME_PATTERN = '/^[a-zA-Z0-9_.@+\'-]+$/';
+
     #[ORM\Column(type: 'string', length: 255, unique: true)]
     #[Assert\NotBlank]
+    #[Assert\Length(max: 255, groups: ['creation'])]
+    #[Assert\Regex(pattern: self::USERNAME_PATTERN, message: 'form.username.invalid', groups: ['creation'])]
     private $username;
 
     #[ORM\Column(name: 'digesta1', type: 'string', length: 255)]

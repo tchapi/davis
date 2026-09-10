@@ -385,6 +385,10 @@
         <source>form.uri.unique</source>
         <target>Diese URI wird bereits für diesen Auftraggeber verwendet. Bitte wählen Sie einen anderen.</target>
       </trans-unit>
+      <trans-unit id="9gDpv.10" resname="form.username.invalid">
+        <source>form.username.invalid</source>
+        <target>Ein Benutzername darf nur Buchstaben, Ziffern und die Zeichen "_", ".", "@", "+", "'" und "-" enthalten.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

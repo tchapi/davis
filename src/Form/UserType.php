@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserType extends AbstractType
@@ -55,6 +56,11 @@ class UserType extends AbstractType
         $resolver->setDefaults([
             'new' => false,
             'data_class' => User::class,
+            // The username rule only applies to new accounts: the field is disabled when editing,
+            // and an account created before the rule (or by LDAP/IMAP) must stay editable.
+            'validation_groups' => static fn (FormInterface $form): array => $form->getConfig()->getOption('new')
+                ? ['Default', 'creation']
+                : ['Default'],
         ]);
     }
 }

@@ -228,4 +228,29 @@ class UserControllerTest extends WebTestCase
         $this->postAdmin($client, '/users/delegates/'.$userId.'/remove/'.$foreignProxy->getId().'/'.$delegate->getId());
         $this->assertResponseStatusCodeSame(404);
     }
+
+    public function testUserCreationRejectsAUsernameThatBreaksThePrincipalUri(): void
+    {
+        $user = new AdminUser('admin', 'test');
+
+        $client = static::createClient();
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/users/new');
+        $form = $crawler->selectButton('user_save')->form();
+
+        $client->submit($form, [
+            'user[username]' => 'bad/user',
+            'user[displayName]' => 'Bad User',
+            'user[email]' => 'bad@example.org',
+            'user[password][first]' => 'secret',
+            'user[password][second]' => 'secret',
+        ]);
+
+        // The form is re-rendered rather than redirecting, and nothing is created
+        $this->assertResponseIsSuccessful();
+        $this->assertNull(
+            static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class)->findOneByUsername('bad/user')
+        );
+    }
 }

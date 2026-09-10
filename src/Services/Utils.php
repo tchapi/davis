@@ -49,8 +49,20 @@ final class Utils
         return md5($username.':'.$this->authRealm.':'.$password);
     }
 
+    /**
+     * A username is only acceptable if it can be used verbatim in a principal URI.
+     */
+    public static function isValidUsername(?string $username): bool
+    {
+        return null !== $username && '' !== $username && 1 === preg_match(User::USERNAME_PATTERN, $username);
+    }
+
     public function createPasswordlessUserWithDefaultObjects(string $username, string $displayName, string $email)
     {
+        if (!self::isValidUsername($username)) {
+            throw new \InvalidArgumentException(sprintf('Refusing to create the user "%s": a username may only contain letters, digits and the characters _ . @ + \' -', $username));
+        }
+
         $user = new User();
         $user->setUsername($username);
 
