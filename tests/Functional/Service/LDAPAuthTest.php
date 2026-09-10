@@ -11,6 +11,14 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class LDAPAuthTest extends KernelTestCase
 {
+    protected function setUp(): void
+    {
+        // ext-ldap is optional for Davis: it is only needed with AUTH_METHOD=LDAP
+        if (!function_exists('ldap_escape')) {
+            $this->markTestSkipped('The LDAP extension is not loaded');
+        }
+    }
+
     private function buildDn(string $pattern, string $username): string
     {
         self::bootKernel();
