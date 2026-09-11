@@ -13,6 +13,8 @@ parameters:
     default_birthday_reminder_offset: "PT9H"
     caldav_enabled: "%env(bool:CALDAV_ENABLED)%"
     carddav_enabled: "%env(bool:CARDDAV_ENABLED)%"
+    icscalendars_enabled: "%env(default:default_icscalendars_enabled:bool:ICSCALENDARS_ENABLED)%"
+    default_icscalendars_enabled: "0"
 
 services:
     # default configuration for services in *this* file
@@ -77,6 +79,10 @@ services:
     App\Services\BirthdayService:
         arguments:
             $birthdayReminderOffset: "%birthday_reminder_offset%"
+
+    App\Services\ICSCalendarsService:
+        arguments:
+            $enabled: "%icscalendars_enabled%"
 
     App\Security\ApiKeyAuthenticator:
         arguments:

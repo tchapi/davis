@@ -7,12 +7,13 @@ use App\Entity\User;
 use App\Plugins\BirthdayCalendarPlugin;
 use App\Plugins\DavisIMipPlugin;
 use App\Plugins\PublicAwareDAVACLPlugin;
+use App\Plugins\ICSCalendarsPlugin;
 use App\Services\BasicAuth;
 use App\Services\BirthdayService;
+use App\Services\ICSCalendarsService;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
 use Doctrine\ORM\EntityManagerInterface;
-use PDO;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -108,6 +109,11 @@ class DAVController extends AbstractController
     protected $birthdayService;
 
     /**
+     * @var ICSCalendarsService
+     */
+    protected $icsCalendarsService;
+
+    /**
      * Base URI of the server.
      *
      * @var string
@@ -149,7 +155,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, BirthdayService $birthdayService, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, bool $publicCalendarsEnabled = true, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, BirthdayService $birthdayService, ICSCalendarsService $icsCalendarsService, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, bool $publicCalendarsEnabled = true, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null)
     {
         $this->publicDir = $publicDir;
 
@@ -167,6 +173,7 @@ class DAVController extends AbstractController
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->birthdayService = $birthdayService;
+        $this->icsCalendarsService = $icsCalendarsService;
         $this->baseUri = $router->generate('dav', ['path' => '']);
 
         $this->basicAuthBackend = $basicAuthBackend;
@@ -273,6 +280,7 @@ class DAVController extends AbstractController
             if ($this->inviteAddress) {
                 $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->publicDir));
             }
+            $this->server->addPlugin(new ICSCalendarsPlugin($this->icsCalendarsService, $calendarBackend));
         }
 
         // CardDAV plugins
