@@ -63,8 +63,7 @@ class LDAPAuthTest extends KernelTestCase
     }
 
     /**
-     * Regression test: the username was interpolated into the DN pattern verbatim, so a name
-     * carrying DN syntax added structure to the DN instead of being a value inside it.
+     * A username carrying DN syntax must stay a value inside the DN, not add structure to it.
      */
     public function testAUsernameCannotInjectDnStructure(): void
     {

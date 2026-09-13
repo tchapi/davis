@@ -45,9 +45,8 @@ class CalendarSubscriptionTest extends KernelTestCase
     }
 
     /**
-     * Regression test: `calendarorder` had no default, and sabre only lists it in its INSERT
-     * when the client sent {http://apple.com/ns/ical/}calendar-order. Subscribing without one
-     * therefore failed with a NOT NULL violation.
+     * sabre only lists `calendarorder` in its INSERT when the client sent
+     * {http://apple.com/ns/ical/}calendar-order, so the column needs a default.
      */
     public function testSubscriptionCanBeCreatedWithoutACalendarOrder(): void
     {

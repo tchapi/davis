@@ -230,12 +230,10 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             ->replyTo(new Address($senderEmail, $mailSenderName))
             ->subject($subject);
 
-        // Keep holiday auto-replies from bouncing back at invitations. This used to sit behind
-        // the version check, so disabling that would have silently dropped it too.
+        // Keep holiday auto-replies from bouncing back at invitations.
         $message->getHeaders()->addTextHeader('X-Auto-Response-Suppress', 'OOF, DR, RN, NRN, AutoReply');
 
         if (DAV\Server::$exposeVersion) {
-            // NB: the header name carried a trailing ": " here, which is not a valid name
             $message->getHeaders()->addTextHeader('X-Sabre-Version', DAV\Version::VERSION);
         }
 

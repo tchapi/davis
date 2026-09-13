@@ -129,8 +129,8 @@ class DavTest extends WebTestCase
     }
 
     /**
-     * Regression test: the ACL plugin used to skip all privilege checks whenever
-     * `sabreAction=asset` was present in the query string, for any method and any path.
+     * `sabreAction=asset` is only meaningful for the browser plugin's own assets: it must not
+     * waive the privilege checks on an arbitrary path.
      */
     public function testAssetQueryParameterDoesNotBypassReadAcl(): void
     {
@@ -208,8 +208,8 @@ class DavTest extends WebTestCase
     }
 
     /**
-     * OPTIONS used to answer for the server root whatever was asked, so it never advertised
-     * the methods that only exist deeper in the tree, MKCALENDAR being the obvious one.
+     * The advertised methods depend on the node: MKCALENDAR only exists inside a calendar home,
+     * so OPTIONS has to answer for the path it was asked about rather than for the root.
      */
     public function testOptionsDescribesTheRequestedPath(): void
     {

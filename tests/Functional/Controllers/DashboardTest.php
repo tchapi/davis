@@ -94,7 +94,7 @@ class DashboardTest extends WebTestCase
     }
 
     /**
-     * A plain `GET /logout` from any page the admin happens to visit used to end their session.
+     * Logging out is a state change: a bare `GET /logout` must not end the session.
      */
     public function testLogoutRequiresACsrfToken(): void
     {
