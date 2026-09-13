@@ -233,4 +233,18 @@ class DavTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('PROPFIND', (string) $client->getResponse()->headers->get('Allow'));
     }
+
+    /**
+     * The exact sabre/dav version appeared in the `X-Sabre-Version` header, in every error
+     * body and in the HTML browser, which only helps match an install against known advisories.
+     */
+    public function testTheSabreVersionIsNotAdvertised(): void
+    {
+        $client = static::requestDavClient('GET', '/dav/');
+
+        $this->assertResponseStatusCodeSame(401);
+        $this->assertStringNotContainsString('sabredav-version', $client->getResponse()->getContent());
+        $this->assertFalse($client->getResponse()->headers->has('X-Sabre-Version'));
+        $this->assertFalse(\Sabre\DAV\Server::$exposeVersion, 'The DAV server must be built with version exposure off');
+    }
 }
