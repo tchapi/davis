@@ -206,4 +206,15 @@ class AddressBookControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertAnySelectorTextContains('h5', 'nameless-book');
     }
+
+    public function testAddressBookPagesAreNotReachableAnonymously(): void
+    {
+        $client = static::createClient();
+
+        foreach (['/addressbooks/1', '/addressbooks/1/new', '/addressbooks/1/edit/1'] as $url) {
+            $client->request('GET', $url);
+
+            $this->assertResponseRedirects('/login', null, $url.' must not be public');
+        }
+    }
 }

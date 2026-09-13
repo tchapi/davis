@@ -253,4 +253,19 @@ class UserControllerTest extends WebTestCase
             static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class)->findOneByUsername('bad/user')
         );
     }
+
+    /**
+     * Every admin test authenticates first, so a missing `access_control` entry would go
+     * unnoticed — which is exactly how the `^/adressbooks` typo of #268 shipped.
+     */
+    public function testUserPagesAreNotReachableAnonymously(): void
+    {
+        $client = static::createClient();
+
+        foreach (['/users/', '/users/new', '/users/edit/1', '/users/delegates/1'] as $url) {
+            $client->request('GET', $url);
+
+            $this->assertResponseRedirects('/login', null, $url.' must not be public');
+        }
+    }
 }

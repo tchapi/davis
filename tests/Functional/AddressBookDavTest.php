@@ -44,8 +44,7 @@ class AddressBookDavTest extends KernelTestCase
     }
 
     /**
-     * Regression test for issue #275: a display name is optional in CardDAV, but the column
-     * was NOT NULL, so an MKCOL without {DAV:}displayname failed with a 500.
+     * A display name is optional in CardDAV: an MKCOL without {DAV:}displayname must succeed.
      */
     public function testAddressBookCanBeCreatedWithoutADisplayName(): void
     {

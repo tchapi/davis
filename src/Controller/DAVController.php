@@ -187,6 +187,11 @@ class DAVController extends AbstractController
 
     private function initServer(string $authMethod, string $authRealm = User::DEFAULT_AUTH_REALM)
     {
+        // Don't advertise the exact sabre/dav version: it appears in the `X-Sabre-Version`
+        // header, in the `<s:sabredav-version>` element of every error body and in the HTML
+        // browser, which only helps someone matching an installation against known advisories.
+        \Sabre\DAV\Server::$exposeVersion = false;
+
         // Get the PDO Connection of type PDO
         $pdo = $this->em->getConnection()->getNativeConnection();
 

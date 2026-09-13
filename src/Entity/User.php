@@ -20,9 +20,11 @@ class User
 
     /**
      * A username ends up in the principal URI (`principals/<username>`), so it must not carry
-     * anything that would change that path's structure. Letters, digits and `_ . @ + ' -` are allowed:
-     * the punctuation is what shows up in mail-derived login names. Enforced when a user is created; existing
-     * accounts are left alone so that an odd username created before this rule stays editable.
+     * anything that would change that path's structure. Letters, digits and `_ . @ + ' -` are
+     * allowed: the punctuation is what shows up in mail-derived login names.
+     *
+     * Only checked in the `creation` validation group, so that an account whose name does not
+     * match — an LDAP or IMAP login, say — stays editable.
      */
     public const USERNAME_PATTERN = '/^[a-zA-Z0-9_.@+\'-]+$/';
 
