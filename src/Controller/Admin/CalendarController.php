@@ -30,30 +30,31 @@ class CalendarController extends AbstractController
         $principalUri = $user->getPrincipalUri();
 
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
-        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
+        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUriWithCalendars($principalUri);
 
         $subscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($principalUri);
+
+        $objectCounts = $doctrine->getRepository(CalendarInstance::class)->countObjectsByCalendar(
+            array_map(fn (CalendarInstance $instance) => $instance->getCalendar()->getId(), $allCalendars)
+        );
 
         // Separate shared calendars
         $calendars = [];
         $shared = [];
         $auto = [];
         foreach ($allCalendars as $calendar) {
+            $compoundObject = [
+                'entity' => $calendar,
+                'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
+                'objectCount' => $objectCounts[$calendar->getCalendar()->getId()],
+            ];
+
             if ($calendar->isAutomaticallyGenerated()) {
-                $auto[] = [
-                    'entity' => $calendar,
-                    'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
-                ];
+                $auto[] = $compoundObject;
             } elseif (!$calendar->isShared()) {
-                $calendars[] = [
-                    'entity' => $calendar,
-                    'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
-                ];
+                $calendars[] = $compoundObject;
             } else {
-                $shared[] = [
-                    'entity' => $calendar,
-                    'uri' => $router->generate('dav', ['path' => 'calendars/'.$username.'/'.$calendar->getUri()], UrlGeneratorInterface::ABSOLUTE_URL),
-                ];
+                $shared[] = $compoundObject;
             }
         }
 

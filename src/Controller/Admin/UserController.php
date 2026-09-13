@@ -152,7 +152,7 @@ class UserController extends AbstractController
         $principalUri = $user->getPrincipalUri();
 
         // Remove calendars and addressbooks
-        $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
+        $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUriWithCalendars($principalUri);
         foreach ($calendars ?? [] as $instance) {
             // We're only removing the calendar objects / changes / and calendar if the deleted user is an owner,
             // which means that the underlying calendar instance should not have another principal as owner.
