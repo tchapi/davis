@@ -313,4 +313,15 @@ class CalendarControllerTest extends WebTestCase
         $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
         $this->assertNull($calendarRepository->findOneBy(['uri' => 'hijack']));
     }
+
+    public function testCalendarPagesAreNotReachableAnonymously(): void
+    {
+        $client = static::createClient();
+
+        foreach (['/calendars/1', '/calendars/1/new', '/calendars/1/edit/1', '/calendars/1/shares/1'] as $url) {
+            $client->request('GET', $url);
+
+            $this->assertResponseRedirects('/login', null, $url.' must not be public');
+        }
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Security\AdminUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DashboardTest extends WebTestCase
@@ -90,5 +91,32 @@ class DashboardTest extends WebTestCase
         $this->assertSelectorTextContains('h3.objects', 'Objects');
         $this->assertSelectorTextContains('h3.environment', 'Configured environment');
         $this->assertSelectorExists('nav.navbar');
+    }
+
+    /**
+     * A plain `GET /logout` from any page the admin happens to visit used to end their session.
+     */
+    public function testLogoutRequiresACsrfToken(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $client->request('GET', '/logout');
+        $this->assertResponseStatusCodeSame(403);
+
+        $client->request('GET', '/dashboard');
+        $this->assertResponseIsSuccessful('The session must survive a logout without a token');
+    }
+
+    public function testLogoutWorksFromTheMenuLink(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $crawler = $client->request('GET', '/dashboard');
+        $client->click($crawler->filter('a.dropdown-item')->selectLink('Logout')->link());
+
+        $client->request('GET', '/dashboard');
+        $this->assertResponseRedirects('/login');
     }
 }

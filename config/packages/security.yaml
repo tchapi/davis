@@ -21,6 +21,8 @@ security:
             logout:
                 path: app_logout
                 target: dashboard
+                # Without this, any page the admin visits can log them out with a plain GET
+                enable_csrf: true
             
 
     access_control:
