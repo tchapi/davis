@@ -26,8 +26,13 @@ class AddressBookController extends AbstractController
         $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
         $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri($principalUri);
 
+        $cardCounts = $doctrine->getRepository(AddressBook::class)->countCardsByAddressBook(
+            array_map(fn (AddressBook $addressbook) => $addressbook->getId(), $addressbooks)
+        );
+
         return $this->render('addressbooks/index.html.twig', [
             'addressbooks' => $addressbooks,
+            'cardCounts' => $cardCounts,
             'principal' => $principal,
             'userId' => $userId,
         ]);

@@ -23,7 +23,7 @@
             </div>
         </div>
         <p class="mb-1">{{ addressbook.description }}</p>
-        <small>{{ "addressbooks.uri"|trans }} : <code>{{ addressbook.uri }}</code> — {{ "addressbooks.contacts"|trans({'%count%': addressbook.cards|length}) }}</small>
+        <small>{{ "addressbooks.uri"|trans }} : <code>{{ addressbook.uri }}</code> — {{ "addressbooks.contacts"|trans({'%count%': cardCounts[addressbook.id]}) }}</small>
         <div class="btn-group btn-group-sm mt-3 d-flex d-md-none" role="group">
             <a href="{{ path('addressbook_edit',{userId: userId, id: addressbook.id})}}" class="btn btn-sm btn-outline-primary">✎ {{ "edit"|trans }}</a>
             <a href="#"
