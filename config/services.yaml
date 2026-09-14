@@ -12,6 +12,7 @@ parameters:
     birthday_reminder_offset: '%env(default:default_birthday_reminder_offset:BIRTHDAY_REMINDER_OFFSET)%'
     default_birthday_reminder_offset: "PT9H"
     caldav_enabled: "%env(bool:CALDAV_ENABLED)%"
+    default_webdav_public_dir_writable: "false"
     carddav_enabled: "%env(bool:CARDDAV_ENABLED)%"
 
 services:
@@ -64,6 +65,7 @@ services:
             $webdavPublicDir: "%env(resolve:WEBDAV_PUBLIC_DIR)%"
             $webdavHomesDir: "%env(resolve:WEBDAV_HOMES_DIR)%"
             $webdavTmpDir: "%env(resolve:WEBDAV_TMP_DIR)%"
+            $webdavPublicDirWritable: "%env(bool:default:default_webdav_public_dir_writable:WEBDAV_PUBLIC_DIR_WRITABLE)%"
 
     App\Security\LoginFormAuthenticator:
         arguments:
