@@ -25,12 +25,15 @@ security:
                 enable_csrf: true
             
 
+    # Only the first matching rule applies, so the public endpoints are listed first and the
+    # admin interface is whatever is left. A route added later is protected unless it is added
+    # to this list on purpose.
     access_control:
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/dav, roles: PUBLIC_ACCESS }
-        - { path: ^/dashboard, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
-        - { path: ^/users, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
-        - { path: ^/calendars, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
-        - { path: ^/addressbooks, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
+        - { path: ^/\.well-known/, roles: PUBLIC_ACCESS }
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/logout$, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/health$, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED }
+        - { path: ^/, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }

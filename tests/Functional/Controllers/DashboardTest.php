@@ -108,6 +108,26 @@ class DashboardTest extends WebTestCase
         $this->assertResponseIsSuccessful('The session must survive a logout without a token');
     }
 
+    /**
+     * The admin interface is protected by a terminal `^/` rule, so the endpoints that have to stay
+     * reachable without an account are the ones listed before it. If that list ever falls after the
+     * catch-all, clients can no longer discover or reach the DAV endpoint and nobody can log in.
+     */
+    public function testThePublicEndpointsStayPublic(): void
+    {
+        $client = static::createClient();
+
+        foreach (['/', '/login', '/.well-known/caldav', '/.well-known/carddav'] as $url) {
+            $client->request('GET', $url);
+
+            $this->assertNotSame(
+                '/login',
+                $client->getResponse()->headers->get('Location'),
+                $url.' must not redirect to the login page'
+            );
+        }
+    }
+
     public function testLogoutWorksFromTheMenuLink(): void
     {
         $client = static::createClient();
