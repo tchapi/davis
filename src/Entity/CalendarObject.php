@@ -88,18 +88,6 @@ class CalendarObject
         return $this;
     }
 
-    public function getLastModifier(): ?int
-    {
-        return $this->lastModifier;
-    }
-
-    public function setLastModifier(?int $lastModifier): self
-    {
-        $this->lastModifier = $lastModifier;
-
-        return $this;
-    }
-
     public function getEtag(): ?string
     {
         return $this->etag;

@@ -24,24 +24,24 @@ class Principal
     private $id;
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
-    #[Assert\Unique]
     #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private $uri;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Assert\NotBlank]
     #[Assert\Email(message: "The email '{{ value }}' is not a valid email.")]
+    #[Assert\Length(max: 255)]
     private $email;
 
     #[ORM\Column(name: 'displayname', type: 'string', length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private $displayName;
 
     #[ORM\Column(type: 'boolean')]
-    #[Assert\NotBlank]
     private $isMain;
 
     #[ORM\Column(type: 'boolean')]
-    #[Assert\NotBlank]
     private $isAdmin;
 
     #[ORM\ManyToMany(targetEntity: 'Principal')]

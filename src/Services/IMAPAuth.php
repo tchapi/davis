@@ -64,20 +64,10 @@ final class IMAPAuth extends AbstractAuth
         $components = parse_url($IMAPAuthUrl);
 
         if (!$components) {
-            throw new Exception('IMAP Error (parsing IMAP url "'.$IMAPAuthUrl.'"): '.$e->getMessage());
+            throw new \RuntimeException('IMAP_AUTH_URL could not be parsed as a URL: "'.$IMAPAuthUrl.'". Expected something like "imap.example.com:993".');
         }
 
         $this->IMAPHost = $components['host'] ?? null;
-
-        // Trying to choose the best port if it was not provided,
-        // defaulting to 993 (secure)
-        if (isset($components['port'])) {
-            $this->IMAPPort = $components['port'];
-        } elseif (false === $this->IMAPEncryptionMethod) {
-            $this->IMAPPort = 143;
-        } else {
-            $this->IMAPPort = 993;
-        }
 
         // We're making sure that only ssl, tls or 'false' are passed down to the IMAP client,
         // defaulting to SSL
@@ -89,6 +79,17 @@ final class IMAPAuth extends AbstractAuth
         } else {
             $this->IMAPEncryptionMethod = 'ssl';
         }
+
+        // Trying to choose the best port if it was not provided,
+        // defaulting to 993 (secure)
+        if (isset($components['port'])) {
+            $this->IMAPPort = $components['port'];
+        } elseif (false === $this->IMAPEncryptionMethod) {
+            $this->IMAPPort = 143;
+        } else {
+            $this->IMAPPort = 993;
+        }
+
         $this->IMAPCertificateValidation = $IMAPCertificateValidation;
 
         $this->autoCreate = $autoCreate;

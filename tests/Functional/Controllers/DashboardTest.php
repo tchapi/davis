@@ -72,6 +72,56 @@ class DashboardTest extends WebTestCase
         $this->assertSelectorTextContains('div.alert.alert-danger', 'Invalid credentials.');
     }
 
+    /**
+     * The login throttling budget is keyed on the username *and* the client IP, and it outlives
+     * the kernel because it lives in a cache pool. Giving each test its own random IP keeps one
+     * test from spending another's budget, including across repeated local runs.
+     */
+    private function submitLogin($client, string $username, string $password): void
+    {
+        $crawler = $client->request('GET', '/login');
+
+        $form = $crawler->selectButton('Submit')->form();
+        $form['_username']->setValue($username);
+        $form['_password']->setValue($password);
+
+        $client->submit($form);
+    }
+
+    public function testRepeatedFailedLoginsAreThrottled(): void
+    {
+        $client = static::createClient();
+        $client->setServerParameter('REMOTE_ADDR', '10.'.random_int(0, 255).'.'.random_int(0, 255).'.'.random_int(1, 254));
+
+        for ($i = 1; $i <= 5; ++$i) {
+            $this->submitLogin($client, $_ENV['ADMIN_LOGIN'], 'bad_password');
+            $client->followRedirect();
+            $this->assertSelectorTextContains('div.alert.alert-danger', 'Invalid credentials.', 'attempt '.$i.' should still be answered normally');
+        }
+
+        $this->submitLogin($client, $_ENV['ADMIN_LOGIN'], 'bad_password');
+        $client->followRedirect();
+
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Too many failed login attempts');
+    }
+
+    /**
+     * The budget is per username and IP, so a few typos must not lock the admin out.
+     */
+    public function testACorrectLoginStillWorksAfterAFewFailedAttempts(): void
+    {
+        $client = static::createClient();
+        $client->setServerParameter('REMOTE_ADDR', '10.'.random_int(0, 255).'.'.random_int(0, 255).'.'.random_int(1, 254));
+
+        for ($i = 1; $i <= 4; ++$i) {
+            $this->submitLogin($client, $_ENV['ADMIN_LOGIN'], 'bad_password');
+        }
+
+        $this->submitLogin($client, $_ENV['ADMIN_LOGIN'], $_ENV['ADMIN_PASSWORD']);
+
+        $this->assertResponseRedirects('/dashboard');
+    }
+
     public function testLoginCorrect(): void
     {
         $client = static::createClient();

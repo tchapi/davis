@@ -18,6 +18,8 @@ security:
             custom_authenticators:
                 - App\Security\LoginFormAuthenticator
             provider: admin_user_provider
+            login_throttling:
+                max_attempts: 5
             logout:
                 path: app_logout
                 target: dashboard

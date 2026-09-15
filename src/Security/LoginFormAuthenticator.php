@@ -7,13 +7,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
@@ -46,31 +45,33 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             && $request->isMethod('POST');
     }
 
+    /**
+     * The credentials are rejected by the passport rather than by throwing from here, because
+     * `login_throttling` only gets to run once a passport exists: throwing earlier means failed
+     * attempts are counted but never blocked.
+     */
     public function authenticate(Request $request): Passport
     {
-        $credentials = [
-            'username' => $request->request->get('_username'),
-            'password' => $request->request->get('_password'),
-            'csrf_token' => $request->request->get('_csrf_token'),
-        ];
-        $request->getSession()->set(
-            SecurityRequestAttributes::LAST_USERNAME,
-            $credentials['username']
-        );
+        $username = $request->request->getString('_username');
+        $password = $request->request->getString('_password');
 
-        if ($credentials['username'] !== $this->adminLogin) {
-            // fail authentication with a custom error
-            throw new CustomUserMessageAuthenticationException('Username could not be found.');
-        }
+        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        if ($credentials['password'] !== $this->adminPassword) {
-            // fail authentication with a custom error
-            throw new CustomUserMessageAuthenticationException('Invalid credentials.');
-        }
+        return new Passport(
+            new UserBadge($username),
+            new CustomCredentials(
+                function (string $presentedPassword) use ($username): bool {
+                    // Both halves are compared, and both in constant time, so the response says
+                    // nothing about which one was wrong — an unknown name and a wrong password
+                    // fail identically with "Invalid credentials.".
+                    $loginMatches = hash_equals($this->adminLogin, $username);
+                    $passwordMatches = hash_equals($this->adminPassword, $presentedPassword);
 
-        return new SelfValidatingPassport(
-            new UserBadge($this->adminLogin),
-            [new CsrfTokenBadge('authenticate', $credentials['csrf_token'])]
+                    return $loginMatches && $passwordMatches;
+                },
+                $password
+            ),
+            [new CsrfTokenBadge('authenticate', $request->request->getString('_csrf_token'))]
         );
     }
 
