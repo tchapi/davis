@@ -23,10 +23,12 @@ class AddressBook
     private $principalUri;
 
     #[ORM\Column(name: 'displayname', type: 'string', length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private $displayName;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\Regex("/[0-9a-z\-]+/")]
+    #[Assert\Length(max: 255)]
     private $uri;
 
     #[ORM\Column(type: 'text', nullable: true)]
