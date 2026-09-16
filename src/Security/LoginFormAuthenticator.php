@@ -2,6 +2,8 @@
 
 namespace App\Security;
 
+use App\Entity\User;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,14 +23,16 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
+    private $doctrine;
     private $urlGenerator;
     private $csrfTokenManager;
 
     private $adminLogin;
     private $adminPassword;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, string $adminLogin, string $adminPassword)
+    public function __construct(ManagerRegistry $doctrine, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, string $adminLogin, string $adminPassword)
     {
+		$this->doctrine = $doctrine;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->adminLogin = $adminLogin;
@@ -58,28 +62,38 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             $credentials['username']
         );
 
-        if ($credentials['username'] !== $this->adminLogin) {
-            // fail authentication with a custom error
+        if (($credentials['username'] == $this->adminLogin) && ($credentials['password'] == $this->adminPassword)) {
+			return new SelfValidatingPassport(
+				new UserBadge($this->adminLogin),
+				[new CsrfTokenBadge('authenticate', $credentials['csrf_token'])]
+			);
+        }
+
+		$user = $this->doctrine->getRepository(User::class)->findOneByUsername($credentials['username']);
+		if (!$user) {
             throw new CustomUserMessageAuthenticationException('Username could not be found.');
         }
 
-        if ($credentials['password'] !== $this->adminPassword) {
+        if (!password_verify($credentials['password'], $user->getPassword())) {
             // fail authentication with a custom error
             throw new CustomUserMessageAuthenticationException('Invalid credentials.');
         }
 
         return new SelfValidatingPassport(
-            new UserBadge($this->adminLogin),
+            new UserBadge($user->getUsername()),
             [new CsrfTokenBadge('authenticate', $credentials['csrf_token'])]
         );
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
-            return new RedirectResponse($targetPath);
-        }
+		if (in_array("ROLE_ADMIN", $token->getRoleNames(), true)) {
+        	return new RedirectResponse($this->urlGenerator->generate('dashboard'));
+		} else if (in_array("ROLE_USER", $token->getRoleNames(), true)) {
+        	return new RedirectResponse($this->urlGenerator->generate('user_user', ['userId' => $token->getUser()->getUserId()]));
+		}
 
-        return new RedirectResponse($this->urlGenerator->generate('dashboard'));
+		# XXX: this should not be reachable
+        return new RedirectResponse($this->urlGenerator->generate('/'));
     }
 }

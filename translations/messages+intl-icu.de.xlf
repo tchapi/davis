@@ -29,8 +29,8 @@
         <source>label.error</source>
         <target>Fehler</target>
       </trans-unit>
-      <trans-unit id="gyZcKbE" resname="admin.interface">
-        <source>admin.interface</source>
+      <trans-unit id="gyZcKbE" resname="index.login">
+        <source>index.login</source>
         <target>Administrationsoberfläche</target>
       </trans-unit>
       <trans-unit id="CAiOZVb" resname="close">
@@ -216,6 +216,10 @@
       <trans-unit id="ybqHGGr" resname="calendars.shared.with">
         <source>calendars.shared.with</source>
         <target>Kalender geteilt mit {who}</target>
+      </trans-unit>
+      <trans-unit id="ea6Wise" resname="calendars.share.with">
+        <source>calendars.share.with</source>
+        <target>Kalender mit [Benutzername] teilen</target>
       </trans-unit>
       <trans-unit id="caEhjpg" resname="users.username">
         <source>users.username</source>

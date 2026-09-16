@@ -14,11 +14,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/addressbooks', name: 'addressbook_')]
 class AddressBookController extends AbstractController
 {
     #[Route('/{userId}', name: 'index')]
+	#[IsGranted('access', 'userId')]
     public function addressBooks(ManagerRegistry $doctrine, #[MapEntity(id: 'userId')] User $user, int $userId): Response
     {
         $principalUri = $user->getPrincipalUri();
@@ -35,6 +37,7 @@ class AddressBookController extends AbstractController
 
     #[Route('/{userId}/new', name: 'create')]
     #[Route('/{userId}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
+	#[IsGranted('access', 'userId')]
     public function addressbookCreate(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, ?int $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
         $username = $user->getUsername();
@@ -97,6 +100,7 @@ class AddressBookController extends AbstractController
     }
 
     #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"], methods: ['POST'])]
+	#[IsGranted('access', 'userId')]
     public function addressbookDelete(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $id, TranslatorInterface $trans, BirthdayService $birthdayService): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {

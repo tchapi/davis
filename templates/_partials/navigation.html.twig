@@ -1,19 +1,31 @@
 <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
   <div class="container">
+  	{% if admin_logged %}
     <a class="navbar-brand" href="{{ path('dashboard') }}">
       <img src="/images/logo.png" width="30" height="30" alt=""> Davis
     </a>
+	{% elseif user_logged %}
+    <a class="navbar-brand" href="{{ path('user_user', {userId: user_logged_id}) }}">
+      <img src="/images/logo.png" width="30" height="30" alt=""> Davis
+    </a>
+	{% else %}
+    <a class="navbar-brand" href="{{ path('app_login') }}">
+      <img src="/images/logo.png" width="30" height="30" alt=""> Davis
+    </a>
+	{% endif %}
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="{{ "toggle.navigation"|trans }}">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
+  	  	{% if admin_logged %}
         <li class="nav-item{% if menu == "dashboard" %} active{% endif %}">
           <a class="nav-link" href="{{ path('dashboard') }}">{{ "title.dashboard"|trans }}</a>
         </li>
         <li class="nav-item{% if menu == "resources" %} active{% endif %}">
           <a class="nav-link" href="{{ path('user_index') }}">{{ "title.users_and_resources"|trans }}</a>
         </li>
+	  	{% endif %}
       </ul>
       {% if app.user %}
       <ul class="navbar-nav">

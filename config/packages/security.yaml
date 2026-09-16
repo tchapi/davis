@@ -2,8 +2,8 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     providers:
-        admin_user_provider:
-            id: App\Security\AdminUserProvider
+        user_provider:
+            id: App\Security\UserProvider
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -17,7 +17,7 @@ security:
             lazy: true
             custom_authenticators:
                 - App\Security\LoginFormAuthenticator
-            provider: admin_user_provider
+            provider: user_provider
             logout:
                 path: app_logout
                 target: dashboard
@@ -27,8 +27,8 @@ security:
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/dav, roles: PUBLIC_ACCESS }
         - { path: ^/dashboard, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
-        - { path: ^/users, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
-        - { path: ^/calendars, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
-        - { path: ^/addressbooks, roles: ROLE_ADMIN, allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
+        - { path: ^/users, roles: [ROLE_ADMIN, ROLE_USER], allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
+        - { path: ^/calendars, roles: [ROLE_ADMIN, ROLE_USER], allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
+        - { path: ^/addressbooks, roles: [ROLE_ADMIN, ROLE_USER], allow_if: "'%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%' === 'true'" }
         - { path: ^/api/v1/health$, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED }
