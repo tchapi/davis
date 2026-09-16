@@ -47,8 +47,11 @@ class UserProvider implements UserProviderInterface
 
 		$user = $this->doctrine->getRepository(User::class)->findOneByUsername($identifier);
 		if (!$user) {
-        	throw new \Exception('Invalid username');
+            // instead of throwing an exception, return a fake user: this will
+            // fail during authentication since the user does not exist
+            return new NormalUser($identifier, '', 0);
 		}
+
         return new NormalUser($identifier, $user->getPassword(), $user->getId());
     }
 

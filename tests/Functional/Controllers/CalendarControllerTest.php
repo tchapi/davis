@@ -291,6 +291,33 @@ class CalendarControllerTest extends WebTestCase
         $this->assertNotNull($calendarRepository->find($calendar->getId()));
     }
 
+    /**
+     * `uri` and `displayname` are 255 characters wide and `calendarcolor` is 10, so an over-long
+     * value has to come back as a form error rather than as a truncation error from the driver.
+     */
+    public function testCalendarNewRefusesOverLongValues(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $crawler = $client->request('GET', '/calendars/'.$userId.'/new');
+        $form = $crawler->selectButton('calendar_instance_save')->form();
+
+        $client->submit($form, [
+            'calendar_instance[uri]' => str_repeat('a', 256),
+            'calendar_instance[displayName]' => str_repeat('b', 256),
+            'calendar_instance[description]' => 'too long',
+            'calendar_instance[calendarColor]' => '#ABCDEF'.str_repeat('0', 20),
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $this->assertNull($em->getRepository(CalendarInstance::class)->findOneBy(['uri' => str_repeat('a', 256)]));
+    }
+
     public function testCalendarNewIgnoresASubmittedOwner(): void
     {
         $client = $this->loggedInClient();
@@ -312,5 +339,16 @@ class CalendarControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
         $this->assertNull($calendarRepository->findOneBy(['uri' => 'hijack']));
+    }
+
+    public function testCalendarPagesAreNotReachableAnonymously(): void
+    {
+        $client = static::createClient();
+
+        foreach (['/calendars/1', '/calendars/1/new', '/calendars/1/edit/1', '/calendars/1/shares/1'] as $url) {
+            $client->request('GET', $url);
+
+            $this->assertResponseRedirects('/login', null, $url.' must not be public');
+        }
     }
 }

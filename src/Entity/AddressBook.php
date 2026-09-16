@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
+use App\Repository\AddressBookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity()]
+#[ORM\Entity(repositoryClass: AddressBookRepository::class)]
 #[ORM\Table(name: 'addressbooks')]
 #[UniqueEntity(fields: ['principalUri', 'uri'], errorPath: 'uri', message: 'form.uri.unique')]
 class AddressBook
@@ -22,10 +23,12 @@ class AddressBook
     private $principalUri;
 
     #[ORM\Column(name: 'displayname', type: 'string', length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private $displayName;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\Regex("/[0-9a-z\-]+/")]
+    #[Assert\Length(max: 255)]
     private $uri;
 
     #[ORM\Column(type: 'text', nullable: true)]

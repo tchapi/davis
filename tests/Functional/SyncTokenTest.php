@@ -50,10 +50,8 @@ class SyncTokenTest extends KernelTestCase
     }
 
     /**
-     * Regression test: sync tokens were stored as text, so `synctoken >= 9 AND synctoken < 11`
-     * was compared lexicographically ('10' sorts before '9'). A client syncing across a
-     * decimal-width boundary was told the collection had advanced but received no changes at
-     * all, silently losing contacts.
+     * Sync tokens are compared numerically, so a client syncing across a decimal-width
+     * boundary gets every change in the range. Compared as text, `'10' < '9'` would hide them.
      */
     public function testChangesAcrossADecimalBoundaryAreReported(): void
     {

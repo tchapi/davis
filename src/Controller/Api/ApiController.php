@@ -168,7 +168,7 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
-        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
+        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUriWithCalendars($principalUri);
         $allSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($principalUri);
 
         $calendars = [];
@@ -243,7 +243,7 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
-        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
+        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUriWithCalendars($principalUri);
 
         $calendar_details = [];
         foreach ($allCalendars as $calendar) {

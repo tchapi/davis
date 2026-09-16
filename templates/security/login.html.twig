@@ -5,7 +5,7 @@
 
 {% if app.user %}
     <div class="mb-3">
-        {{ "login.already"|trans({username: app.user.username}) }}, <a href="{{ path('app_logout') }}">{{ "logout"|trans }}</a>
+        {{ "login.already"|trans({username: app.user.username}) }}, <a href="{{ path('app_logout', {_csrf_token: csrf_token('logout')}) }}">{{ "logout"|trans }}</a>
     </div>
 {% else %}
     <div class="row justify-content-md-center">

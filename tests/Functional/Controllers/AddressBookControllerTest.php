@@ -97,6 +97,33 @@ class AddressBookControllerTest extends WebTestCase
         $this->assertAnySelectorTextContains('h5', 'New test address book');
     }
 
+    /**
+     * `uri` and `displayname` are 255-char columns, so an over-long value has to be refused by the
+     * form. Without a length constraint it reaches the driver and comes back as a 500.
+     */
+    public function testAddressBookNewRefusesOverLongValues(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $crawler = $client->request('GET', '/addressbooks/'.$userId.'/new');
+        $form = $crawler->selectButton('address_book_save')->form();
+
+        $client->submit($form, [
+            'address_book[uri]' => str_repeat('a', 256),
+            'address_book[displayName]' => str_repeat('b', 256),
+            'address_book[description]' => 'too long',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $this->assertNull($em->getRepository(AddressBook::class)->findOneBy(['uri' => str_repeat('a', 256)]));
+    }
+
     public function testAddressBookDelete(): void
     {
         $user = new AdminUser('admin', 'test');
@@ -205,5 +232,16 @@ class AddressBookControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertAnySelectorTextContains('h5', 'nameless-book');
+    }
+
+    public function testAddressBookPagesAreNotReachableAnonymously(): void
+    {
+        $client = static::createClient();
+
+        foreach (['/addressbooks/1', '/addressbooks/1/new', '/addressbooks/1/edit/1'] as $url) {
+            $client->request('GET', $url);
+
+            $this->assertResponseRedirects('/login', null, $url.' must not be public');
+        }
     }
 }

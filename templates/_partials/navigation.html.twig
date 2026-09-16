@@ -34,7 +34,7 @@
             👤 {{ app.user.username }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navUserMenu">
-            <a class="dropdown-item" href="{{ path('app_logout') }}">{{ "logout"|trans }}</a>
+            <a class="dropdown-item" href="{{ path('app_logout', {_csrf_token: csrf_token('logout')}) }}">{{ "logout"|trans }}</a>
           </div>
         </li>
         <li class="nav-item dropdown">
