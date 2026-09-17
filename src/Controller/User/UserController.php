@@ -300,13 +300,24 @@ class UserController extends AbstractController
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        if (!is_numeric($request->request->get('principalId'))) {
-            throw new BadRequestHttpException();
-        }
-
         $principalUri = $user->getPrincipalUri();
 
-        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
+		if ($this->isGranted('ROLE_ADMIN')) {
+			// in this case, this is the id of the principal to add
+			if (!is_numeric($request->request->get('principalId'))) {
+				throw new BadRequestHttpException();
+			}
+
+        	$newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
+		} else {
+			// in this case, this is the username of the member to add, we need to convert it to a principal
+        	$memberToAdd = $doctrine->getRepository(User::class)->findOneByUsername($request->request->get('principalId'));
+			if (!$memberToAdd) {
+				$this->addFlash('warning', 'User does not exist');
+				return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
+			}
+        	$newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneByUri($memberToAdd->getPrincipalUri());
+		}
 
         if (!$newMemberToAdd) {
             throw $this->createNotFoundException('Member not found');

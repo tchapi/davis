@@ -29,7 +29,7 @@
         <source>label.error</source>
         <target>Error</target>
       </trans-unit>
-      <trans-unit id="gyZcKbE" resname="index.login">
+      <trans-unit id="NNcSOEd" resname="index.login">
         <source>index.login</source>
         <target>Login</target>
       </trans-unit>
@@ -217,7 +217,7 @@
         <source>calendars.shared.with</source>
         <target>Calendars shared with {who}</target>
       </trans-unit>
-      <trans-unit id="ea6Wise" resname="calendars.share.with">
+      <trans-unit id="mshOD6v" resname="calendars.share.with">
         <source>calendars.share.with</source>
         <target>Share calendar with [username]</target>
       </trans-unit>
@@ -284,6 +284,10 @@
       <trans-unit id="pL5FhyS" resname="calendars.delegates.member.add">
         <source>calendars.delegates.member.add</source>
         <target>Share this calendar with another user:</target>
+      </trans-unit>
+      <trans-unit id="gIxL0sq" resname="calendars.delegates.member.add.username">
+        <source>calendars.delegates.member.add.username</source>
+        <target>Share all calendars with [username]</target>
       </trans-unit>
       <trans-unit id="gdXa6Lc" resname="calendars.delegates.member.help">
         <source>calendars.delegates.member.help</source>
@@ -589,7 +593,7 @@
         <source>calendar.share_access.3</source>
         <target>read / write</target>
       </trans-unit>
-      <trans-unit id="F8h2YaT" resname="calendar.public">
+      <trans-unit id="HtzCcCV" resname="calendar.public">
         <source>calendar.public</source>
         <target>public</target>
       </trans-unit>

@@ -29,7 +29,7 @@
         <source>label.error</source>
         <target>Erreur</target>
       </trans-unit>
-      <trans-unit id="gyZcKbE" resname="index.login">
+      <trans-unit id="NNcSOEd" resname="index.login">
         <source>index.login</source>
         <target>Interface d'administration</target>
       </trans-unit>
@@ -217,7 +217,7 @@
         <source>calendars.shared.with</source>
         <target>Calendriers partagés avec {who}</target>
       </trans-unit>
-      <trans-unit id="ea6Wise" resname="calendars.share.with">
+      <trans-unit id="mshOD6v" resname="calendars.share.with">
         <source>calendars.share.with</source>
         <target>Partagez le calendrier avec [nom d'utilisateur]</target>
       </trans-unit>
@@ -284,6 +284,10 @@
       <trans-unit id="pL5FhyS" resname="calendars.delegates.member.add">
         <source>calendars.delegates.member.add</source>
         <target>Partager ce calendrier avec un autre utilisateur :</target>
+      </trans-unit>
+      <trans-unit id="gIxL0sq" resname="calendars.delegates.member.add.username">
+        <source>calendars.delegates.member.add.username</source>
+        <target>Partagez tous les calendriers avec [nom d'utilisateur]</target>
       </trans-unit>
       <trans-unit id="gdXa6Lc" resname="calendars.delegates.member.help">
         <source>calendars.delegates.member.help</source>
