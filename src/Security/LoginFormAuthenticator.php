@@ -31,11 +31,11 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function __construct(ManagerRegistry $doctrine, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, string $adminLogin, string $adminPassword)
     {
-		$this->doctrine = $doctrine;
+        $this->doctrine = $doctrine;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->adminLogin = $adminLogin;
-		$this->adminPassword = password_hash($adminPassword, PASSWORD_DEFAULT);
+        $this->adminPassword = password_hash($adminPassword, PASSWORD_DEFAULT);
     }
 
     protected function getLoginUrl(Request $request): string
@@ -90,13 +90,13 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
-		if (in_array("ROLE_ADMIN", $token->getRoleNames(), true)) {
-        	return new RedirectResponse($this->urlGenerator->generate('dashboard'));
-		} else if (in_array("ROLE_USER", $token->getRoleNames(), true)) {
-        	return new RedirectResponse($this->urlGenerator->generate('user_user', ['userId' => $token->getUser()->getUserId()]));
-		}
+        if (in_array('ROLE_ADMIN', $token->getRoleNames(), true)) {
+            return new RedirectResponse($this->urlGenerator->generate('dashboard'));
+        } elseif (in_array('ROLE_USER', $token->getRoleNames(), true)) {
+            return new RedirectResponse($this->urlGenerator->generate('user_user', ['userId' => $token->getUser()->getUserId()]));
+        }
 
-		# XXX: this should not be reachable
+        // XXX: this should not be reachable
         return new RedirectResponse($this->urlGenerator->generate('/'));
     }
 }

@@ -56,7 +56,6 @@ class NormalUser implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
-
     /**
      * Returns the id used of the user.
      *

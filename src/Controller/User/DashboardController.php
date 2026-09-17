@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'dashboard')]
-	#[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_ADMIN')]
     public function dashboard(ManagerRegistry $doctrine): Response
     {
         $usersCount = $doctrine->getRepository(User::class)->count([]);

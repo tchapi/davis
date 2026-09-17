@@ -10,13 +10,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class UserVoter extends Voter
 {
-    const ACCESS = 'access';
+    public const ACCESS = 'access';
 
     private $doctrine;
 
     public function __construct(ManagerRegistry $doctrine)
-	{
-		$this->doctrine = $doctrine;
+    {
+        $this->doctrine = $doctrine;
     }
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -25,7 +25,7 @@ class UserVoter extends Voter
         if (!in_array($attribute, [self::ACCESS])) {
             return false;
         }
-		
+
         return true;
     }
 
@@ -34,35 +34,36 @@ class UserVoter extends Voter
         $user = $token->getUser();
 
         if ($user instanceof AdminUser) {
-			// admins can alway access everything
-			return true;
-		}
+            // admins can alway access everything
+            return true;
+        }
 
         if (!$user instanceof NormalUser) {
             // the user must be logged in; if not, deny access
             $vote?->addReason('The user is not logged in.');
+
             return false;
         }
 
         $userId = $subject;
 
-        return match($attribute) {
+        return match ($attribute) {
             self::ACCESS => $this->canAccess($user, $userId, $vote),
-            default => throw new \LogicException('This code should not be reached!')
+            default => throw new \LogicException('This code should not be reached!'),
         };
     }
 
     private function canAccess(NormalUser $logged_user, int $userId, ?Vote $vote): bool
     {
-		$user = $this->doctrine->getRepository(User::class)->findOneById($userId);
-		if (!$user) {
-			$vote?->addReason(sprintf(
-				'Id %d does not exist',
-				$userId
-			));
+        $user = $this->doctrine->getRepository(User::class)->findOneById($userId);
+        if (!$user) {
+            $vote?->addReason(sprintf(
+                'Id %d does not exist',
+                $userId
+            ));
 
-			return false;
-		}
+            return false;
+        }
 
         if ($logged_user->getUsername() === $user->getUsername()) {
             return true;

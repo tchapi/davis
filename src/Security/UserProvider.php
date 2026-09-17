@@ -17,8 +17,8 @@ class UserProvider implements UserProviderInterface
     private $adminPassword;
 
     public function __construct(ManagerRegistry $doctrine, string $adminLogin, string $adminPassword)
-	{
-		$this->doctrine = $doctrine;
+    {
+        $this->doctrine = $doctrine;
         $this->adminLogin = $adminLogin;
         $this->adminPassword = $adminPassword;
     }
@@ -41,16 +41,16 @@ class UserProvider implements UserProviderInterface
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-		if ($identifier == $this->adminLogin) {
-        	return new AdminUser($identifier, bin2hex(random_bytes(64)));
-		}
+        if ($identifier == $this->adminLogin) {
+            return new AdminUser($identifier, bin2hex(random_bytes(64)));
+        }
 
-		$user = $this->doctrine->getRepository(User::class)->findOneByUsername($identifier);
-		if (!$user) {
+        $user = $this->doctrine->getRepository(User::class)->findOneByUsername($identifier);
+        if (!$user) {
             // instead of throwing an exception, return a fake user: this will
             // fail during authentication since the user does not exist
             return new NormalUser($identifier, '', 0);
-		}
+        }
 
         return new NormalUser($identifier, $user->getPassword(), $user->getId());
     }
