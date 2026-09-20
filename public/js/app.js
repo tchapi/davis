@@ -140,9 +140,41 @@ if (colorPicker) {
 }
 
 // Bootstrap 5 popovers
+//
+// The setup popovers show a calendar or address book uri, which its owner chooses over DAV. The
+// content is built here as DOM rather than handed to Bootstrap as an HTML string, so those values
+// go through textContent and are never parsed as markup.
+const buildPopoverContent = element => {
+    const content = document.createDocumentFragment();
+
+    [['URI', element.dataset.uri], ['Absolute path', element.dataset.davUri]].forEach(([label, value], index) => {
+        if (!value) {
+            return;
+        }
+
+        if (index > 0) {
+            content.appendChild(document.createElement('br'));
+        }
+
+        content.appendChild(document.createTextNode(`${label}: `));
+
+        const code = document.createElement('code');
+        code.textContent = value;
+        content.appendChild(code);
+    })
+
+    return content;
+}
+
 const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
 if (popoverTriggerList) {
-    [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+    [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(
+        popoverTriggerEl,
+        // Popovers that carry no uri keep their own static `data-bs-content`
+        popoverTriggerEl.dataset.uri
+            ? { html: true, content: buildPopoverContent(popoverTriggerEl) }
+            : {}
+    ))
 }
 
 // Bootstrap 5 toasts

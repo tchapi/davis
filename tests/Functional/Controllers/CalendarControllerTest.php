@@ -318,6 +318,67 @@ class CalendarControllerTest extends WebTestCase
         $this->assertNull($em->getRepository(CalendarInstance::class)->findOneBy(['uri' => str_repeat('a', 256)]));
     }
 
+    /**
+     * A calendar colour is whatever the owner's client sent over CalDAV, and it lands inside a
+     * `style` attribute. HTML escaping does not stop it from closing the declaration and adding
+     * its own, and SQLite does not enforce the column length, so the payload is unbounded there.
+     */
+    public function testAnInjectedCalendarColourNeverReachesTheStyleAttribute(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        // The client reboots the kernel between requests, so the entity manager has to be taken
+        // again on every pass or the flush lands in a closed one and the page never changes.
+        $store = function (string $color): void {
+            $em = static::getContainer()->get('doctrine.orm.entity_manager');
+            $em->getRepository(CalendarInstance::class)
+                ->findOneBy(['principalUri' => Principal::PREFIX.'test_user', 'uri' => 'default'])
+                ->setCalendarColor($color);
+            $em->flush();
+        };
+
+        // Ten characters is all MySQL and PostgreSQL accept in that column, and it is enough to
+        // close the declaration and open another. SQLite enforces no length at all.
+        foreach (['red;x:y', 'a;b:url(1', 'red;z:0'] as $payload) {
+            $store($payload);
+
+            $client->request('GET', '/calendars/'.$userId);
+
+            $this->assertResponseIsSuccessful();
+            $this->assertStringContainsString('background-color: transparent', $client->getResponse()->getContent(), $payload.' should not be rendered');
+            $this->assertStringNotContainsString('background-color: '.$payload, $client->getResponse()->getContent());
+        }
+
+        // A real colour still gets through, in every form the clients write
+        foreach (['#ABC', '#5A80B4', '#5A80B4FF'] as $colour) {
+            $store($colour);
+
+            $client->request('GET', '/calendars/'.$userId);
+
+            $this->assertStringContainsString('background-color: '.$colour, $client->getResponse()->getContent(), $colour.' should be rendered');
+        }
+    }
+
+    /**
+     * The uri is client-chosen too, and it used to be interpolated into `data-bs-content` with
+     * `data-bs-html`, so only Bootstrap's sanitizer stood between it and the DOM. It is passed as
+     * plain data now, and app.js builds the popover through textContent.
+     */
+    public function testTheSetupPopoverCarriesNoMarkup(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $client->request('GET', '/calendars/'.$userId);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('data-bs-html', $client->getResponse()->getContent());
+        $this->assertSelectorExists('a[data-bs-toggle="popover"][data-uri]');
+    }
+
     public function testCalendarNewIgnoresASubmittedOwner(): void
     {
         $client = $this->loggedInClient();

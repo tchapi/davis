@@ -1,4 +1,10 @@
 {% extends 'base.html.twig' %}
+
+{# A calendar colour is whatever the owner's client sent over CalDAV, and it lands inside a `style`
+   attribute: HTML escaping does not stop it from closing the declaration and adding its own, and
+   SQLite does not enforce the column length. Anything that is not a hex colour renders as
+   `transparent`, which is what an empty value already rendered as. #}
+{% macro colour(value) %}{{ value matches '/^#([0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/' ? value : 'transparent' }}{% endmacro %}
 {% set menu = 'resources' %}
 
 {% block body %}
@@ -18,8 +24,8 @@
                 {% if calendar.isPublic() %}
                     <span class="badge bg-success ml-1">{{ ('calendar.public')|trans }}</span>
                 {% endif %}
-                <a href="#" tabindex="0" class="badge badge-indicator" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ calendar.uri }}</code><br />Absolute path: <code>{{ davUri }}</code>">ⓘ</a>
-                <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
+                <a href="#" tabindex="0" class="badge badge-indicator" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-uri="{{ calendar.uri }}" data-dav-uri="{{ davUri }}">ⓘ</a>
+                <span class="badge badge-indicator" style="background-color: {{ _self.colour(calendar.calendarColor) }}">&nbsp;</span>
             </h5>
             <div class="me-0 text-right d-md-block d-none">
                 {% if not calendar.isPublic() %}
@@ -84,8 +90,8 @@
                     {% else %}
                         <span class="badge bg-info ms-1">{{ ('calendar.share_access.' ~ calendar.access)|trans }}</span>
                     {% endif %}
-                    <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ calendar.uri }}</code><br />Absolute path: <code>{{ davUri }}</code>">ⓘ</a>
-                    <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
+                    <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-uri="{{ calendar.uri }}" data-dav-uri="{{ davUri }}">ⓘ</a>
+                    <span class="badge badge-indicator" style="background-color: {{ _self.colour(calendar.calendarColor) }}">&nbsp;</span>
                 </h5>
                 <div class="me-0 text-right d-md-block d-none">
                     <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
@@ -134,8 +140,8 @@
                 <h5 class="mb-1 me-auto">
                     {{ calendar.displayName }}
                     <span class="badge bg-warning ms-1">{{ ('calendar.auto')|trans }}</span>
-                    <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ calendar.uri }}</code><br />Absolute path: <code>{{ davUri }}</code>">ⓘ</a>
-                    <span class="badge badge-indicator" style="background-color: {{ calendar.calendarColor }}">&nbsp;</span>
+                    <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-uri="{{ calendar.uri }}" data-dav-uri="{{ davUri }}">ⓘ</a>
+                    <span class="badge badge-indicator" style="background-color: {{ _self.colour(calendar.calendarColor) }}">&nbsp;</span>
                 </h5>
                 <div class="me-0 text-right d-md-block d-none">
                     <a href="{{ path('calendar_edit',{userId: userId, id: calendar.id})}}" class="btn btn-sm btn-outline-primary ms-1">✎ {{ "edit"|trans }}</a>
@@ -167,8 +173,8 @@
                 <h5 class="mb-1 me-auto">
                     {{ subscription.displayName }}
                     <span class="badge bg-info ms-1">{{ ('calendar.subscription')|trans }}</span>
-                    <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-bs-html='true' data-bs-content="URI: <code>{{ subscription.uri }}</code>">ⓘ</a>
-                    <span class="badge badge-indicator" style="background-color: {{ subscription.calendarColor }}">&nbsp;</span>
+                    <a href="#" tabindex="0" class="badge badge-indicator ms-1" role="button" data-bs-toggle="popover" data-bs-title="{{ 'calendars.setup.title'|trans }}" data-uri="{{ subscription.uri }}">ⓘ</a>
+                    <span class="badge badge-indicator" style="background-color: {{ _self.colour(subscription.calendarColor) }}">&nbsp;</span>
                 </h5>
             </div>
             <code class="mb-1">{{ subscription.source }}</code>
