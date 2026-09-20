@@ -276,7 +276,11 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\Subscriptions\Plugin());
             if ($this->inviteAddress) {
-                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->publicDir));
+                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->publicDir, $this->logger));
+            } else {
+                // Without it the scheduling plugin above still answers, but no invitation ever
+                // leaves the server and nothing says so.
+                $this->logger->warning('CalDAV scheduling is enabled but INVITE_FROM_ADDRESS is not set: no invitation email will be sent.');
             }
         }
 

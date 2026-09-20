@@ -325,6 +325,10 @@
         <source>form.email</source>
         <target>E-Mail</target>
       </trans-unit>
+      <trans-unit id="frmEmlHlp" resname="form.email.help">
+        <source>form.email.help</source>
+        <target>Wird als Kalenderadresse für Einladungen verwendet: Sie muss mit der Adresse übereinstimmen, die der Client als Organisator sendet, sonst werden keine Einladungen versendet.</target>
+      </trans-unit>
       <trans-unit id="RQWeqAY" resname="form.admin">
         <source>form.admin</source>
         <target>Ist dieser Benutzer ein Administrator?</target>

@@ -167,6 +167,21 @@ INVITE_FROM_ADDRESS=no-reply@example.org
 > If the username, password or host contain any character considered special in a URI (such as `: / ? # [ ] @ ! $ & ' ( ) * + , ; =`), you MUST encode them.
 > See [here](https://symfony.com/doc/current/mailer.html#transport-setup) for more details.
 
+If `INVITE_FROM_ADDRESS` is empty, Davis does not send scheduling emails at all and logs a warning when the DAV endpoint starts.
+
+Invitations are only produced for events whose `ORGANIZER` matches the organiser's own address, and that address is the `email` of their principal — the *Email* field of the account in the dashboard. If it is empty or different from what the calendar client sends, the server has nothing to send an invitation about and stays silent. To find accounts in that state:
+
+```sql
+SELECT uri, email FROM principals WHERE email IS NULL OR email = '';
+```
+
+To check the mailer itself without creating an event:
+
+```shell
+php bin/console davis:mail:test you@example.org
+```
+
+
 **f. The reminder offset for all birthdays**
 
 You must specify a relative duration, as specified in [the RFC 5545 spec](https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.6)
