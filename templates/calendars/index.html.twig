@@ -9,7 +9,11 @@
 
 {% block body %}
 
+{% if admin_logged %}
 {% include '_partials/back_button.html.twig' with { url: path('user_index'), text: "users.back"|trans } %}
+{% elseif user_logged %}
+{% include '_partials/back_button.html.twig' with { url: path('user_user', {userId: user_logged_id}), text: "users.back"|trans } %}
+{% endif %}
 
 <h1 class="display-4 fw-lighter d-flex justify-content-between">{{ "calendars.for"|trans({'who': principal.displayName}) }} <a href="{{ path('calendar_create', {userId: userId}) }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "calendars.new"|trans }}</a></h1>
 

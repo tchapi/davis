@@ -52,4 +52,26 @@ class PrincipalRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return array<array{Principal, userId: int}>
+     */
+    public function findOneMainPrincipalsWithUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('p')
+            ->addSelect('u.id AS userId')
+            ->leftJoin(
+                \App\Entity\User::class,
+                'u',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'CONCAT(:prefix, u.username) = p.uri'
+            )
+            ->andWhere('p.isMain = :isMain')
+            ->andWhere('u.id = :userid')
+            ->setParameter('isMain', true)
+            ->setParameter('userid', $userId)
+            ->setParameter('prefix', Principal::PREFIX)
+            ->getQuery()
+            ->getResult();
+    }
 }

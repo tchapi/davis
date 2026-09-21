@@ -2,6 +2,8 @@
 
 namespace App\Security;
 
+use App\Entity\User;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,18 +22,20 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
+    private $doctrine;
     private $urlGenerator;
     private $csrfTokenManager;
 
     private $adminLogin;
     private $adminPassword;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, string $adminLogin, string $adminPassword)
+    public function __construct(ManagerRegistry $doctrine, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, string $adminLogin, string $adminPassword)
     {
+        $this->doctrine = $doctrine;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->adminLogin = $adminLogin;
-        $this->adminPassword = $adminPassword;
+        $this->adminPassword = password_hash($adminPassword, PASSWORD_DEFAULT);
     }
 
     protected function getLoginUrl(Request $request): string
@@ -55,17 +59,26 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $username = $request->request->getString('_username');
         $password = $request->request->getString('_password');
 
+        $user = $this->doctrine->getRepository(User::class)->findOneByUsername($username);
+        if ($user) {
+            $username_to_test = $user->getUsername();
+            $password_to_test = $user->getPassword();
+        } else {
+            $username_to_test = $this->adminLogin;
+            $password_to_test = $this->adminPassword;
+        }
+
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
 
         return new Passport(
             new UserBadge($username),
             new CustomCredentials(
-                function (string $presentedPassword) use ($username): bool {
+                function (string $presentedPassword) use ($username, $username_to_test, $password_to_test): bool {
                     // Both halves are compared, and both in constant time, so the response says
                     // nothing about which one was wrong — an unknown name and a wrong password
                     // fail identically with "Invalid credentials.".
-                    $loginMatches = hash_equals($this->adminLogin, $username);
-                    $passwordMatches = hash_equals($this->adminPassword, $presentedPassword);
+                    $loginMatches = hash_equals($username, $username_to_test);
+                    $passwordMatches = password_verify($presentedPassword, $password_to_test);
 
                     return $loginMatches && $passwordMatches;
                 },
@@ -77,10 +90,13 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
-            return new RedirectResponse($targetPath);
+        if (in_array('ROLE_ADMIN', $token->getRoleNames(), true)) {
+            return new RedirectResponse($this->urlGenerator->generate('dashboard'));
+        } elseif (in_array('ROLE_USER', $token->getRoleNames(), true)) {
+            return new RedirectResponse($this->urlGenerator->generate('user_user', ['userId' => $token->getUser()->getUserId()]));
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('dashboard'));
+        // XXX: this should not be reachable
+        return new RedirectResponse($this->urlGenerator->generate('/'));
     }
 }

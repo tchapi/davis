@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\User;
 
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
@@ -18,12 +18,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/calendars', name: 'calendar_')]
 class CalendarController extends AbstractController
 {
     #[Route('/{userId}', name: 'index')]
+    #[IsGranted('access', 'userId')]
     public function calendars(ManagerRegistry $doctrine, UrlGeneratorInterface $router, #[MapEntity(id: 'userId')] User $user, int $userId): Response
     {
         $username = $user->getUsername();
@@ -74,6 +76,7 @@ class CalendarController extends AbstractController
 
     #[Route('/{userId}/new', name: 'create')]
     #[Route('/{userId}/edit/{id}', name: 'edit', requirements: ['id' => "\d+"])]
+    #[IsGranted('access', 'userId')]
     public function calendarEdit(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, ?int $id, TranslatorInterface $trans): Response
     {
         $principalUri = $user->getPrincipalUri();
@@ -163,6 +166,7 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/{userId}/shares/{calendarid}', name: 'shares', requirements: ['calendarid' => "\d+"])]
+    #[IsGranted('access', 'userId')]
     public function calendarShares(ManagerRegistry $doctrine, #[MapEntity(id: 'userId')] User $user, int $userId, string $calendarid, TranslatorInterface $trans): Response
     {
         $principalUri = $user->getPrincipalUri();
@@ -189,6 +193,7 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/{userId}/share/{instanceid}', name: 'share_add', requirements: ['instanceid' => "\d+"], methods: ['POST'])]
+    #[IsGranted('access', 'userId')]
     public function calendarShareAdd(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $instanceid, TranslatorInterface $trans): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
@@ -203,11 +208,24 @@ class CalendarController extends AbstractController
             throw $this->createNotFoundException('Calendar not found');
         }
 
-        if (!is_numeric($request->request->get('principalId'))) {
-            throw new BadRequestHttpException();
+        if ($this->isGranted('ROLE_ADMIN')) {
+            // in this case, this is the id of the principal to add
+            if (!is_numeric($request->request->get('principalId'))) {
+                throw new BadRequestHttpException();
+            }
+
+            $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
+        } else {
+            // in this case, this is the username of the user to add, we need to convert it to a principal
+            $userToAdd = $doctrine->getRepository(User::class)->findOneByUsername($request->request->get('principalId'));
+            if (!$userToAdd) {
+                $this->addFlash('warning', 'User does not exist');
+
+                return $this->redirectToRoute('calendar_index', ['userId' => $userId]);
+            }
+            $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneByUri($userToAdd->getPrincipalUri());
         }
 
-        $newShareeToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
         if (!$newShareeToAdd) {
             throw $this->createNotFoundException('Member not found');
         }
@@ -246,6 +264,7 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/{userId}/delete/{id}', name: 'delete', requirements: ['id' => "\d+"], methods: ['POST'])]
+    #[IsGranted('access', 'userId')]
     public function calendarDelete(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $id, TranslatorInterface $trans): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
@@ -301,6 +320,7 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/{userId}/revoke/{id}', name: 'revoke', requirements: ['id' => "\d+"], methods: ['POST'])]
+    #[IsGranted('access', 'userId')]
     public function calendarRevoke(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $id, TranslatorInterface $trans): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {

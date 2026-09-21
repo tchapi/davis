@@ -1,3 +1,7 @@
+{% set admin_logged = app.user and is_granted("ROLE_ADMIN") %}
+{% set user_logged = app.user and is_granted("ROLE_USER") %}
+{% set user_logged_id = app.user and is_granted("ROLE_USER") ? app.user.getUserId() : 0 %}
+
 <!DOCTYPE html>
 <html>
     <head>

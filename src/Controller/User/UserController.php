@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\User;
 
 use App\Entity\AddressBook;
 use App\Entity\Calendar;
@@ -18,12 +18,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/users', name: 'user_')]
 class UserController extends AbstractController
 {
     #[Route('/', name: 'index')]
+    #[IsGranted('ROLE_ADMIN')]
     public function users(ManagerRegistry $doctrine): Response
     {
         $results = $doctrine->getRepository(Principal::class)->findAllMainPrincipalsWithUserIds();
@@ -33,8 +35,24 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/{userId}', name: 'user', requirements: ['userId' => "\d+"])]
+    #[IsGranted('access', 'userId')]
+    public function user(ManagerRegistry $doctrine, #[MapEntity(id: 'userId')] User $user, int $userId): Response
+    {
+        $results = $doctrine->getRepository(Principal::class)->findOneMainPrincipalsWithUserId($userId);
+
+        if (!$results) {
+            throw BadRequestHttpException('User not found');
+        }
+
+        return $this->render('users/index.html.twig', [
+            'results' => $results,
+        ]);
+    }
+
     #[Route('/new', name: 'create')]
     #[Route('/edit/{userId}', name: 'edit')]
+    #[IsGranted('access', 'userId')]
     public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?int $userId, TranslatorInterface $trans): Response
     {
         if ($userId) {
@@ -115,7 +133,11 @@ class UserController extends AbstractController
 
             $this->addFlash('success', $trans->trans('user.saved'));
 
-            return $this->redirectToRoute('user_index');
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('user_index');
+            }
+
+            return $this->redirectToRoute('user_user', ['userId' => $userId]);
         }
 
         return $this->render('users/edit.html.twig', [
@@ -126,6 +148,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/delete/{userId}', name: 'delete', methods: ['POST'])]
+    #[IsGranted('access', 'userId')]
     public function userDelete(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, TranslatorInterface $trans): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
@@ -195,10 +218,15 @@ class UserController extends AbstractController
         $entityManager->flush();
         $this->addFlash('success', $trans->trans('user.deleted'));
 
-        return $this->redirectToRoute('user_index');
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('user_index');
+        }
+
+        return $this->redirectToRoute('app_logout');
     }
 
     #[Route('/delegates/{userId}', name: 'delegates')]
+    #[IsGranted('access', 'userId')]
     public function userDelegates(ManagerRegistry $doctrine, #[MapEntity(id: 'userId')] User $user, int $userId): Response
     {
         $principalUri = $user->getPrincipalUri();
@@ -222,6 +250,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/delegation/{userId}/{toggle}', name: 'delegation_toggle', requirements: ['toggle' => '(on|off)'], methods: ['POST'])]
+    #[IsGranted('access', 'userId')]
     public function userToggleDelegation(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, string $toggle): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
@@ -265,19 +294,32 @@ class UserController extends AbstractController
     }
 
     #[Route('/delegates/{userId}/add', name: 'delegate_add', methods: ['POST'])]
+    #[IsGranted('access', 'userId')]
     public function userDelegateAdd(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        if (!is_numeric($request->request->get('principalId'))) {
-            throw new BadRequestHttpException();
-        }
-
         $principalUri = $user->getPrincipalUri();
 
-        $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
+        if ($this->isGranted('ROLE_ADMIN')) {
+            // in this case, this is the id of the principal to add
+            if (!is_numeric($request->request->get('principalId'))) {
+                throw new BadRequestHttpException();
+            }
+
+            $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneById($request->request->get('principalId'));
+        } else {
+            // in this case, this is the username of the member to add, we need to convert it to a principal
+            $memberToAdd = $doctrine->getRepository(User::class)->findOneByUsername($request->request->get('principalId'));
+            if (!$memberToAdd) {
+                $this->addFlash('warning', 'User does not exist');
+
+                return $this->redirectToRoute('user_delegates', ['userId' => $userId]);
+            }
+            $newMemberToAdd = $doctrine->getRepository(Principal::class)->findOneByUri($memberToAdd->getPrincipalUri());
+        }
 
         if (!$newMemberToAdd) {
             throw $this->createNotFoundException('Member not found');
@@ -309,6 +351,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/delegates/{userId}/remove/{principalProxyId}/{delegateId}', name: 'delegate_remove', requirements: ['principalProxyId' => "\d+", 'delegateId' => "\d+"], methods: ['POST'])]
+    #[IsGranted('access', 'userId')]
     public function userDelegateRemove(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, int $principalProxyId, int $delegateId): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
