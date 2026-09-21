@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\Entity\AddressBook;
+use App\Entity\Principal;
 use App\Entity\User;
 use App\Security\AdminUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -122,6 +123,43 @@ class AddressBookControllerTest extends WebTestCase
 
         $em = static::getContainer()->get('doctrine.orm.entity_manager');
         $this->assertNull($em->getRepository(AddressBook::class)->findOneBy(['uri' => str_repeat('a', 256)]));
+    }
+
+    /**
+     * The field is mapped, so `handleRequest()` writes it onto the entity and the flush persists
+     * it, both ways round.
+     */
+    public function testTheBirthdayCalendarFlagIsSaved(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        foreach ([true, false] as $included) {
+            $book = $em->getRepository(AddressBook::class)->findOneBy([
+                'principalUri' => Principal::PREFIX.'test_user',
+                'uri' => 'default',
+            ]);
+
+            $crawler = $client->request('GET', '/addressbooks/'.$userId.'/edit/'.$book->getId());
+            $form = $crawler->selectButton('address_book_save')->form();
+
+            $client->submit($form, [
+                'address_book[uri]' => 'default',
+                'address_book[displayName]' => 'Default',
+                'address_book[includedInBirthdayCalendar]' => $included ? 1 : 0,
+            ]);
+            $this->assertResponseRedirects('/addressbooks/'.$userId);
+
+            $em = static::getContainer()->get('doctrine.orm.entity_manager');
+            $reloaded = $em->getRepository(AddressBook::class)->findOneBy([
+                'principalUri' => Principal::PREFIX.'test_user',
+                'uri' => 'default',
+            ]);
+            $this->assertSame($included, $reloaded->isIncludedInBirthdayCalendar());
+        }
     }
 
     public function testAddressBookDelete(): void
