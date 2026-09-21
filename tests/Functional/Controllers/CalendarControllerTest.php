@@ -362,9 +362,8 @@ class CalendarControllerTest extends WebTestCase
     }
 
     /**
-     * The uri is client-chosen too, and it used to be interpolated into `data-bs-content` with
-     * `data-bs-html`, so only Bootstrap's sanitizer stood between it and the DOM. It is passed as
-     * plain data now, and app.js builds the popover through textContent.
+     * The uri is client-chosen, so it travels as plain data and app.js builds the popover through
+     * textContent: nothing hands it to Bootstrap as an HTML string to be sanitised.
      */
     public function testTheSetupPopoverCarriesNoMarkup(): void
     {

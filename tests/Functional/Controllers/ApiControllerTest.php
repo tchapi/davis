@@ -8,8 +8,11 @@ use App\Entity\CalendarObject;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
 use App\Entity\SchedulingObject;
+use App\Security\ApiKeyAuthenticator;
 use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class ApiControllerTest extends WebTestCase
 {
@@ -113,6 +116,33 @@ class ApiControllerTest extends WebTestCase
     /*
      * Test the API endpoint with invalid token
      */
+    /**
+     * The authenticator is built for every /api/v1 request, so an empty API_KEY — the shipped
+     * default — has to leave the public health endpoint answering and refuse the rest politely.
+     */
+    public function testTheApiIsDisabledRatherThanBrokenWithoutAKey(): void
+    {
+        $authenticator = new ApiKeyAuthenticator('');
+
+        $this->assertFalse(
+            $authenticator->supports(Request::create('/api/v1/health')),
+            'The health endpoint stays public'
+        );
+
+        $request = Request::create('/api/v1/users');
+        $this->assertTrue($authenticator->supports($request));
+
+        try {
+            $authenticator->authenticate($request);
+            $this->fail('A request to the API without a key configured should be refused');
+        } catch (CustomUserMessageAuthenticationException $e) {
+            $this->assertSame('The API is disabled: no API_KEY is configured.', $e->getMessage());
+        }
+
+        $response = $authenticator->onAuthenticationFailure($request, new CustomUserMessageAuthenticationException('The API is disabled: no API_KEY is configured.'));
+        $this->assertSame(401, $response->getStatusCode());
+    }
+
     public function testApiInvalidToken(): void
     {
         $client = static::createClient();

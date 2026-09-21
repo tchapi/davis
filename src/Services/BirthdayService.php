@@ -51,7 +51,9 @@ class BirthdayService
     {
         $book = $this->doctrine->getRepository(AddressBook::class)->findOneById($addressBookId);
 
-        if (!$book->isIncludedInBirthdayCalendar()) {
+        // The address book is gone when its deletion is what triggered this, and then there is
+        // no birthday entry to maintain.
+        if (!$book || !$book->isIncludedInBirthdayCalendar()) {
             return;
         }
 
@@ -65,7 +67,9 @@ class BirthdayService
     {
         $book = $this->doctrine->getRepository(AddressBook::class)->findOneById($addressBookId);
 
-        if (!$book->isIncludedInBirthdayCalendar()) {
+        // Deleting an address book deletes its cards, so this runs for a book that is already
+        // gone, with nothing left to remove from the birthday calendar.
+        if (!$book || !$book->isIncludedInBirthdayCalendar()) {
             return;
         }
 

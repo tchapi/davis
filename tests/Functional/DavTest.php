@@ -195,6 +195,59 @@ class DavTest extends WebTestCase
         );
     }
 
+    /**
+     * "Public" means everyone: being signed in as another account must not make a public calendar
+     * less readable than it is to a stranger.
+     */
+    public function testAPublicCalendarIsReadableByAnyoneIncludingSignedInUsers(): void
+    {
+        $client = static::createClient();
+        $this->createSecretCalendarObject();
+
+        /** @var EntityManagerInterface $em */
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $instance = $em->getRepository(CalendarInstance::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+        $instance->setPublic(true);
+        $em->flush();
+        $em->clear();
+
+        // Another account, signed in
+        static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH, 'test_user2:password2');
+        $this->assertResponseStatusCodeSame(200, 'A signed-in user must be able to read a public calendar');
+        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+
+        // And anonymously, which already worked
+        static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH);
+        $this->assertResponseStatusCodeSame(200, 'An anonymous visitor must be able to read a public calendar');
+        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+    }
+
+    /**
+     * Making a calendar public grants reading, never writing.
+     */
+    public function testAPublicCalendarIsNotWritableByOtherUsers(): void
+    {
+        $client = static::createClient();
+        $this->createSecretCalendarObject();
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $instance = $em->getRepository(CalendarInstance::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+        $instance->setPublic(true);
+        $em->flush();
+        $em->clear();
+
+        static::requestDav($client, 'DELETE', self::SECRET_OBJECT_PATH, 'test_user2:password2');
+
+        $this->assertResponseStatusCodeSame(403);
+        $this->assertSame(self::SECRET_CALENDAR_DATA, $this->getSecretCalendarData(), 'The object must still be there');
+    }
+
     public function testWellKnownUrlsRedirectToTheDavEndpoint(): void
     {
         $client = static::createClient();

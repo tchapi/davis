@@ -68,9 +68,10 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
                 $calendar = $this->em->getRepository(CalendarInstance::class)->findOneById($calendarInstanceId);
 
                 if ($calendar && $calendar->isPublic()) {
-                    // Add unauthenticated read access on the object itself
+                    // `{DAV:}all` covers authenticated and unauthenticated alike:
+                    // `{DAV:}unauthenticated` would match logged-out requests only.
                     $acl[] = [
-                        'principal' => '{DAV:}unauthenticated',
+                        'principal' => '{DAV:}all',
                         'privilege' => '{DAV:}read',
                         'protected' => false,
                     ];

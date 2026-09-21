@@ -66,9 +66,6 @@ class AddressBookController extends AbstractController
 
         $form = $this->createForm(AddressBookType::class, $addressbook, ['new' => !$id, 'birthday_calendar_enabled' => $isBirthdayCalendarEnabled]);
 
-        if ($isBirthdayCalendarEnabled) {
-            $form->get('includedInBirthdayCalendar')->setData($addressbook->isIncludedInBirthdayCalendar());
-        }
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -78,12 +75,6 @@ class AddressBookController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', $trans->trans('addressbooks.saved'));
-
-            if ($isBirthdayCalendarEnabled && true === $form->get('includedInBirthdayCalendar')->getData()) {
-                $addressbook->setIncludedInBirthdayCalendar(true);
-            } else {
-                $addressbook->setIncludedInBirthdayCalendar(false);
-            }
 
             if ($isBirthdayCalendarEnabled) {
                 // Let's sync the user birthday calendar if needed
