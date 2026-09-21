@@ -5,12 +5,15 @@ namespace App\Plugins;
 use DantSu\OpenStreetMapStaticAPI\LatLng;
 use DantSu\OpenStreetMapStaticAPI\Markers;
 use DantSu\OpenStreetMapStaticAPI\OpenStreetMap;
+use Psr\Log\LoggerInterface;
 use Sabre\CalDAV\Schedule\IMipPlugin as SabreBaseIMipPlugin;
 use Sabre\DAV;
 use Sabre\VObject\ITip;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * iMIP handler.
@@ -35,13 +38,19 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
     protected $publicDir;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Creates the email handler.
      */
-    public function __construct(MailerInterface $mailer, string $senderEmail, string $publicDir)
+    public function __construct(MailerInterface $mailer, string $senderEmail, string $publicDir, LoggerInterface $logger)
     {
         $this->mailer = $mailer;
         $this->senderEmail = $senderEmail;
         $this->publicDir = $publicDir;
+        $this->logger = $logger;
     }
 
     /**
@@ -52,6 +61,8 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         // Not sending any emails if the system considers the update
         // insignificant.
         if (!$itip->significantChange) {
+            $this->logger->debug('iMIP: no email for an insignificant change', ['method' => $itip->method, 'recipient' => $itip->recipient]);
+
             if (empty($itip->scheduleStatus)) {
                 $itip->scheduleStatus = '1.0;We got the message, but it\'s not significant enough to warrant an email';
             }
@@ -63,6 +74,9 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 
         if ('mailto' !== parse_url($itip->sender, PHP_URL_SCHEME)
             || 'mailto' !== parse_url($itip->recipient, PHP_URL_SCHEME)) {
+            // iTIP allows other schemes; this plugin only knows how to send email.
+            $this->logger->warning('iMIP: not an email exchange, no invitation sent', ['sender' => $itip->sender, 'recipient' => $itip->recipient]);
+
             return;
         }
 
@@ -90,6 +104,9 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         }
 
         $subject = 'CalDAV message';
+        // Anything other than the three methods below leaves the template without an action to
+        // render, so the message is not one this plugin knows how to word.
+        $action = null;
         switch (strtoupper($itip->method)) {
             case 'REPLY':
                 // In the case of a reply, we need to find the `PARTSTAT` from
@@ -109,6 +126,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                         $action = 'TENTATIVE';
                         break;
                     default:
+                        $this->logger->warning('iMIP: unsupported PARTSTAT in a REPLY, no email sent', ['partstat' => $partstat, 'recipient' => $itip->recipient]);
                         $itip->scheduleStatus = '5.0;Email not delivered. We didn\'t understand this PARTSTAT.';
 
                         return;
@@ -123,6 +141,11 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $subject = '"'.$summary.'" has been canceled.';
                 $action = 'CANCEL';
                 break;
+            default:
+                $this->logger->warning('iMIP: unsupported iTIP method, no email sent', ['method' => $itip->method, 'recipient' => $itip->recipient]);
+                $itip->scheduleStatus = '5.0;Email not delivered. We don\'t know how to send this iTIP method.';
+
+                return;
         }
 
         // Construct objects for the mail template
@@ -192,14 +215,21 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $latLng = new LatLng($coordinates['latitude'], $coordinates['longitude']);
 
                 // https://github.com/DantSu/php-osm-static-api
-                $locationImageDataAsBase64 = (new OpenStreetMap($latLng, $zoom, $width, $height))
-                    ->addMarkers(
-                        (new Markers($this->publicDir.'/images/marker.png'))
-                            ->setAnchor(Markers::ANCHOR_CENTER, Markers::ANCHOR_BOTTOM)
-                            ->addMarker(new LatLng($coordinates['latitude'], $coordinates['longitude']))
-                    )
-                    ->getImage()
-                    ->getBase64PNG();
+                // This fetches map tiles over the network. The map is decoration on an invitation,
+                // so a tile server that is unreachable or slow must not take the invitation — and
+                // with it the client's PUT — down with it.
+                try {
+                    $locationImageDataAsBase64 = (new OpenStreetMap($latLng, $zoom, $width, $height))
+                        ->addMarkers(
+                            (new Markers($this->publicDir.'/images/marker.png'))
+                                ->setAnchor(Markers::ANCHOR_CENTER, Markers::ANCHOR_BOTTOM)
+                                ->addMarker(new LatLng($coordinates['latitude'], $coordinates['longitude']))
+                        )
+                        ->getImage()
+                        ->getBase64PNG();
+                } catch (\Throwable $e) {
+                    $this->logger->warning('iMIP: the location map could not be rendered, sending the invitation without it', ['exception' => $e->getMessage()]);
+                }
 
                 $locationLink =
                     'https://www.openstreetmap.org'.
@@ -224,11 +254,24 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             $mailSenderName = $senderEmail.' '.static::MESSAGE_ORIGIN_INDICATOR;
         }
 
-        $message = (new TemplatedEmail())
-            ->from(new Address($this->senderEmail, $mailSenderName))
-            ->to(new Address($recipientEmail, $recipientName ?? ''))
-            ->replyTo(new Address($senderEmail, $mailSenderName))
-            ->subject($subject);
+        try {
+            $message = (new TemplatedEmail())
+                ->from(new Address($this->senderEmail, $mailSenderName))
+                ->to(new Address($recipientEmail, $recipientName ?? ''))
+                ->replyTo(new Address($senderEmail, $mailSenderName))
+                ->subject($subject);
+        } catch (RfcComplianceException $e) {
+            // An attendee address comes from the organiser's client and is not validated anywhere
+            // before this point. Letting it through would abort the PUT that triggered it.
+            $this->logger->error('iMIP: an address in the invitation is not a valid email address, no email sent', [
+                'sender' => $senderEmail,
+                'recipient' => $recipientEmail,
+                'exception' => $e->getMessage(),
+            ]);
+            $itip->scheduleStatus = '5.3;Email not delivered. One of the addresses is not a valid email address.';
+
+            return;
+        }
 
         // Keep holiday auto-replies from bouncing back at invitations.
         $message->getHeaders()->addTextHeader('X-Auto-Response-Suppress', 'OOF, DR, RN, NRN, AutoReply');
@@ -259,7 +302,23 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             $message->attach($itip->message->serialize(), 'invite.ics', 'text/calendar; method='.(string) $itip->method.'; charset=UTF-8');
         }
 
-        $this->mailer->send($message);
+        try {
+            $this->mailer->send($message);
+        } catch (TransportExceptionInterface $e) {
+            // The scheduling message is a side effect of storing the event: if the mail cannot be
+            // sent, the event still has to be saved. Throwing here would surface as a 500 on the
+            // client's PUT and lose it.
+            $this->logger->error('iMIP: the invitation could not be sent', [
+                'recipient' => $recipientEmail,
+                'method' => $itip->method,
+                'exception' => $e->getMessage(),
+            ]);
+            $itip->scheduleStatus = '5.1;Email not delivered. The mail transport is unavailable.';
+
+            return;
+        }
+
+        $this->logger->info('iMIP: invitation sent', ['recipient' => $recipientEmail, 'method' => $itip->method]);
 
         if (false === $deliveredLocally) {
             $itip->scheduleStatus = '1.1;Scheduling message is sent via iMip.';

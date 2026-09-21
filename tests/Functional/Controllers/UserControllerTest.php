@@ -91,6 +91,36 @@ class UserControllerTest extends WebTestCase
         $this->assertAnySelectorTextContains('h5', 'New test User');
     }
 
+    /**
+     * The address is what sabre puts in the principal's `calendar-user-address-set`, and it only
+     * emits a scheduling message when the event's organiser matches one of those. An account saved
+     * without an address therefore never sends an invitation, and nothing says so at the time.
+     */
+    public function testUserCreationRequiresAnEmailAddress(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        foreach (['', 'not-an-address'] as $email) {
+            $crawler = $client->request('GET', '/users/new');
+            $form = $crawler->selectButton('user_save')->form();
+
+            $client->submit($form, [
+                'user[username]' => 'no_email_user',
+                'user[displayName]' => 'No email',
+                'user[email]' => $email,
+                'user[password][first]' => 'coucou',
+                'user[password][second]' => 'coucou',
+            ]);
+
+            $this->assertResponseIsSuccessful(sprintf('"%s" should be refused by the form', $email));
+            $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+        }
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $this->assertNull($em->getRepository(User::class)->findOneBy(['username' => 'no_email_user']));
+    }
+
     public function testUserDelete(): void
     {
         $user = new AdminUser('admin', 'test');

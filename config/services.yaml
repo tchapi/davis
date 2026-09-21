@@ -30,6 +30,10 @@ services:
         arguments:
             $authRealm: "%env(AUTH_REALM)%"
 
+    App\Command\MailTestCommand:
+        arguments:
+            $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
+
     App\Services\IMAPAuth:
         arguments:
             $IMAPAuthUrl: "%env(IMAP_AUTH_URL)%"

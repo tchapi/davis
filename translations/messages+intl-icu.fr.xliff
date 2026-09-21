@@ -325,6 +325,10 @@
         <source>form.email</source>
         <target>Email</target>
       </trans-unit>
+      <trans-unit id="frmEmlHlp" resname="form.email.help">
+        <source>form.email.help</source>
+        <target>Sert d'adresse de calendrier pour les invitations : elle doit correspondre à celle que le client envoie comme organisateur, sinon aucune invitation n'est envoyée.</target>
+      </trans-unit>
       <trans-unit id="RQWeqAY" resname="form.admin">
         <source>form.admin</source>
         <target>Cet utilisateur est-il administrateur ?</target>

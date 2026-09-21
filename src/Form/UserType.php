@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UserType extends AbstractType
 {
@@ -27,10 +28,23 @@ class UserType extends AbstractType
             ->add('displayName', TextType::class, [
                 'label' => 'form.displayName',
                 'mapped' => false,
+                'constraints' => [
+                    new Assert\Length(max: 255),
+                ],
             ])
+            // The field is unmapped — it belongs to the Principal, not the User — so the entity's
+            // own constraints never run on it and the rules have to live here. An empty address
+            // keeps the principal out of its own `calendar-user-address-set`, which means sabre
+            // never emits a scheduling message and invitations are silently never sent.
             ->add('email', EmailType::class, [
                 'label' => 'form.email',
                 'mapped' => false,
+                'help' => 'form.email.help',
+                'constraints' => [
+                    new Assert\NotBlank(),
+                    new Assert\Email(),
+                    new Assert\Length(max: 255),
+                ],
             ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
