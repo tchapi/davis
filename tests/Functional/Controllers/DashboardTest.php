@@ -139,7 +139,7 @@ class DashboardTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Dashboard');
         $this->assertSelectorTextContains('h3.capabilities', 'Capabilities');
         $this->assertSelectorTextContains('h3.objects', 'Objects');
-        $this->assertSelectorTextContains('h3.environment', 'Configured environment');
+        $this->assertSelectorTextContains('h3.health', 'Health');
         $this->assertSelectorExists('nav.navbar');
     }
 
@@ -156,6 +156,49 @@ class DashboardTest extends WebTestCase
 
         $client->request('GET', '/dashboard');
         $this->assertResponseIsSuccessful('The session must survive a logout without a token');
+    }
+
+    public function testTheDiagnosticsPageListsEveryBucket(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $client->request('GET', '/dashboard/diagnostics');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'Diagnostics');
+
+        foreach (['Runtime', 'Database', 'Authentication', 'Scheduling and mail', 'Endpoints'] as $bucket) {
+            $this->assertAnySelectorTextContains('h3', $bucket);
+        }
+
+        // Nothing on this page may disclose the mailer credentials or the application secret
+        $content = $client->getResponse()->getContent();
+        $this->assertStringNotContainsString($_ENV['APP_SECRET'], $content);
+        $this->assertStringNotContainsString('MAILER_DSN', $content);
+    }
+
+    public function testTheDashboardPointsAtTheDiagnosticsPage(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $crawler = $client->request('GET', '/dashboard');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('a[href="/dashboard/diagnostics"]');
+
+        $client->click($crawler->filter('a[href="/dashboard/diagnostics"]')->link());
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testTheDiagnosticsPageIsNotReachableAnonymously(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/dashboard/diagnostics');
+
+        $this->assertResponseRedirects('/login');
     }
 
     /**

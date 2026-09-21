@@ -61,6 +61,25 @@ body {
     user-select: text;
 }
 
+/* The diagnostics page exists to be copied into a bug report, so let everything be selected */
+.diagnostics-page,
+.diagnostics-page * {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* Each check reads as its own card rather than as one continuous list */
+.diagnostics-page .list-group {
+    gap: 0.5rem;
+}
+
+.diagnostics-page .list-group > .list-group-item {
+    border: 1px solid var(--bs-list-group-border-color);
+    border-radius: var(--bs-border-radius);
+}
+
 /* Github link icon */
 .github-link {
     background-image: url("/images/github-mark.png");
