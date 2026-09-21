@@ -598,6 +598,18 @@ Below are some issues that can bring more info / insight into custom setups that
 
 ## 🐛 Troubleshooting
 
+### Start with the diagnostics page
+
+The dashboard tells you how many points need your attention and links to **Diagnostics**(`/dashboard/diagnostics`), which is usually the fastest way to find out why something configured does not happen.
+
+![Diagnostics page](_screenshots/diagnostics.png)
+
+It groups the checks into Runtime, Database, Authentication, Scheduling and mail, and Endpoints, and each one that needs action says what to do about it and gives the command or query to run. Among other things it reports migrations that have not been run, the database engine actually in use, whether the log directory is writable, whether the selected authentication method has the PHP extension it needs, and how many accounts have no email address and therefore never send an invitation.
+
+Everything on it is read-only and passive — no connection is opened, so it stays usable when something is down. Credentials are never shown: the mail transport is displayed as scheme and host only. Use `bin/console davis:mail:test you@example.org` to actually exercise the mailer.
+
+### Logs
+
 Depending on how you run Davis, logs are either:
   - [dev] printed out directly in the console
   - [dev] available in the Symfony Debug Bar in the [Profiler](https://symfony.com/doc/current/profiler.html)
@@ -613,12 +625,9 @@ Depending on how you run Davis, logs are either:
 > docker exec -it davis tail /var/www/davis/var/log/prod.log
 > ```
 
-### I have a "Bad timezone configuration env var" error on the dashboard
+### I have a "Bad timezone configuration env var" error
 
-If you see this:
-
-![Bad timezone configuration env var error](_screenshots/bad_timezone_configuration_env_var.png)
-
+The **Server timezone** check on the [diagnostics page](#start-with-the-diagnostics-page) flags it.
 It means that the value you set for the `APP_TIMEZONE` env var is not a correct timezone, as per [the official list](https://www.php.net/manual/en/timezones.php). Your timezone has thus not been set and is the server's default (Here, UTC). Adjust the setting accordingly.
 
 ### I have a 500 and no tables have been created

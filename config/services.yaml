@@ -30,6 +30,21 @@ services:
         arguments:
             $authRealm: "%env(AUTH_REALM)%"
 
+    App\Services\Diagnostics:
+        arguments:
+            $migrations: "@doctrine.migrations.dependency_factory"
+            $environment: "%kernel.environment%"
+            $debug: "%kernel.debug%"
+            $logFilePath: "%env(resolve:LOG_FILE_PATH)%"
+            $timezoneParameter: "%timezone%"
+            $authMethod: "%env(AUTH_METHOD)%"
+            $authRealm: "%env(AUTH_REALM)%"
+            $calDAVEnabled: "%env(bool:CALDAV_ENABLED)%"
+            $cardDAVEnabled: "%env(bool:CARDDAV_ENABLED)%"
+            $webDAVEnabled: "%env(bool:WEBDAV_ENABLED)%"
+            $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
+            $mailerDsn: "%env(MAILER_DSN)%"
+
     App\Command\MailTestCommand:
         arguments:
             $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
