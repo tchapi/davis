@@ -60,11 +60,10 @@ class AdminUser implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Removes sensitive data from the user.
-     *
-     * This is important if, at any given point, sensitive information like
-     * the plain-text password is stored on this object.
+     * Nothing to erase: the password this object carries is a throwaway value, never the
+     * configured one. The attribute is how Symfony wants an empty implementation declared.
      */
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }
