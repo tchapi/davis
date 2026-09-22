@@ -1,5 +1,5 @@
 # Initial PHP image is available here:
-# https://github.com/docker-library/php/blob/master/8.4/alpine/fpm/Dockerfile
+# https://github.com/docker-library/php/blob/master/8.4/alpine3.24/fpm/Dockerfile#L33
 
 # Base image, used to build extensions and the final image ———————————————————————
 FROM php:8.4-fpm-alpine AS base-image

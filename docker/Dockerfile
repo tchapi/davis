@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Initial PHP image is available here:
-# https://github.com/docker-library/php/blob/master/8.4/alpine/fpm/Dockerfile
+# https://github.com/docker-library/php/blob/master/8.4/alpine3.24/fpm/Dockerfile#L33
 ARG fpm_user=82:82
 
 # Base image, used to build extensions and the final image ———————————————————————
