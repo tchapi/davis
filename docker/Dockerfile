@@ -109,4 +109,4 @@ RUN mkdir -p var/log var/cache && chown -R ${FPM_USER} var
 
 USER $FPM_USER
 
-HEALTHCHECK --interval=30s --timeout=1s CMD php-fpm-healthcheck || exit 1
+HEALTHCHECK --interval=30s --timeout=1s CMD ["php-fpm-healthcheck"]
