@@ -1,8 +1,8 @@
 # Initial PHP image is available here:
-# https://github.com/docker-library/php/blob/master/8.2/alpine3.18/fpm/Dockerfile#L33
+# https://github.com/docker-library/php/blob/master/8.4/alpine3.24/fpm/Dockerfile#L33
 
 # Base image, used to build extensions and the final image ———————————————————————
-FROM php:8.3-fpm-alpine AS base-image
+FROM php:8.4-fpm-alpine AS base-image
 
 # Run update, and gets basic packages and packages for runtime
 RUN apk --no-progress --update add --no-cache \
@@ -118,7 +118,7 @@ RUN docker-php-source delete && \
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 HEALTHCHECK --interval=120s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl --fail http://localhost:9000 || exit 1 
+    CMD ["curl", "--fail", "http://localhost:9000"]
 
 # It's the Caddy port, not the PHP-fpm one (as we use sockets)
 EXPOSE 9000
