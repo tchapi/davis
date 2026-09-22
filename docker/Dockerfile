@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
 
 # Initial PHP image is available here:
-# https://github.com/docker-library/php/blob/master/8.2/alpine3.18/fpm/Dockerfile#L33
+# https://github.com/docker-library/php/blob/master/8.4/alpine/fpm/Dockerfile
 ARG fpm_user=82:82
 
 # Base image, used to build extensions and the final image ———————————————————————
-FROM php:8.3-fpm-alpine AS base-image
+FROM php:8.4-fpm-alpine AS base-image
 
 # Run update, and gets basic packages and packages for runtime
 RUN apk --no-progress --update add --no-cache \

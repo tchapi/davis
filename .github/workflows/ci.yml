@@ -16,7 +16,7 @@ env:
 jobs:
   dockerfile-checks:
     name: Dockerfile Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         dockerfile:
@@ -24,16 +24,16 @@ jobs:
           - docker/Dockerfile-standalone
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Lint with Hadolint
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: ${{ matrix.dockerfile }}
           failure-threshold: warning
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Validate Dockerfile syntax
         run: |
@@ -45,7 +45,7 @@ jobs:
 
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: php:8.4-alpine
       options: >-
@@ -53,7 +53,7 @@ jobs:
         --tmpfs /var/tmp:exec
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install GD / ZIP PHP extension
         run: |
@@ -76,7 +76,7 @@ jobs:
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: php:${{ matrix.php }}-alpine
       options: >-
@@ -110,7 +110,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install MySQL / GD / ZIP / LDAP PHP extensions
         run: |
@@ -135,7 +135,7 @@ jobs:
 
   migrations:
     name: Migrations (${{ matrix.database }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: php:8.4-alpine
       options: >-
@@ -178,7 +178,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install database extensions
         run: |
@@ -252,7 +252,7 @@ jobs:
 
   smoke-test:
     name: Application Smoke Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: php:8.4-alpine
       options: >-
@@ -275,7 +275,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install extensions and curl
         run: |
