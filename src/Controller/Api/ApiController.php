@@ -166,7 +166,7 @@ class ApiController extends AbstractController
         }
 
         $username = $data['name'] ?? null;
-        if (is_null($username) || !$this->validateUsername($userName)) {
+        if (is_null($username) || !$this->validateUsername($username)) {
             return $this->json(['status' => 'error', 'message' => 'Invalid Username', 'timestamp' => $this->getTimestamp()], 400);
         }
         $display_name = $data['display_name'] ?? null;
