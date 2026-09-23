@@ -261,6 +261,10 @@
         <source>user.deleted</source>
         <target>Benutzer erfolgreich gelöscht</target>
       </trans-unit>
+      <trans-unit id="KgVUPvv" resname="user.deleted.error">
+        <source>user.deleted.error</source>
+        <target>Fehler beim Löschen dieses Benutzers</target>
+      </trans-unit>
       <trans-unit id="rey4Kec" resname="calendar.saved">
         <source>calendar.saved</source>
         <target>Kalender erfolgreich gespeichert</target>
@@ -585,7 +589,7 @@
         <source>calendar.share_access.3</source>
         <target>lesen / schreiben</target>
       </trans-unit>
-      <trans-unit id="F8h2YaT" resname="calendar.public">
+      <trans-unit id="HtzCcCV" resname="calendar.public">
         <source>calendar.public</source>
         <target>öffentlich</target>
       </trans-unit>

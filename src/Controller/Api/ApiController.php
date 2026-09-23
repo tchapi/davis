@@ -2,12 +2,10 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\AddressBook;
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
-use App\Entity\SchedulingObject;
 use App\Entity\User;
 use App\Services\Utils;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/api/v1', name: 'api_v1_')]
@@ -157,7 +157,7 @@ class ApiController extends AbstractController
      * @return JsonResponse A JSON response containing the user details if successfull
      */
     #[Route('/users/create', name: 'user_create', methods: ['POST'])]
-    public function createUser(Request $request, ManagerRegistry $doctrine, TranslatorInterface $trans): JsonResponse
+    public function createUser(Request $request, ManagerRegistry $doctrine, TranslatorInterface $trans, ValidatorInterface $validator, Utils $utils): JsonResponse
     {
         // Parse JSON body
         $data = json_decode($request->getContent(), true);
@@ -165,83 +165,36 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        $userName = $data['name'] ?? null;
-        if (empty($userName)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid User Name', 'timestamp' => $this->getTimestamp()], 400);
+        $username = $data['name'] ?? null;
+        if (is_null($username) || !$this->validateUsername($userName)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Username', 'timestamp' => $this->getTimestamp()], 400);
         }
-        $userDisplayName = $data['display_name'] ?? null;
-        if (empty($userDisplayName) || 1 !== preg_match('/^[a-zA-Z0-9 ._-]{1,64}$/', $userDisplayName)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid User Display Name', 'timestamp' => $this->getTimestamp()], 400);
+        $display_name = $data['display_name'] ?? null;
+        if (empty($display_name)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Display Name', 'timestamp' => $this->getTimestamp()], 400);
         }
-        $userEmail = $data['email'] ?? null;
-        if (empty($userEmail)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid User Email', 'timestamp' => $this->getTimestamp()], 400);
+        $email = $data['email'] ?? null;
+        if (empty($email) || count($validator->validate($email, new Assert\Email())) > 0) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Email', 'timestamp' => $this->getTimestamp()], 400);
         }
-        $userPassword = $data['password'] ?? null;
-        if (empty($userPassword)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid User Password', 'timestamp' => $this->getTimestamp()], 400);
+        $password = $data['password'] ?? null;
+        if (is_null($password)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Password', 'timestamp' => $this->getTimestamp()], 400);
         }
-        $userIsAdmin = $data['is_admin'] ?? null;
-        if (empty($userIsAdmin) || !in_array($userIsAdmin, [true, false, 'true', 'false'], true)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid User Is Admin', 'timestamp' => $this->getTimestamp()], 400);
-        }
-
-        $userNameCheck = $doctrine->getRepository(User::class)->findOneBy([
-            'username' => $userName,
-        ]);
-        if ($userNameCheck) {
-            return $this->json(['status' => 'error', 'message' => 'User Name Already Exists', 'timestamp' => $this->getTimestamp()], 400);
+        $isAdmin = $data['is_admin'] ?? false;
+        if (!in_array($isAdmin, [true, false, 'true', 'false'], true)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Is Admin', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        if (!$this->validateUsername($userName)) {
-            return $this->json(['status' => 'error', 'message' => 'Invalid User Name', 'timestamp' => $this->getTimestamp()], 400);
+        $existingUsername = $doctrine->getRepository(User::class)->findOneByUsername($username);
+        if ($existingUsername) {
+            return $this->json(['status' => 'error', 'message' => 'Username Already Exists', 'timestamp' => $this->getTimestamp()], 400);
         }
 
-        $user = new User();
-        $principal = new Principal();
-
-        $user->setUsername($userName);
-
-        $hash = password_hash($userPassword, PASSWORD_DEFAULT);
-        $user->setPassword($hash);
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $user = $utils->createUserWithDefaultObjects($username, $display_name, $email, $hashed_password, (true === $isAdmin || 'true' === $isAdmin) ? true : false);
 
         $entityManager = $doctrine->getManager();
-
-        $principal->setUri($user->getPrincipalUri());
-
-        $calendarInstance = new CalendarInstance();
-        $calendar = new Calendar();
-        $calendarInstance->setPrincipalUri($user->getPrincipalUri())
-                 ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
-                 ->setDisplayName($trans->trans('default.calendar.title'))
-                 ->setDescription($trans->trans('default.calendar.description', ['user' => $userDisplayName]))
-                 ->setCalendar($calendar);
-
-        // Enable delegation by default
-        $principalProxyRead = new Principal();
-        $principalProxyRead->setUri($principal->getUri().Principal::READ_PROXY_SUFFIX)
-                           ->setIsMain(false);
-        $entityManager->persist($principalProxyRead);
-
-        $principalProxyWrite = new Principal();
-        $principalProxyWrite->setUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX)
-                           ->setIsMain(false);
-        $entityManager->persist($principalProxyWrite);
-
-        $addressbook = new AddressBook();
-        $addressbook->setPrincipalUri($user->getPrincipalUri())
-                 ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
-                 ->setDisplayName($trans->trans('default.addressbook.title'))
-                 ->setDescription($trans->trans('default.addressbook.description', ['user' => $userDisplayName]));
-        $entityManager->persist($calendarInstance);
-        $entityManager->persist($addressbook);
-        $entityManager->persist($principal);
-
-        $principal->setDisplayName($userDisplayName)
-                  ->setEmail($userEmail)
-                  ->setIsAdmin($userIsAdmin);
-
-        $entityManager->persist($user);
         $entityManager->flush();
 
         $response = [
@@ -253,19 +206,18 @@ class ApiController extends AbstractController
             'timestamp' => $this->getTimestamp(),
         ];
 
-        return $this->json($response, 200);
+        return $this->json($response, 201);
     }
 
     /**
      * Deletes a specific user.
      *
-     * @param Request $request The HTTP POST request
-     * @param int     $userId  The ID of the user to delete
+     * @param int $userId The ID of the user to delete
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
     #[Route('/users/{userId}', name: 'user_delete', methods: ['DELETE'], requirements: ['userId' => '\d+'])]
-    public function deleteUser(Request $request, int $userId, ManagerRegistry $doctrine): JsonResponse
+    public function deleteUser(int $userId, ManagerRegistry $doctrine, Utils $utils): JsonResponse
     {
         $user = $this->resolveUser($doctrine, $userId);
         if (!$user) {
@@ -273,70 +225,13 @@ class ApiController extends AbstractController
         }
 
         try {
-            $entityManager = $doctrine->getManager();
-            $entityManager->remove($user);
-
-            $principal = $doctrine->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
-            $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
-            $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
-
-            $entityManager->remove($principal);
-
-            if ($principalProxyRead) {
-                $entityManager->remove($principalProxyRead);
-            }
-
-            if ($principalProxyWrite) {
-                $entityManager->remove($principalProxyWrite);
-            }
-
-            $principalUri = $user->getPrincipalUri();
-
-            // Remove calendars and addressbooks
-            $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUri($principalUri);
-            foreach ($calendars ?? [] as $instance) {
-                // We're only removing the calendar objects / changes / and calendar if the deleted user is an owner,
-                // which means that the underlying calendar instance should not have another principal as owner.
-                $hasDifferentOwner = $doctrine->getRepository(CalendarInstance::class)->hasDifferentOwner($instance->getCalendar()->getId(), $principalUri);
-                if (!$hasDifferentOwner) {
-                    foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
-                        $entityManager->remove($object);
-                    }
-                    foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
-                        $entityManager->remove($change);
-                    }
-                    // We need to remove the shared versions of this calendar, too
-                    foreach ($instance->getCalendar()->getInstances() ?? [] as $instances) {
-                        $entityManager->remove($instances);
-                    }
-                    $entityManager->remove($instance->getCalendar());
-                }
-                $entityManager->remove($instance);
-            }
-            $calendarsSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($principalUri);
-            foreach ($calendarsSubscriptions ?? [] as $subscription) {
-                $entityManager->remove($subscription);
-            }
-            $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri($principalUri);
-            foreach ($schedulingObjects ?? [] as $object) {
-                $entityManager->remove($object);
-            }
-
-            $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri($principalUri);
-            foreach ($addressbooks ?? [] as $addressbook) {
-                foreach ($addressbook->getCards() ?? [] as $card) {
-                    $entityManager->remove($card);
-                }
-                foreach ($addressbook->getChanges() ?? [] as $change) {
-                    $entityManager->remove($change);
-                }
-                $entityManager->remove($addressbook);
-            }
-
-            $entityManager->flush();
+            $utils->deleteUser($user);
         } catch (\Exception $e) {
             return $this->json(['status' => 'error', 'message' => 'Failed to Delete User', 'timestamp' => $this->getTimestamp()], 500);
         }
+
+        $entityManager = $doctrine->getManager();
+        $entityManager->flush();
 
         return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
     }
