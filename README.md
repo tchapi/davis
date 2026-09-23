@@ -250,6 +250,24 @@ If you're behind one or several proxies, the TLS termination might be upstream a
 SYMFONY_TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
 ```
 
+> [!WARNING]
+>
+> **If your PHP was built without IPv6** (`--disable-ipv6`, as some source-based distributions do),
+> your proxy must connect to Davis over **IPv4**, or every request returns a 500 with
+> `RuntimeException: Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6"`.
+>
+> Symfony picks its IPv4/IPv6 comparison from the address the request *came from*, not from the
+> value you set here, so listing only IPv4 proxies does **not** avoid it. In practice this means
+> writing the proxy target as `127.0.0.1` rather than `localhost`, which usually resolves to `::1`
+> first:
+>
+> ```apache
+> ProxyPass / http://127.0.0.1:9000/
+> ```
+>
+> Unsetting `SYMFONY_TRUSTED_PROXIES` also avoids the error, but then Davis no longer sees the
+> `X-Forwarded-*` headers and generates URLs with the wrong scheme or host.
+
 #### Overriding the dotenv (`.env`) path
 
 You can override the expected location of the environment files (`.env`, `.env.local`, etc) by setting the `ENV_DIR` variable.
@@ -399,6 +417,10 @@ dav.domain.tld {
     <Directory /var/www/davis/public/bundles>
         FallbackResource disabled
     </Directory>
+
+    # If you proxy to Davis rather than serving it directly, target 127.0.0.1 and not localhost:
+    # on a PHP built without IPv6, a request arriving from ::1 returns a 500.
+    # ProxyPass / http://127.0.0.1:9000/
 
     # Env vars (if you did not use .env.local)
     SetEnv APP_ENV prod
