@@ -227,7 +227,7 @@ class ApiController extends AbstractController
         try {
             $utils->deleteUser($user);
         } catch (\Exception $e) {
-            return $this->json(['status' => 'error', 'message' => 'Failed to Delete User', 'timestamp' => $this->getTimestamp()], 500);
+            return $this->json(['status' => 'error', 'message' => 'Error while Deleting User', 'timestamp' => $this->getTimestamp()], 500);
         }
 
         $entityManager = $doctrine->getManager();
