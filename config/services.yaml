@@ -12,8 +12,10 @@ parameters:
     birthday_reminder_offset: '%env(default:default_birthday_reminder_offset:BIRTHDAY_REMINDER_OFFSET)%'
     default_birthday_reminder_offset: "PT9H"
     caldav_enabled: "%env(bool:CALDAV_ENABLED)%"
-    default_webdav_public_dir_writable: "false"
     carddav_enabled: "%env(bool:CARDDAV_ENABLED)%"
+    # `bool:` must wrap `default:` so that the fallback string is cast too
+    webdav_public_dir_writable: "%env(bool:default:default_webdav_public_dir_writable:WEBDAV_PUBLIC_DIR_WRITABLE)%"
+    default_webdav_public_dir_writable: "false"
 
 services:
     # default configuration for services in *this* file
@@ -43,6 +45,7 @@ services:
             $calDAVEnabled: "%env(bool:CALDAV_ENABLED)%"
             $cardDAVEnabled: "%env(bool:CARDDAV_ENABLED)%"
             $webDAVEnabled: "%env(bool:WEBDAV_ENABLED)%"
+            $webdavPublicDirWritable: "%webdav_public_dir_writable%"
             $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
             $mailerDsn: "%env(MAILER_DSN)%"
 
@@ -84,7 +87,7 @@ services:
             $webdavPublicDir: "%env(resolve:WEBDAV_PUBLIC_DIR)%"
             $webdavHomesDir: "%env(resolve:WEBDAV_HOMES_DIR)%"
             $webdavTmpDir: "%env(resolve:WEBDAV_TMP_DIR)%"
-            $webdavPublicDirWritable: "%env(bool:default:default_webdav_public_dir_writable:WEBDAV_PUBLIC_DIR_WRITABLE)%"
+            $webdavPublicDirWritable: "%webdav_public_dir_writable%"
 
     App\Security\LoginFormAuthenticator:
         arguments:

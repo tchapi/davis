@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -252,6 +253,13 @@ class DAVController extends AbstractController
         if ($this->webDAVEnabled && $this->webdavTmpDir && $this->webdavPublicDir) {
             $this->assertWebdavDirectory($this->webdavTmpDir, 'WEBDAV_TMP_DIR');
             $this->assertWebdavDirectory($this->webdavPublicDir, 'WEBDAV_PUBLIC_DIR');
+            // Temporary files and the locks database would be served as regular files if the tmp
+            // dir lived inside the public one, and users could browse other users' homes if the
+            // homes dir did.
+            $this->assertWebdavDirectoriesAreDisjoint($this->webdavPublicDir, 'WEBDAV_PUBLIC_DIR', $this->webdavTmpDir, 'WEBDAV_TMP_DIR');
+            if ($this->webdavHomesDir) {
+                $this->assertWebdavDirectoriesAreDisjoint($this->webdavPublicDir, 'WEBDAV_PUBLIC_DIR', $this->webdavHomesDir, 'WEBDAV_HOMES_DIR');
+            }
 
             // Explicit ACL for the shared directory: every authenticated user can read it, and
             // writing is reserved to admins (the ACL plugin grants them every privilege) unless
@@ -333,9 +341,9 @@ class DAVController extends AbstractController
      * must not live inside the web root, where the web server would serve its content
      * directly and bypass every DAV permission check.
      */
-    private function assertWebdavDirectory(string $dir, string $envVar): void
+    private function assertWebdavDirectory(string $dir, string $envVar): string
     {
-        if (!str_starts_with($dir, '/')) {
+        if (!Path::isAbsolute($dir)) {
             throw new \RuntimeException(sprintf('%s must be an absolute path, "%s" given.', $envVar, $dir));
         }
 
@@ -345,8 +353,24 @@ class DAVController extends AbstractController
         }
 
         $webRoot = realpath($this->publicDir);
-        if (false !== $webRoot && ($realDir === $webRoot || str_starts_with($realDir.'/', $webRoot.'/'))) {
+        if (false !== $webRoot && Path::isBasePath($webRoot, $realDir)) {
             throw new \RuntimeException(sprintf('%s ("%s") must not be inside the web root ("%s"): the web server would serve these files without any permission check.', $envVar, $dir, $webRoot));
+        }
+
+        return $realDir;
+    }
+
+    /**
+     * Neither directory may be the other one or live inside it. Both must already have
+     * passed assertWebdavDirectory(), so they exist and realpath() resolves them.
+     */
+    private function assertWebdavDirectoriesAreDisjoint(string $dirA, string $envVarA, string $dirB, string $envVarB): void
+    {
+        $realA = realpath($dirA);
+        $realB = realpath($dirB);
+
+        if (Path::isBasePath($realA, $realB) || Path::isBasePath($realB, $realA)) {
+            throw new \RuntimeException(sprintf('%s ("%s") and %s ("%s") must be separate directories, one must not be inside the other.', $envVarA, $dirA, $envVarB, $dirB));
         }
     }
 

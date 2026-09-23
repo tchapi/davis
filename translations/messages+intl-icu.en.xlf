@@ -809,6 +809,26 @@
         <source>dashboard.attention.go</source>
         <target>Diagnostics</target>
       </trans-unit>
+      <trans-unit id="dbg050" resname="diagnostics.webdav_public_dir">
+        <source>diagnostics.webdav_public_dir</source>
+        <target>WebDAV public directory</target>
+      </trans-unit>
+      <trans-unit id="dbg051" resname="diagnostics.webdav_public_dir.admins">
+        <source>diagnostics.webdav_public_dir.admins</source>
+        <target>Readable by every user, writable by admins only</target>
+      </trans-unit>
+      <trans-unit id="dbg052" resname="diagnostics.webdav_public_dir.everyone">
+        <source>diagnostics.webdav_public_dir.everyone</source>
+        <target>Readable and writable by every user</target>
+      </trans-unit>
+      <trans-unit id="dbg053" resname="diagnostics.webdav_public_dir.admins.hint">
+        <source>diagnostics.webdav_public_dir.admins.hint</source>
+        <target>Regular users get a 403 when they save a file there. Set WEBDAV_PUBLIC_DIR_WRITABLE=true to let every authenticated user write to it.</target>
+      </trans-unit>
+      <trans-unit id="dbg054" resname="diagnostics.webdav_public_dir.everyone.hint">
+        <source>diagnostics.webdav_public_dir.everyone.hint</source>
+        <target>Every authenticated user can create, modify and delete files there. Set WEBDAV_PUBLIC_DIR_WRITABLE=false to reserve writing to admins.</target>
+      </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>
         <target>A calendar subscription with no source makes the entire calendar list of its owner fail to load. Only a direct database write can produce one, so this is normally zero.</target>

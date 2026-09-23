@@ -11,33 +11,13 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 
 class DavTest extends WebTestCase
 {
+    use DavRequestTrait;
+
     private const SECRET_OBJECT_URI = 'secret.ics';
     private const SECRET_SUMMARY = 'Top secret meeting';
     private const SECRET_OBJECT_PATH = '/dav/calendars/test_user/default/'.self::SECRET_OBJECT_URI;
 
     private const SECRET_CALENDAR_DATA = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Davis//Test//EN\r\nBEGIN:VEVENT\r\nUID:secret-1\r\nDTSTAMP:20260101T100000Z\r\nDTSTART:20260101T100000Z\r\nDTEND:20260101T110000Z\r\nSUMMARY:".self::SECRET_SUMMARY."\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n";
-
-    /**
-     * The DAVController uses a sabre/dav that relies on REQUEST_URI and REQUEST_METHOD
-     * which are not set by default by PHPUnit (or to the wrong values).
-     * We thus force them here so that the request looks like a real one for PHPUnit.
-     *
-     * The Authorization header is read by sabre/dav from $_SERVER too, so we set (or unset)
-     * it the same way.
-     */
-    public static function requestDav(AbstractBrowser $client, string $method, string $path, ?string $basicAuthUserPass = null): void
-    {
-        $_SERVER['REQUEST_URI'] = $path;
-        $_SERVER['REQUEST_METHOD'] = $method;
-
-        if (null !== $basicAuthUserPass) {
-            $_SERVER['HTTP_AUTHORIZATION'] = 'Basic '.base64_encode($basicAuthUserPass);
-        } else {
-            unset($_SERVER['HTTP_AUTHORIZATION']);
-        }
-
-        $client->request($method, $path);
-    }
 
     public static function requestDavClient(string $method, string $path): AbstractBrowser
     {

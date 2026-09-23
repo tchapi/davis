@@ -27,19 +27,26 @@ final class DavisTemporaryFileFilterPlugin extends TemporaryFileFilterPlugin
             return;
         }
 
+        // This is a permission check: it must fail closed, never be skipped silently.
         $acl = $this->server->getPlugin('acl');
-        if ($acl instanceof AclPlugin) {
-            [$parent] = Uri\split($path);
-
-            $privilege = match ($request->getMethod()) {
-                'PUT' => '{DAV:}bind',
-                'DELETE' => '{DAV:}unbind',
-                default => '{DAV:}read',
-            };
-
-            // Throws NotAuthenticated (401) for anonymous users and NeedPrivileges (403) otherwise
-            $acl->checkPrivileges($parent ?? '', $privilege);
+        if (!$acl instanceof AclPlugin) {
+            throw new \LogicException('The ACL plugin must be registered for '.self::class.' to work: temporary files would otherwise bypass every permission check.');
         }
+
+        [$parent] = Uri\split($path);
+
+        // Temporary files are not nodes of the tree, so the finer-grained checks the ACL
+        // plugin does on real files (write-content on an existing file for PUT, for
+        // instance) cannot apply. We check the privilege on the parent directory that the
+        // matching operation on a real file would require.
+        $privilege = match ($request->getMethod()) {
+            'PUT' => '{DAV:}bind',
+            'DELETE' => '{DAV:}unbind',
+            default => '{DAV:}read',
+        };
+
+        // Throws NotAuthenticated (401) for anonymous users and NeedPrivileges (403) otherwise
+        $acl->checkPrivileges($parent ?? '', $privilege);
 
         return parent::beforeMethod($request, $response);
     }
