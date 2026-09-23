@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\User;
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarObject;
@@ -238,6 +239,290 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('email', $data['data']);
         $this->assertStringContainsString('test@test.com', $data['data']['email']);
         $this->assertStringEqualsStringIgnoringLineEndings($username, $data['data']['username']);
+    }
+
+    /*
+     * Test the user creation endpoint
+     */
+    public function testUserCreate(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Create user API request with JSON body
+        $payload = [
+            'name' => 'user',
+            'display_name' => 'user display name',
+            'email' => 'user@email.com',
+            'password' => 'password',
+            'is_admin' => false,
+        ];
+
+        $client->request('POST', '/api/v1/users/create', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+
+        // Check if the user was created
+		$user = $em->getRepository(User::class)->findOneByUsername('user');
+        $this->assertNotNull($user, 'The user was not created');
+
+        // Check if user details are correct
+        $this->assertArrayHasKey('user_id', $data['data']);
+        $this->assertEquals($user->getId(), $data['data']['user_id']);
+        $this->assertArrayHasKey('user_name', $data['data']);
+        $this->assertEquals($user->getUsername(), $data['data']['user_name']);
+        $this->assertTrue(password_verify('password', $user->getPassword()));
+
+        // Check if the principal was created
+        $principal = $em->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
+        $this->assertNotNull($principal, 'The principal was not created');
+
+        // Check if principal details are correct
+        $this->assertEquals('user display name', $principal->getDisplayName());
+        $this->assertEquals('user@email.com', $principal->getEmail());
+        $this->assertFalse($principal->getIsAdmin());
+    }
+
+    /*
+     * Test the user creation endpoint if is_admin is passed as string
+     */
+    public function testUserCreateIfIsAdminIsString(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Create user API request with JSON body
+        $payload = [
+            'name' => 'user',
+            'display_name' => 'user display name',
+            'email' => 'user@email.com',
+            'password' => 'password',
+            'is_admin' => "true",
+        ];
+
+        $client->request('POST', '/api/v1/users/create', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+
+        // Check if the user was created
+		$user = $em->getRepository(User::class)->findOneByUsername('user');
+        $this->assertNotNull($user, 'The user was not created');
+
+        // Check if user details are correct
+        $this->assertArrayHasKey('user_id', $data['data']);
+        $this->assertEquals($user->getId(), $data['data']['user_id']);
+        $this->assertArrayHasKey('user_name', $data['data']);
+        $this->assertEquals($user->getUsername(), $data['data']['user_name']);
+        $this->assertTrue(password_verify('password', $user->getPassword()));
+
+        // Check if the principal was created
+        $principal = $em->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
+        $this->assertNotNull($principal, 'The principal was not created');
+
+        // Check if principal details are correct
+        $this->assertEquals('user display name', $principal->getDisplayName());
+        $this->assertEquals('user@email.com', $principal->getEmail());
+        $this->assertTrue($principal->getIsAdmin());
+    }
+
+    /*
+     * Test that the user creation endpoint fails when passing invalid email
+     */
+    public function testUserCreateFailInvalidEmail(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Create user API request with JSON body
+        $payload = [
+            'name' => 'user',
+            'display_name' => 'user display name',
+            'email' => 'email',
+            'password' => 'password',
+            'is_admin' => false,
+        ];
+
+        $client->request('POST', '/api/v1/users/create', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertStringContainsString('Invalid Email', $data['message']);
+    }
+
+    /*
+     * Test that the user creation endpoint fails when passing invalid is_admin
+     */
+    public function testUserCreateFailInvalidIsAdmin(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Create user API request with JSON body
+        $payload = [
+            'name' => 'user',
+            'display_name' => 'user display name',
+            'email' => 'user@email.com',
+            'password' => 'password',
+            'is_admin' => "notfalse",
+        ];
+
+        $client->request('POST', '/api/v1/users/create', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertStringContainsString('Invalid Is Admin', $data['message']);
+    }
+
+    /*
+     * Test that the user creation endpoint fails when the user already exists
+     */
+    public function testUserCreateFailWhenUserAlreadyExists(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Get username from existing user lists
+        $username = $this->getUserUsername($client, 0);
+
+        // Create user API request with JSON body
+        $payload = [
+            'name' => $username,
+            'display_name' => 'user display name',
+            'email' => 'user@email.com',
+            'password' => 'password',
+            'is_admin' => false,
+        ];
+
+        $client->request('POST', '/api/v1/users/create', [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode($payload));
+
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertStringContainsString('Username Already Exists', $data['message']);
+    }
+
+    /*
+     * Test the user deletion endpoint
+     */
+    public function testUserDelete(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Get userId, username and principal from existing user
+        $userId = $this->getUserId($client, 0);
+        $username = $this->getUserUsername($client, 0);
+        $user = $em->getRepository(User::class)->findOneByUsername($username);
+        $principal = $em->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
+
+        $client->request('DELETE', '/api/v1/users/'.$userId, [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+
+        // Check if the user was deleted
+		$user = $em->getRepository(User::class)->findOneByUsername($username);
+        $this->assertNull($user, 'The user was not deleted');
+
+        // Check if the principal was deleted
+        $principal = $em->getRepository(Principal::class)->findOneByUri($principal->getUri());
+        $this->assertNull($principal, 'The principal was not deleted');
+    }
+
+    /*
+     * Test that the user deletion endpoint fails when the user does not exist
+     */
+    public function testUserDeleteFailUserDoesNotExists(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Get userId, username and principal from existing user
+        $userId = $this->getUserId($client, 0);
+        $username = $this->getUserUsername($client, 0);
+        $user = $em->getRepository(User::class)->findOneByUsername($username);
+        $em->remove($user);
+        $em->flush();
+
+        $client->request('DELETE', '/api/v1/users/'.$userId, [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ]);
+
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertStringContainsString('User Not Found', $data['message']);
+    }
+
+    /*
+     * Test that the user deletion endpoint fails when the user does not have a principal
+     */
+    public function testUserDeleteFailIfNoPrincipal(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // Get userId, username and principal from existing user
+        $userId = $this->getUserId($client, 0);
+        $username = $this->getUserUsername($client, 0);
+        $user = $em->getRepository(User::class)->findOneByUsername($username);
+        $principal = $em->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
+        $em->remove($principal);
+        $em->flush();
+
+        $client->request('DELETE', '/api/v1/users/'.$userId, [], [], [
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
+            'CONTENT_TYPE' => 'application/json',
+        ]);
+
+        $this->assertResponseStatusCodeSame(500);
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('error', $data['status']);
+        $this->assertStringContainsString('Error while Deleting User', $data['message']);
     }
 
     /*
