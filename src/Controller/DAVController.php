@@ -10,6 +10,7 @@ use App\Plugins\DavisTemporaryFileFilterPlugin;
 use App\Plugins\PublicAwareDAVACLPlugin;
 use App\Services\BasicAuth;
 use App\Services\BirthdayService;
+use App\Services\CapturingSapi;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -273,8 +275,9 @@ class DAVController extends AbstractController
             $nodes[] = new \Sabre\DAVACL\FS\Collection($this->webdavPublicDir, $publicDirAcl);
         }
 
-        // The object tree needs in turn to be passed to the server class
-        $this->server = new \Sabre\DAV\Server($nodes);
+        // The object tree needs in turn to be passed to the server class. The SAPI keeps
+        // sabre from writing to the output itself: dav() turns its response into a Symfony one.
+        $this->server = new \Sabre\DAV\Server($nodes, new CapturingSapi());
         $this->server->setBaseUri($this->baseUri);
 
         // Plugins
@@ -442,34 +445,30 @@ class DAVController extends AbstractController
             return $response;
         }
 
-        // \Sabre\DAV\Server does not let us use a custom SAPI: it writes its status line and
-        // headers with header() and streams the body to php://output. We capture the output
-        // so that we can hand a proper Response back to Symfony (and keep its kernel events,
-        // like TERMINATE, working).
-        ob_start(); // Does not capture headers!
+        // The server runs the request but, thanks to CapturingSapi, sends nothing: status,
+        // headers and body are all still in its response object, whether a method handler
+        // produced them, a plugin short-circuited the request from `beforeMethod` (the
+        // temporary file filter does) or the server caught an exception.
         $this->server->start();
-        $output = ob_get_clean();
-
-        // Some plugins short-circuit a request by returning false from `beforeMethod` (the
-        // temporary file filter does, for .DS_Store and friends). sabre then never sends
-        // anything: status, headers and body only exist in its response object. So we always
-        // rebuild the Symfony response from that object, falling back to its body when
-        // nothing was streamed.
         $sabreResponse = $this->server->httpResponse;
-        if ('' === $output) {
-            $body = $sabreResponse->getBody();
-            // A stream that sabre already sent has been closed (is_resource() is then false):
-            // only read bodies that were never streamed.
-            if (is_string($body) || (is_resource($body) && 'stream' === get_resource_type($body))) {
-                $output = $sabreResponse->getBodyAsString();
-            }
+        $body = $sabreResponse->getBody();
+
+        if (is_resource($body)) {
+            // Stream file contents instead of buffering them in memory. sabre honours
+            // Content-Length when it streams (range requests rely on it), so do the same.
+            $length = $sabreResponse->getHeader('Content-Length');
+            $response = new StreamedResponse(function () use ($body, $length): void {
+                $output = fopen('php://output', 'wb');
+                stream_copy_to_stream($body, $output, null === $length ? null : (int) $length);
+                fclose($body);
+            }, $sabreResponse->getStatus());
+        } elseif (is_callable($body)) {
+            // Some plugins hand over a closure that writes straight to php://output
+            $response = new StreamedResponse($body, $sabreResponse->getStatus());
+        } else {
+            $response = new Response($sabreResponse->getBodyAsString(), $sabreResponse->getStatus());
         }
 
-        // Drop the headers sabre may already have queued with header(): Symfony re-sends the
-        // very same ones from the Response below, and would otherwise duplicate them.
-        header_remove();
-
-        $response = new Response($output, $sabreResponse->getStatus());
         foreach ($sabreResponse->getHeaders() as $name => $values) {
             $response->headers->set($name, $values);
         }

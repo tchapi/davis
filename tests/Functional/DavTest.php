@@ -94,7 +94,7 @@ class DavTest extends WebTestCase
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH, 'test_user:password');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     public function testAnonymousCannotReadCalendarObject(): void
@@ -105,7 +105,7 @@ class DavTest extends WebTestCase
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH);
 
         $this->assertResponseStatusCodeSame(401);
-        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     /**
@@ -120,7 +120,7 @@ class DavTest extends WebTestCase
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH.'?sabreAction=asset');
 
         $this->assertResponseStatusCodeSame(401);
-        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     /**
@@ -135,7 +135,7 @@ class DavTest extends WebTestCase
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH.'?sabreAction=asset', 'test_user2:password2');
 
         $this->assertResponseStatusCodeSame(403);
-        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     public function testAssetQueryParameterDoesNotBypassWriteAcl(): void
@@ -171,7 +171,7 @@ class DavTest extends WebTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertSame(
             file_get_contents(static::getContainer()->getParameter('kernel.project_dir').'/vendor/sabre/dav/lib/DAV/Browser/assets/favicon.ico'),
-            $client->getResponse()->getContent()
+            $client->getInternalResponse()->getContent()
         );
     }
 
@@ -197,12 +197,12 @@ class DavTest extends WebTestCase
         // Another account, signed in
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH, 'test_user2:password2');
         $this->assertResponseStatusCodeSame(200, 'A signed-in user must be able to read a public calendar');
-        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
 
         // And anonymously, which already worked
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH);
         $this->assertResponseStatusCodeSame(200, 'An anonymous visitor must be able to read a public calendar');
-        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     /**
@@ -276,7 +276,7 @@ class DavTest extends WebTestCase
         $client = static::requestDavClient('GET', '/dav/');
 
         $this->assertResponseStatusCodeSame(401);
-        $this->assertStringNotContainsString('sabredav-version', $client->getResponse()->getContent());
+        $this->assertStringNotContainsString('sabredav-version', $client->getInternalResponse()->getContent());
         $this->assertFalse($client->getResponse()->headers->has('X-Sabre-Version'));
         $this->assertFalse(\Sabre\DAV\Server::$exposeVersion, 'The DAV server must be built with version exposure off');
     }
