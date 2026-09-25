@@ -809,6 +809,26 @@
         <source>dashboard.attention.go</source>
         <target>Diagnostic</target>
       </trans-unit>
+      <trans-unit id="dbg050" resname="diagnostics.webdav_public_dir">
+        <source>diagnostics.webdav_public_dir</source>
+        <target>Répertoire public WebDAV</target>
+      </trans-unit>
+      <trans-unit id="dbg051" resname="diagnostics.webdav_public_dir.admins">
+        <source>diagnostics.webdav_public_dir.admins</source>
+        <target>Lisible par tous les utilisateurs, modifiable par les administrateurs uniquement</target>
+      </trans-unit>
+      <trans-unit id="dbg052" resname="diagnostics.webdav_public_dir.everyone">
+        <source>diagnostics.webdav_public_dir.everyone</source>
+        <target>Lisible et modifiable par tous les utilisateurs</target>
+      </trans-unit>
+      <trans-unit id="dbg053" resname="diagnostics.webdav_public_dir.admins.hint">
+        <source>diagnostics.webdav_public_dir.admins.hint</source>
+        <target>Les utilisateurs non administrateurs obtiennent une erreur 403 en y enregistrant un fichier. Mettez WEBDAV_PUBLIC_DIR_WRITABLE=true pour permettre à tous les utilisateurs authentifiés d'y écrire.</target>
+      </trans-unit>
+      <trans-unit id="dbg054" resname="diagnostics.webdav_public_dir.everyone.hint">
+        <source>diagnostics.webdav_public_dir.everyone.hint</source>
+        <target>Tous les utilisateurs authentifiés peuvent y créer, modifier et supprimer des fichiers. Mettez WEBDAV_PUBLIC_DIR_WRITABLE=false pour réserver l'écriture aux administrateurs.</target>
+      </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>
         <target>Un abonnement de calendrier sans source empêche toute la liste de calendriers de son propriétaire de se charger. Seule une écriture directe en base peut en produire un : ce nombre est donc normalement nul.</target>

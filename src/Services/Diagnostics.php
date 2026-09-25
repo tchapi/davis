@@ -35,6 +35,7 @@ final class Diagnostics
         private bool $calDAVEnabled,
         private bool $cardDAVEnabled,
         private bool $webDAVEnabled,
+        private bool $webdavPublicDirWritable,
         private ?string $inviteAddress,
         private ?string $mailerDsn,
     ) {
@@ -66,10 +67,11 @@ final class Diagnostics
                 $this->mailer(),
                 $this->accountsWithoutEmail(),
             ],
-            'diagnostics.bucket.endpoints' => [
+            'diagnostics.bucket.endpoints' => array_values(array_filter([
                 $this->davEndpoint(),
                 $this->protocols(),
-            ],
+                $this->webdavPublicDir(),
+            ])),
         ];
 
         $result = [];
@@ -322,5 +324,22 @@ final class Diagnostics
         }
 
         return $this->check(self::OK, 'diagnostics.protocols', implode(' · ', $enabled));
+    }
+
+    /**
+     * Who can write to the shared WebDAV directory. A regular user getting 403 when saving a
+     * file there is the expected default, and this is the place that says so.
+     */
+    private function webdavPublicDir(): ?array
+    {
+        if (!$this->webDAVEnabled) {
+            return null;
+        }
+
+        if ($this->webdavPublicDirWritable) {
+            return $this->check(self::INFO, 'diagnostics.webdav_public_dir', 'diagnostics.webdav_public_dir.everyone', 'diagnostics.webdav_public_dir.everyone.hint');
+        }
+
+        return $this->check(self::INFO, 'diagnostics.webdav_public_dir', 'diagnostics.webdav_public_dir.admins', 'diagnostics.webdav_public_dir.admins.hint');
     }
 }

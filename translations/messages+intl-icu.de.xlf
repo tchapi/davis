@@ -809,6 +809,26 @@
         <source>dashboard.attention.go</source>
         <target>Diagnose</target>
       </trans-unit>
+      <trans-unit id="dbg050" resname="diagnostics.webdav_public_dir">
+        <source>diagnostics.webdav_public_dir</source>
+        <target>Öffentliches WebDAV-Verzeichnis</target>
+      </trans-unit>
+      <trans-unit id="dbg051" resname="diagnostics.webdav_public_dir.admins">
+        <source>diagnostics.webdav_public_dir.admins</source>
+        <target>Für alle Benutzer lesbar, nur für Administratoren beschreibbar</target>
+      </trans-unit>
+      <trans-unit id="dbg052" resname="diagnostics.webdav_public_dir.everyone">
+        <source>diagnostics.webdav_public_dir.everyone</source>
+        <target>Für alle Benutzer lesbar und beschreibbar</target>
+      </trans-unit>
+      <trans-unit id="dbg053" resname="diagnostics.webdav_public_dir.admins.hint">
+        <source>diagnostics.webdav_public_dir.admins.hint</source>
+        <target>Normale Benutzer erhalten beim Speichern einer Datei dort einen Fehler 403. Setzen Sie WEBDAV_PUBLIC_DIR_WRITABLE=true, damit alle angemeldeten Benutzer dort schreiben dürfen.</target>
+      </trans-unit>
+      <trans-unit id="dbg054" resname="diagnostics.webdav_public_dir.everyone.hint">
+        <source>diagnostics.webdav_public_dir.everyone.hint</source>
+        <target>Alle angemeldeten Benutzer können dort Dateien anlegen, ändern und löschen. Setzen Sie WEBDAV_PUBLIC_DIR_WRITABLE=false, um das Schreiben Administratoren vorzubehalten.</target>
+      </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>
         <target>Ein Kalenderabonnement ohne Quelle führt dazu, dass die gesamte Kalenderliste seines Besitzers nicht mehr geladen werden kann. Nur ein direkter Datenbankschreibvorgang kann so etwas erzeugen, daher steht hier normalerweise null.</target>

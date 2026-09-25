@@ -209,8 +209,21 @@ BIRTHDAY_REMINDER_OFFSET=false
 ```shell
 WEBDAV_TMP_DIR=/webdav/tmp
 WEBDAV_PUBLIC_DIR=/webdav/public
+WEBDAV_PUBLIC_DIR_WRITABLE=false
 WEBDAV_HOMES_DIR=
 ```
+
+> [!NOTE]
+>
+> The public directory (served at `/dav/public`) is readable by every authenticated user. By default only users flagged as admins in the dashboard can create, modify or delete files in it; set `WEBDAV_PUBLIC_DIR_WRITABLE=true` to let every authenticated user write to it. The Diagnostics page of the dashboard shows which of the two applies.
+
+> [!IMPORTANT]
+>
+> Up to Davis 5.4 included, every authenticated user could write to the public directory. If you relied on that (a shared drop folder), set `WEBDAV_PUBLIC_DIR_WRITABLE=true` when upgrading, otherwise your users will get a `403` when saving files there.
+
+> [!NOTE]
+>
+> The directories must be absolute paths and must not live inside the web root (Davis refuses to start the DAV server otherwise). The tmp dir and the homes dir must not be inside the public dir either, and vice versa.
 
 > [!NOTE]
 >
@@ -218,7 +231,7 @@ WEBDAV_HOMES_DIR=
 
 > [!NOTE]
 >
-> By default, home directories are disabled totally (the env var is set to an empty string). If needed, it is recommended to use a folder that is **NOT** a child of the public dir, such as `/webdav/homes` for instance, so that users cannot access other users' homes.
+> By default, home directories are disabled totally (the env var is set to an empty string). If needed, use a folder that is **NOT** a child of the public dir, such as `/webdav/homes` for instance, so that users cannot access other users' homes: Davis checks this and refuses to start the DAV server otherwise.
 
 **h. The log file path**
 
