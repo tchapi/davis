@@ -171,9 +171,14 @@ class WebDavTest extends WebTestCase
         $this->assertResponseStatusCodeSame(201);
         $this->assertFileExists($this->baseDir.'/public/notes.txt');
 
-        // Regular user can read what the admin published, but not remove it
+        // Regular user can read what the admin published, but not remove it. The test client
+        // cannot send a request body, so the content is written on disk; the GET then goes
+        // through the streamed response path.
+        file_put_contents($this->baseDir.'/public/notes.txt', 'Hello from the public dir');
         static::requestDav($client, 'GET', '/dav/public/notes.txt', 'test_user2:password2');
         $this->assertResponseStatusCodeSame(200);
+        $this->assertSame('Hello from the public dir', $client->getInternalResponse()->getContent());
+        $this->assertResponseHeaderSame('Content-Length', '25');
 
         static::requestDav($client, 'DELETE', '/dav/public/notes.txt', 'test_user2:password2');
         $this->assertResponseStatusCodeSame(403);
