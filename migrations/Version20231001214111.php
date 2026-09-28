@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,7 +20,9 @@ final class Version20231001214111 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE calendarobjects CHANGE calendardata calendardata MEDIUMTEXT DEFAULT NULL');
         $this->addSql('ALTER TABLE cards CHANGE carddata carddata MEDIUMTEXT DEFAULT NULL');
@@ -28,7 +31,9 @@ final class Version20231001214111 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE schedulingobjects CHANGE calendardata calendardata LONGBLOB DEFAULT NULL');
         $this->addSql('ALTER TABLE calendarobjects CHANGE calendardata calendardata LONGBLOB DEFAULT NULL');

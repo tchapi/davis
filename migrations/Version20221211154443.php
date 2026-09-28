@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,7 +20,9 @@ final class Version20221211154443 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('sqlite' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'sqlite\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return;
+        }
 
         $this->addSql('CREATE TABLE addressbookchanges (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, addressbookid INTEGER NOT NULL, uri VARCHAR(255) NOT NULL, synctoken VARCHAR(255) NOT NULL, operation INTEGER NOT NULL)');
         $this->addSql('CREATE INDEX IDX_EB122CD58B26C2E9 ON addressbookchanges (addressbookid)');
@@ -48,7 +51,9 @@ final class Version20221211154443 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('sqlite' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'sqlite\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return;
+        }
 
         $this->addSql('DROP TABLE addressbookchanges');
         $this->addSql('DROP TABLE addressbooks');

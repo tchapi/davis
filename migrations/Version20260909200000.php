@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -39,7 +40,7 @@ final class Version20260909200000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // NB: the rows removed by up() cannot be restored; they were stale duplicates.
-        if ('mysql' === $this->connection->getDatabasePlatform()->getName()) {
+        if ($this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
             $this->addSql(sprintf('DROP INDEX %s ON propertystorage', self::INDEX_NAME));
         } else {
             $this->addSql(sprintf('DROP INDEX %s', self::INDEX_NAME));

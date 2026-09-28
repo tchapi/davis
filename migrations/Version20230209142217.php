@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,7 +20,9 @@ final class Version20230209142217 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'postgresql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE addressbooks ALTER COLUMN id SET DEFAULT nextval(\'addressbooks_id_seq\');');
         $this->addSql('ALTER TABLE calendars ALTER COLUMN id SET DEFAULT nextval(\'calendars_id_seq\');');
@@ -40,7 +43,9 @@ final class Version20230209142217 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'postgresql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE addressbooks ALTER COLUMN id DROP DEFAULT;');
         $this->addSql('ALTER TABLE calendars ALTER COLUMN id DROP DEFAULT;');

@@ -183,6 +183,9 @@ final class Diagnostics
     /**
      * An install running without its migrations looks like a set of unrelated 500s: a PROPPATCH
      * that always fails, an address book that cannot be created, contacts that stop syncing.
+     *
+     * Migrations that do not apply to the current engine return early rather than calling
+     * `skipIf()`, so they are recorded like any other and this count reaches zero on every engine.
      */
     private function pendingMigrations(): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,14 +20,18 @@ final class Version20191203111729 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE addressbooks CHANGE description description LONGTEXT DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return;
+        }
 
         // Since up() made the column nullable, address books created in the meantime may have
         // no description at all; they would violate the restored NOT NULL.

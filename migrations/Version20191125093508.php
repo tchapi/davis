@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,14 +20,18 @@ final class Version20191125093508 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE principals ADD is_admin TINYINT(1) NOT NULL');
     }
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE principals DROP is_admin');
     }

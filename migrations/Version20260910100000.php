@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -39,7 +40,7 @@ final class Version20260910100000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $isMysql = 'mysql' === $this->connection->getDatabasePlatform()->getName();
+        $isMysql = $this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform;
 
         foreach (self::INDEXES as $name => [$table]) {
             $this->addSql($isMysql

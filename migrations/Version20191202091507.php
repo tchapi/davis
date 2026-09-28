@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,14 +20,18 @@ final class Version20191202091507 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE calendarinstances CHANGE access access SMALLINT DEFAULT 1 NOT NULL, CHANGE share_invitestatus share_invitestatus INT DEFAULT 2 NOT NULL, CHANGE timezone timezone LONGTEXT DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'mysql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            return;
+        }
 
         // NB: `timezone` is restored to its original VARCHAR(255); a VTIMEZONE blob longer than
         // that would be rejected by MySQL rather than silently truncated.

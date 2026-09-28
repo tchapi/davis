@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,10 +22,12 @@ final class Version20250409193948 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('sqlite' === $this->connection->getDatabasePlatform()->getName(), 'This migration is not needed on \'sqlite\'. Skipping it is fine.');
+        if ($this->connection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return;
+        }
 
         // MySQL
-        if ('mysql' === $this->connection->getDatabasePlatform()->getName()) {
+        if ($this->connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE calendarobjects CHANGE lastmodified lastmodified BIGINT DEFAULT NULL, CHANGE firstoccurence firstoccurence BIGINT DEFAULT NULL, CHANGE lastoccurence lastoccurence BIGINT DEFAULT NULL');
             $this->addSql('ALTER TABLE calendarsubscriptions CHANGE lastmodified lastmodified BIGINT DEFAULT NULL');
             $this->addSql('ALTER TABLE locks CHANGE created created BIGINT DEFAULT NULL');
@@ -30,7 +35,7 @@ final class Version20250409193948 extends AbstractMigration
         }
 
         // Posgres
-        if ('postgresql' === $this->connection->getDatabasePlatform()->getName()) {
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             $this->addSql('ALTER TABLE calendarobjects ALTER COLUMN lastmodified TYPE BIGINT');
             $this->addSql('ALTER TABLE calendarobjects ALTER COLUMN firstoccurence TYPE BIGINT');
             $this->addSql('ALTER TABLE calendarobjects ALTER COLUMN lastoccurence TYPE BIGINT');
