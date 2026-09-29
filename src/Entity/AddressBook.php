@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AddressBook
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
     private $id;
 

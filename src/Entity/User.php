@@ -14,7 +14,7 @@ class User
     public const DEFAULT_AUTH_REALM = 'SabreDAV';
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
     private $id;
 

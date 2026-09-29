@@ -19,7 +19,7 @@ class Principal
     public const WRITE_PROXY_SUFFIX = '/calendar-proxy-write';
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
     private $id;
 
