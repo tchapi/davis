@@ -137,6 +137,29 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 ```
 > See [the following paragraph](#specific-environment-variables-for-imap-and-ldap-authentication-methods) for more information if you choose either IMAP or LDAP.
 
+> [!WARNING]
+>
+> **Do not change `AUTH_REALM` on an existing installation.** Davis stored passwords as
+> `md5(username:AUTH_REALM:password)` until v1.10.0 (September 2021), and a database imported from
+> Baïkal uses the same scheme. The realm is part of those hashes, so changing it makes every one of
+> them stop working, with no error beyond a failed login — the accounts are still there, they simply
+> cannot authenticate any more.
+>
+> Passwords set since v1.10.0 use bcrypt and are unaffected. You can still be carrying legacy ones
+> without ever having used Baïkal, if the account predates that version. To find out:
+>
+> ```sql
+> SELECT username FROM users WHERE digesta1 NOT LIKE '$2y$%';
+> ```
+>
+> Any row returned is a legacy hash tied to the current realm.
+>
+> There is no password reset in Davis. If you must change the realm, the only way back is to open
+> each of those accounts in the dashboard and type a new password: the field is blank on the edit
+> page and leaving it blank keeps the current hash, so filling it in is what replaces it. The new
+> one is stored with bcrypt and no longer depends on the realm. Your own admin login is unaffected —
+> it comes from `ADMIN_LOGIN` / `ADMIN_PASSWORD`, not from the users table.
+
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
 ```shell
