@@ -14,6 +14,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/api/v1', name: 'api_v1_')]
 class ApiController extends AbstractController
@@ -144,6 +147,93 @@ class ApiController extends AbstractController
         ];
 
         return $this->json($response, 200);
+    }
+
+    /**
+     * Creates a new user.
+     *
+     * @param Request $request The HTTP POST request
+     *
+     * @return JsonResponse A JSON response containing the user details if successfull
+     */
+    #[Route('/users/create', name: 'user_create', methods: ['POST'])]
+    public function createUser(Request $request, ManagerRegistry $doctrine, TranslatorInterface $trans, ValidatorInterface $validator, Utils $utils): JsonResponse
+    {
+        // Parse JSON body
+        $data = json_decode($request->getContent(), true);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid JSON', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $username = $data['name'] ?? null;
+        if (is_null($username) || !$this->validateUsername($username)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Username', 'timestamp' => $this->getTimestamp()], 400);
+        }
+        $display_name = $data['display_name'] ?? null;
+        if (empty($display_name)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Display Name', 'timestamp' => $this->getTimestamp()], 400);
+        }
+        $email = $data['email'] ?? null;
+        if (empty($email) || count($validator->validate($email, new Assert\Email())) > 0) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Email', 'timestamp' => $this->getTimestamp()], 400);
+        }
+        $password = $data['password'] ?? null;
+        if (is_null($password)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Password', 'timestamp' => $this->getTimestamp()], 400);
+        }
+        $isAdmin = $data['is_admin'] ?? false;
+        if (!in_array($isAdmin, [true, false, 'true', 'false'], true)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid Is Admin', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $existingUsername = $doctrine->getRepository(User::class)->findOneByUsername($username);
+        if ($existingUsername) {
+            return $this->json(['status' => 'error', 'message' => 'Username Already Exists', 'timestamp' => $this->getTimestamp()], 400);
+        }
+
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $user = $utils->createUserWithDefaultObjects($username, $display_name, $email, $hashed_password, (true === $isAdmin || 'true' === $isAdmin) ? true : false);
+
+        $entityManager = $doctrine->getManager();
+        $entityManager->flush();
+
+        $response = [
+            'status' => 'success',
+            'data' => [
+                'user_id' => $user->getId(),
+                'user_name' => $user->getUsername(),
+            ],
+            'timestamp' => $this->getTimestamp(),
+        ];
+
+        return $this->json($response, 201);
+    }
+
+    /**
+     * Deletes a specific user.
+     *
+     * @param int $userId The ID of the user to delete
+     *
+     * @return JsonResponse A JSON response indicating the success or failure of the operation
+     */
+    #[Route('/users/{userId}', name: 'user_delete', methods: ['DELETE'], requirements: ['userId' => '\d+'])]
+    public function deleteUser(int $userId, ManagerRegistry $doctrine, Utils $utils): JsonResponse
+    {
+        $user = $this->resolveUser($doctrine, $userId);
+        if (!$user) {
+            return $this->json(['status' => 'error', 'message' => 'User Not Found', 'timestamp' => $this->getTimestamp()], 404);
+        }
+
+        try {
+            $utils->deleteUser($user);
+        } catch (\Exception $e) {
+            return $this->json(['status' => 'error', 'message' => 'Error while Deleting User', 'timestamp' => $this->getTimestamp()], 500);
+        }
+
+        $entityManager = $doctrine->getManager();
+        $entityManager->flush();
+
+        return $this->json(['status' => 'success', 'timestamp' => $this->getTimestamp()], 200);
     }
 
     /**
