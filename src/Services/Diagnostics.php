@@ -238,14 +238,12 @@ final class Diagnostics
     }
 
     /**
-     * ext-ldap and ext-imap are optional for Davis, but the selected method cannot work without
-     * the one it needs, and that surfaces as every login being refused.
+     * ext-ldap is optional for Davis, but the LDAP method cannot work without it, and that surfaces as every login being refused.
      */
     private function authExtension(): array
     {
         $required = match (strtolower($this->authMethod)) {
             'ldap' => 'ldap',
-            'imap' => 'imap',
             default => null,
         };
 
