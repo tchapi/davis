@@ -131,6 +131,42 @@ class ImipPluginTest extends KernelTestCase
         $this->assertSame([], $mailer->sent);
     }
 
+    /**
+     * `VEVENT.URL` comes from whoever created the event and the invitation makes it clickable in
+     * the recipient's mail client, so only web and mail addresses get through.
+     *
+     * @dataProvider urls
+     */
+    public function testOnlyLinkableUrlsReachTheInvitation(string $url, bool $expected): void
+    {
+        $logs = [];
+        $plugin = $this->plugin($mailer = $this->mailer(null), $logs);
+
+        $message = $this->message();
+        $message->message->VEVENT->add('URL', $url);
+        $plugin->schedule($message);
+
+        $this->assertCount(1, $mailer->sent);
+
+        // The templates render from this context, and both of them only emit a link when it is set
+        $this->assertSame(
+            $expected ? $url : false,
+            $mailer->sent[0]->getContext()['url'],
+            $url.($expected ? ' should be offered' : ' should not be offered')
+        );
+    }
+
+    public static function urls(): iterable
+    {
+        yield 'https' => ['https://example.org/meeting', true];
+        yield 'http' => ['http://example.org/meeting', true];
+        yield 'mailto' => ['mailto:someone@example.org', true];
+        yield 'javascript' => ['javascript:alert(1)', false];
+        yield 'data' => ['data:text/html,<script>alert(1)</script>', false];
+        yield 'file' => ['file:///etc/passwd', false];
+        yield 'no scheme' => ['example.org/meeting', false];
+    }
+
     public function testASuccessfulSendIsLoggedAndReported(): void
     {
         $logs = [];

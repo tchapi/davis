@@ -195,7 +195,9 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             return $else;
         };
 
-        $url = $notEmpty('URL', false);
+        // The invitation renders this as a link, and it is whatever the organiser's client put in
+        // VEVENT.URL. Anything but a web or mail address is dropped rather than made clickable.
+        $url = $this->linkableUrl($notEmpty('URL', false));
         $description = $notEmpty('DESCRIPTION', false);
         $location = $notEmpty('LOCATION', false);
         $locationImageDataAsBase64 = false;
@@ -323,6 +325,22 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         if (false === $deliveredLocally) {
             $itip->scheduleStatus = '1.1;Scheduling message is sent via iMip.';
         }
+    }
+
+    /**
+     * @param string|false $url
+     *
+     * @return string|false the url if it is one a mail client should offer to open, false otherwise
+     */
+    private function linkableUrl($url)
+    {
+        if (!is_string($url) || '' === $url) {
+            return false;
+        }
+
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
+        return \in_array(strtolower((string) $scheme), ['http', 'https', 'mailto'], true) ? $url : false;
     }
 
     /**
