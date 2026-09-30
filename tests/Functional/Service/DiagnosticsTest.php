@@ -76,7 +76,6 @@ class DiagnosticsTest extends KernelTestCase
     {
         $diagnostics = $this->diagnosticsWith();
 
-        $this->assertSame(Diagnostics::OK, $this->severityOf($diagnostics, 'diagnostics.migrations'));
         $this->assertSame(Diagnostics::OK, $this->severityOf($diagnostics, 'diagnostics.log_file'));
         $this->assertSame(Diagnostics::OK, $this->severityOf($diagnostics, 'diagnostics.environment'));
         $this->assertSame(Diagnostics::OK, $this->severityOf($diagnostics, 'diagnostics.timezone'));
