@@ -76,6 +76,8 @@ class DiagnosticsTest extends KernelTestCase
     {
         $diagnostics = $this->diagnosticsWith();
 
+        // The test database is built by the migrations, so none of them are pending
+        $this->assertSame(Diagnostics::OK, $this->severityOf($diagnostics, 'diagnostics.migrations'));
         $this->assertSame(Diagnostics::OK, $this->severityOf($diagnostics, 'diagnostics.log_file'));
         $this->assertSame(Diagnostics::OK, $this->severityOf($diagnostics, 'diagnostics.environment'));
         $this->assertSame(Diagnostics::OK, $this->severityOf($diagnostics, 'diagnostics.timezone'));
