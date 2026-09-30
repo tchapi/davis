@@ -232,10 +232,6 @@ class BirthdayService
 
         $leapDay = (2 === (int) $dateParts['month']
                 && 29 === (int) $dateParts['date']);
-        if (null === $dateParts['year'] || $originalYear < 1970) {
-            $birthday = ($leapDay ? '1972-' : '1970-')
-                .$dateParts['month'].'-'.$dateParts['date'];
-        }
 
         if ($leapDay) {
             /* Sabre\VObject supports BYMONTHDAY only if BYMONTH
