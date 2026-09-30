@@ -34,6 +34,32 @@ class PrincipalRepository extends ServiceEntityRepository
     }
 
     /**
+     * The delegates page needs a principal and both of its proxies, and reads the `delegees` of each
+     * proxy, which is six lookups done one at a time.
+     *
+     * @param string[] $uris
+     *
+     * @return array<string, Principal> keyed by uri, missing uris simply absent
+     */
+    public function findWithDelegeesByUris(array $uris): array
+    {
+        $principals = $this->createQueryBuilder('p')
+            ->leftJoin('p.delegees', 'd')
+            ->addSelect('d')
+            ->andWhere('p.uri IN (:uris)')
+            ->setParameter('uris', $uris)
+            ->getQuery()
+            ->getResult();
+
+        $byUri = [];
+        foreach ($principals as $principal) {
+            $byUri[$principal->getUri()] = $principal;
+        }
+
+        return $byUri;
+    }
+
+    /**
      * @return array<array{Principal, userId: int}>
      */
     public function findAllMainPrincipalsWithUserIds(): array

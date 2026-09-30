@@ -320,6 +320,76 @@ class CalendarControllerTest extends WebTestCase
     }
 
     /**
+     * The uri becomes a path segment under `/dav/calendars/<user>/`, so it has to be a single
+     * segment and nothing else.
+     */
+    public function testCalendarNewRefusesAUriThatIsNotOneSegment(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        foreach (['../../evil', 'a/b', 'has space', 'dots.and.more', ''] as $uri) {
+            $crawler = $client->request('GET', '/calendars/'.$userId.'/new');
+            $form = $crawler->selectButton('calendar_instance_save')->form();
+
+            $client->submit($form, [
+                'calendar_instance[uri]' => $uri,
+                'calendar_instance[displayName]' => 'Traversal',
+                'calendar_instance[description]' => 'nope',
+                'calendar_instance[calendarColor]' => '#001122',
+            ]);
+
+            $this->assertResponseIsSuccessful('"'.$uri.'" should come back as a form error');
+            $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+            $this->assertNull($em->getRepository(CalendarInstance::class)->findOneBy(['uri' => $uri]));
+        }
+    }
+
+    /**
+     * The form has to accept exactly what the `colour()` macro renders, and refuse the rest: a
+     * value it accepts but the macro blanks out is a colour the admin cannot set.
+     */
+    public function testTheColourFieldAgreesWithWhatThePageRenders(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        $submit = function (string $uri, string $colour) use ($client, $userId): void {
+            $crawler = $client->request('GET', '/calendars/'.$userId.'/new');
+            $form = $crawler->selectButton('calendar_instance_save')->form();
+
+            $client->submit($form, [
+                'calendar_instance[uri]' => $uri,
+                'calendar_instance[displayName]' => 'Colour '.$uri,
+                'calendar_instance[description]' => '',
+                'calendar_instance[calendarColor]' => $colour,
+            ]);
+        };
+
+        // Lowercase and the 8-digit form the placeholder advertises were both refused before
+        foreach (['#abc', '#aabbcc', '#00112233'] as $i => $colour) {
+            $uri = 'colour_ok_'.$i;
+            $submit($uri, $colour);
+
+            $this->assertResponseRedirects('/calendars/'.$userId, null, '"'.$colour.'" should be accepted');
+            $this->assertSame($colour, $em->getRepository(CalendarInstance::class)->findOneBy(['uri' => $uri])->getCalendarColor());
+        }
+
+        foreach (['red;x:y', 'red', '#gggggg', '#12345'] as $i => $colour) {
+            $uri = 'colour_bad_'.$i;
+            $submit($uri, $colour);
+
+            $this->assertResponseIsSuccessful('"'.$colour.'" should come back as a form error');
+            $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+            $this->assertNull($em->getRepository(CalendarInstance::class)->findOneBy(['uri' => $uri]));
+        }
+    }
+
+    /**
      * A calendar colour is whatever the owner's client sent over CalDAV, and it lands inside a
      * `style` attribute. HTML escaping does not stop it from closing the declaration and adding
      * its own, and SQLite does not enforce the column length, so the payload is unbounded there.

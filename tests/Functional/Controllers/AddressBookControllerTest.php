@@ -126,6 +126,34 @@ class AddressBookControllerTest extends WebTestCase
     }
 
     /**
+     * The uri becomes a path segment under `/dav/addressbooks/<user>/`, so it has to be a single
+     * segment and nothing else.
+     */
+    public function testAddressBookNewRefusesAUriThatIsNotOneSegment(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        foreach (['../../evil', 'a/b', 'has space', 'dots.and.more', ''] as $uri) {
+            $crawler = $client->request('GET', '/addressbooks/'.$userId.'/new');
+            $form = $crawler->selectButton('address_book_save')->form();
+
+            $client->submit($form, [
+                'address_book[uri]' => $uri,
+                'address_book[displayName]' => 'Traversal',
+                'address_book[description]' => 'nope',
+            ]);
+
+            $this->assertResponseIsSuccessful('"'.$uri.'" should come back as a form error');
+            $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+            $this->assertNull($em->getRepository(AddressBook::class)->findOneBy(['uri' => $uri]));
+        }
+    }
+
+    /**
      * The field is mapped, so `handleRequest()` writes it onto the entity and the flush persists
      * it, both ways round.
      */
