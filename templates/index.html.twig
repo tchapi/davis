@@ -4,11 +4,11 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Davis{% endblock %}</title>
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-        <link rel="manifest" href="/site.webmanifest">
-        <link rel="stylesheet" href="/css/bootstrap.min.css" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+        <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+        <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
         <style type="text/css">
           .hero {
             height: 100vh;
@@ -22,11 +22,11 @@
             width: 240px;
           }
         </style>
-        <script type="text/javascript" src="/js/color.mode.toggler.js"></script>
+        <script type="text/javascript" src="{{ asset('js/color.mode.toggler.js') }}"></script>
     </head>
     <body>
       <div class="hero">
-        <img class="mb-2" src="/images/logo.png" width="60px">
+        <img class="mb-2" src="{{ asset('images/logo.png') }}" width="60px">
         <h3 class="mb-4">{{ "davis"|trans }}</h3>
         <ul class="list-group">
           <li class="caldav list-group-item d-flex justify-content-between align-items-center">

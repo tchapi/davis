@@ -14,6 +14,11 @@ framework:
         name: 'DAVIS_SESSION'
         storage_factory_id: session.storage.factory.native
 
+    # The CSS and JS only ever change with a release, so the version is the release. It also makes
+    # `asset()` prepend the base path, which a hard-coded `/css/…` does not on a sub-directory install.
+    assets:
+        version: !php/const App\Version::VERSION
+
     property_info:
         with_constructor_extractor: false
 
