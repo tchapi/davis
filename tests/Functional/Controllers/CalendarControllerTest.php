@@ -99,7 +99,8 @@ class CalendarControllerTest extends WebTestCase
         $this->assertResponseRedirects('/calendars/'.$userId);
         $client->followRedirect();
 
-        $this->assertSelectorTextContains('h5', 'default.calendar.title');
+        // The list has no ORDER BY, so assert both are present rather than which comes first
+        $this->assertAnySelectorTextContains('h5', 'default.calendar.title');
         $this->assertAnySelectorTextContains('h5', 'New test calendar');
     }
 
