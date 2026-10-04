@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\Security\AdminUser;
+use App\Version;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DashboardTest extends WebTestCase
@@ -18,6 +19,30 @@ class DashboardTest extends WebTestCase
         $this->assertSelectorExists('li.caldav');
         $this->assertSelectorExists('li.carddav');
         $this->assertSelectorExists('li.webdav');
+    }
+
+    /**
+     * The shipped nginx and Caddy configurations tell browsers to keep these for a year, which is
+     * only safe because the URL carries the release: a new release is a new URL.
+     */
+    public function testStaticAssetsCarryTheReleaseInTheirUrl(): void
+    {
+        $client = static::createClient();
+
+        foreach (['/', '/login'] as $path) {
+            $crawler = $client->request('GET', $path);
+            $this->assertResponseIsSuccessful();
+
+            $urls = array_merge(
+                $crawler->filter('link[rel="stylesheet"]')->extract(['href']),
+                $crawler->filter('script[src]')->extract(['src']),
+            );
+
+            $this->assertNotEmpty($urls, $path.' should reference stylesheets and scripts');
+            foreach ($urls as $url) {
+                $this->assertStringEndsWith('?'.Version::VERSION, $url);
+            }
+        }
     }
 
     public function testDashboardPageUnlogged(): void

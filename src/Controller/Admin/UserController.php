@@ -202,14 +202,18 @@ class UserController extends AbstractController
     public function userDelegates(ManagerRegistry $doctrine, #[MapEntity(id: 'userId')] User $user, int $userId): Response
     {
         $principalUri = $user->getPrincipalUri();
+        $readProxyUri = $principalUri.Principal::READ_PROXY_SUFFIX;
+        $writeProxyUri = $principalUri.Principal::WRITE_PROXY_SUFFIX;
 
-        $principal = $doctrine->getRepository(Principal::class)->findOneByUri($principalUri);
+        // Delegates are not linked to the principal itself but to its proxies, so the three
+        // principals and the delegees the template reads off the proxies come back together
+        $principals = $doctrine->getRepository(Principal::class)->findWithDelegeesByUris([$principalUri, $readProxyUri, $writeProxyUri]);
+
+        $principal = $principals[$principalUri] ?? null;
+        $principalProxyRead = $principals[$readProxyUri] ?? null;
+        $principalProxyWrite = $principals[$writeProxyUri] ?? null;
 
         $allPrincipalsExcept = $doctrine->getRepository(Principal::class)->findAllExceptPrincipal($principalUri);
-
-        // Get delegates. They are not linked to the principal in itself, but to its proxies
-        $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
-        $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
 
         return $this->render('users/delegates.html.twig', [
             'principal' => $principal,

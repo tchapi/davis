@@ -41,7 +41,8 @@ class CalendarInstance
     private $displayName;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Assert\Regex("/[0-9a-z\-]+/")]
+    #[Assert\NotBlank]
+    #[Assert\Regex("/^[0-9a-zA-Z_\-]+$/")]
     #[Assert\Length(max: 255)]
     private $uri;
 
@@ -52,7 +53,7 @@ class CalendarInstance
     private $calendarOrder;
 
     #[ORM\Column(name: 'calendarcolor', type: 'string', length: 10, nullable: true)]
-    #[Assert\Regex("/\#[0-9A-F]{6}/")]
+    #[Assert\Regex('/^#([0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/')]
     #[Assert\Length(max: 10)]
     private $calendarColor;
 

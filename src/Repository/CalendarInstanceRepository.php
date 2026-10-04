@@ -168,22 +168,30 @@ class CalendarInstanceRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get counts of calendar objects by component type for a calendar instance.
+     * Counts the objects of several calendars at once, split by component type, so that listing a
+     * principal's calendars costs a single query instead of one per calendar. Shared calendars
+     * share the `calendars` row their instances point at, so duplicate ids cost nothing extra.
      *
-     * @param int $calendarId The ID of the calendar
+     * @param int[] $calendarIds
      *
-     * @return array An associative array with keys 'events', 'notes', 'tasks' containing their respective counts
+     * @return array<int, array{events: int, notes: int, tasks: int}> per calendar id, including the calendars that hold nothing
      */
-    public function getObjectCountsByComponentType(int $calendarId): array
+    public function countObjectsByComponentType(array $calendarIds): array
     {
-        $objectRepository = $this->getEntityManager()->getRepository(CalendarObject::class);
+        $calendarIds = array_values(array_unique(array_map('intval', $calendarIds)));
+        $counts = array_fill_keys($calendarIds, ['events' => 0, 'notes' => 0, 'tasks' => 0]);
 
-        // Instead of three separate queries, get all counts in a single query
-        $results = $objectRepository->createQueryBuilder('o')
-            ->select('o.componentType, COUNT(o.id) as count')
-            ->where('o.calendar = :calendarId')
-            ->setParameter('calendarId', $calendarId)
-            ->groupBy('o.componentType')
+        if (!$calendarIds) {
+            return $counts;
+        }
+
+        $results = $this->getEntityManager()->getRepository(CalendarObject::class)
+            ->createQueryBuilder('o')
+            ->select('IDENTITY(o.calendar) AS calendarId, o.componentType, COUNT(o.id) AS count')
+            ->where('o.calendar IN (:calendarIds)')
+            ->setParameter('calendarIds', $calendarIds)
+            ->groupBy('o.calendar')
+            ->addGroupBy('o.componentType')
             ->getQuery()
             ->getResult();
 
@@ -193,16 +201,10 @@ class CalendarInstanceRepository extends ServiceEntityRepository
             Calendar::COMPONENT_TODOS => 'tasks',
         ];
 
-        $counts = [
-            'events' => 0,
-            'notes' => 0,
-            'tasks' => 0,
-        ];
-
-        // Map query results to the expected keys
         foreach ($results as $result) {
-            if (isset($componentTypeMap[$result['componentType']])) {
-                $counts[$componentTypeMap[$result['componentType']]] = (int) $result['count'];
+            $key = $componentTypeMap[$result['componentType']] ?? null;
+            if (null !== $key) {
+                $counts[(int) $result['calendarId']][$key] = (int) $result['count'];
             }
         }
 

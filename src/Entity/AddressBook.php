@@ -27,7 +27,8 @@ class AddressBook
     private $displayName;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\Regex("/[0-9a-z\-]+/")]
+    #[Assert\NotBlank]
+    #[Assert\Regex("/^[0-9a-zA-Z_\-]+$/")]
     #[Assert\Length(max: 255)]
     private $uri;
 
