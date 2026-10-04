@@ -8,6 +8,7 @@ use DantSu\OpenStreetMapStaticAPI\OpenStreetMap;
 use Psr\Log\LoggerInterface;
 use Sabre\CalDAV\Schedule\IMipPlugin as SabreBaseIMipPlugin;
 use Sabre\DAV;
+use Sabre\VObject;
 use Sabre\VObject\ITip;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -43,6 +44,11 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
     private $logger;
 
     /**
+     * @var DAV\Server
+     */
+    private $server;
+
+    /**
      * Creates the email handler.
      */
     public function __construct(MailerInterface $mailer, string $senderEmail, string $publicDir, LoggerInterface $logger)
@@ -51,6 +57,112 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         $this->senderEmail = $senderEmail;
         $this->publicDir = $publicDir;
         $this->logger = $logger;
+    }
+
+    public function initialize(DAV\Server $server)
+    {
+        parent::initialize($server);
+
+        $this->server = $server;
+
+        // sabre only emits `schedule` when it has decided to send an iTIP message. These two
+        // events fire on every calendar object that gets written, sent or not.
+        $server->on('afterCreateFile', function (string $path) {
+            $this->explainMissingScheduling($path);
+        });
+        // This one already hands us the node, so there is no need to look it up again
+        $server->on('afterWriteContent', function (string $path, DAV\INode $node) {
+            $this->explainMissingScheduling($path, $node);
+        });
+    }
+
+    /**
+     * Logs why an event with attendees did not produce an invitation.
+     *
+     * When sabre decides not to schedule, it saves the event and emits nothing, so `schedule()`
+     * below is never called and the log stays empty. This runs the same two checks sabre runs
+     * (`Sabre\CalDAV\Schedule\Plugin::calendarObjectChange()`) and logs the one that failed.
+     *
+     * It runs after the object has been written, so it cannot affect the write.
+     */
+    public function explainMissingScheduling(string $path, ?DAV\INode $node = null): void
+    {
+        try {
+            $node = $node ?? $this->server->tree->getNodeForPath($path);
+            if (!$node instanceof \Sabre\CalDAV\ICalendarObject) {
+                return;
+            }
+
+            $vCal = VObject\Reader::read($node->get());
+            if (!isset($vCal->VEVENT)) {
+                return;
+            }
+
+            $vevent = $vCal->VEVENT;
+
+            // An event with no attendees or no organiser is never scheduled
+            if (!isset($vevent->ATTENDEE) || !isset($vevent->ORGANIZER)) {
+                return;
+            }
+
+            if ('F' === $this->server->httpRequest->getHeader('Schedule-Reply')) {
+                $this->logger->warning('Scheduling: the client asked not to send invitations for this event (Schedule-Reply: F).', ['path' => $path]);
+
+                return;
+            }
+
+            $organizer = (string) $vevent->ORGANIZER;
+            $addresses = $this->addressesForCalendarOf($path);
+
+            if (!\in_array($organizer, $addresses, true)) {
+                $this->logger->warning(
+                    'Scheduling: no invitation will be sent because the event organiser is not one of this account\'s calendar addresses. Set the account\'s email to the address its client sends as ORGANIZER.',
+                    [
+                        'organizer' => $organizer,
+                        'account_addresses' => $addresses ?: '(none: the principal has no email)',
+                        'path' => $path,
+                    ]
+                );
+
+                return;
+            }
+
+            foreach ($vevent->ATTENDEE as $attendee) {
+                if (isset($attendee['SCHEDULE-AGENT']) && 'CLIENT' === strtoupper((string) $attendee['SCHEDULE-AGENT'])) {
+                    $this->logger->warning('Scheduling: an attendee is marked SCHEDULE-AGENT=CLIENT, so the client sends that invitation itself and Davis does not.', [
+                        'attendee' => (string) $attendee,
+                        'path' => $path,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            // This only logs, so never let it break a write that already succeeded
+            $this->logger->debug('Scheduling: could not inspect the stored object', ['path' => $path, 'exception' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Returns the addresses of the account that owns this calendar, read from the same
+     * `calendar-user-address-set` property sabre uses.
+     *
+     * @return string[]
+     */
+    private function addressesForCalendarOf(string $path): array
+    {
+        $calendar = $this->server->tree->getNodeForPath(\dirname($path));
+        if (!$calendar instanceof \Sabre\DAVACL\IACL) {
+            return [];
+        }
+
+        $owner = $calendar->getOwner();
+        if (!$owner) {
+            return [];
+        }
+
+        $addressSet = '{'.\Sabre\CalDAV\Plugin::NS_CALDAV.'}calendar-user-address-set';
+        $properties = $this->server->getProperties($owner, [$addressSet]);
+
+        return isset($properties[$addressSet]) ? $properties[$addressSet]->getHrefs() : [];
     }
 
     /**
