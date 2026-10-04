@@ -738,6 +738,100 @@ class ApiControllerTest extends WebTestCase
         $this->assertSame([], json_decode($client->getResponse()->getContent(), true)['data']);
     }
 
+    /**
+     * The counts come back from one grouped query for every calendar at once, so each row has to
+     * land against the right calendar and the right component type. Per-calendar totals that
+     * differ from each other are what catches a mis-keyed result.
+     */
+    public function testEachCalendarGetsItsOwnObjectCounts(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        // uri => [events, tasks, notes]
+        $expected = [
+            'counts_a' => [3, 1, 0],
+            'counts_b' => [0, 2, 4],
+            'counts_c' => [0, 0, 0],
+        ];
+
+        foreach ($expected as $uri => [$events, $tasks, $notes]) {
+            $calendar = (new Calendar())->setComponents(implode(',', [Calendar::COMPONENT_EVENTS, Calendar::COMPONENT_TODOS, Calendar::COMPONENT_NOTES]));
+            $em->persist($calendar);
+            $em->persist((new CalendarInstance())->setCalendar($calendar)->setPrincipalUri(Principal::PREFIX.'test_user')->setUri($uri)->setDisplayName($uri));
+
+            foreach ([Calendar::COMPONENT_EVENTS => $events, Calendar::COMPONENT_TODOS => $tasks, Calendar::COMPONENT_NOTES => $notes] as $type => $count) {
+                for ($i = 0; $i < $count; ++$i) {
+                    $em->persist((new CalendarObject())->setCalendar($calendar)->setUri($uri.'-'.$type.'-'.$i.'.ics')
+                        ->setCalendarData("BEGIN:VCALENDAR\nEND:VCALENDAR")->setComponentType($type)->setSize(30)->setEtag('"x"')->setLastModified(time()));
+                }
+            }
+        }
+        $em->flush();
+
+        $userId = $this->getUserId($client, 0);
+        $client->request('GET', '/api/v1/calendars/'.$userId, [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+
+        $byUri = [];
+        foreach (json_decode($client->getResponse()->getContent(), true)['data']['user_calendars'] as $calendar) {
+            $byUri[$calendar['uri']] = $calendar;
+        }
+
+        foreach ($expected as $uri => [$events, $tasks, $notes]) {
+            $this->assertArrayHasKey($uri, $byUri);
+            $this->assertSame($events, $byUri[$uri]['events'], $uri.' events');
+            $this->assertSame($tasks, $byUri[$uri]['tasks'], $uri.' tasks');
+            $this->assertSame($notes, $byUri[$uri]['notes'], $uri.' notes');
+        }
+
+        // The details endpoint reads the same counts for a single calendar
+        $client->request('GET', '/api/v1/calendars/'.$userId.'/'.$byUri['counts_b']['id'], [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+
+        $details = json_decode($client->getResponse()->getContent(), true)['data'];
+        $this->assertSame(0, $details['events']['count']);
+        $this->assertSame(2, $details['tasks']['count']);
+        $this->assertSame(4, $details['notes']['count']);
+    }
+
+    /**
+     * The details endpoint resolves the instance by id and principal rather than scanning the
+     * principal's calendars, so the two cases that used to be filtered out in the loop — a shared
+     * instance, and an id that is not this principal's — must still answer with an empty payload.
+     */
+    public function testCalendarDetailsIgnoresSharedAndForeignCalendars(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        $owner = $em->getRepository(CalendarInstance::class)->findOneBy(['principalUri' => Principal::PREFIX.'test_user', 'uri' => 'default']);
+        $shared = (new CalendarInstance())->setCalendar($owner->getCalendar())->setPrincipalUri(Principal::PREFIX.'test_user2')
+            ->setUri('shared-with-user2')->setAccess(SharingPlugin::ACCESS_READ)->setDisplayName('Shared');
+        $em->persist($shared);
+        $em->flush();
+        $sharedId = $shared->getId();
+        $ownerId = $owner->getId();
+
+        $userId = $this->getUserId($client, 0);
+        $otherUserId = $this->getUserId($client, 1);
+
+        // test_user2 asking about the instance shared *with* them
+        $client->request('GET', '/api/v1/calendars/'.$otherUserId.'/'.$sharedId, [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+        $this->assertSame([], json_decode($client->getResponse()->getContent(), true)['data']);
+
+        // test_user2 asking about a calendar that is not theirs at all
+        $client->request('GET', '/api/v1/calendars/'.$otherUserId.'/'.$ownerId, [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+        $this->assertSame([], json_decode($client->getResponse()->getContent(), true)['data']);
+
+        // the owner still gets theirs
+        $client->request('GET', '/api/v1/calendars/'.$userId.'/'.$ownerId, [], [], $this->apiHeaders());
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($ownerId, json_decode($client->getResponse()->getContent(), true)['data']['id']);
+    }
+
     public function testSharesListToleratesAPrincipalWithoutUser(): void
     {
         $client = static::createClient();
