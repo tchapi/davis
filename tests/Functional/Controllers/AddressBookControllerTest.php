@@ -154,6 +154,69 @@ class AddressBookControllerTest extends WebTestCase
     }
 
     /**
+     * Issue #308: saving an address book with an empty description gave a 500. The field is
+     * optional, so an empty textarea arrives as null, but setDescription() only took a string.
+     */
+    public function testAnAddressBookCanBeSavedWithoutADescription(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $book = $em->getRepository(AddressBook::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+
+        $crawler = $client->request('GET', '/addressbooks/'.$userId.'/edit/'.$book->getId());
+        $form = $crawler->selectButton('address_book_save')->form();
+
+        $client->submit($form, [
+            'address_book[uri]' => 'default',
+            'address_book[displayName]' => 'Renamed, no description',
+            'address_book[description]' => '',
+        ]);
+
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $reloaded = $em->getRepository(AddressBook::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+        $this->assertSame('Renamed, no description', $reloaded->getDisplayName());
+        $this->assertNull($reloaded->getDescription());
+    }
+
+    /**
+     * Creating one never failed, because Symfony only calls the setter when the value changes and a
+     * new address book starts with no description. This checks the result instead: an empty
+     * description is saved as null, not as an empty string.
+     */
+    public function testAnAddressBookCanBeCreatedWithoutADescription(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $crawler = $client->request('GET', '/addressbooks/'.$userId.'/new');
+        $form = $crawler->selectButton('address_book_save')->form();
+
+        $client->submit($form, [
+            'address_book[uri]' => 'no_description',
+            'address_book[displayName]' => 'No description',
+            'address_book[description]' => '',
+        ]);
+
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $this->assertNull($em->getRepository(AddressBook::class)->findOneBy(['uri' => 'no_description'])->getDescription());
+    }
+
+    /**
      * The field is mapped, so `handleRequest()` writes it onto the entity and the flush persists
      * it, both ways round.
      */
