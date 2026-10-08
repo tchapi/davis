@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Entity\AddressBook;
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
+use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
+use App\Entity\SchedulingObject;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -59,24 +61,47 @@ final class Utils
 
     public function createPasswordlessUserWithDefaultObjects(string $username, string $displayName, string $email)
     {
+        // Set the password to a random string (but hashed beforehand)
+        $password = substr(bin2hex(random_bytes(256)), 0, 48);
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        return $this->createUserWithDefaultObjects($username, $displayName, $email, $hash, false);
+    }
+
+    /**
+     * Return the new user, persisted in the database.
+     */
+    public function createUserWithDefaultObjects(string $username, string $displayName, string $email, string $hashed_password, bool $isAdmin)
+    {
         if (!self::isValidUsername($username)) {
             throw new \InvalidArgumentException(sprintf('Refusing to create the user "%s": a username may only contain letters, digits and the characters _ . @ + \' -', $username));
         }
 
         $user = new User();
         $user->setUsername($username);
+        $user->setPassword($hashed_password);
 
-        // Set the password to a random string (but hashed beforehand)
-        $randomBytes = substr(bin2hex(random_bytes(256)), 0, 48);
-        $hash = password_hash($randomBytes, PASSWORD_DEFAULT);
-        $user->setPassword($hash);
+        $this->createDefaultObjectsForUser($user, $displayName, $email, $isAdmin);
 
-        // Create principal, default calendar and addressbook
+        $em = $this->doctrine->getManager();
+        $em->persist($user);
+
+        return $user;
+    }
+
+    /**
+     * Create the default objects for a new user: principal, default calendar
+     * and addressbook, all persisted in the database.
+     *
+     * Return the new principal
+     */
+    public function createDefaultObjectsForUser(User $user, string $displayName, string $email, bool $isAdmin)
+    {
         $principal = new Principal();
         $principal->setUri($user->getPrincipalUri())
                 ->setDisplayName($displayName)
                 ->setEmail($email)
-                ->setIsAdmin(false);
+                ->setIsAdmin($isAdmin);
 
         $calendarInstance = new CalendarInstance();
         $calendar = new Calendar();
@@ -108,6 +133,74 @@ final class Utils
         $em->persist($calendarInstance);
         $em->persist($addressbook);
         $em->persist($principal);
-        $em->persist($user);
+
+        return $principal;
+    }
+
+    public function deleteUser(User $user)
+    {
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->remove($user);
+
+        $principal = $this->doctrine->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
+        if (!$principal) {
+            throw new \Exception('Principal is null');
+        }
+
+        $principalProxyRead = $this->doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
+        $principalProxyWrite = $this->doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
+
+        $entityManager->remove($principal);
+
+        if ($principalProxyRead) {
+            $entityManager->remove($principalProxyRead);
+        }
+
+        if ($principalProxyWrite) {
+            $entityManager->remove($principalProxyWrite);
+        }
+
+        $principalUri = $user->getPrincipalUri();
+
+        // Remove calendars and addressbooks
+        $calendars = $this->doctrine->getRepository(CalendarInstance::class)->findByPrincipalUriWithCalendars($principalUri);
+        foreach ($calendars ?? [] as $instance) {
+            // We're only removing the calendar objects / changes / and calendar if the deleted user is an owner,
+            // which means that the underlying calendar instance should not have another principal as owner.
+            $hasDifferentOwner = $this->doctrine->getRepository(CalendarInstance::class)->hasDifferentOwner($instance->getCalendar()->getId(), $principalUri);
+            if (!$hasDifferentOwner) {
+                foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
+                    $entityManager->remove($object);
+                }
+                foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
+                    $entityManager->remove($change);
+                }
+                // We need to remove the shared versions of this calendar, too
+                foreach ($instance->getCalendar()->getInstances() ?? [] as $instances) {
+                    $entityManager->remove($instances);
+                }
+                $entityManager->remove($instance->getCalendar());
+            }
+            $entityManager->remove($instance);
+        }
+        $calendarsSubscriptions = $this->doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($principalUri);
+        foreach ($calendarsSubscriptions ?? [] as $subscription) {
+            $entityManager->remove($subscription);
+        }
+        $schedulingObjects = $this->doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri($principalUri);
+        foreach ($schedulingObjects ?? [] as $object) {
+            $entityManager->remove($object);
+        }
+
+        $addressbooks = $this->doctrine->getRepository(AddressBook::class)->findByPrincipalUri($principalUri);
+        foreach ($addressbooks ?? [] as $addressbook) {
+            foreach ($addressbook->getCards() ?? [] as $card) {
+                $entityManager->remove($card);
+            }
+            foreach ($addressbook->getChanges() ?? [] as $change) {
+                $entityManager->remove($change);
+            }
+            $entityManager->remove($addressbook);
+        }
     }
 }

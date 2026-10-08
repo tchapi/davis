@@ -2,12 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\AddressBook;
-use App\Entity\Calendar;
-use App\Entity\CalendarInstance;
-use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
-use App\Entity\SchedulingObject;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Services\Utils;
@@ -37,23 +32,28 @@ class UserController extends AbstractController
     #[Route('/edit/{userId}', name: 'edit')]
     public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?int $userId, TranslatorInterface $trans): Response
     {
-        if ($userId) {
+        $new_user = is_null($userId) ? false : true;
+        if ($new_user) {
             $user = $doctrine->getRepository(User::class)->findOneById($userId);
             if (!$user) {
                 throw $this->createNotFoundException('User not found');
             }
             $oldHash = $user->getPassword();
             $principal = $doctrine->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
+            if (!$principal) {
+                throw $this->createNotFoundException('Principal not found');
+            }
         } else {
             $user = new User();
-            $principal = new Principal();
         }
 
-        $form = $this->createForm(UserType::class, $user, ['new' => !$userId]);
+        $form = $this->createForm(UserType::class, $user, ['new' => !$new_user]);
 
-        $form->get('displayName')->setData($principal->getDisplayName());
-        $form->get('email')->setData($principal->getEmail());
-        $form->get('isAdmin')->setData($principal->getIsAdmin());
+        if ($new_user) {
+            $form->get('displayName')->setData($principal->getDisplayName());
+            $form->get('email')->setData($principal->getEmail());
+            $form->get('isAdmin')->setData($principal->getIsAdmin());
+        }
 
         $form->handleRequest($request);
 
@@ -63,7 +63,7 @@ class UserController extends AbstractController
             $isAdmin = $form->get('isAdmin')->getData();
 
             // Create password for user
-            if ($userId && is_null($user->getPassword())) {
+            if ($new_user && is_null($user->getPassword())) {
                 // The user is not new and does not want to change its password
                 $user->setPassword($oldHash);
             } else {
@@ -71,45 +71,18 @@ class UserController extends AbstractController
                 $user->setPassword($hash);
             }
 
-            $entityManager = $doctrine->getManager();
-
-            // If it's a new user, create default calendar and address book, and principal
-            if (null === $user->getId()) {
-                $principal->setUri($user->getPrincipalUri());
-
-                $calendarInstance = new CalendarInstance();
-                $calendar = new Calendar();
-                $calendarInstance->setPrincipalUri($user->getPrincipalUri())
-                         ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
-                         ->setDisplayName($trans->trans('default.calendar.title'))
-                         ->setDescription($trans->trans('default.calendar.description', ['user' => $displayName]))
-                         ->setCalendar($calendar);
-
-                // Enable delegation by default
-                $principalProxyRead = new Principal();
-                $principalProxyRead->setUri($principal->getUri().Principal::READ_PROXY_SUFFIX)
-                                   ->setIsMain(false);
-                $entityManager->persist($principalProxyRead);
-
-                $principalProxyWrite = new Principal();
-                $principalProxyWrite->setUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX)
-                                   ->setIsMain(false);
-                $entityManager->persist($principalProxyWrite);
-
-                $addressbook = new AddressBook();
-                $addressbook->setPrincipalUri($user->getPrincipalUri())
-                         ->setUri('default') // No risk of collision since unicity is guaranteed by the new user principal
-                         ->setDisplayName($trans->trans('default.addressbook.title'))
-                         ->setDescription($trans->trans('default.addressbook.description', ['user' => $displayName]));
-                $entityManager->persist($calendarInstance);
-                $entityManager->persist($addressbook);
-                $entityManager->persist($principal);
+            // If it's a new user, create default objects, otherwise set the new values
+            if (!$new_user) {
+                $username = $form->get('username')->getData();
+                $user->setUsername($username);
+                $utils->createDefaultObjectsForUser($user, $displayName, $email, $isAdmin);
+            } else {
+                $principal->setDisplayName($displayName)
+                          ->setEmail($email)
+                          ->setIsAdmin($isAdmin);
             }
 
-            $principal->setDisplayName($displayName)
-                      ->setEmail($email)
-                      ->setIsAdmin($isAdmin);
-
+            $entityManager = $doctrine->getManager();
             $entityManager->persist($user);
             $entityManager->flush();
 
@@ -126,74 +99,20 @@ class UserController extends AbstractController
     }
 
     #[Route('/delete/{userId}', name: 'delete', methods: ['POST'])]
-    public function userDelete(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, TranslatorInterface $trans): Response
+    public function userDelete(ManagerRegistry $doctrine, Request $request, #[MapEntity(id: 'userId')] User $user, int $userId, TranslatorInterface $trans, Utils $utils): Response
     {
         if (!$this->isCsrfTokenValid('admin_action', $request->getPayload()->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
         $entityManager = $doctrine->getManager();
-        $entityManager->remove($user);
-
-        $principal = $doctrine->getRepository(Principal::class)->findOneByUri($user->getPrincipalUri());
-        $principalProxyRead = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::READ_PROXY_SUFFIX);
-        $principalProxyWrite = $doctrine->getRepository(Principal::class)->findOneByUri($principal->getUri().Principal::WRITE_PROXY_SUFFIX);
-
-        $entityManager->remove($principal);
-
-        if ($principalProxyRead) {
-            $entityManager->remove($principalProxyRead);
+        try {
+            $utils->deleteUser($user);
+            $entityManager->flush();
+            $this->addFlash('success', $trans->trans('user.deleted'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $trans->trans('user.deleted.error'));
         }
-
-        if ($principalProxyWrite) {
-            $entityManager->remove($principalProxyWrite);
-        }
-
-        $principalUri = $user->getPrincipalUri();
-
-        // Remove calendars and addressbooks
-        $calendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUriWithCalendars($principalUri);
-        foreach ($calendars ?? [] as $instance) {
-            // We're only removing the calendar objects / changes / and calendar if the deleted user is an owner,
-            // which means that the underlying calendar instance should not have another principal as owner.
-            $hasDifferentOwner = $doctrine->getRepository(CalendarInstance::class)->hasDifferentOwner($instance->getCalendar()->getId(), $principalUri);
-            if (!$hasDifferentOwner) {
-                foreach ($instance->getCalendar()->getObjects() ?? [] as $object) {
-                    $entityManager->remove($object);
-                }
-                foreach ($instance->getCalendar()->getChanges() ?? [] as $change) {
-                    $entityManager->remove($change);
-                }
-                // We need to remove the shared versions of this calendar, too
-                foreach ($instance->getCalendar()->getInstances() ?? [] as $instances) {
-                    $entityManager->remove($instances);
-                }
-                $entityManager->remove($instance->getCalendar());
-            }
-            $entityManager->remove($instance);
-        }
-        $calendarsSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($principalUri);
-        foreach ($calendarsSubscriptions ?? [] as $subscription) {
-            $entityManager->remove($subscription);
-        }
-        $schedulingObjects = $doctrine->getRepository(SchedulingObject::class)->findByPrincipalUri($principalUri);
-        foreach ($schedulingObjects ?? [] as $object) {
-            $entityManager->remove($object);
-        }
-
-        $addressbooks = $doctrine->getRepository(AddressBook::class)->findByPrincipalUri($principalUri);
-        foreach ($addressbooks ?? [] as $addressbook) {
-            foreach ($addressbook->getCards() ?? [] as $card) {
-                $entityManager->remove($card);
-            }
-            foreach ($addressbook->getChanges() ?? [] as $change) {
-                $entityManager->remove($change);
-            }
-            $entityManager->remove($addressbook);
-        }
-
-        $entityManager->flush();
-        $this->addFlash('success', $trans->trans('user.deleted'));
 
         return $this->redirectToRoute('user_index');
     }
