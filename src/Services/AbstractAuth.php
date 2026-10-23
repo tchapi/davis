@@ -29,6 +29,21 @@ abstract class AbstractAuth extends AbstractBasic
      */
     private ?string $canonicalUsername = null;
 
+    private ?string $masterUser = null;
+
+    private ?string $masterPassword = null;
+
+    /**
+     * Enables the master user, Dovecot style: a client logging in as `<login>*<master>` with
+     * the master password is authenticated as `<login>`. Off unless both values are set.
+     */
+    public function setMasterUser(?string $user, ?string $password): void
+    {
+        $enabled = null !== $user && '' !== $user && null !== $password && '' !== $password;
+        $this->masterUser = $enabled ? $user : null;
+        $this->masterPassword = $enabled ? $password : null;
+    }
+
     /**
      * @param string $username
      * @param string $password
@@ -39,6 +54,25 @@ abstract class AbstractAuth extends AbstractBasic
 
         if (!is_string($username) || !is_string($password) || '' === $username || '' === $password) {
             return false;
+        }
+
+        // `<login>*<master>`: when the part after the last `*` is the master user, the password
+        // must be the master one and we never consult the backend, so a wrong master password
+        // is a plain failure and not a lookup of `alice*webmail` in the directory. Any other
+        // suffix is left alone, a real username can contain `*`.
+        if (null !== $this->masterUser && false !== ($star = strrpos($username, '*'))) {
+            $login = substr($username, 0, $star);
+            $master = substr($username, $star + 1);
+
+            if ($master === $this->masterUser) {
+                if ('' === $login || self::breaksPrincipalUri($login) || !hash_equals((string) $this->masterPassword, $password)) {
+                    return false;
+                }
+
+                $this->setCanonicalUsername($login);
+
+                return true;
+            }
         }
 
         if (self::breaksPrincipalUri($username)) {

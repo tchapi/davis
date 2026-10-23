@@ -829,6 +829,18 @@
         <source>diagnostics.webdav_public_dir.everyone.hint</source>
         <target>Tous les utilisateurs authentifiés peuvent y créer, modifier et supprimer des fichiers. Mettez WEBDAV_PUBLIC_DIR_WRITABLE=false pour réserver l'écriture aux administrateurs.</target>
       </trans-unit>
+      <trans-unit id="dbg055" resname="diagnostics.auth_master_user">
+        <source>diagnostics.auth_master_user</source>
+        <target>Utilisateur maître</target>
+      </trans-unit>
+      <trans-unit id="dbg056" resname="diagnostics.auth_master_user.disabled">
+        <source>diagnostics.auth_master_user.disabled</source>
+        <target>Désactivé</target>
+      </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.auth_master_user.enabled">
+        <source>diagnostics.auth_master_user.enabled</source>
+        <target>N'importe quel client peut agir au nom de n'importe quel compte avec le mot de passe maître : gardez-le côté serveur et renouvelez-le comme tout identifiant de service.</target>
+      </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>
         <target>Un abonnement de calendrier sans source empêche toute la liste de calendriers de son propriétaire de se charger. Seule une écriture directe en base peut en produire un : ce nombre est donc normalement nul.</target>

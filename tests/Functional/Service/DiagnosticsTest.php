@@ -32,6 +32,8 @@ class DiagnosticsTest extends KernelTestCase
             'timezoneParameter' => 'Europe/Paris',
             'authMethod' => 'Basic',
             'authRealm' => 'SabreDAV',
+            'authMasterUser' => '',
+            'authMasterPassword' => '',
             'calDAVEnabled' => true,
             'cardDAVEnabled' => true,
             'webDAVEnabled' => false,
@@ -193,5 +195,31 @@ class DiagnosticsTest extends KernelTestCase
         $this->assertStringNotContainsString('hunter2', $checks['diagnostics.mailer']['value']);
         $this->assertStringNotContainsString('someone', $checks['diagnostics.mailer']['value']);
         $this->assertSame('smtp://smtp.example.org', $checks['diagnostics.mailer']['value']);
+    }
+
+    public function testTheMasterUserIsReportedButNeverItsPassword(): void
+    {
+        $checks = $this->checksOf($this->diagnosticsWith([
+            'authMasterUser' => 'webmail',
+            'authMasterPassword' => 'hunter2',
+        ]));
+
+        $this->assertSame('webmail', $checks['diagnostics.auth_master_user']['value']);
+        $this->assertStringNotContainsString('hunter2', json_encode($checks['diagnostics.auth_master_user']));
+    }
+
+    /**
+     * The auth backend only turns the feature on when both values are set, the page must say the same.
+     */
+    public function testAMasterUserWithoutAPasswordIsReportedAsDisabled(): void
+    {
+        foreach ([['webmail', ''], ['', 'hunter2'], ['', '']] as [$user, $password]) {
+            $checks = $this->checksOf($this->diagnosticsWith([
+                'authMasterUser' => $user,
+                'authMasterPassword' => $password,
+            ]));
+
+            $this->assertSame('diagnostics.auth_master_user.disabled', $checks['diagnostics.auth_master_user']['value']);
+        }
     }
 }

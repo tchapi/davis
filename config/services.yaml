@@ -23,6 +23,11 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    _instanceof:
+        App\Services\AbstractAuth:
+            calls:
+                - setMasterUser: ["%env(AUTH_MASTER_USER)%", "%env(AUTH_MASTER_PASSWORD)%"]
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -42,6 +47,8 @@ services:
             $timezoneParameter: "%timezone%"
             $authMethod: "%env(AUTH_METHOD)%"
             $authRealm: "%env(AUTH_REALM)%"
+            $authMasterUser: "%env(AUTH_MASTER_USER)%"
+            $authMasterPassword: "%env(AUTH_MASTER_PASSWORD)%"
             $calDAVEnabled: "%env(bool:CALDAV_ENABLED)%"
             $cardDAVEnabled: "%env(bool:CARDDAV_ENABLED)%"
             $webDAVEnabled: "%env(bool:WEBDAV_ENABLED)%"

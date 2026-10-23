@@ -829,6 +829,18 @@
         <source>diagnostics.webdav_public_dir.everyone.hint</source>
         <target>Every authenticated user can create, modify and delete files there. Set WEBDAV_PUBLIC_DIR_WRITABLE=false to reserve writing to admins.</target>
       </trans-unit>
+      <trans-unit id="dbg055" resname="diagnostics.auth_master_user">
+        <source>diagnostics.auth_master_user</source>
+        <target>Master user</target>
+      </trans-unit>
+      <trans-unit id="dbg056" resname="diagnostics.auth_master_user.disabled">
+        <source>diagnostics.auth_master_user.disabled</source>
+        <target>Disabled</target>
+      </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.auth_master_user.enabled">
+        <source>diagnostics.auth_master_user.enabled</source>
+        <target>Any client can act as any account with the master password: keep it on the server side and rotate it like any service credential.</target>
+      </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>
         <target>A calendar subscription with no source makes the entire calendar list of its owner fail to load. Only a direct database write can produce one, so this is normally zero.</target>

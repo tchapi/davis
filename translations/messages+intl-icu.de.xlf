@@ -829,6 +829,18 @@
         <source>diagnostics.webdav_public_dir.everyone.hint</source>
         <target>Alle angemeldeten Benutzer können dort Dateien anlegen, ändern und löschen. Setzen Sie WEBDAV_PUBLIC_DIR_WRITABLE=false, um das Schreiben Administratoren vorzubehalten.</target>
       </trans-unit>
+      <trans-unit id="dbg055" resname="diagnostics.auth_master_user">
+        <source>diagnostics.auth_master_user</source>
+        <target>Master-Benutzer</target>
+      </trans-unit>
+      <trans-unit id="dbg056" resname="diagnostics.auth_master_user.disabled">
+        <source>diagnostics.auth_master_user.disabled</source>
+        <target>Deaktiviert</target>
+      </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.auth_master_user.enabled">
+        <source>diagnostics.auth_master_user.enabled</source>
+        <target>Jeder Client kann mit dem Master-Passwort im Namen jedes Kontos handeln: bewahren Sie es serverseitig auf und wechseln Sie es wie jedes Dienst-Passwort.</target>
+      </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>
         <target>Ein Kalenderabonnement ohne Quelle führt dazu, dass die gesamte Kalenderliste seines Besitzers nicht mehr geladen werden kann. Nur ein direkter Datenbankschreibvorgang kann so etwas erzeugen, daher steht hier normalerweise null.</target>

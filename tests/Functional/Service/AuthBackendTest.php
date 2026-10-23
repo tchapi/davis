@@ -74,6 +74,9 @@ class AuthBackendTest extends KernelTestCase
         $this->assertSame([['test_user', 'pa:ss']], $backend->seen);
     }
 
+    /**
+     * The test env sets AUTH_MASTER_USER=webmail / AUTH_MASTER_PASSWORD=master-secret (see .env.test).
+     */
     public function testAllBackendsShareTheGuard(): void
     {
         self::bootKernel();
@@ -88,6 +91,100 @@ class AuthBackendTest extends KernelTestCase
 
             [$ok] = self::check($backend, ':password');
             $this->assertFalse($ok, $class.' must reject an empty username');
+
+            [$ok, $principal] = self::check($backend, 'alice*webmail:master-secret');
+            $this->assertTrue($ok, $class.' must accept the master user');
+            $this->assertSame('principals/alice', $principal, $class.' must impersonate the login part');
+
+            [$ok] = self::check($backend, 'alice*webmail:wrong');
+            $this->assertFalse($ok, $class.' must reject a wrong master password');
+        }
+    }
+
+    public function testWithoutAMasterUserAStarIsJustACharacter(): void
+    {
+        $backend = self::acceptAllBackend();
+
+        [$ok, $principal] = self::check($backend, 'alice*webmail:secret');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice*webmail', $principal);
+        $this->assertSame([['alice*webmail', 'secret']], $backend->seen);
+    }
+
+    public function testTheMasterUserImpersonatesTheLoginWithoutAskingTheBackend(): void
+    {
+        $backend = self::acceptAllBackend();
+        $backend->setMasterUser('webmail', 'master-secret');
+
+        [$ok, $principal] = self::check($backend, 'alice*webmail:master-secret');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice', $principal);
+        $this->assertSame([], $backend->seen);
+    }
+
+    /**
+     * A wrong master password must not fall through to the backend with `alice*webmail` as a
+     * username: it would be a directory lookup with an attacker-chosen password.
+     */
+    public function testAWrongMasterPasswordIsRejectedWithoutAskingTheBackend(): void
+    {
+        $backend = self::acceptAllBackend();
+        $backend->setMasterUser('webmail', 'master-secret');
+
+        [$ok] = self::check($backend, 'alice*webmail:wrong');
+
+        $this->assertFalse($ok);
+        $this->assertSame([], $backend->seen);
+    }
+
+    public function testAnotherSuffixIsDelegatedToTheBackendAsIs(): void
+    {
+        $backend = self::acceptAllBackend();
+        $backend->setMasterUser('webmail', 'master-secret');
+
+        [$ok, $principal] = self::check($backend, 'alice*other:secret');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice*other', $principal);
+        $this->assertSame([['alice*other', 'secret']], $backend->seen);
+    }
+
+    public function testTheMasterUserNeedsALogin(): void
+    {
+        foreach (['*webmail', 'a/b*webmail'] as $username) {
+            $backend = self::acceptAllBackend();
+            $backend->setMasterUser('webmail', 'master-secret');
+
+            [$ok] = self::check($backend, $username.':master-secret');
+
+            $this->assertFalse($ok, sprintf('%s must not authenticate', var_export($username, true)));
+            $this->assertSame([], $backend->seen, 'The backend must not even be consulted');
+        }
+    }
+
+    public function testTheLoginIsEverythingBeforeTheLastStar(): void
+    {
+        $backend = self::acceptAllBackend();
+        $backend->setMasterUser('webmail', 'master-secret');
+
+        [$ok, $principal] = self::check($backend, 'a*b*webmail:master-secret');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/a*b', $principal);
+    }
+
+    public function testAnEmptyMasterUserOrPasswordDisablesTheFeature(): void
+    {
+        foreach ([['', 'master-secret'], ['webmail', ''], [null, null]] as [$user, $password]) {
+            $backend = self::acceptAllBackend();
+            $backend->setMasterUser($user, $password);
+
+            [$ok, $principal] = self::check($backend, 'alice*webmail:master-secret');
+
+            $this->assertTrue($ok);
+            $this->assertSame('principals/alice*webmail', $principal, 'It must be delegated as a plain username');
         }
     }
 

@@ -32,6 +32,8 @@ final class Diagnostics
         private string $timezoneParameter,
         private string $authMethod,
         private string $authRealm,
+        private ?string $authMasterUser,
+        private ?string $authMasterPassword,
         private bool $calDAVEnabled,
         private bool $cardDAVEnabled,
         private bool $webDAVEnabled,
@@ -60,6 +62,7 @@ final class Diagnostics
             ],
             'diagnostics.bucket.authentication' => [
                 $this->auth(),
+                $this->authMasterUser(),
                 $this->authExtension(),
             ],
             'diagnostics.bucket.scheduling' => [
@@ -235,6 +238,18 @@ final class Diagnostics
         }
 
         return $this->check(self::INFO, 'diagnostics.auth', $value, 'basic' === strtolower($this->authMethod) ? 'diagnostics.auth.realm' : null);
+    }
+
+    /**
+     * Same on/off rule as AbstractAuth::setMasterUser(): both values must be set.
+     */
+    private function authMasterUser(): array
+    {
+        if (null === $this->authMasterUser || '' === $this->authMasterUser || null === $this->authMasterPassword || '' === $this->authMasterPassword) {
+            return $this->check(self::INFO, 'diagnostics.auth_master_user', 'diagnostics.auth_master_user.disabled');
+        }
+
+        return $this->check(self::INFO, 'diagnostics.auth_master_user', $this->authMasterUser, 'diagnostics.auth_master_user.enabled');
     }
 
     /**

@@ -160,6 +160,21 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 > one is stored with bcrypt and no longer depends on the realm. Your own admin login is unaffected —
 > it comes from `ADMIN_LOGIN` / `ADMIN_PASSWORD`, not from the users table.
 
+**Master user**
+
+A trusted service that already knows who the user is (a webmail behind SSO, for instance) can read and write their DAV data without holding their password, the same way Dovecot master users work: the client logs in as `<login>*<master>` with the master password, and Davis treats the request as `<login>`.
+
+```shell
+AUTH_MASTER_USER=webmail
+AUTH_MASTER_PASSWORD=some-long-random-secret
+```
+
+So with the values above, `alice*webmail` with `some-long-random-secret` acts as `alice`. The feature is off unless both variables are set. It works with every `AUTH_METHOD` and never contacts the backend: a wrong master password is refused outright, and a username ending in `*<something else>` is sent to the backend as is. The login is not checked for existence either, so with IMAP or LDAP and `*_AUTH_USER_AUTOCREATE`, the master path does **not** create the account, it has to exist already.
+
+> [!CAUTION]
+>
+> The master password gives access to every account. Keep it on a trusted service on the same network, never in a browser, and rotate it like any service credential.
+
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
 ```shell
