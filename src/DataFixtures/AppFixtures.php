@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\AddressBook;
+use App\Entity\AppKey;
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\Principal;
@@ -99,6 +100,19 @@ class AppFixtures extends Fixture
                     ->setDisplayName('default.addressbook.title2')
                     ->setDescription('default.addressbook.description2');
         $manager->persist($addressbook);
+
+        $manager->flush();
+
+        $appKey = AppKey::create('Test app')
+            ->setAppId('app_test')
+            ->setSecretHash(password_hash('app-secret', PASSWORD_DEFAULT));
+        $manager->persist($appKey);
+
+        $revokedAppKey = AppKey::create('Revoked app', ['test_user'])
+            ->setAppId('app_revoked')
+            ->setSecretHash(password_hash('app-secret', PASSWORD_DEFAULT))
+            ->setRevokedAt(new \DateTimeImmutable('-1 day'));
+        $manager->persist($revokedAppKey);
 
         $manager->flush();
     }

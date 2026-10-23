@@ -32,8 +32,6 @@ final class Diagnostics
         private string $timezoneParameter,
         private string $authMethod,
         private string $authRealm,
-        private ?string $authMasterUser,
-        private ?string $authMasterPassword,
         private bool $calDAVEnabled,
         private bool $cardDAVEnabled,
         private bool $webDAVEnabled,
@@ -62,7 +60,7 @@ final class Diagnostics
             ],
             'diagnostics.bucket.authentication' => [
                 $this->auth(),
-                $this->authMasterUser(),
+                $this->appKeys(),
                 $this->authExtension(),
             ],
             'diagnostics.bucket.scheduling' => [
@@ -241,15 +239,21 @@ final class Diagnostics
     }
 
     /**
-     * Same on/off rule as AbstractAuth::setMasterUser(): both values must be set.
+     * A key acts as any user in its scope with no password of theirs involved, so the count
+     * belongs next to the auth method. Never the secrets: they are not stored in clear anyway.
      */
-    private function authMasterUser(): array
+    private function appKeys(): array
     {
-        if (null === $this->authMasterUser || '' === $this->authMasterUser || null === $this->authMasterPassword || '' === $this->authMasterPassword) {
-            return $this->check(self::INFO, 'diagnostics.auth_master_user', 'diagnostics.auth_master_user.disabled');
+        try {
+            $count = (int) $this->connection->fetchOne(
+                'SELECT COUNT(*) FROM app_keys WHERE revoked_at IS NULL OR revoked_at > :now',
+                ['now' => (new \DateTimeImmutable())->format('Y-m-d H:i:s')]
+            );
+        } catch (\Throwable $e) {
+            return $this->check(self::INFO, 'diagnostics.app_keys', $e->getMessage());
         }
 
-        return $this->check(self::INFO, 'diagnostics.auth_master_user', $this->authMasterUser, 'diagnostics.auth_master_user.enabled');
+        return $this->check(self::INFO, 'diagnostics.app_keys', (string) $count, 'diagnostics.app_keys.help', null, $this->router->generate('app_key_index'));
     }
 
     /**

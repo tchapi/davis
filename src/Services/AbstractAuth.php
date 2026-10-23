@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Entity\AppKey;
+use App\Repository\AppKeyRepository;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 use Sabre\HTTP\RequestInterface;
 use Sabre\HTTP\ResponseInterface;
@@ -21,6 +23,8 @@ use Sabre\HTTP\ResponseInterface;
  * is exactly the URI Davis uses for alice's delegation proxy. Only structural characters are
  * refused here, not the stricter set required when creating an account, so that an unusual
  * but working username keeps authenticating.
+ *
+ * App keys (`<login>*<app_id>`) are handled here too, so that every backend gets them.
  */
 abstract class AbstractAuth extends AbstractBasic
 {
@@ -29,19 +33,11 @@ abstract class AbstractAuth extends AbstractBasic
      */
     private ?string $canonicalUsername = null;
 
-    private ?string $masterUser = null;
+    private ?AppKeyRepository $appKeys = null;
 
-    private ?string $masterPassword = null;
-
-    /**
-     * Enables the master user, Dovecot style: a client logging in as `<login>*<master>` with
-     * the master password is authenticated as `<login>`. Off unless both values are set.
-     */
-    public function setMasterUser(?string $user, ?string $password): void
+    public function setAppKeyRepository(?AppKeyRepository $appKeys): void
     {
-        $enabled = null !== $user && '' !== $user && null !== $password && '' !== $password;
-        $this->masterUser = $enabled ? $user : null;
-        $this->masterPassword = $enabled ? $password : null;
+        $this->appKeys = $appKeys;
     }
 
     /**
@@ -56,17 +52,23 @@ abstract class AbstractAuth extends AbstractBasic
             return false;
         }
 
-        // `<login>*<master>`: when the part after the last `*` is the master user, the password
-        // must be the master one and we never consult the backend, so a wrong master password
-        // is a plain failure and not a lookup of `alice*webmail` in the directory. Any other
-        // suffix is left alone, a real username can contain `*`.
-        if (null !== $this->masterUser && false !== ($star = strrpos($username, '*'))) {
-            $login = substr($username, 0, $star);
-            $master = substr($username, $star + 1);
+        // `<login>*<app_id>`: when the part after the last `*` names an app key, the key decides
+        // alone and the backend is never asked, so a wrong secret is a plain failure and not a
+        // directory lookup of `alice*app_...`. Any other suffix is left alone, a real username
+        // can contain `*`.
+        if (null !== $this->appKeys && false !== ($star = strrpos($username, '*'))) {
+            $key = $this->appKeys->findOneByAppId(substr($username, $star + 1));
 
-            if ($master === $this->masterUser) {
-                if ('' === $login || self::breaksPrincipalUri($login) || !hash_equals((string) $this->masterPassword, $password)) {
+            if (null !== $key) {
+                $login = substr($username, 0, $star);
+                $now = new \DateTimeImmutable();
+
+                if ('' === $login || self::breaksPrincipalUri($login) || !$key->accepts($login, $password, $now)) {
                     return false;
+                }
+
+                if (!$key->wasUsedWithin(AppKey::LAST_USED_THROTTLE, $now)) {
+                    $this->appKeys->touch($key, $now);
                 }
 
                 $this->setCanonicalUsername($login);

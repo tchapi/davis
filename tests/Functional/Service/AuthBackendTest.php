@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
+use App\Entity\AppKey;
+use App\Repository\AppKeyRepository;
 use App\Services\AbstractAuth;
 use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
+use Doctrine\ORM\EntityManagerInterface;
 use Sabre\HTTP\Request;
 use Sabre\HTTP\Response;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -43,6 +46,29 @@ class AuthBackendTest extends KernelTestCase
         };
     }
 
+    /**
+     * @param string[] $scope
+     */
+    private function appKeyFor(array $scope = ['*'], ?\DateTimeImmutable $revokedAt = null, string $secret = 'app-secret'): AppKey
+    {
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        $key = AppKey::create('Test', $scope, $revokedAt)
+            ->setSecretHash(password_hash($secret, PASSWORD_DEFAULT));
+        $em->persist($key);
+        $em->flush();
+
+        return $key;
+    }
+
+    private function guardedBackend(): AbstractAuth
+    {
+        $backend = self::acceptAllBackend();
+        $backend->setAppKeyRepository(static::getContainer()->get(AppKeyRepository::class));
+
+        return $backend;
+    }
+
     public function testEmptyPasswordNeverReachesTheBackend(): void
     {
         $backend = self::acceptAllBackend();
@@ -74,9 +100,6 @@ class AuthBackendTest extends KernelTestCase
         $this->assertSame([['test_user', 'pa:ss']], $backend->seen);
     }
 
-    /**
-     * The test env sets AUTH_MASTER_USER=webmail / AUTH_MASTER_PASSWORD=master-secret (see .env.test).
-     */
     public function testAllBackendsShareTheGuard(): void
     {
         self::bootKernel();
@@ -92,32 +115,34 @@ class AuthBackendTest extends KernelTestCase
             [$ok] = self::check($backend, ':password');
             $this->assertFalse($ok, $class.' must reject an empty username');
 
-            [$ok, $principal] = self::check($backend, 'alice*webmail:master-secret');
-            $this->assertTrue($ok, $class.' must accept the master user');
+            // The fixtures hold `app_test` (secret `app-secret`, every user): IMAP and LDAP have no
+            // server here, so this only passes if the app key path never reaches them
+            [$ok, $principal] = self::check($backend, 'alice*app_test:app-secret');
+            $this->assertTrue($ok, $class.' must accept an app key');
             $this->assertSame('principals/alice', $principal, $class.' must impersonate the login part');
 
-            [$ok] = self::check($backend, 'alice*webmail:wrong');
-            $this->assertFalse($ok, $class.' must reject a wrong master password');
+            [$ok] = self::check($backend, 'alice*app_test:wrong');
+            $this->assertFalse($ok, $class.' must reject a wrong app key secret');
         }
     }
 
-    public function testWithoutAMasterUserAStarIsJustACharacter(): void
+    public function testWithoutARepositoryAStarIsJustACharacter(): void
     {
         $backend = self::acceptAllBackend();
 
-        [$ok, $principal] = self::check($backend, 'alice*webmail:secret');
+        [$ok, $principal] = self::check($backend, 'alice*app_test:secret');
 
         $this->assertTrue($ok);
-        $this->assertSame('principals/alice*webmail', $principal);
-        $this->assertSame([['alice*webmail', 'secret']], $backend->seen);
+        $this->assertSame('principals/alice*app_test', $principal);
+        $this->assertSame([['alice*app_test', 'secret']], $backend->seen);
     }
 
-    public function testTheMasterUserImpersonatesTheLoginWithoutAskingTheBackend(): void
+    public function testAnAppKeyImpersonatesTheLoginWithoutAskingTheBackend(): void
     {
-        $backend = self::acceptAllBackend();
-        $backend->setMasterUser('webmail', 'master-secret');
+        $key = $this->appKeyFor();
+        $backend = $this->guardedBackend();
 
-        [$ok, $principal] = self::check($backend, 'alice*webmail:master-secret');
+        [$ok, $principal] = self::check($backend, 'alice*'.$key->getAppId().':app-secret');
 
         $this->assertTrue($ok);
         $this->assertSame('principals/alice', $principal);
@@ -125,39 +150,77 @@ class AuthBackendTest extends KernelTestCase
     }
 
     /**
-     * A wrong master password must not fall through to the backend with `alice*webmail` as a
-     * username: it would be a directory lookup with an attacker-chosen password.
+     * A wrong secret must not fall through to the backend with `alice*app_...` as a username:
+     * it would be a directory lookup with an attacker-chosen password.
      */
-    public function testAWrongMasterPasswordIsRejectedWithoutAskingTheBackend(): void
+    public function testAWrongSecretIsRejectedWithoutAskingTheBackend(): void
     {
-        $backend = self::acceptAllBackend();
-        $backend->setMasterUser('webmail', 'master-secret');
+        $key = $this->appKeyFor();
+        $backend = $this->guardedBackend();
 
-        [$ok] = self::check($backend, 'alice*webmail:wrong');
+        [$ok] = self::check($backend, 'alice*'.$key->getAppId().':wrong');
 
         $this->assertFalse($ok);
         $this->assertSame([], $backend->seen);
     }
 
-    public function testAnotherSuffixIsDelegatedToTheBackendAsIs(): void
+    public function testARevokedKeyIsRejected(): void
     {
-        $backend = self::acceptAllBackend();
-        $backend->setMasterUser('webmail', 'master-secret');
+        $key = $this->appKeyFor(['*'], new \DateTimeImmutable('-1 minute'));
+        $backend = $this->guardedBackend();
 
-        [$ok, $principal] = self::check($backend, 'alice*other:secret');
+        [$ok] = self::check($backend, 'alice*'.$key->getAppId().':app-secret');
 
-        $this->assertTrue($ok);
-        $this->assertSame('principals/alice*other', $principal);
-        $this->assertSame([['alice*other', 'secret']], $backend->seen);
+        $this->assertFalse($ok);
+        $this->assertSame([], $backend->seen);
     }
 
-    public function testTheMasterUserNeedsALogin(): void
+    public function testAKeyExpiringInTheFutureStillWorks(): void
     {
-        foreach (['*webmail', 'a/b*webmail'] as $username) {
-            $backend = self::acceptAllBackend();
-            $backend->setMasterUser('webmail', 'master-secret');
+        $key = $this->appKeyFor(['*'], new \DateTimeImmutable('+1 day'));
+        $backend = $this->guardedBackend();
 
-            [$ok] = self::check($backend, $username.':master-secret');
+        [$ok, $principal] = self::check($backend, 'alice*'.$key->getAppId().':app-secret');
+
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice', $principal);
+    }
+
+    public function testALoginOutOfScopeIsRejected(): void
+    {
+        $key = $this->appKeyFor(['bob']);
+        $backend = $this->guardedBackend();
+
+        [$ok] = self::check($backend, 'alice*'.$key->getAppId().':app-secret');
+        $this->assertFalse($ok);
+        $this->assertSame([], $backend->seen);
+
+        [$ok, $principal] = self::check($backend, 'bob*'.$key->getAppId().':app-secret');
+        $this->assertTrue($ok);
+        $this->assertSame('principals/bob', $principal);
+    }
+
+    public function testAStarScopeAllowsEveryLogin(): void
+    {
+        $key = $this->appKeyFor(['*']);
+        $backend = $this->guardedBackend();
+
+        foreach (['alice', 'bob', 'first.last+tag@example.org'] as $login) {
+            [$ok, $principal] = self::check($backend, $login.'*'.$key->getAppId().':app-secret');
+
+            $this->assertTrue($ok, $login.' must be allowed');
+            $this->assertSame('principals/'.$login, $principal);
+        }
+    }
+
+    public function testTheAppKeyNeedsALogin(): void
+    {
+        $key = $this->appKeyFor();
+
+        foreach (['*'.$key->getAppId(), 'a/b*'.$key->getAppId()] as $username) {
+            $backend = $this->guardedBackend();
+
+            [$ok] = self::check($backend, $username.':app-secret');
 
             $this->assertFalse($ok, sprintf('%s must not authenticate', var_export($username, true)));
             $this->assertSame([], $backend->seen, 'The backend must not even be consulted');
@@ -166,26 +229,51 @@ class AuthBackendTest extends KernelTestCase
 
     public function testTheLoginIsEverythingBeforeTheLastStar(): void
     {
-        $backend = self::acceptAllBackend();
-        $backend->setMasterUser('webmail', 'master-secret');
+        $key = $this->appKeyFor();
+        $backend = $this->guardedBackend();
 
-        [$ok, $principal] = self::check($backend, 'a*b*webmail:master-secret');
+        [$ok, $principal] = self::check($backend, 'a*b*'.$key->getAppId().':app-secret');
 
         $this->assertTrue($ok);
         $this->assertSame('principals/a*b', $principal);
     }
 
-    public function testAnEmptyMasterUserOrPasswordDisablesTheFeature(): void
+    public function testAnUnknownSuffixIsDelegatedToTheBackendAsIs(): void
     {
-        foreach ([['', 'master-secret'], ['webmail', ''], [null, null]] as [$user, $password]) {
-            $backend = self::acceptAllBackend();
-            $backend->setMasterUser($user, $password);
+        $backend = $this->guardedBackend();
 
-            [$ok, $principal] = self::check($backend, 'alice*webmail:master-secret');
+        [$ok, $principal] = self::check($backend, 'alice*other:secret');
 
-            $this->assertTrue($ok);
-            $this->assertSame('principals/alice*webmail', $principal, 'It must be delegated as a plain username');
-        }
+        $this->assertTrue($ok);
+        $this->assertSame('principals/alice*other', $principal);
+        $this->assertSame([['alice*other', 'secret']], $backend->seen);
+    }
+
+    public function testLastUsedAtIsStampedAtMostOnceAMinute(): void
+    {
+        $key = $this->appKeyFor();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $backend = $this->guardedBackend();
+        $userPass = 'alice*'.$key->getAppId().':app-secret';
+
+        $this->assertNull($key->getLastUsedAt());
+        self::check($backend, $userPass);
+        $em->refresh($key);
+        $this->assertNotNull($key->getLastUsedAt(), 'A first use must be stamped');
+
+        $recent = new \DateTimeImmutable('-30 seconds');
+        $key->setLastUsedAt($recent);
+        $em->flush();
+        self::check($backend, $userPass);
+        $em->refresh($key);
+        $this->assertSame($recent->format('Y-m-d H:i:s'), $key->getLastUsedAt()->format('Y-m-d H:i:s'), 'A use within the minute must not write');
+
+        $old = new \DateTimeImmutable('-120 seconds');
+        $key->setLastUsedAt($old);
+        $em->flush();
+        self::check($backend, $userPass);
+        $em->refresh($key);
+        $this->assertGreaterThan($old, $key->getLastUsedAt(), 'A use after the minute must be stamped again');
     }
 
     public function testBasicAuthStillAcceptsValidCredentials(): void

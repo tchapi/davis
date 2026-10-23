@@ -160,20 +160,13 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 > one is stored with bcrypt and no longer depends on the realm. Your own admin login is unaffected —
 > it comes from `ADMIN_LOGIN` / `ADMIN_PASSWORD`, not from the users table.
 
-**Master user**
+**App keys**
 
-A trusted service that already knows who the user is (a webmail behind SSO, for instance) can read and write their DAV data without holding their password, the same way Dovecot master users work: the client logs in as `<login>*<master>` with the master password, and Davis treats the request as `<login>`.
+A service that already knows who the user is (a webmail behind SSO, a scheduling tool like cal.com) can read and write a user's calendars and address books without holding that user's password. An admin creates an app key from the dashboard (or with `bin/console davis:app-key:create`), scoped to some users or to all of them, and the service logs in over HTTP Basic as `<login>*<app_id>` with the key's secret as the password, Dovecot style. Davis then acts as `<login>`.
 
-```shell
-AUTH_MASTER_USER=webmail
-AUTH_MASTER_PASSWORD=some-long-random-secret
-```
+It works with every `AUTH_METHOD` and never contacts the backend: a wrong secret is refused outright, and a username ending in `*<something that is not an app id>` is sent to the backend as is. The login is not checked for existence, so with IMAP or LDAP and `*_AUTH_USER_AUTOCREATE`, an app key does **not** create the account, it has to exist already.
 
-So with the values above, `alice*webmail` with `some-long-random-secret` acts as `alice`. The feature is off unless both variables are set. It works with every `AUTH_METHOD` and never contacts the backend: a wrong master password is refused outright, and a username ending in `*<something else>` is sent to the backend as is. The login is not checked for existence either, so with IMAP or LDAP and `*_AUTH_USER_AUTOCREATE`, the master path does **not** create the account, it has to exist already.
-
-> [!CAUTION]
->
-> The master password gives access to every account. Keep it on a trusted service on the same network, never in a browser, and rotate it like any service credential.
+The secret is shown once at creation and stored hashed. Keep it on the server side, never in a browser, and revoke the key (dashboard, or `davis:app-key:revoke <app_id>`) when the service goes away; an expiry date can be set when the access is meant to be temporary. This is the use case of [#183](https://github.com/tchapi/davis/issues/183).
 
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
