@@ -19,6 +19,17 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
      */
     protected $public_calendars_enabled;
 
+    /**
+     * Whether a calendar instance is public, by instance id.
+     *
+     * getAcl() runs once per node, so a PROPFIND over a calendar asks the same question for the
+     * collection and for every object in it. The plugin is built per request, so this lasts no
+     * longer than one.
+     *
+     * @var array<int, bool>
+     */
+    private $isPublicByInstanceId = [];
+
     public function __construct(EntityManagerInterface $entityManager, bool $public_calendars_enabled)
     {
         $this->em = $entityManager;
@@ -65,9 +76,12 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
                 // [0] is the calendarId, [1] is the calendarInstanceId
                 $calendarInstanceId = $calendarInfo['id'][1];
 
-                $calendar = $this->em->getRepository(CalendarInstance::class)->findOneById($calendarInstanceId);
+                if (!\array_key_exists($calendarInstanceId, $this->isPublicByInstanceId)) {
+                    $calendar = $this->em->getRepository(CalendarInstance::class)->find($calendarInstanceId);
+                    $this->isPublicByInstanceId[$calendarInstanceId] = (bool) $calendar?->isPublic();
+                }
 
-                if ($calendar && $calendar->isPublic()) {
+                if ($this->isPublicByInstanceId[$calendarInstanceId]) {
                     // `{DAV:}all` covers authenticated and unauthenticated alike:
                     // `{DAV:}unauthenticated` would match logged-out requests only.
                     $acl[] = [

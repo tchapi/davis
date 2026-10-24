@@ -300,7 +300,9 @@ class BirthdayService
             $cards = $this->doctrine->getRepository(Card::class)->findByAddressBook($book);
 
             foreach ($cards as $card) {
-                $this->onCardChanged($book->getId(), $card->getUri(), $card->getCardData());
+                // Not onCardChanged(): it would look the address book and the birthday calendar up
+                // again for every card, and we already have both.
+                $this->updateCalendar($card->getUri(), $card->getCardData(), $book, $calendarInstance);
             }
         }
     }
