@@ -935,11 +935,15 @@
       </trans-unit>
       <trans-unit id="apk25" resname="form.app_key.expires_at">
         <source>form.app_key.expires_at</source>
-        <target>Expires at</target>
+        <target>Expires on</target>
       </trans-unit>
       <trans-unit id="apk26" resname="form.app_key.expires_at.help">
         <source>form.app_key.expires_at.help</source>
-        <target>Optional. The key stops working at that time; you can also revoke it at any moment.</target>
+        <target>Optional. The key stops working from the start of that day; leave empty for a key that never expires. You can also revoke it at any moment.</target>
+      </trans-unit>
+      <trans-unit id="apk27" resname="form.app_key.expires_at.clear">
+        <source>form.app_key.expires_at.clear</source>
+        <target>No expiry</target>
       </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>

@@ -136,13 +136,32 @@ class AppKeyControllerTest extends WebTestCase
 
         $client->submit($crawler->selectButton('app_key_save')->form(), [
             'app_key[name]' => 'temporary',
-            'app_key[expiresAt]' => '2099-01-01T10:00',
+            'app_key[expiresAt]' => '2099-01-01',
         ]);
 
         $this->assertResponseRedirects('/app-keys/');
         $client->followRedirect();
 
-        $this->assertAnySelectorTextContains('.badge', 'Expires on 2099-01-01 10:00');
+        $this->assertAnySelectorTextContains('.badge', 'Expires on 2099-01-01 00:00');
+    }
+
+    public function testCreateWithAnEmptyExpiryNeverExpires(): void
+    {
+        $client = $this->adminClient();
+        $crawler = $client->request('GET', '/app-keys/new');
+
+        $this->assertSelectorExists('button[data-clear-target="app_key_expiresAt"]');
+
+        $client->submit($crawler->selectButton('app_key_save')->form(), [
+            'app_key[name]' => 'forever',
+            'app_key[expiresAt]' => '',
+        ]);
+
+        $this->assertResponseRedirects('/app-keys/');
+        $crawler = $client->followRedirect();
+
+        $appId = $crawler->filter('code.app-id')->text();
+        $this->assertNull(self::keyByAppId($appId)->getRevokedAt());
     }
 
     public function testRevoke(): void

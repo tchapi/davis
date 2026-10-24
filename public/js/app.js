@@ -34,6 +34,21 @@ document.addEventListener('click', event => {
     postTo(trigger.getAttribute('data-post-href'));
 });
 
+// Any element with a data-clear-target attribute empties the input with that id
+// (native date inputs offer no reliable way to go back to an empty value)
+document.addEventListener('click', event => {
+    const trigger = event.target.closest('[data-clear-target]');
+    if (!trigger) {
+        return;
+    }
+
+    const input = document.getElementById(trigger.getAttribute('data-clear-target'));
+    if (input) {
+        input.value = '';
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+});
+
 // Calendar share modal
 const shareModal = document.getElementById('shareModal')
 if (shareModal) {

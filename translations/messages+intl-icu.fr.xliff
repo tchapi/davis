@@ -939,7 +939,11 @@
       </trans-unit>
       <trans-unit id="apk26" resname="form.app_key.expires_at.help">
         <source>form.app_key.expires_at.help</source>
-        <target>Facultatif. La clé cesse de fonctionner à ce moment ; vous pouvez aussi la révoquer à tout moment.</target>
+        <target>Facultatif. La clé cesse de fonctionner dès le début de ce jour ; laissez vide pour une clé qui n'expire jamais. Vous pouvez aussi la révoquer à tout moment.</target>
+      </trans-unit>
+      <trans-unit id="apk27" resname="form.app_key.expires_at.clear">
+        <source>form.app_key.expires_at.clear</source>
+        <target>Pas d'expiration</target>
       </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>
