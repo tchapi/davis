@@ -11,3 +11,4 @@ twig:
         authRealm: '%env(AUTH_REALM)%'
         authMethod: '%env(AUTH_METHOD)%'
         appKeysEnabled: '%app_keys_enabled%'
+        adminAuthBypass: '%admin_auth_bypass%'

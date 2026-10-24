@@ -845,6 +845,26 @@
         <source>diagnostics.value.disabled</source>
         <target>disabled</target>
       </trans-unit>
+      <trans-unit id="byp01" resname="auth_bypass.label">
+        <source>auth_bypass.label</source>
+        <target>Auth bypass</target>
+      </trans-unit>
+      <trans-unit id="dbg059" resname="diagnostics.admin_auth_bypass">
+        <source>diagnostics.admin_auth_bypass</source>
+        <target>Dashboard authentication bypass</target>
+      </trans-unit>
+      <trans-unit id="dbg060" resname="diagnostics.admin_auth_bypass.enabled">
+        <source>diagnostics.admin_auth_bypass.enabled</source>
+        <target>ADMIN_AUTH_BYPASS is on: the dashboard is open to anyone who can reach it. Only use this behind a proxy that authenticates first (Authelia, etc.). The DAV server is not affected.</target>
+      </trans-unit>
+      <trans-unit id="dbg061" resname="diagnostics.admin_auth_bypass.invalid">
+        <source>diagnostics.admin_auth_bypass.invalid</source>
+        <target>ADMIN_AUTH_BYPASS is only honoured when set to the exact string "true" (lowercase). This value is ignored and the dashboard still asks for a login.</target>
+      </trans-unit>
+      <trans-unit id="dbg062" resname="diagnostics.value.enabled">
+        <source>diagnostics.value.enabled</source>
+        <target>enabled</target>
+      </trans-unit>
       <trans-unit id="apk01" resname="title.app_keys">
         <source>title.app_keys</source>
         <target>App keys</target>

@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     default_database_driver: "mysql"
+    # Compared to the string "true" (case-sensitive) everywhere, as security.yaml does
+    admin_auth_bypass: "%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%"
     default_admin_auth_bypass: "false"
     timezone: '%env(APP_TIMEZONE)%'
     public_calendars_enabled: '%env(default:default_public_calendars_enabled:bool:PUBLIC_CALENDARS_ENABLED)%'
@@ -56,6 +58,7 @@ services:
             $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
             $mailerDsn: "%env(MAILER_DSN)%"
             $appKeysEnabled: "%app_keys_enabled%"
+            $adminAuthBypass: "%admin_auth_bypass%"
 
     App\Command\MailTestCommand:
         arguments:

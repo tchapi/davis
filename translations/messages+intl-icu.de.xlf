@@ -845,6 +845,26 @@
         <source>diagnostics.value.disabled</source>
         <target>deaktiviert</target>
       </trans-unit>
+      <trans-unit id="byp01" resname="auth_bypass.label">
+        <source>auth_bypass.label</source>
+        <target>Ohne Anmeldung</target>
+      </trans-unit>
+      <trans-unit id="dbg059" resname="diagnostics.admin_auth_bypass">
+        <source>diagnostics.admin_auth_bypass</source>
+        <target>Umgehung der Dashboard-Anmeldung</target>
+      </trans-unit>
+      <trans-unit id="dbg060" resname="diagnostics.admin_auth_bypass.enabled">
+        <source>diagnostics.admin_auth_bypass.enabled</source>
+        <target>ADMIN_AUTH_BYPASS ist aktiv: Das Dashboard ist für jeden offen, der es erreicht. Nur hinter einem Proxy verwenden, der vorher authentifiziert (Authelia usw.). Der DAV-Server ist nicht betroffen.</target>
+      </trans-unit>
+      <trans-unit id="dbg061" resname="diagnostics.admin_auth_bypass.invalid">
+        <source>diagnostics.admin_auth_bypass.invalid</source>
+        <target>ADMIN_AUTH_BYPASS wird nur beim exakten Wert "true" (kleingeschrieben) berücksichtigt. Dieser Wert wird ignoriert und das Dashboard verlangt weiterhin eine Anmeldung.</target>
+      </trans-unit>
+      <trans-unit id="dbg062" resname="diagnostics.value.enabled">
+        <source>diagnostics.value.enabled</source>
+        <target>aktiviert</target>
+      </trans-unit>
       <trans-unit id="apk01" resname="title.app_keys">
         <source>title.app_keys</source>
         <target>App-Schlüssel</target>

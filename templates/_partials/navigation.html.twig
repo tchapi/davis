@@ -15,20 +15,28 @@
           <a class="nav-link" href="{{ path('user_index') }}">{{ "title.users_and_resources"|trans }}</a>
         </li>
       </ul>
-      {% if app.user %}
+      {# With the auth bypass, nobody is logged in: there is no username to show and nothing to log out of #}
+      {% set authBypassed = not app.user and adminAuthBypass == 'true' %}
+      {% if app.user or authBypassed %}
       <ul class="navbar-nav">
+        {% if app.user or appKeysEnabled %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navUserMenu" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            👤 {{ app.user.username }}
+            {% if authBypassed %}🔓 {{ "auth_bypass.label"|trans }}{% else %}👤 {{ app.user.username }}{% endif %}
           </a>
           <div class="dropdown-menu" aria-labelledby="navUserMenu">
             {% if appKeysEnabled %}
             <a class="dropdown-item" href="{{ path('app_key_index') }}">{{ "title.app_keys"|trans }}</a>
-            <div class="dropdown-divider"></div>
             {% endif %}
+            {% if app.user %}
+            {% if appKeysEnabled %}<div class="dropdown-divider"></div>{% endif %}
             <a class="dropdown-item" href="{{ path('app_logout', {_csrf_token: csrf_token('logout')}) }}">{{ "logout"|trans }}</a>
+            {% endif %}
           </div>
         </li>
+        {% else %}
+        <li class="nav-item"><span class="navbar-text">🔓 {{ "auth_bypass.label"|trans }}</span></li>
+        {% endif %}
         <li class="nav-item dropdown">
           <button class="nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="{{ "toggle.theme"|trans }}">
             <span class="theme-icon-active me-1">☀️</span> <span class="d-lg-none ms-2" id="bd-theme-text">{{ "toggle.theme"|trans }}</span>

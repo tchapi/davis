@@ -39,6 +39,7 @@ final class Diagnostics
         private ?string $inviteAddress,
         private ?string $mailerDsn,
         private bool $appKeysEnabled = false,
+        private string $adminAuthBypass = 'false',
     ) {
     }
 
@@ -61,6 +62,7 @@ final class Diagnostics
             ],
             'diagnostics.bucket.authentication' => [
                 $this->auth(),
+                $this->adminAuthBypass(),
                 $this->appKeys(),
                 $this->authExtension(),
             ],
@@ -237,6 +239,25 @@ final class Diagnostics
         }
 
         return $this->check(self::INFO, 'diagnostics.auth', $value, 'basic' === strtolower($this->authMethod) ? 'diagnostics.auth.realm' : null);
+    }
+
+    /**
+     * With the bypass on, the dashboard trusts whoever reaches it, so it is only safe behind a
+     * proxy that authenticates first. The DAV server is not affected.
+     */
+    private function adminAuthBypass(): array
+    {
+        // Same strict comparison as the access rule in security.yaml
+        if ('true' === $this->adminAuthBypass) {
+            return $this->check(self::INFO, 'diagnostics.admin_auth_bypass', 'diagnostics.value.enabled', 'diagnostics.admin_auth_bypass.enabled');
+        }
+
+        // "True", "1" or "yes" read as an attempt to turn it on, but are ignored
+        if ('false' !== $this->adminAuthBypass) {
+            return $this->check(self::WARNING, 'diagnostics.admin_auth_bypass', $this->adminAuthBypass, 'diagnostics.admin_auth_bypass.invalid', 'ADMIN_AUTH_BYPASS=true');
+        }
+
+        return $this->check(self::OK, 'diagnostics.admin_auth_bypass', 'diagnostics.value.disabled');
     }
 
     /**

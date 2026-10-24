@@ -39,6 +39,7 @@ class DiagnosticsTest extends KernelTestCase
             'inviteAddress' => 'no-reply@example.org',
             'mailerDsn' => 'smtp://smtp.example.org:587',
             'appKeysEnabled' => true,
+            'adminAuthBypass' => 'false',
         ], $overrides);
 
         // Only for the default, writable path: some tests deliberately point somewhere unwritable
@@ -215,5 +216,26 @@ class DiagnosticsTest extends KernelTestCase
         $this->assertSame('diagnostics.value.disabled', $check['value']);
         $this->assertSame('APP_KEYS_ENABLED=true', $check['command']);
         $this->assertNull($check['link'], 'There is no page to link to');
+    }
+
+    public function testTheAuthBypassIsShownWhenOn(): void
+    {
+        $diagnostics = $this->diagnosticsWith(['adminAuthBypass' => 'true']);
+        $check = $this->checksOf($diagnostics)['diagnostics.admin_auth_bypass'];
+
+        $this->assertSame('diagnostics.value.enabled', $check['value']);
+        $this->assertSame(Diagnostics::INFO, $check['severity'], 'A deliberate setup behind a proxy is nothing to fix');
+        $this->assertSame(0, $diagnostics->attentionCount());
+    }
+
+    public function testAnAuthBypassValueThatIsIgnoredIsReported(): void
+    {
+        // The access rule compares to the exact string "true"
+        foreach (['True', '1', 'yes'] as $value) {
+            $check = $this->checksOf($this->diagnosticsWith(['adminAuthBypass' => $value]))['diagnostics.admin_auth_bypass'];
+
+            $this->assertSame(Diagnostics::WARNING, $check['severity'], $value);
+            $this->assertSame($value, $check['value']);
+        }
     }
 }

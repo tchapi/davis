@@ -845,6 +845,26 @@
         <source>diagnostics.value.disabled</source>
         <target>désactivées</target>
       </trans-unit>
+      <trans-unit id="byp01" resname="auth_bypass.label">
+        <source>auth_bypass.label</source>
+        <target>Sans authentification</target>
+      </trans-unit>
+      <trans-unit id="dbg059" resname="diagnostics.admin_auth_bypass">
+        <source>diagnostics.admin_auth_bypass</source>
+        <target>Contournement de l'authentification du tableau de bord</target>
+      </trans-unit>
+      <trans-unit id="dbg060" resname="diagnostics.admin_auth_bypass.enabled">
+        <source>diagnostics.admin_auth_bypass.enabled</source>
+        <target>ADMIN_AUTH_BYPASS est activé : le tableau de bord est ouvert à quiconque peut y accéder. À n'utiliser que derrière un proxy qui authentifie en amont (Authelia, etc.). Le serveur DAV n'est pas concerné.</target>
+      </trans-unit>
+      <trans-unit id="dbg061" resname="diagnostics.admin_auth_bypass.invalid">
+        <source>diagnostics.admin_auth_bypass.invalid</source>
+        <target>ADMIN_AUTH_BYPASS n'est pris en compte que s'il vaut exactement la chaîne "true" (en minuscules). Cette valeur est ignorée et le tableau de bord demande toujours une connexion.</target>
+      </trans-unit>
+      <trans-unit id="dbg062" resname="diagnostics.value.enabled">
+        <source>diagnostics.value.enabled</source>
+        <target>activé</target>
+      </trans-unit>
       <trans-unit id="apk01" resname="title.app_keys">
         <source>title.app_keys</source>
         <target>Clés d'application</target>
