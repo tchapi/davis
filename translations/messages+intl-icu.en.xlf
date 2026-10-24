@@ -837,6 +837,14 @@
         <source>diagnostics.app_keys.help</source>
         <target>Number of active keys. Each one acts as any user in its scope with that user's password never involved: keep the secrets server-side and revoke a key when the service that holds it goes away.</target>
       </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.app_keys.disabled">
+        <source>diagnostics.app_keys.disabled</source>
+        <target>App keys are turned off. To use them, set APP_KEYS_ENABLED=true.</target>
+      </trans-unit>
+      <trans-unit id="dbg058" resname="diagnostics.value.disabled">
+        <source>diagnostics.value.disabled</source>
+        <target>disabled</target>
+      </trans-unit>
       <trans-unit id="apk01" resname="title.app_keys">
         <source>title.app_keys</source>
         <target>App keys</target>
@@ -859,7 +867,7 @@
       </trans-unit>
       <trans-unit id="apk06" resname="app_keys.scope.all">
         <source>app_keys.scope.all</source>
-        <target>All users</target>
+        <target>All users except admins</target>
       </trans-unit>
       <trans-unit id="apk07" resname="app_keys.created">
         <source>app_keys.created</source>
@@ -921,6 +929,14 @@
         <source>no.app_keys.yet</source>
         <target>No app key yet</target>
       </trans-unit>
+      <trans-unit id="apk28" resname="app_keys.used_as">
+        <source>app_keys.used_as</source>
+        <target>Used as</target>
+      </trans-unit>
+      <trans-unit id="apk29" resname="app_keys.used_as.more">
+        <source>app_keys.used_as.more</source>
+        <target>and {count} more</target>
+      </trans-unit>
       <trans-unit id="apk22" resname="form.app_key.name">
         <source>form.app_key.name</source>
         <target>Name</target>
@@ -931,7 +947,7 @@
       </trans-unit>
       <trans-unit id="apk24" resname="form.app_key.scope.help">
         <source>form.app_key.scope.help</source>
-        <target>One username per line, or * for every user.</target>
+        <target>One username per line. Use * for all users except admins. To include an admin, add their username. The key can see everything the user can see, including calendars shared with them and calendars they are a delegate for.</target>
       </trans-unit>
       <trans-unit id="apk25" resname="form.app_key.expires_at">
         <source>form.app_key.expires_at</source>

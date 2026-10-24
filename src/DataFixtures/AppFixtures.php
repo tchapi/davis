@@ -103,7 +103,7 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
-        $appKey = AppKey::create('Test app')
+        $appKey = AppKey::create('Test app', [AppKey::ALL_USERS])
             ->setAppId('app_test')
             ->setSecretHash(password_hash('app-secret', PASSWORD_DEFAULT));
         $manager->persist($appKey);

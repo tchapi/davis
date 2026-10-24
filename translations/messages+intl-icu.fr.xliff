@@ -837,6 +837,14 @@
         <source>diagnostics.app_keys.help</source>
         <target>Nombre de clés actives. Chacune agit au nom de n'importe quel utilisateur de son périmètre sans jamais passer par son mot de passe : gardez les secrets côté serveur et révoquez une clé quand le service qui la détient disparaît.</target>
       </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.app_keys.disabled">
+        <source>diagnostics.app_keys.disabled</source>
+        <target>Les clés d'application sont désactivées. Pour les utiliser, définissez APP_KEYS_ENABLED=true.</target>
+      </trans-unit>
+      <trans-unit id="dbg058" resname="diagnostics.value.disabled">
+        <source>diagnostics.value.disabled</source>
+        <target>désactivées</target>
+      </trans-unit>
       <trans-unit id="apk01" resname="title.app_keys">
         <source>title.app_keys</source>
         <target>Clés d'application</target>
@@ -859,7 +867,7 @@
       </trans-unit>
       <trans-unit id="apk06" resname="app_keys.scope.all">
         <source>app_keys.scope.all</source>
-        <target>Tous les utilisateurs</target>
+        <target>Tous les utilisateurs sauf les admins</target>
       </trans-unit>
       <trans-unit id="apk07" resname="app_keys.created">
         <source>app_keys.created</source>
@@ -921,6 +929,14 @@
         <source>no.app_keys.yet</source>
         <target>Aucune clé d'application pour l'instant</target>
       </trans-unit>
+      <trans-unit id="apk28" resname="app_keys.used_as">
+        <source>app_keys.used_as</source>
+        <target>Utilisée en tant que</target>
+      </trans-unit>
+      <trans-unit id="apk29" resname="app_keys.used_as.more">
+        <source>app_keys.used_as.more</source>
+        <target>et {count} autres</target>
+      </trans-unit>
       <trans-unit id="apk22" resname="form.app_key.name">
         <source>form.app_key.name</source>
         <target>Nom</target>
@@ -931,7 +947,7 @@
       </trans-unit>
       <trans-unit id="apk24" resname="form.app_key.scope.help">
         <source>form.app_key.scope.help</source>
-        <target>Un nom d'utilisateur par ligne, ou * pour tous les utilisateurs.</target>
+        <target>Un nom d'utilisateur par ligne. Utilisez * pour tous les utilisateurs sauf les admins. Pour inclure un admin, ajoutez son nom d'utilisateur. La clé voit tout ce que l'utilisateur voit, y compris les calendriers partagés avec lui et ceux dont il est délégué.</target>
       </trans-unit>
       <trans-unit id="apk25" resname="form.app_key.expires_at">
         <source>form.app_key.expires_at</source>

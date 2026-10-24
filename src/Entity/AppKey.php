@@ -12,6 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AppKey
 {
     public const APP_ID_PREFIX = 'app_';
+    // `*` means all users except admins. To let a key act as an admin, add the admin's username.
+    // Admins can read all calendars and address books, so we don't include them by default.
     public const ALL_USERS = '*';
     // DAV clients send credentials on every request. We only update the last use date
     // once per minute to avoid a database write on each request.
@@ -37,7 +39,7 @@ class AppKey
      * @var string[]
      */
     #[ORM\Column(type: 'json')]
-    private $scope = [self::ALL_USERS];
+    private $scope = [];
 
     #[ORM\Column(name: 'revoked_at', type: 'datetime_immutable', nullable: true)]
     private $revokedAt;
@@ -51,7 +53,7 @@ class AppKey
     /**
      * @param string[] $scope
      */
-    public static function create(string $name, array $scope = [self::ALL_USERS], ?\DateTimeImmutable $revokedAt = null): self
+    public static function create(string $name, array $scope, ?\DateTimeImmutable $revokedAt = null): self
     {
         return (new self())
             ->setName($name)
@@ -89,8 +91,10 @@ class AppKey
     {
         $scope = array_values(array_unique(array_filter(array_map('trim', $scope), fn (string $login) => '' !== $login)));
 
-        if (!$scope || in_array(self::ALL_USERS, $scope, true)) {
-            return [self::ALL_USERS];
+        // An empty scope does not mean all users. You have to use `*` for that.
+        // We keep the usernames listed next to `*`. This is how you add an admin.
+        if (in_array(self::ALL_USERS, $scope, true)) {
+            return array_values(array_unique([self::ALL_USERS, ...$scope]));
         }
 
         return $scope;
@@ -99,6 +103,46 @@ class AppKey
     public function allows(string $login): bool
     {
         return in_array(self::ALL_USERS, $this->scope, true) || in_array($login, $this->scope, true);
+    }
+
+    /**
+     * Returns true if the login is in the scope by name, not only through `*`.
+     */
+    public function names(string $login): bool
+    {
+        return self::ALL_USERS !== $login && in_array($login, $this->scope, true);
+    }
+
+    /**
+     * Removes a deleted user from the scope. If the key was only for this user, we revoke it.
+     * Otherwise, a new user created later with the same name could use the key.
+     *
+     * @return bool true if the key changed
+     */
+    public function forgetUser(string $login, \DateTimeImmutable $now): bool
+    {
+        if (!$this->names($login)) {
+            return false;
+        }
+
+        $rest = array_values(array_diff($this->scope, [$login]));
+
+        if ($rest) {
+            $this->scope = $rest;
+        } else {
+            // We keep the scope, so the list still shows who the key was for
+            $this->revoke($now);
+        }
+
+        return true;
+    }
+
+    /**
+     * @return string[] the usernames in the scope, without `*`
+     */
+    public function getNamedUsers(): array
+    {
+        return array_values(array_diff($this->scope, [self::ALL_USERS]));
     }
 
     public function isActive(\DateTimeImmutable $now): bool
@@ -184,7 +228,13 @@ class AppKey
      */
     public function setScope(array $scope): self
     {
-        $this->scope = self::normaliseScope($scope);
+        $scope = self::normaliseScope($scope);
+
+        if (!$scope) {
+            throw new \InvalidArgumentException('An app key needs at least one user, or * for all of them.');
+        }
+
+        $this->scope = $scope;
 
         return $this;
     }

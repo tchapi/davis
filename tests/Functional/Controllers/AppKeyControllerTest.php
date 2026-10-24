@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\Entity\AppKey;
+use App\Entity\User;
 use App\Repository\AppKeyRepository;
 use App\Security\AdminUser;
 use App\Services\BasicAuth;
@@ -129,6 +130,79 @@ class AppKeyControllerTest extends WebTestCase
         $this->assertCount($before, static::getContainer()->get(AppKeyRepository::class)->findAll());
     }
 
+    public function testCreateRequiresAScope(): void
+    {
+        $client = $this->adminClient();
+        $before = count(static::getContainer()->get(AppKeyRepository::class)->findAll());
+
+        foreach (['', " ,\n"] as $scope) {
+            $crawler = $client->request('GET', '/app-keys/new');
+            $client->submit($crawler->selectButton('app_key_save')->form(), [
+                'app_key[name]' => 'nobody',
+                'app_key[scope]' => $scope,
+            ]);
+
+            $this->assertResponseStatusCodeSame(200);
+            $this->assertSelectorTextContains('.invalid-feedback', 'Enter at least one username');
+        }
+
+        $this->assertCount($before, static::getContainer()->get(AppKeyRepository::class)->findAll());
+    }
+
+    public function testCreateRejectsUnknownUsers(): void
+    {
+        $client = $this->adminClient();
+        $before = count(static::getContainer()->get(AppKeyRepository::class)->findAll());
+
+        $crawler = $client->request('GET', '/app-keys/new');
+        $client->submit($crawler->selectButton('app_key_save')->form(), [
+            'app_key[name]' => 'webmail',
+            'app_key[scope]' => "*\ntest_user\nalice",
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertSelectorTextContains('.invalid-feedback', 'These users do not exist: alice.');
+        $this->assertCount($before, static::getContainer()->get(AppKeyRepository::class)->findAll());
+    }
+
+    public function testIndexShowsWhoTheKeyActedAs(): void
+    {
+        $client = $this->adminClient();
+
+        [$ok] = self::basicAuth('test_user2*app_test:app-secret');
+        $this->assertTrue($ok);
+
+        $client->request('GET', '/app-keys/');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertAnySelectorTextContains('p', 'Used as : test_user2');
+    }
+
+    public function testDeletingAUserUpdatesTheKeys(): void
+    {
+        $client = $this->adminClient();
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        $onlyUser2 = AppKey::create('only user 2', ['test_user2'])->setSecretHash('x');
+        $user2AndBob = AppKey::create('user 2 and bob', ['test_user2', 'bob'])->setSecretHash('x');
+        $em->persist($onlyUser2);
+        $em->persist($user2AndBob);
+        $em->flush();
+
+        $userId = $em->getRepository(User::class)->findOneByUsername('test_user2')->getId();
+        $this->postAdmin($client, '/users/delete/'.$userId);
+        $this->assertResponseRedirects('/users/');
+
+        $onlyUser2 = self::keyByAppId($onlyUser2->getAppId());
+        $this->assertNotNull($onlyUser2->getRevokedAt(), 'A key only for the deleted user is revoked');
+
+        $user2AndBob = self::keyByAppId($user2AndBob->getAppId());
+        $this->assertNull($user2AndBob->getRevokedAt());
+        $this->assertSame(['bob'], $user2AndBob->getScope());
+
+        $this->assertNull(self::keyByAppId('app_test')->getRevokedAt(), 'A * key is not changed');
+    }
+
     public function testCreateWithAnExpiry(): void
     {
         $client = $this->adminClient();
@@ -136,6 +210,7 @@ class AppKeyControllerTest extends WebTestCase
 
         $client->submit($crawler->selectButton('app_key_save')->form(), [
             'app_key[name]' => 'temporary',
+            'app_key[scope]' => '*',
             'app_key[expiresAt]' => '2099-01-01',
         ]);
 
@@ -154,6 +229,7 @@ class AppKeyControllerTest extends WebTestCase
 
         $client->submit($crawler->selectButton('app_key_save')->form(), [
             'app_key[name]' => 'forever',
+            'app_key[scope]' => '*',
             'app_key[expiresAt]' => '',
         ]);
 
@@ -176,7 +252,7 @@ class AppKeyControllerTest extends WebTestCase
         $this->assertAnySelectorTextContains('.badge', 'Revoked on');
         $this->assertNotNull(self::keyByAppId('app_test')->getRevokedAt());
 
-        [$ok] = self::basicAuth('alice*app_test:app-secret');
+        [$ok] = self::basicAuth('test_user2*app_test:app-secret');
         $this->assertFalse($ok);
     }
 

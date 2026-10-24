@@ -35,9 +35,10 @@ abstract class AbstractAuth extends AbstractBasic
 
     private ?AppKeyRepository $appKeys = null;
 
-    public function setAppKeyRepository(?AppKeyRepository $appKeys): void
+    public function setAppKeyRepository(?AppKeyRepository $appKeys, bool $enabled = true): void
     {
-        $this->appKeys = $appKeys;
+        // When app keys are turned off, we don't keep the repository, so `*` is a normal character
+        $this->appKeys = $enabled ? $appKeys : null;
     }
 
     /**
@@ -66,9 +67,19 @@ abstract class AbstractAuth extends AbstractBasic
                     return false;
                 }
 
+                // The login must be an existing account. Otherwise a `*` key could log in with any
+                // name, for example a principal left behind by an older version.
+                // `*` does not include admins, because they can read all calendars and address books.
+                // A key can act as an admin only if the admin's username is in its scope.
+                $account = $this->appKeys->findAccount($login, $this->principalPrefix.$login);
+                if (null === $account || ($account->getIsAdmin() && !$key->names($login))) {
+                    return false;
+                }
+
                 if (!$key->wasUsedWithin(AppKey::LAST_USED_THROTTLE, $now)) {
                     $this->appKeys->touch($key, $now);
                 }
+                $this->appKeys->recordUse($key, $login, $now);
 
                 $this->setCanonicalUsername($login);
 

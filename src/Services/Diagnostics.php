@@ -38,6 +38,7 @@ final class Diagnostics
         private bool $webdavPublicDirWritable,
         private ?string $inviteAddress,
         private ?string $mailerDsn,
+        private bool $appKeysEnabled = false,
     ) {
     }
 
@@ -244,6 +245,10 @@ final class Diagnostics
      */
     private function appKeys(): array
     {
+        if (!$this->appKeysEnabled) {
+            return $this->check(self::INFO, 'diagnostics.app_keys', 'diagnostics.value.disabled', 'diagnostics.app_keys.disabled', 'APP_KEYS_ENABLED=true');
+        }
+
         try {
             $count = (int) $this->connection->fetchOne(
                 'SELECT COUNT(*) FROM app_keys WHERE revoked_at IS NULL OR revoked_at > :now',

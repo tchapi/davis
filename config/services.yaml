@@ -16,6 +16,8 @@ parameters:
     # `bool:` must wrap `default:` so that the fallback string is cast too
     webdav_public_dir_writable: "%env(bool:default:default_webdav_public_dir_writable:WEBDAV_PUBLIC_DIR_WRITABLE)%"
     default_webdav_public_dir_writable: "false"
+    app_keys_enabled: "%env(bool:default:default_app_keys_enabled:APP_KEYS_ENABLED)%"
+    default_app_keys_enabled: "false"
 
 services:
     # default configuration for services in *this* file
@@ -26,7 +28,7 @@ services:
     _instanceof:
         App\Services\AbstractAuth:
             calls:
-                - setAppKeyRepository: ['@App\Repository\AppKeyRepository']
+                - setAppKeyRepository: ['@App\Repository\AppKeyRepository', '%app_keys_enabled%']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -53,6 +55,7 @@ services:
             $webdavPublicDirWritable: "%webdav_public_dir_writable%"
             $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
             $mailerDsn: "%env(MAILER_DSN)%"
+            $appKeysEnabled: "%app_keys_enabled%"
 
     App\Command\MailTestCommand:
         arguments:

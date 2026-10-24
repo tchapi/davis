@@ -41,7 +41,12 @@
             {% endif %}
         </div>
         <p class="mb-1">{{ "app_keys.app_id"|trans }} : <code>{{ key.appId }}</code></p>
-        <p class="mb-1">{{ "app_keys.scope"|trans }} : {% if key.isAllUsers %}<span class="badge bg-primary">{{ "app_keys.scope.all"|trans }}</span>{% else %}<code>{{ key.scope|join(', ') }}</code>{% endif %}</p>
+        <p class="mb-1">{{ "app_keys.scope"|trans }} : {% if key.isAllUsers %}<span class="badge bg-primary">{{ "app_keys.scope.all"|trans }}</span> {% endif %}{% if key.namedUsers %}<code>{{ key.namedUsers|join(', ') }}</code>{% endif %}</p>
+        {% set keyUsages = usages[key.id] ?? [] %}
+        <p class="mb-1">{{ "app_keys.used_as"|trans }} :
+        {% for usage in keyUsages|slice(0, 10) %}<code title="{{ usage.firstUsedAt|date('Y-m-d H:i') }} → {{ usage.lastUsedAt|date('Y-m-d H:i') }}">{{ usage.login }}</code>{% if not loop.last %}, {% endif %}{% else %}{{ "app_keys.never"|trans }}{% endfor %}
+        {% if keyUsages|length > 10 %}{{ "app_keys.used_as.more"|trans({'count': keyUsages|length - 10}) }}{% endif %}
+        </p>
         <small>{{ "app_keys.created"|trans }} {{ key.createdAt|date('Y-m-d H:i') }} · {{ "app_keys.last_used"|trans }} {{ key.lastUsedAt ? key.lastUsedAt|date('Y-m-d H:i') : 'app_keys.never'|trans }}</small>
     </div>
 {% else %}

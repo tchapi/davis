@@ -51,7 +51,7 @@ class AppKeyCommandsTest extends KernelTestCase
 
     public function testCreatePrintsTheAppIdAndTheSecretOnce(): void
     {
-        $tester = $this->runCommand('davis:app-key:create', ['name' => 'cal.com']);
+        $tester = $this->runCommand('davis:app-key:create', ['name' => 'cal.com', '--all-users' => true]);
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
         $display = $tester->getDisplay();
@@ -64,19 +64,52 @@ class AppKeyCommandsTest extends KernelTestCase
         $this->assertSame('cal.com', $key->getName());
         $this->assertSame(['*'], $key->getScope());
 
-        $request = new Request('PROPFIND', '/dav/', ['Authorization' => 'Basic '.base64_encode('test_user*'.$appId.':'.$secret)]);
+        $request = new Request('PROPFIND', '/dav/', ['Authorization' => 'Basic '.base64_encode('test_user2*'.$appId.':'.$secret)]);
         [$ok, $principal] = static::getContainer()->get(BasicAuth::class)->check($request, new Response());
         $this->assertTrue($ok);
-        $this->assertSame('principals/test_user', $principal);
+        $this->assertSame('principals/test_user2', $principal);
+    }
+
+    public function testCreateRequiresAScope(): void
+    {
+        self::bootKernel();
+        $before = self::countKeys();
+
+        $tester = $this->runCommand('davis:app-key:create', ['name' => 'nobody']);
+
+        $this->assertSame(Command::INVALID, $tester->getStatusCode());
+        $this->assertStringContainsString('--all-users', $tester->getDisplay());
+        $this->assertSame($before, self::countKeys());
+    }
+
+    public function testCreateForAllUsersAndANamedAdmin(): void
+    {
+        $tester = $this->runCommand('davis:app-key:create', ['name' => 'sync', '--all-users' => true, '--user' => ['test_user']]);
+
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        [$appId] = $this->credentialsFrom($tester->getDisplay());
+        $this->assertSame(['*', 'test_user'], self::keyByAppId($appId)->getScope());
     }
 
     public function testCreateWithUsersRestrictsTheScope(): void
     {
-        $tester = $this->runCommand('davis:app-key:create', ['name' => 'webmail', '--user' => ['alice', 'bob']]);
+        $tester = $this->runCommand('davis:app-key:create', ['name' => 'webmail', '--user' => ['test_user', 'test_user2']]);
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
         [$appId] = $this->credentialsFrom($tester->getDisplay());
-        $this->assertSame(['alice', 'bob'], self::keyByAppId($appId)->getScope());
+        $this->assertSame(['test_user', 'test_user2'], self::keyByAppId($appId)->getScope());
+    }
+
+    public function testCreateRejectsUnknownUsers(): void
+    {
+        self::bootKernel();
+        $before = self::countKeys();
+
+        $tester = $this->runCommand('davis:app-key:create', ['name' => 'webmail', '--user' => ['test_user2', 'alice', 'TEST_USER']]);
+
+        $this->assertSame(Command::INVALID, $tester->getStatusCode());
+        $this->assertStringContainsString('alice, TEST_USER', $tester->getDisplay());
+        $this->assertSame($before, self::countKeys());
     }
 
     public function testCreateRejectsABadExpiry(): void
@@ -84,7 +117,7 @@ class AppKeyCommandsTest extends KernelTestCase
         self::bootKernel();
         $before = self::countKeys();
 
-        $tester = $this->runCommand('davis:app-key:create', ['name' => 'nope', '--expires-at' => 'yesterday-ish-garbage']);
+        $tester = $this->runCommand('davis:app-key:create', ['name' => 'nope', '--all-users' => true, '--expires-at' => 'yesterday-ish-garbage']);
 
         $this->assertSame(Command::FAILURE, $tester->getStatusCode());
         $this->assertSame($before, self::countKeys());

@@ -837,6 +837,14 @@
         <source>diagnostics.app_keys.help</source>
         <target>Anzahl aktiver Schlüssel. Jeder handelt im Namen jedes Benutzers in seinem Geltungsbereich, ohne dass dessen Passwort beteiligt ist: Bewahren Sie die Geheimnisse serverseitig auf und widerrufen Sie einen Schlüssel, wenn der Dienst, der ihn hält, wegfällt.</target>
       </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.app_keys.disabled">
+        <source>diagnostics.app_keys.disabled</source>
+        <target>App-Schlüssel sind deaktiviert. Um sie zu verwenden, setzen Sie APP_KEYS_ENABLED=true.</target>
+      </trans-unit>
+      <trans-unit id="dbg058" resname="diagnostics.value.disabled">
+        <source>diagnostics.value.disabled</source>
+        <target>deaktiviert</target>
+      </trans-unit>
       <trans-unit id="apk01" resname="title.app_keys">
         <source>title.app_keys</source>
         <target>App-Schlüssel</target>
@@ -859,7 +867,7 @@
       </trans-unit>
       <trans-unit id="apk06" resname="app_keys.scope.all">
         <source>app_keys.scope.all</source>
-        <target>Alle Benutzer</target>
+        <target>Alle Benutzer außer Admins</target>
       </trans-unit>
       <trans-unit id="apk07" resname="app_keys.created">
         <source>app_keys.created</source>
@@ -921,6 +929,14 @@
         <source>no.app_keys.yet</source>
         <target>Noch kein App-Schlüssel</target>
       </trans-unit>
+      <trans-unit id="apk28" resname="app_keys.used_as">
+        <source>app_keys.used_as</source>
+        <target>Verwendet als</target>
+      </trans-unit>
+      <trans-unit id="apk29" resname="app_keys.used_as.more">
+        <source>app_keys.used_as.more</source>
+        <target>und {count} weitere</target>
+      </trans-unit>
       <trans-unit id="apk22" resname="form.app_key.name">
         <source>form.app_key.name</source>
         <target>Name</target>
@@ -931,7 +947,7 @@
       </trans-unit>
       <trans-unit id="apk24" resname="form.app_key.scope.help">
         <source>form.app_key.scope.help</source>
-        <target>Ein Benutzername pro Zeile, oder * für alle Benutzer.</target>
+        <target>Ein Benutzername pro Zeile. Verwenden Sie * für alle Benutzer außer Admins. Um einen Admin einzuschließen, fügen Sie seinen Benutzernamen hinzu. Der Schlüssel sieht alles, was der Benutzer sieht, auch mit ihm geteilte Kalender und Kalender, für die er Stellvertreter ist.</target>
       </trans-unit>
       <trans-unit id="apk25" resname="form.app_key.expires_at">
         <source>form.app_key.expires_at</source>

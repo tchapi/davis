@@ -12,7 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/app-keys', name: 'app_key_')]
+// When APP_KEYS_ENABLED is off, these routes don't match and return a 404
+#[Route('/app-keys', name: 'app_key_', condition: "service('app_keys').isEnabled()")]
 class AppKeyController extends AbstractController
 {
     #[Route('/', name: 'index')]
@@ -20,6 +21,7 @@ class AppKeyController extends AbstractController
     {
         return $this->render('app_keys/index.html.twig', [
             'keys' => $doctrine->getRepository(AppKey::class)->findAllNewestFirst(),
+            'usages' => $doctrine->getRepository(AppKey::class)->findUsagesByKey(),
             'now' => new \DateTimeImmutable(),
             // We use the session, not a flash, because flashes are shown as toasts.
             // remove() returns the secret and deletes it, so it is only shown once.

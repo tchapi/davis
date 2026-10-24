@@ -22,8 +22,10 @@
             👤 {{ app.user.username }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navUserMenu">
+            {% if appKeysEnabled %}
             <a class="dropdown-item" href="{{ path('app_key_index') }}">{{ "title.app_keys"|trans }}</a>
             <div class="dropdown-divider"></div>
+            {% endif %}
             <a class="dropdown-item" href="{{ path('app_logout', {_csrf_token: csrf_token('logout')}) }}">{{ "logout"|trans }}</a>
           </div>
         </li>
