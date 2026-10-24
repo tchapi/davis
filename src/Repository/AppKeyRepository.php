@@ -36,8 +36,8 @@ class AppKeyRepository extends ServiceEntityRepository
     {
         $key->setLastUsedAt($now);
 
-        // a targeted update and not a flush(): we are inside a DAV request and must not write
-        // whatever else happens to be in the unit of work
+        // We use an update query instead of flush(). We are in a DAV request, and flush()
+        // would also save any other pending change.
         $this->createQueryBuilder('k')
             ->update()
             ->set('k.lastUsedAt', ':now')

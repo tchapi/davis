@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% set menu = 'app_keys' %}
 
-{# Native date inputs offer no reliable way to go back to an empty value, so add a button for it #}
+{# Native date inputs have no good way to clear the value, so we add a button for it #}
 {% form_theme form _self %}
 {% block _app_key_expiresAt_widget %}
     <div class="input-group">

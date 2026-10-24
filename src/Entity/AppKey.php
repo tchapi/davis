@@ -13,7 +13,8 @@ class AppKey
 {
     public const APP_ID_PREFIX = 'app_';
     public const ALL_USERS = '*';
-    // A DAV client sends Basic on every request, a PROPFIND storm must not turn into a write storm
+    // DAV clients send credentials on every request. We only update the last use date
+    // once per minute to avoid a database write on each request.
     public const LAST_USED_THROTTLE = 60;
 
     #[ORM\Id]

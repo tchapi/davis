@@ -34,8 +34,8 @@ document.addEventListener('click', event => {
     postTo(trigger.getAttribute('data-post-href'));
 });
 
-// Any element with a data-clear-target attribute empties the input with that id
-// (native date inputs offer no reliable way to go back to an empty value)
+// Clicking an element with data-clear-target empties the input with that id.
+// Native date inputs have no good way to clear the value.
 document.addEventListener('click', event => {
     const trigger = event.target.closest('[data-clear-target]');
     if (!trigger) {

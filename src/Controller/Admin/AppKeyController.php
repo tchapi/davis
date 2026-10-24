@@ -21,8 +21,8 @@ class AppKeyController extends AbstractController
         return $this->render('app_keys/index.html.twig', [
             'keys' => $doctrine->getRepository(AppKey::class)->findAllNewestFirst(),
             'now' => new \DateTimeImmutable(),
-            // the session and not a flash: the flashes partial shows every flash type as a toast,
-            // and remove() hands the secret over exactly once
+            // We use the session, not a flash, because flashes are shown as toasts.
+            // remove() returns the secret and deletes it, so it is only shown once.
             'created' => $request->getSession()->remove('app_key_created'),
         ]);
     }

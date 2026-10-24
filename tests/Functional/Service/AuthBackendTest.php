@@ -115,8 +115,8 @@ class AuthBackendTest extends KernelTestCase
             [$ok] = self::check($backend, ':password');
             $this->assertFalse($ok, $class.' must reject an empty username');
 
-            // The fixtures hold `app_test` (secret `app-secret`, every user): IMAP and LDAP have no
-            // server here, so this only passes if the app key path never reaches them
+            // The fixtures have the key `app_test` (secret `app-secret`, all users). There is no
+            // IMAP or LDAP server here, so this only passes if the backend is never called.
             [$ok, $principal] = self::check($backend, 'alice*app_test:app-secret');
             $this->assertTrue($ok, $class.' must accept an app key');
             $this->assertSame('principals/alice', $principal, $class.' must impersonate the login part');
@@ -150,8 +150,8 @@ class AuthBackendTest extends KernelTestCase
     }
 
     /**
-     * A wrong secret must not fall through to the backend with `alice*app_...` as a username:
-     * it would be a directory lookup with an attacker-chosen password.
+     * A wrong secret must not be sent to the backend with `alice*app_...` as the username.
+     * That would let an attacker query the directory with a password they chose.
      */
     public function testAWrongSecretIsRejectedWithoutAskingTheBackend(): void
     {

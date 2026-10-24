@@ -239,8 +239,8 @@ final class Diagnostics
     }
 
     /**
-     * A key acts as any user in its scope with no password of theirs involved, so the count
-     * belongs next to the auth method. Never the secrets: they are not stored in clear anyway.
+     * An app key can log in as any user in its scope without their password, so we show the
+     * count next to the auth method. We never show secrets (they are only stored hashed).
      */
     private function appKeys(): array
     {

@@ -24,7 +24,7 @@ use Sabre\HTTP\ResponseInterface;
  * refused here, not the stricter set required when creating an account, so that an unusual
  * but working username keeps authenticating.
  *
- * App keys (`<login>*<app_id>`) are handled here too, so that every backend gets them.
+ * App keys (`<login>*<app_id>`) are checked here too, so they work with every backend.
  */
 abstract class AbstractAuth extends AbstractBasic
 {
@@ -52,10 +52,9 @@ abstract class AbstractAuth extends AbstractBasic
             return false;
         }
 
-        // `<login>*<app_id>`: when the part after the last `*` names an app key, the key decides
-        // alone and the backend is never asked, so a wrong secret is a plain failure and not a
-        // directory lookup of `alice*app_...`. Any other suffix is left alone, a real username
-        // can contain `*`.
+        // `<login>*<app_id>`: if the part after the last `*` is an existing app id, we only
+        // check the app key and never call the backend. A wrong secret simply fails.
+        // Otherwise we do nothing here, because a real username can contain `*`.
         if (null !== $this->appKeys && false !== ($star = strrpos($username, '*'))) {
             $key = $this->appKeys->findOneByAppId(substr($username, $star + 1));
 
