@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\AddressBook;
 use App\Entity\Principal;
+use App\Entity\PropertyStorage;
 use App\Entity\User;
 use App\Form\AddressBookType;
 use App\Services\BirthdayService;
@@ -117,7 +118,14 @@ class AddressBookController extends AbstractController
         }
         $entityManager->remove($addressbook);
 
+        $addressbookUri = $addressbook->getUri();
+
         $entityManager->flush();
+
+        $doctrine->getRepository(PropertyStorage::class)->deletePathsAndTheirChildren([
+            'addressbooks/'.$username.'/'.$addressbookUri,
+        ]);
+
         $this->addFlash('success', $trans->trans('addressbooks.deleted'));
 
         $isBirthdayCalendarEnabled = $this->getParameter('caldav_enabled') && $this->getParameter('carddav_enabled');

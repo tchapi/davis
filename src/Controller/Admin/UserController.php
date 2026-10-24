@@ -8,6 +8,7 @@ use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
+use App\Entity\PropertyStorage;
 use App\Entity\SchedulingObject;
 use App\Entity\User;
 use App\Form\UserType;
@@ -197,6 +198,14 @@ class UserController extends AbstractController
         $doctrine->getRepository(AppKey::class)->forgetUser($user->getUsername(), new \DateTimeImmutable());
 
         $entityManager->flush();
+
+        // After the flush, so the properties are still there if the flush fails
+        $doctrine->getRepository(PropertyStorage::class)->deletePathsAndTheirChildren([
+            $principalUri,
+            'calendars/'.$user->getUsername(),
+            'addressbooks/'.$user->getUsername(),
+        ]);
+
         $this->addFlash('success', $trans->trans('user.deleted'));
 
         return $this->redirectToRoute('user_index');
