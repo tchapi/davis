@@ -762,6 +762,11 @@ An update event might have been missed. In this case, it's easy to resync all co
 bin/console dav:sync-birthday-calendar
 ```
 
+> [!WARNING]
+> This is a repair command, don't put it on a schedule. It deletes and recreates every birthday
+> event, so each run tells your clients that all of them changed and they download the lot again.
+> Birthdays are kept up to date on their own whenever a contact is added, changed or removed.
+
 # 📚 Libraries used
 
   - Symfony 7 (Licence : MIT)

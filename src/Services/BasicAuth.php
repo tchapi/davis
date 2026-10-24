@@ -41,6 +41,6 @@ final class BasicAuth extends AbstractAuth
         }
 
         // Use unsecure legacy password hashing (from legacy sabre/dav implementation)
-        return $user->getPassword() === $this->utils->hashPassword($username, $password);
+        return hash_equals($user->getPassword(), $this->utils->hashPassword($username, $password));
     }
 }
