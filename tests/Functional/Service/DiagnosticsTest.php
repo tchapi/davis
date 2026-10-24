@@ -38,6 +38,7 @@ class DiagnosticsTest extends KernelTestCase
             'webdavPublicDirWritable' => false,
             'inviteAddress' => 'no-reply@example.org',
             'mailerDsn' => 'smtp://smtp.example.org:587',
+            'appKeysEnabled' => true,
         ], $overrides);
 
         // Only for the default, writable path: some tests deliberately point somewhere unwritable
@@ -193,5 +194,26 @@ class DiagnosticsTest extends KernelTestCase
         $this->assertStringNotContainsString('hunter2', $checks['diagnostics.mailer']['value']);
         $this->assertStringNotContainsString('someone', $checks['diagnostics.mailer']['value']);
         $this->assertSame('smtp://smtp.example.org', $checks['diagnostics.mailer']['value']);
+    }
+
+    public function testActiveAppKeysAreCounted(): void
+    {
+        // The fixtures hold one active key and one revoked key
+        $check = $this->checksOf($this->diagnosticsWith())['diagnostics.app_keys'];
+
+        $this->assertSame('1', $check['value']);
+        $this->assertSame(Diagnostics::INFO, $check['severity']);
+        $this->assertSame('/app-keys/', $check['link']);
+        $this->assertStringNotContainsString('app-secret', json_encode($check));
+        $this->assertStringNotContainsString('$2y$', json_encode($check));
+    }
+
+    public function testAppKeysTurnedOff(): void
+    {
+        $check = $this->checksOf($this->diagnosticsWith(['appKeysEnabled' => false]))['diagnostics.app_keys'];
+
+        $this->assertSame('diagnostics.value.disabled', $check['value']);
+        $this->assertSame('APP_KEYS_ENABLED=true', $check['command']);
+        $this->assertNull($check['link'], 'There is no page to link to');
     }
 }

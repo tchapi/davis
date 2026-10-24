@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\AddressBook;
+use App\Entity\AppKey;
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
@@ -191,6 +192,9 @@ class UserController extends AbstractController
             }
             $entityManager->remove($addressbook);
         }
+
+        // Remove the user from the app keys that list them by name.
+        $doctrine->getRepository(AppKey::class)->forgetUser($user->getUsername(), new \DateTimeImmutable());
 
         $entityManager->flush();
         $this->addFlash('success', $trans->trans('user.deleted'));

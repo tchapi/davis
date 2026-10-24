@@ -562,6 +562,14 @@
               <source>form.username.invalid</source>
               <target>Un nom d'utilisateur ne peut contenir que des lettres, des chiffres et les caractères "_", ".", "@", "+", "'" et "-".</target>
             </trans-unit>
+            <trans-unit id="apk.v1" resname="app_key.scope.empty">
+              <source>app_key.scope.empty</source>
+              <target>Indiquez au moins un nom d'utilisateur, ou * pour tous les utilisateurs.</target>
+            </trans-unit>
+            <trans-unit id="apk.v2" resname="app_key.scope.unknown">
+              <source>app_key.scope.unknown</source>
+              <target>Ces utilisateurs n'existent pas : {{ users }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

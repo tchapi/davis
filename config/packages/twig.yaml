@@ -10,3 +10,4 @@ twig:
         webDAVEnabled: '%env(bool:WEBDAV_ENABLED)%'
         authRealm: '%env(AUTH_REALM)%'
         authMethod: '%env(AUTH_METHOD)%'
+        appKeysEnabled: '%app_keys_enabled%'

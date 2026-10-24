@@ -160,6 +160,24 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 > one is stored with bcrypt and no longer depends on the realm. Your own admin login is unaffected —
 > it comes from `ADMIN_LOGIN` / `ADMIN_PASSWORD`, not from the users table.
 
+**App keys**
+
+App keys are off by default. To use them, set `APP_KEYS_ENABLED=true`. When they are off, the app keys page, the `davis:app-key:*` commands and the app key login are not available. Existing keys stay in the database and work again if you turn the setting back on.
+
+A service that already knows who the user is (a webmail behind SSO, a scheduling tool like cal.com) can read and write a user's calendars and address books without holding that user's password. An admin creates an app key from the dashboard (or with `bin/console davis:app-key:create`), scoped to some users or to all of them, and the service logs in over HTTP Basic as `<login>*<app_id>` with the key's secret as the password, Dovecot style. Davis then acts as `<login>`.
+
+You must say which users the key can act as. List their usernames (they must already exist in Davis), or use `*` for all users (`--all-users` on the command line). `*` does not include admins, because an admin can read every calendar and address book. To let a key act as an admin, add the admin's username to the list.
+
+When logged in as `alice`, the key has the same access as alice. This includes calendars that other users shared with her. If she is a delegate for another user, it also includes that user's calendars.
+
+When you delete a user from the dashboard, Davis removes them from the keys that list them. If a key was only for that user, the key is revoked. Keys with `*` are not changed. With IMAP or LDAP, removing someone from the directory does not delete their Davis account, so their keys keep working until you delete the account or revoke the keys.
+
+Davis records which users each key has acted as, with the first and last time. You can see this on the app keys page and with `davis:app-key:list`.
+
+It works with every `AUTH_METHOD` and never contacts the backend: a wrong secret is refused outright, and a username ending in `*<something that is not an app id>` is sent to the backend as is. The login must be an existing Davis account, with exactly the same username. An app key never creates an account, even with IMAP or LDAP and `*_AUTH_USER_AUTOCREATE`, because it never asks the IMAP or LDAP server if the user is real. The account must already exist.
+
+The secret is shown once at creation and stored hashed. Keep it on the server side, never in a browser, and revoke the key (dashboard, or `davis:app-key:revoke <app_id>`) when the service goes away; an expiry date can be set when the access is meant to be temporary. This is the use case of [#183](https://github.com/tchapi/davis/issues/183).
+
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
 ```shell

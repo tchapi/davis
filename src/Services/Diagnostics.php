@@ -38,6 +38,7 @@ final class Diagnostics
         private bool $webdavPublicDirWritable,
         private ?string $inviteAddress,
         private ?string $mailerDsn,
+        private bool $appKeysEnabled = false,
     ) {
     }
 
@@ -60,6 +61,7 @@ final class Diagnostics
             ],
             'diagnostics.bucket.authentication' => [
                 $this->auth(),
+                $this->appKeys(),
                 $this->authExtension(),
             ],
             'diagnostics.bucket.scheduling' => [
@@ -235,6 +237,28 @@ final class Diagnostics
         }
 
         return $this->check(self::INFO, 'diagnostics.auth', $value, 'basic' === strtolower($this->authMethod) ? 'diagnostics.auth.realm' : null);
+    }
+
+    /**
+     * An app key can log in as any user in its scope without their password, so we show the
+     * count next to the auth method. We never show secrets (they are only stored hashed).
+     */
+    private function appKeys(): array
+    {
+        if (!$this->appKeysEnabled) {
+            return $this->check(self::INFO, 'diagnostics.app_keys', 'diagnostics.value.disabled', 'diagnostics.app_keys.disabled', 'APP_KEYS_ENABLED=true');
+        }
+
+        try {
+            $count = (int) $this->connection->fetchOne(
+                'SELECT COUNT(*) FROM app_keys WHERE revoked_at IS NULL OR revoked_at > :now',
+                ['now' => (new \DateTimeImmutable())->format('Y-m-d H:i:s')]
+            );
+        } catch (\Throwable $e) {
+            return $this->check(self::INFO, 'diagnostics.app_keys', $e->getMessage());
+        }
+
+        return $this->check(self::INFO, 'diagnostics.app_keys', (string) $count, 'diagnostics.app_keys.help', null, $this->router->generate('app_key_index'));
     }
 
     /**

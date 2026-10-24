@@ -829,6 +829,138 @@
         <source>diagnostics.webdav_public_dir.everyone.hint</source>
         <target>Tous les utilisateurs authentifiés peuvent y créer, modifier et supprimer des fichiers. Mettez WEBDAV_PUBLIC_DIR_WRITABLE=false pour réserver l'écriture aux administrateurs.</target>
       </trans-unit>
+      <trans-unit id="dbg055" resname="diagnostics.app_keys">
+        <source>diagnostics.app_keys</source>
+        <target>Clés d'application</target>
+      </trans-unit>
+      <trans-unit id="dbg056" resname="diagnostics.app_keys.help">
+        <source>diagnostics.app_keys.help</source>
+        <target>Nombre de clés actives. Chacune agit au nom de n'importe quel utilisateur de son périmètre sans jamais passer par son mot de passe : gardez les secrets côté serveur et révoquez une clé quand le service qui la détient disparaît.</target>
+      </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.app_keys.disabled">
+        <source>diagnostics.app_keys.disabled</source>
+        <target>Les clés d'application sont désactivées. Pour les utiliser, définissez APP_KEYS_ENABLED=true.</target>
+      </trans-unit>
+      <trans-unit id="dbg058" resname="diagnostics.value.disabled">
+        <source>diagnostics.value.disabled</source>
+        <target>désactivées</target>
+      </trans-unit>
+      <trans-unit id="apk01" resname="title.app_keys">
+        <source>title.app_keys</source>
+        <target>Clés d'application</target>
+      </trans-unit>
+      <trans-unit id="apk02" resname="app_keys.new">
+        <source>app_keys.new</source>
+        <target>Nouvelle clé d'application</target>
+      </trans-unit>
+      <trans-unit id="apk03" resname="app_keys.back">
+        <source>app_keys.back</source>
+        <target>Retour aux clés d'application</target>
+      </trans-unit>
+      <trans-unit id="apk04" resname="app_keys.app_id">
+        <source>app_keys.app_id</source>
+        <target>Identifiant</target>
+      </trans-unit>
+      <trans-unit id="apk05" resname="app_keys.scope">
+        <source>app_keys.scope</source>
+        <target>Périmètre</target>
+      </trans-unit>
+      <trans-unit id="apk06" resname="app_keys.scope.all">
+        <source>app_keys.scope.all</source>
+        <target>Tous les utilisateurs sauf les admins</target>
+      </trans-unit>
+      <trans-unit id="apk07" resname="app_keys.created">
+        <source>app_keys.created</source>
+        <target>Créée</target>
+      </trans-unit>
+      <trans-unit id="apk08" resname="app_keys.last_used">
+        <source>app_keys.last_used</source>
+        <target>Dernière utilisation</target>
+      </trans-unit>
+      <trans-unit id="apk09" resname="app_keys.never">
+        <source>app_keys.never</source>
+        <target>jamais</target>
+      </trans-unit>
+      <trans-unit id="apk10" resname="app_keys.status.active">
+        <source>app_keys.status.active</source>
+        <target>Active</target>
+      </trans-unit>
+      <trans-unit id="apk11" resname="app_keys.status.expires">
+        <source>app_keys.status.expires</source>
+        <target>Expire le {date}</target>
+      </trans-unit>
+      <trans-unit id="apk12" resname="app_keys.status.revoked">
+        <source>app_keys.status.revoked</source>
+        <target>Révoquée le {date}</target>
+      </trans-unit>
+      <trans-unit id="apk13" resname="app_keys.revoke">
+        <source>app_keys.revoke</source>
+        <target>Révoquer</target>
+      </trans-unit>
+      <trans-unit id="apk14" resname="app_keys.saved">
+        <source>app_keys.saved</source>
+        <target>La clé d'application a été créée</target>
+      </trans-unit>
+      <trans-unit id="apk15" resname="app_keys.revoked">
+        <source>app_keys.revoked</source>
+        <target>La clé d'application a été révoquée</target>
+      </trans-unit>
+      <trans-unit id="apk16" resname="app_keys.secret.title">
+        <source>app_keys.secret.title</source>
+        <target>Secret de «{name}»</target>
+      </trans-unit>
+      <trans-unit id="apk17" resname="app_keys.secret.text">
+        <source>app_keys.secret.text</source>
+        <target>Copiez-le maintenant : il n'est pas stocké et ne sera plus affiché.</target>
+      </trans-unit>
+      <trans-unit id="apk18" resname="app_keys.secret.username">
+        <source>app_keys.secret.username</source>
+        <target>Les clients se connectent en HTTP Basic avec le nom d'utilisateur &lt;login&gt;*{appId} et ce secret comme mot de passe.</target>
+      </trans-unit>
+      <trans-unit id="apk19" resname="app_keys.modal.title">
+        <source>app_keys.modal.title</source>
+        <target>Révoquer cette clé d'application ?</target>
+      </trans-unit>
+      <trans-unit id="apk20" resname="app_keys.modal.text">
+        <source>app_keys.modal.text</source>
+        <target>Tous les clients qui l'utilisent seront refusés à partir de maintenant. C'est irréversible.</target>
+      </trans-unit>
+      <trans-unit id="apk21" resname="no.app_keys.yet">
+        <source>no.app_keys.yet</source>
+        <target>Aucune clé d'application pour l'instant</target>
+      </trans-unit>
+      <trans-unit id="apk28" resname="app_keys.used_as">
+        <source>app_keys.used_as</source>
+        <target>Utilisée en tant que</target>
+      </trans-unit>
+      <trans-unit id="apk29" resname="app_keys.used_as.more">
+        <source>app_keys.used_as.more</source>
+        <target>et {count} autres</target>
+      </trans-unit>
+      <trans-unit id="apk22" resname="form.app_key.name">
+        <source>form.app_key.name</source>
+        <target>Nom</target>
+      </trans-unit>
+      <trans-unit id="apk23" resname="form.app_key.scope">
+        <source>form.app_key.scope</source>
+        <target>Utilisateurs</target>
+      </trans-unit>
+      <trans-unit id="apk24" resname="form.app_key.scope.help">
+        <source>form.app_key.scope.help</source>
+        <target>Un nom d'utilisateur par ligne. Utilisez * pour tous les utilisateurs sauf les admins. Pour inclure un admin, ajoutez son nom d'utilisateur. La clé voit tout ce que l'utilisateur voit, y compris les calendriers partagés avec lui et ceux dont il est délégué.</target>
+      </trans-unit>
+      <trans-unit id="apk25" resname="form.app_key.expires_at">
+        <source>form.app_key.expires_at</source>
+        <target>Expire le</target>
+      </trans-unit>
+      <trans-unit id="apk26" resname="form.app_key.expires_at.help">
+        <source>form.app_key.expires_at.help</source>
+        <target>Facultatif. La clé cesse de fonctionner dès le début de ce jour ; laissez vide pour une clé qui n'expire jamais. Vous pouvez aussi la révoquer à tout moment.</target>
+      </trans-unit>
+      <trans-unit id="apk27" resname="form.app_key.expires_at.clear">
+        <source>form.app_key.expires_at.clear</source>
+        <target>Pas d'expiration</target>
+      </trans-unit>
       <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
         <source>diagnostics.broken_subscriptions.help</source>
         <target>Un abonnement de calendrier sans source empêche toute la liste de calendriers de son propriétaire de se charger. Seule une écriture directe en base peut en produire un : ce nombre est donc normalement nul.</target>
