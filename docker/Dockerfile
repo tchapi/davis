@@ -107,6 +107,12 @@ RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev 
 # otherwise PHP-FPM can neither write its cache nor its logs (500 on every request, and no log to tell)
 RUN mkdir -p var/log var/cache && chown -R ${FPM_USER} var
 
+COPY ./docker/configurations/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 USER $FPM_USER
 
 HEALTHCHECK --interval=30s --timeout=1s CMD ["php-fpm-healthcheck"]
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]
