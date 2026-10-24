@@ -40,7 +40,7 @@
             </div>
             {% endif %}
         </div>
-        <p class="mb-1">{{ "app_keys.app_id"|trans }} : <code>{{ key.appId }}</code></p>
+        <p class="mb-1">{{ "app_keys.app_id"|trans }} : <code class="app-id">{{ key.appId }}</code></p>
         <p class="mb-1">{{ "app_keys.scope"|trans }} : {% if key.isAllUsers %}<span class="badge bg-primary">{{ "app_keys.scope.all"|trans }}</span> {% endif %}{% if key.namedUsers %}<code>{{ key.namedUsers|join(', ') }}</code>{% endif %}</p>
         {% set keyUsages = usages[key.id] ?? [] %}
         <p class="mb-1">{{ "app_keys.used_as"|trans }} :

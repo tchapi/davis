@@ -162,6 +162,10 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 
 **App keys**
 
+```shell
+APP_KEYS_ENABLED=false
+```
+
 App keys are off by default. To use them, set `APP_KEYS_ENABLED=true`. When they are off, the app keys page, the `davis:app-key:*` commands and the app key login are not available. Existing keys stay in the database and work again if you turn the setting back on.
 
 A service that already knows who the user is (a webmail behind SSO, a scheduling tool like cal.com) can read and write a user's calendars and address books without holding that user's password. An admin creates an app key from the dashboard (or with `bin/console davis:app-key:create`), scoped to some users or to all of them, and the service logs in over HTTP Basic as `<login>*<app_id>` with the key's secret as the password, Dovecot style. Davis then acts as `<login>`.

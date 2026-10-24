@@ -61,6 +61,23 @@ body {
     user-select: text;
 }
 
+/* The newly created app key credentials must be copied, so let them be selected */
+#app-key-secret,
+#app-key-secret * {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* A single click selects the whole secret or app id (in the list of keys too) */
+#app-key-secret code.app-secret,
+code.app-id {
+    -webkit-user-select: all;
+    -moz-user-select: all;
+    user-select: all;
+}
+
 /* The diagnostics page exists to be copied into a bug report, so let everything be selected */
 .diagnostics-page,
 .diagnostics-page * {
