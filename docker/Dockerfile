@@ -21,7 +21,9 @@ RUN apk --no-progress --update add --no-cache \
         libjpeg-turbo \
         libpng \
         # This is for PostgreSQL
-        libpq
+        libpq \
+        # Timezone data, so that the TZ env var is honoured
+        tzdata
 
 # Build all extensions in a separate image ———————————————————————————————————————
 FROM base-image AS extension-builder
