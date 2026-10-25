@@ -225,7 +225,8 @@ class DiagnosticsTest extends KernelTestCase
 
         $this->assertSame('diagnostics.value.enabled', $check['value']);
         $this->assertSame(Diagnostics::INFO, $check['severity'], 'A deliberate setup behind a proxy is nothing to fix');
-        $this->assertSame(0, $diagnostics->attentionCount());
+        // Relative to the baseline: on SQLite the engine check warns on its own, by design.
+        $this->assertSame($this->diagnosticsWith()->attentionCount(), $diagnostics->attentionCount());
     }
 
     public function testAnAuthBypassValueThatIsIgnoredIsReported(): void
