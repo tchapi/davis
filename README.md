@@ -84,6 +84,15 @@ Dependencies
 
    And set `APP_ENV=prod` in your `.env.local` file (see below)
 
+2. Generate a unique `APP_SECRET` and set it in your `.env.local` file (or as a real environment variable, see below):
+
+    ```
+    openssl rand -hex 16
+    ```
+
+    > [!CAUTION]
+    >
+    > The `.env` file committed in this repository ships a default `APP_SECRET`. It is the same for every installation, so you **must** override it. This value is not used to encrypt any data: you can change it at any time without losing anything.
 
 3. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
 
@@ -109,7 +118,7 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 
 > [!CAUTION]
 >
-> In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data.
+> In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data, and `APP_SECRET` MUST be set to a unique value (see the installation steps above).
 
 **a. The database driver and url** (_you should already have it configured since you created the database previously_)
 
