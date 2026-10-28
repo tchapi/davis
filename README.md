@@ -780,6 +780,23 @@ bin/console dav:sync-birthday-calendar
 > event, so each run tells your clients that all of them changed and they download the lot again.
 > Birthdays are kept up to date on their own whenever a contact is added, changed or removed.
 
+### macOS Calendar shows "There was a problem accessing the availability for this account"
+
+macOS Calendar reads the user's availability (the hours they can be invited, RFC 7953) from the `calendar-availability` property of their scheduling inbox (`/dav/calendars/<user>/inbox/`) when the account settings are opened. Like any sabre/dav server (Baïkal behaves the same), Davis only stores that property once a client has written it, so for a new user it does not exist. Calendar treats a missing value as an error, whatever the server answers (a `404`, or the empty `418` propstat sabre/dav returns because Calendar asks for a minimal response), and never writes a default itself.
+
+Davis therefore answers with a default availability, **weekdays from 09:00 to 17:00**, until the user saves their own in Calendar. A few things to know:
+
+- The default is only shown to clients: free-busy lookups (when someone checks whether the user is free before inviting them) keep treating a user who never saved an availability as **always available**, as before. Once the user saves their availability, it applies everywhere.
+- The times are "floating": every client reads 09:00 to 17:00 in its own time zone.
+- Calendar asks for the property under its old Apple name (`{http://calendarserver.org/ns/}calendar-availability`), which sabre/dav maps to the standard one (`{urn:ietf:params:xml:ns:caldav}calendar-availability`): both names read and write the same value.
+
+To check what a user has, run a PROPFIND on their inbox (it returns the default if nothing is stored):
+
+```shell
+curl -u <user>:<password> -X PROPFIND -H 'Depth: 0' https://dav.example.org/dav/calendars/<user>/inbox/ \
+  --data '<d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-availability/></d:prop></d:propfind>'
+```
+
 # 📚 Libraries used
 
   - Symfony 7 (Licence : MIT)

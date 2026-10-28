@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Plugins\BirthdayCalendarPlugin;
 use App\Plugins\DavisIMipPlugin;
 use App\Plugins\DavisTemporaryFileFilterPlugin;
+use App\Plugins\DefaultAvailabilityPlugin;
 use App\Plugins\PublicAwareDAVACLPlugin;
 use App\Services\BasicAuth;
 use App\Services\BirthdayService;
@@ -306,6 +307,8 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\DAV\Sharing\Plugin());
             $this->server->addPlugin(new \Sabre\CalDAV\Plugin());
             $this->server->addPlugin(new \Sabre\CalDAV\Schedule\Plugin());
+            // Issue #317: macOS Calendar needs calendar-availability to exist on the inbox
+            $this->server->addPlugin(new DefaultAvailabilityPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\Subscriptions\Plugin());
