@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\User;
 
 use App\Entity\AppKey;
 use App\Form\AppKeyType;
@@ -10,10 +10,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 // When APP_KEYS_ENABLED is off, these routes don't match and return a 404
 #[Route('/app-keys', name: 'app_key_', condition: "service('app_keys').isEnabled()")]
+#[IsGranted('ROLE_ADMIN')]
 class AppKeyController extends AbstractController
 {
     #[Route('/', name: 'index')]
