@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\User;
+namespace App\Controller\Admin;
 
 use App\Entity\AppKey;
 use App\Form\AppKeyType;
