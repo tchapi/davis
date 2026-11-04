@@ -1,22 +1,33 @@
 <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
   <div class="container">
+  	{% if admin_logged %}
     <a class="navbar-brand" href="{{ path('dashboard') }}">
       <img src="{{ asset('images/logo.png') }}" width="30" height="30" alt=""> Davis
     </a>
+	{% elseif user_logged %}
+    <a class="navbar-brand" href="{{ path('user_user', {userId: user_logged_id}) }}">
+      <img src="/images/logo.png" width="30" height="30" alt=""> Davis
+    </a>
+	{% else %}
+    <a class="navbar-brand" href="{{ path('app_login') }}">
+      <img src="/images/logo.png" width="30" height="30" alt=""> Davis
+    </a>
+	{% endif %}
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="{{ "toggle.navigation"|trans }}">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
+  	  	{% if admin_logged %}
         <li class="nav-item{% if menu == "dashboard" %} active{% endif %}">
           <a class="nav-link" href="{{ path('dashboard') }}">{{ "title.dashboard"|trans }}</a>
         </li>
         <li class="nav-item{% if menu == "resources" %} active{% endif %}">
           <a class="nav-link" href="{{ path('user_index') }}">{{ "title.users_and_resources"|trans }}</a>
         </li>
+	  	{% endif %}
       </ul>
       {# With the auth bypass, nobody is logged in: there is no username to show and nothing to log out of #}
-      {% set authBypassed = not app.user and adminAuthBypass == 'true' %}
       {% if app.user or authBypassed %}
       <ul class="navbar-nav">
         {% if app.user or appKeysEnabled %}
@@ -25,11 +36,11 @@
             {% if authBypassed %}🔓 {{ "auth_bypass.label"|trans }}{% else %}👤 {{ app.user.username }}{% endif %}
           </a>
           <div class="dropdown-menu" aria-labelledby="navUserMenu">
-            {% if appKeysEnabled %}
+            {% if admin_logged and appKeysEnabled %}
             <a class="dropdown-item" href="{{ path('app_key_index') }}">{{ "title.app_keys"|trans }}</a>
             {% endif %}
             {% if app.user %}
-            {% if appKeysEnabled %}<div class="dropdown-divider"></div>{% endif %}
+            {% if admin_logged and appKeysEnabled %}<div class="dropdown-divider"></div>{% endif %}
             <a class="dropdown-item" href="{{ path('app_logout', {_csrf_token: csrf_token('logout')}) }}">{{ "logout"|trans }}</a>
             {% endif %}
           </div>

@@ -9,11 +9,16 @@
         <form>
           <div class="form-group">
             <label for="member" class="col-form-label">{{ "calendars.delegates.member"|trans }}</label>
+			{% if admin_logged %}
             <select class="form-control" id="addDelegateModal-member">
               {% for principal in principals %}
                 <option value="{{ principal.id}}">{{ principal.displayName }} ({{ principal.email }})</option>
               {% endfor %}
             </select>
+			{% elseif user_logged %}
+			{# do not show to normal users the whole list of users #}
+			<input type="text" class="form-control" id="addDelegateModal-member" placeholder="{{ "calendars.delegates.member.add.username"|trans }}"></input>
+			{% endif %}
             <small class="form-text text-muted">{{ "delegates.member.help"|trans }}</small>
           </div>
           <div class="form-check form-switch mt-2">

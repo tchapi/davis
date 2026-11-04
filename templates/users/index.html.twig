@@ -3,7 +3,9 @@
 
 {% block body %}
 
+{% if admin_logged %}
 <h1 class="display-4 d-flex fw-lighter justify-content-between">{{ "title.users_and_resources"|trans }}<a href="{{ path('user_create') }}" class="btn btn-sm btn-success mb-auto mt-auto">+ {{ "users.new"|trans }}</a></h1>
+{% endif %}
 
 <div class="list-group mt-4">
 {% for result in results %}

@@ -20,6 +20,8 @@ parameters:
     default_webdav_public_dir_writable: "false"
     app_keys_enabled: "%env(bool:default:default_app_keys_enabled:APP_KEYS_ENABLED)%"
     default_app_keys_enabled: "false"
+    user_auth_enabled: "%env(bool:default:default_user_auth_enabled:USER_AUTH_ENABLED)%"
+    default_user_auth_enabled: "false"
 
 services:
     # default configuration for services in *this* file
@@ -101,6 +103,11 @@ services:
             $webdavPublicDirWritable: "%webdav_public_dir_writable%"
 
     App\Security\LoginFormAuthenticator:
+        arguments:
+            $adminLogin: "%env(ADMIN_LOGIN)%"
+            $adminPassword: "%env(ADMIN_PASSWORD)%"
+
+    App\Security\UserProvider:
         arguments:
             $adminLogin: "%env(ADMIN_LOGIN)%"
             $adminPassword: "%env(ADMIN_PASSWORD)%"
