@@ -37,4 +37,9 @@
                 Permissions-Policy "camera=(), microphone=(), geolocation=()"
         }
 
+        # Every URL Davis emits for these carries a `?<version>` that changes with the release, so a
+        # stale copy can never be served: a new release is a new URL
+        @static path *.css *.js *.png *.jpg *.jpeg *.gif *.svg *.ico *.woff *.woff2
+        header @static Cache-Control "public, max-age=31536000, immutable"
+
 }

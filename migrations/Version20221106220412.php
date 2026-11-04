@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,7 +20,9 @@ final class Version20221106220412 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'postgresql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            return;
+        }
 
         $this->addSql('CREATE SEQUENCE addressbooks_id_seq INCREMENT BY 1 MINVALUE 1 START 1;');
         $this->addSql('CREATE SEQUENCE calendars_id_seq INCREMENT BY 1 MINVALUE 1 START 1;');
@@ -68,7 +71,9 @@ final class Version20221106220412 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('postgresql' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'postgresql\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE cards DROP CONSTRAINT FK_4C258FD8B26C2E9;');
         $this->addSql('ALTER TABLE calendarinstances DROP CONSTRAINT FK_51856561B8CB7204;');

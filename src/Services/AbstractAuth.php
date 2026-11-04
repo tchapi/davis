@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Entity\AppKey;
+use App\Repository\AppKeyRepository;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 use Sabre\HTTP\RequestInterface;
 use Sabre\HTTP\ResponseInterface;
@@ -21,6 +23,8 @@ use Sabre\HTTP\ResponseInterface;
  * is exactly the URI Davis uses for alice's delegation proxy. Only structural characters are
  * refused here, not the stricter set required when creating an account, so that an unusual
  * but working username keeps authenticating.
+ *
+ * App keys (`<login>*<app_id>`) are checked here too, so they work with every backend.
  */
 abstract class AbstractAuth extends AbstractBasic
 {
@@ -28,6 +32,14 @@ abstract class AbstractAuth extends AbstractBasic
      * The username as the backend spells it, when that differs from what the client sent.
      */
     private ?string $canonicalUsername = null;
+
+    private ?AppKeyRepository $appKeys = null;
+
+    public function setAppKeyRepository(?AppKeyRepository $appKeys, bool $enabled = true): void
+    {
+        // When app keys are turned off, we don't keep the repository, so `*` is a normal character
+        $this->appKeys = $enabled ? $appKeys : null;
+    }
 
     /**
      * @param string $username
@@ -39,6 +51,40 @@ abstract class AbstractAuth extends AbstractBasic
 
         if (!is_string($username) || !is_string($password) || '' === $username || '' === $password) {
             return false;
+        }
+
+        // `<login>*<app_id>`: if the part after the last `*` is an existing app id, we only
+        // check the app key and never call the backend. A wrong secret simply fails.
+        // Otherwise we do nothing here, because a real username can contain `*`.
+        if (null !== $this->appKeys && false !== ($star = strrpos($username, '*'))) {
+            $key = $this->appKeys->findOneByAppId(substr($username, $star + 1));
+
+            if (null !== $key) {
+                $login = substr($username, 0, $star);
+                $now = new \DateTimeImmutable();
+
+                if ('' === $login || self::breaksPrincipalUri($login) || !$key->accepts($login, $password, $now)) {
+                    return false;
+                }
+
+                // The login must be an existing account. Otherwise a `*` key could log in with any
+                // name, for example a principal left behind by an older version.
+                // `*` does not include admins, because they can read all calendars and address books.
+                // A key can act as an admin only if the admin's username is in its scope.
+                $account = $this->appKeys->findAccount($login, $this->principalPrefix.$login);
+                if (null === $account || ($account->getIsAdmin() && !$key->names($login))) {
+                    return false;
+                }
+
+                if (!$key->wasUsedWithin(AppKey::LAST_USED_THROTTLE, $now)) {
+                    $this->appKeys->touch($key, $now);
+                }
+                $this->appKeys->recordUse($key, $login, $now);
+
+                $this->setCanonicalUsername($login);
+
+                return true;
+            }
         }
 
         if (self::breaksPrincipalUri($username)) {

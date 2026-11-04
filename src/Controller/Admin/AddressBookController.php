@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\AddressBook;
 use App\Entity\Principal;
+use App\Entity\PropertyStorage;
 use App\Entity\User;
 use App\Form\AddressBookType;
 use App\Services\BirthdayService;
@@ -66,9 +67,6 @@ class AddressBookController extends AbstractController
 
         $form = $this->createForm(AddressBookType::class, $addressbook, ['new' => !$id, 'birthday_calendar_enabled' => $isBirthdayCalendarEnabled]);
 
-        if ($isBirthdayCalendarEnabled) {
-            $form->get('includedInBirthdayCalendar')->setData($addressbook->isIncludedInBirthdayCalendar());
-        }
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -78,12 +76,6 @@ class AddressBookController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', $trans->trans('addressbooks.saved'));
-
-            if ($isBirthdayCalendarEnabled && true === $form->get('includedInBirthdayCalendar')->getData()) {
-                $addressbook->setIncludedInBirthdayCalendar(true);
-            } else {
-                $addressbook->setIncludedInBirthdayCalendar(false);
-            }
 
             if ($isBirthdayCalendarEnabled) {
                 // Let's sync the user birthday calendar if needed
@@ -126,7 +118,14 @@ class AddressBookController extends AbstractController
         }
         $entityManager->remove($addressbook);
 
+        $addressbookUri = $addressbook->getUri();
+
         $entityManager->flush();
+
+        $doctrine->getRepository(PropertyStorage::class)->deletePathsAndTheirChildren([
+            'addressbooks/'.$username.'/'.$addressbookUri,
+        ]);
+
         $this->addFlash('success', $trans->trans('addressbooks.deleted'));
 
         $isBirthdayCalendarEnabled = $this->getParameter('caldav_enabled') && $this->getParameter('carddav_enabled');

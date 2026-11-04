@@ -99,7 +99,8 @@ class CalendarControllerTest extends WebTestCase
         $this->assertResponseRedirects('/calendars/'.$userId);
         $client->followRedirect();
 
-        $this->assertSelectorTextContains('h5', 'default.calendar.title');
+        // The list has no ORDER BY, so assert both are present rather than which comes first
+        $this->assertAnySelectorTextContains('h5', 'default.calendar.title');
         $this->assertAnySelectorTextContains('h5', 'New test calendar');
     }
 
@@ -316,6 +317,136 @@ class CalendarControllerTest extends WebTestCase
 
         $em = static::getContainer()->get('doctrine.orm.entity_manager');
         $this->assertNull($em->getRepository(CalendarInstance::class)->findOneBy(['uri' => str_repeat('a', 256)]));
+    }
+
+    /**
+     * The uri becomes a path segment under `/dav/calendars/<user>/`, so it has to be a single
+     * segment and nothing else.
+     */
+    public function testCalendarNewRefusesAUriThatIsNotOneSegment(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        foreach (['../../evil', 'a/b', 'has space', 'dots.and.more', ''] as $uri) {
+            $crawler = $client->request('GET', '/calendars/'.$userId.'/new');
+            $form = $crawler->selectButton('calendar_instance_save')->form();
+
+            $client->submit($form, [
+                'calendar_instance[uri]' => $uri,
+                'calendar_instance[displayName]' => 'Traversal',
+                'calendar_instance[description]' => 'nope',
+                'calendar_instance[calendarColor]' => '#001122',
+            ]);
+
+            $this->assertResponseIsSuccessful('"'.$uri.'" should come back as a form error');
+            $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+            $this->assertNull($em->getRepository(CalendarInstance::class)->findOneBy(['uri' => $uri]));
+        }
+    }
+
+    /**
+     * The form has to accept exactly what the `colour()` macro renders, and refuse the rest: a
+     * value it accepts but the macro blanks out is a colour the admin cannot set.
+     */
+    public function testTheColourFieldAgreesWithWhatThePageRenders(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        $submit = function (string $uri, string $colour) use ($client, $userId): void {
+            $crawler = $client->request('GET', '/calendars/'.$userId.'/new');
+            $form = $crawler->selectButton('calendar_instance_save')->form();
+
+            $client->submit($form, [
+                'calendar_instance[uri]' => $uri,
+                'calendar_instance[displayName]' => 'Colour '.$uri,
+                'calendar_instance[description]' => '',
+                'calendar_instance[calendarColor]' => $colour,
+            ]);
+        };
+
+        // Lowercase and the 8-digit form the placeholder advertises were both refused before
+        foreach (['#abc', '#aabbcc', '#00112233'] as $i => $colour) {
+            $uri = 'colour_ok_'.$i;
+            $submit($uri, $colour);
+
+            $this->assertResponseRedirects('/calendars/'.$userId, null, '"'.$colour.'" should be accepted');
+            $this->assertSame($colour, $em->getRepository(CalendarInstance::class)->findOneBy(['uri' => $uri])->getCalendarColor());
+        }
+
+        foreach (['red;x:y', 'red', '#gggggg', '#12345'] as $i => $colour) {
+            $uri = 'colour_bad_'.$i;
+            $submit($uri, $colour);
+
+            $this->assertResponseIsSuccessful('"'.$colour.'" should come back as a form error');
+            $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+            $this->assertNull($em->getRepository(CalendarInstance::class)->findOneBy(['uri' => $uri]));
+        }
+    }
+
+    /**
+     * A calendar colour is whatever the owner's client sent over CalDAV, and it lands inside a
+     * `style` attribute. HTML escaping does not stop it from closing the declaration and adding
+     * its own, and SQLite does not enforce the column length, so the payload is unbounded there.
+     */
+    public function testAnInjectedCalendarColourNeverReachesTheStyleAttribute(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        // The client reboots the kernel between requests, so the entity manager has to be taken
+        // again on every pass or the flush lands in a closed one and the page never changes.
+        $store = function (string $color): void {
+            $em = static::getContainer()->get('doctrine.orm.entity_manager');
+            $em->getRepository(CalendarInstance::class)
+                ->findOneBy(['principalUri' => Principal::PREFIX.'test_user', 'uri' => 'default'])
+                ->setCalendarColor($color);
+            $em->flush();
+        };
+
+        // Ten characters is all MySQL and PostgreSQL accept in that column, and it is enough to
+        // close the declaration and open another. SQLite enforces no length at all.
+        foreach (['red;x:y', 'a;b:url(1', 'red;z:0'] as $payload) {
+            $store($payload);
+
+            $client->request('GET', '/calendars/'.$userId);
+
+            $this->assertResponseIsSuccessful();
+            $this->assertStringContainsString('background-color: transparent', $client->getResponse()->getContent(), $payload.' should not be rendered');
+            $this->assertStringNotContainsString('background-color: '.$payload, $client->getResponse()->getContent());
+        }
+
+        // A real colour still gets through, in every form the clients write
+        foreach (['#ABC', '#5A80B4', '#5A80B4FF'] as $colour) {
+            $store($colour);
+
+            $client->request('GET', '/calendars/'.$userId);
+
+            $this->assertStringContainsString('background-color: '.$colour, $client->getResponse()->getContent(), $colour.' should be rendered');
+        }
+    }
+
+    /**
+     * The uri is client-chosen, so it travels as plain data and app.js builds the popover through
+     * textContent: nothing hands it to Bootstrap as an HTML string to be sanitised.
+     */
+    public function testTheSetupPopoverCarriesNoMarkup(): void
+    {
+        $client = $this->loggedInClient();
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $client->request('GET', '/calendars/'.$userId);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('data-bs-html', $client->getResponse()->getContent());
+        $this->assertSelectorExists('a[data-bs-toggle="popover"][data-uri]');
     }
 
     public function testCalendarNewIgnoresASubmittedOwner(): void

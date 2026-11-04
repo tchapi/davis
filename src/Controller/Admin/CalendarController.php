@@ -6,6 +6,7 @@ use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
+use App\Entity\PropertyStorage;
 use App\Entity\User;
 use App\Form\CalendarInstanceType;
 use Doctrine\Persistence\ManagerRegistry;
@@ -294,7 +295,14 @@ class CalendarController extends AbstractController
         // Finally remove the calendar itself
         $entityManager->remove($instance->getCalendar());
 
+        $calendarUri = $instance->getUri();
+
         $entityManager->flush();
+
+        $doctrine->getRepository(PropertyStorage::class)->deletePathsAndTheirChildren([
+            'calendars/'.$user->getUsername().'/'.$calendarUri,
+        ]);
+
         $this->addFlash('success', $trans->trans('calendar.deleted'));
 
         return $this->redirectToRoute('calendar_index', ['userId' => $userId]);

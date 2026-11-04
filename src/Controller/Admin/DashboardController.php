@@ -7,6 +7,7 @@ use App\Entity\CalendarInstance;
 use App\Entity\CalendarObject;
 use App\Entity\Card;
 use App\Entity\User;
+use App\Services\Diagnostics;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'dashboard')]
-    public function dashboard(ManagerRegistry $doctrine): Response
+    public function dashboard(ManagerRegistry $doctrine, Diagnostics $diagnostics): Response
     {
         $usersCount = $doctrine->getRepository(User::class)->count([]);
         $calendarsCount = $doctrine->getRepository(CalendarInstance::class)->count([]);
@@ -23,21 +24,13 @@ class DashboardController extends AbstractController
         $eventsCount = $doctrine->getRepository(CalendarObject::class)->count([]);
         $contactsCount = $doctrine->getRepository(Card::class)->count([]);
 
-        $timezoneParameter = $this->getParameter('timezone');
-
         return $this->render('dashboard.html.twig', [
             'usersCount' => $usersCount,
             'calendarsCount' => $calendarsCount,
             'addressBooksCount' => $addressBooksCount,
             'eventsCount' => $eventsCount,
             'contactsCount' => $contactsCount,
-            'timezone' => [
-                'actual_default' => date_default_timezone_get(),
-                'not_set_in_app' => '' === $timezoneParameter,
-                'bad_value' => '' !== $timezoneParameter && !in_array($timezoneParameter, \DateTimeZone::listIdentifiers()),
-            ],
-            'version' => \App\Version::VERSION,
-            'sabredav_version' => \Sabre\DAV\Version::VERSION,
+            'attentionCount' => $diagnostics->attentionCount(),
         ]);
     }
 }

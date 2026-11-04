@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Entity\AddressBook;
+use App\Entity\AppKey;
 use App\Entity\Calendar;
 use App\Entity\CalendarInstance;
 use App\Entity\CalendarSubscription;
 use App\Entity\Principal;
+use App\Entity\PropertyStorage;
 use App\Entity\SchedulingObject;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
@@ -202,5 +204,17 @@ final class Utils
             }
             $entityManager->remove($addressbook);
         }
+
+        // Remove the user from the app keys that list them by name.
+        $this->doctrine->getRepository(AppKey::class)->forgetUser($user->getUsername(), new \DateTimeImmutable());
+
+        $entityManager->flush();
+
+        // After the flush, so the properties are still there if the flush fails
+        $this->doctrine->getRepository(PropertyStorage::class)->deletePathsAndTheirChildren([
+            $principalUri,
+            'calendars/'.$user->getUsername(),
+            'addressbooks/'.$user->getUsername(),
+        ]);
     }
 }

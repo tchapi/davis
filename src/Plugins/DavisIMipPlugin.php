@@ -5,12 +5,16 @@ namespace App\Plugins;
 use DantSu\OpenStreetMapStaticAPI\LatLng;
 use DantSu\OpenStreetMapStaticAPI\Markers;
 use DantSu\OpenStreetMapStaticAPI\OpenStreetMap;
+use Psr\Log\LoggerInterface;
 use Sabre\CalDAV\Schedule\IMipPlugin as SabreBaseIMipPlugin;
 use Sabre\DAV;
+use Sabre\VObject;
 use Sabre\VObject\ITip;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * iMIP handler.
@@ -35,13 +39,130 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
     protected $publicDir;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var DAV\Server
+     */
+    private $server;
+
+    /**
      * Creates the email handler.
      */
-    public function __construct(MailerInterface $mailer, string $senderEmail, string $publicDir)
+    public function __construct(MailerInterface $mailer, string $senderEmail, string $publicDir, LoggerInterface $logger)
     {
         $this->mailer = $mailer;
         $this->senderEmail = $senderEmail;
         $this->publicDir = $publicDir;
+        $this->logger = $logger;
+    }
+
+    public function initialize(DAV\Server $server)
+    {
+        parent::initialize($server);
+
+        $this->server = $server;
+
+        // sabre only emits `schedule` when it has decided to send an iTIP message. These two
+        // events fire on every calendar object that gets written, sent or not.
+        $server->on('afterCreateFile', function (string $path) {
+            $this->explainMissingScheduling($path);
+        });
+        // This one already hands us the node, so there is no need to look it up again
+        $server->on('afterWriteContent', function (string $path, DAV\INode $node) {
+            $this->explainMissingScheduling($path, $node);
+        });
+    }
+
+    /**
+     * Logs why an event with attendees did not produce an invitation.
+     *
+     * When sabre decides not to schedule, it saves the event and emits nothing, so `schedule()`
+     * below is never called and the log stays empty. This runs the same two checks sabre runs
+     * (`Sabre\CalDAV\Schedule\Plugin::calendarObjectChange()`) and logs the one that failed.
+     *
+     * It runs after the object has been written, so it cannot affect the write.
+     */
+    public function explainMissingScheduling(string $path, ?DAV\INode $node = null): void
+    {
+        try {
+            $node = $node ?? $this->server->tree->getNodeForPath($path);
+            if (!$node instanceof \Sabre\CalDAV\ICalendarObject) {
+                return;
+            }
+
+            $vCal = VObject\Reader::read($node->get());
+            if (!isset($vCal->VEVENT)) {
+                return;
+            }
+
+            $vevent = $vCal->VEVENT;
+
+            // An event with no attendees or no organiser is never scheduled
+            if (!isset($vevent->ATTENDEE) || !isset($vevent->ORGANIZER)) {
+                return;
+            }
+
+            if ('F' === $this->server->httpRequest->getHeader('Schedule-Reply')) {
+                $this->logger->warning('Scheduling: the client asked not to send invitations for this event (Schedule-Reply: F).', ['path' => $path]);
+
+                return;
+            }
+
+            $organizer = (string) $vevent->ORGANIZER;
+            $addresses = $this->addressesForCalendarOf($path);
+
+            if (!\in_array($organizer, $addresses, true)) {
+                $this->logger->warning(
+                    'Scheduling: no invitation will be sent because the event organiser is not one of this account\'s calendar addresses. Set the account\'s email to the address its client sends as ORGANIZER.',
+                    [
+                        'organizer' => $organizer,
+                        'account_addresses' => $addresses ?: '(none: the principal has no email)',
+                        'path' => $path,
+                    ]
+                );
+
+                return;
+            }
+
+            foreach ($vevent->ATTENDEE as $attendee) {
+                if (isset($attendee['SCHEDULE-AGENT']) && 'CLIENT' === strtoupper((string) $attendee['SCHEDULE-AGENT'])) {
+                    $this->logger->warning('Scheduling: an attendee is marked SCHEDULE-AGENT=CLIENT, so the client sends that invitation itself and Davis does not.', [
+                        'attendee' => (string) $attendee,
+                        'path' => $path,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            // This only logs, so never let it break a write that already succeeded
+            $this->logger->debug('Scheduling: could not inspect the stored object', ['path' => $path, 'exception' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Returns the addresses of the account that owns this calendar, read from the same
+     * `calendar-user-address-set` property sabre uses.
+     *
+     * @return string[]
+     */
+    private function addressesForCalendarOf(string $path): array
+    {
+        $calendar = $this->server->tree->getNodeForPath(\dirname($path));
+        if (!$calendar instanceof \Sabre\DAVACL\IACL) {
+            return [];
+        }
+
+        $owner = $calendar->getOwner();
+        if (!$owner) {
+            return [];
+        }
+
+        $addressSet = '{'.\Sabre\CalDAV\Plugin::NS_CALDAV.'}calendar-user-address-set';
+        $properties = $this->server->getProperties($owner, [$addressSet]);
+
+        return isset($properties[$addressSet]) ? $properties[$addressSet]->getHrefs() : [];
     }
 
     /**
@@ -52,6 +173,8 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         // Not sending any emails if the system considers the update
         // insignificant.
         if (!$itip->significantChange) {
+            $this->logger->debug('iMIP: no email for an insignificant change', ['method' => $itip->method, 'recipient' => $itip->recipient]);
+
             if (empty($itip->scheduleStatus)) {
                 $itip->scheduleStatus = '1.0;We got the message, but it\'s not significant enough to warrant an email';
             }
@@ -63,6 +186,9 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 
         if ('mailto' !== parse_url($itip->sender, PHP_URL_SCHEME)
             || 'mailto' !== parse_url($itip->recipient, PHP_URL_SCHEME)) {
+            // iTIP allows other schemes; this plugin only knows how to send email.
+            $this->logger->warning('iMIP: not an email exchange, no invitation sent', ['sender' => $itip->sender, 'recipient' => $itip->recipient]);
+
             return;
         }
 
@@ -90,6 +216,9 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         }
 
         $subject = 'CalDAV message';
+        // Anything other than the three methods below leaves the template without an action to
+        // render, so the message is not one this plugin knows how to word.
+        $action = null;
         switch (strtoupper($itip->method)) {
             case 'REPLY':
                 // In the case of a reply, we need to find the `PARTSTAT` from
@@ -109,6 +238,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                         $action = 'TENTATIVE';
                         break;
                     default:
+                        $this->logger->warning('iMIP: unsupported PARTSTAT in a REPLY, no email sent', ['partstat' => $partstat, 'recipient' => $itip->recipient]);
                         $itip->scheduleStatus = '5.0;Email not delivered. We didn\'t understand this PARTSTAT.';
 
                         return;
@@ -123,6 +253,11 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $subject = '"'.$summary.'" has been canceled.';
                 $action = 'CANCEL';
                 break;
+            default:
+                $this->logger->warning('iMIP: unsupported iTIP method, no email sent', ['method' => $itip->method, 'recipient' => $itip->recipient]);
+                $itip->scheduleStatus = '5.0;Email not delivered. We don\'t know how to send this iTIP method.';
+
+                return;
         }
 
         // Construct objects for the mail template
@@ -172,7 +307,9 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             return $else;
         };
 
-        $url = $notEmpty('URL', false);
+        // The invitation renders this as a link, and it is whatever the organiser's client put in
+        // VEVENT.URL. Anything but a web or mail address is dropped rather than made clickable.
+        $url = $this->linkableUrl($notEmpty('URL', false));
         $description = $notEmpty('DESCRIPTION', false);
         $location = $notEmpty('LOCATION', false);
         $locationImageDataAsBase64 = false;
@@ -192,14 +329,21 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $latLng = new LatLng($coordinates['latitude'], $coordinates['longitude']);
 
                 // https://github.com/DantSu/php-osm-static-api
-                $locationImageDataAsBase64 = (new OpenStreetMap($latLng, $zoom, $width, $height))
-                    ->addMarkers(
-                        (new Markers($this->publicDir.'/images/marker.png'))
-                            ->setAnchor(Markers::ANCHOR_CENTER, Markers::ANCHOR_BOTTOM)
-                            ->addMarker(new LatLng($coordinates['latitude'], $coordinates['longitude']))
-                    )
-                    ->getImage()
-                    ->getBase64PNG();
+                // This fetches map tiles over the network. The map is decoration on an invitation,
+                // so a tile server that is unreachable or slow must not take the invitation — and
+                // with it the client's PUT — down with it.
+                try {
+                    $locationImageDataAsBase64 = (new OpenStreetMap($latLng, $zoom, $width, $height))
+                        ->addMarkers(
+                            (new Markers($this->publicDir.'/images/marker.png'))
+                                ->setAnchor(Markers::ANCHOR_CENTER, Markers::ANCHOR_BOTTOM)
+                                ->addMarker(new LatLng($coordinates['latitude'], $coordinates['longitude']))
+                        )
+                        ->getImage()
+                        ->getBase64PNG();
+                } catch (\Throwable $e) {
+                    $this->logger->warning('iMIP: the location map could not be rendered, sending the invitation without it', ['exception' => $e->getMessage()]);
+                }
 
                 $locationLink =
                     'https://www.openstreetmap.org'.
@@ -224,11 +368,24 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             $mailSenderName = $senderEmail.' '.static::MESSAGE_ORIGIN_INDICATOR;
         }
 
-        $message = (new TemplatedEmail())
-            ->from(new Address($this->senderEmail, $mailSenderName))
-            ->to(new Address($recipientEmail, $recipientName ?? ''))
-            ->replyTo(new Address($senderEmail, $mailSenderName))
-            ->subject($subject);
+        try {
+            $message = (new TemplatedEmail())
+                ->from(new Address($this->senderEmail, $mailSenderName))
+                ->to(new Address($recipientEmail, $recipientName ?? ''))
+                ->replyTo(new Address($senderEmail, $mailSenderName))
+                ->subject($subject);
+        } catch (RfcComplianceException $e) {
+            // An attendee address comes from the organiser's client and is not validated anywhere
+            // before this point. Letting it through would abort the PUT that triggered it.
+            $this->logger->error('iMIP: an address in the invitation is not a valid email address, no email sent', [
+                'sender' => $senderEmail,
+                'recipient' => $recipientEmail,
+                'exception' => $e->getMessage(),
+            ]);
+            $itip->scheduleStatus = '5.3;Email not delivered. One of the addresses is not a valid email address.';
+
+            return;
+        }
 
         // Keep holiday auto-replies from bouncing back at invitations.
         $message->getHeaders()->addTextHeader('X-Auto-Response-Suppress', 'OOF, DR, RN, NRN, AutoReply');
@@ -259,11 +416,43 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             $message->attach($itip->message->serialize(), 'invite.ics', 'text/calendar; method='.(string) $itip->method.'; charset=UTF-8');
         }
 
-        $this->mailer->send($message);
+        try {
+            $this->mailer->send($message);
+        } catch (TransportExceptionInterface $e) {
+            // The scheduling message is a side effect of storing the event: if the mail cannot be
+            // sent, the event still has to be saved. Throwing here would surface as a 500 on the
+            // client's PUT and lose it.
+            $this->logger->error('iMIP: the invitation could not be sent', [
+                'recipient' => $recipientEmail,
+                'method' => $itip->method,
+                'exception' => $e->getMessage(),
+            ]);
+            $itip->scheduleStatus = '5.1;Email not delivered. The mail transport is unavailable.';
+
+            return;
+        }
+
+        $this->logger->info('iMIP: invitation sent', ['recipient' => $recipientEmail, 'method' => $itip->method]);
 
         if (false === $deliveredLocally) {
             $itip->scheduleStatus = '1.1;Scheduling message is sent via iMip.';
         }
+    }
+
+    /**
+     * @param string|false $url
+     *
+     * @return string|false the url if it is one a mail client should offer to open, false otherwise
+     */
+    private function linkableUrl($url)
+    {
+        if (!is_string($url) || '' === $url) {
+            return false;
+        }
+
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
+        return \in_array(strtolower((string) $scheme), ['http', 'https', 'mailto'], true) ? $url : false;
     }
 
     /**

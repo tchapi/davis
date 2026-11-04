@@ -19,12 +19,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
 
     public function __construct(string $apiKey)
     {
-        // Disable API endpoint if no API key is set
-        if (hash_equals('', trim($apiKey))) {
-            throw new \LogicException('API endpoint is disabled.');
-        }
-
-        $this->apiKey = $apiKey;
+        $this->apiKey = trim($apiKey);
     }
 
     public function supports(Request $request): ?bool
@@ -41,6 +36,12 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): Passport
     {
+        // No key configured means the API is off. It is reported per request so that the
+        // public health endpoint keeps answering.
+        if ('' === $this->apiKey) {
+            throw new CustomUserMessageAuthenticationException('The API is disabled: no API_KEY is configured.');
+        }
+
         $apiToken = $request->headers->get('X-Davis-API-Token');
         if (null === $apiToken) {
             throw new CustomUserMessageAuthenticationException('Missing X-Davis-API-Token header');

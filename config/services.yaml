@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     default_database_driver: "mysql"
+    # Compared to the string "true" (case-sensitive) everywhere, as security.yaml does
+    admin_auth_bypass: "%env(default:default_admin_auth_bypass:ADMIN_AUTH_BYPASS)%"
     default_admin_auth_bypass: "false"
     timezone: '%env(APP_TIMEZONE)%'
     public_calendars_enabled: '%env(default:default_public_calendars_enabled:bool:PUBLIC_CALENDARS_ENABLED)%'
@@ -13,12 +15,22 @@ parameters:
     default_birthday_reminder_offset: "PT9H"
     caldav_enabled: "%env(bool:CALDAV_ENABLED)%"
     carddav_enabled: "%env(bool:CARDDAV_ENABLED)%"
+    # `bool:` must wrap `default:` so that the fallback string is cast too
+    webdav_public_dir_writable: "%env(bool:default:default_webdav_public_dir_writable:WEBDAV_PUBLIC_DIR_WRITABLE)%"
+    default_webdav_public_dir_writable: "false"
+    app_keys_enabled: "%env(bool:default:default_app_keys_enabled:APP_KEYS_ENABLED)%"
+    default_app_keys_enabled: "false"
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    _instanceof:
+        App\Services\AbstractAuth:
+            calls:
+                - setAppKeyRepository: ['@App\Repository\AppKeyRepository', '%app_keys_enabled%']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -29,6 +41,28 @@ services:
     App\Services\Utils:
         arguments:
             $authRealm: "%env(AUTH_REALM)%"
+
+    App\Services\Diagnostics:
+        arguments:
+            $migrations: "@doctrine.migrations.dependency_factory"
+            $environment: "%kernel.environment%"
+            $debug: "%kernel.debug%"
+            $logFilePath: "%env(resolve:LOG_FILE_PATH)%"
+            $timezoneParameter: "%timezone%"
+            $authMethod: "%env(AUTH_METHOD)%"
+            $authRealm: "%env(AUTH_REALM)%"
+            $calDAVEnabled: "%env(bool:CALDAV_ENABLED)%"
+            $cardDAVEnabled: "%env(bool:CARDDAV_ENABLED)%"
+            $webDAVEnabled: "%env(bool:WEBDAV_ENABLED)%"
+            $webdavPublicDirWritable: "%webdav_public_dir_writable%"
+            $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
+            $mailerDsn: "%env(MAILER_DSN)%"
+            $appKeysEnabled: "%app_keys_enabled%"
+            $adminAuthBypass: "%admin_auth_bypass%"
+
+    App\Command\MailTestCommand:
+        arguments:
+            $inviteAddress: "%env(INVITE_FROM_ADDRESS)%"
 
     App\Services\IMAPAuth:
         arguments:
@@ -64,6 +98,7 @@ services:
             $webdavPublicDir: "%env(resolve:WEBDAV_PUBLIC_DIR)%"
             $webdavHomesDir: "%env(resolve:WEBDAV_HOMES_DIR)%"
             $webdavTmpDir: "%env(resolve:WEBDAV_TMP_DIR)%"
+            $webdavPublicDirWritable: "%webdav_public_dir_writable%"
 
     App\Security\LoginFormAuthenticator:
         arguments:

@@ -89,9 +89,9 @@
         <source>users.new</source>
         <target>New User</target>
       </trans-unit>
-      <trans-unit id="weOCfT2" resname="dashboard.env">
-        <source>dashboard.env</source>
-        <target>Configured environment</target>
+      <trans-unit id="weOCfT2" resname="dashboard.health">
+        <source>dashboard.health</source>
+        <target>Health</target>
       </trans-unit>
       <trans-unit id="wx8fUKV" resname="dashboard.capabilities">
         <source>dashboard.capabilities</source>
@@ -328,6 +328,10 @@
       <trans-unit id="vXLetA0" resname="form.email">
         <source>form.email</source>
         <target>Email</target>
+      </trans-unit>
+      <trans-unit id="frmEmlHlp" resname="form.email.help">
+        <source>form.email.help</source>
+        <target>Used as the calendar address for scheduling: it has to match the address the user’s client sends as the organiser, or invitations are never sent.</target>
       </trans-unit>
       <trans-unit id="RQWeqAY" resname="form.admin">
         <source>form.admin</source>
@@ -608,6 +612,386 @@
       <trans-unit id="ZnEWE47" resname="calendars.auto">
         <source>calendars.auto</source>
         <target>Automatically generated</target>
+      </trans-unit>
+      <trans-unit id="dbg000" resname="diagnostics.title">
+        <source>diagnostics.title</source>
+        <target>Diagnostics</target>
+      </trans-unit>
+      <trans-unit id="dbg001" resname="diagnostics.back">
+        <source>diagnostics.back</source>
+        <target>Back to the dashboard</target>
+      </trans-unit>
+      <trans-unit id="dbg002" resname="diagnostics.go_there">
+        <source>diagnostics.go_there</source>
+        <target>Go there →</target>
+      </trans-unit>
+      <trans-unit id="dbg003" resname="diagnostics.all_good">
+        <source>diagnostics.all_good</source>
+        <target>Nothing needs your attention.</target>
+      </trans-unit>
+      <trans-unit id="dbg004" resname="diagnostics.attention">
+        <source>diagnostics.attention</source>
+        <target>{count, plural, one {# point needs your attention} other {# points need your attention}}</target>
+      </trans-unit>
+      <trans-unit id="dbg005" resname="diagnostics.severity.danger">
+        <source>diagnostics.severity.danger</source>
+        <target>Needs fixing</target>
+      </trans-unit>
+      <trans-unit id="dbg006" resname="diagnostics.severity.warning">
+        <source>diagnostics.severity.warning</source>
+        <target>Check this</target>
+      </trans-unit>
+      <trans-unit id="dbg007" resname="diagnostics.severity.ok">
+        <source>diagnostics.severity.ok</source>
+        <target>OK</target>
+      </trans-unit>
+      <trans-unit id="dbg008" resname="diagnostics.severity.info">
+        <source>diagnostics.severity.info</source>
+        <target>Info</target>
+      </trans-unit>
+      <trans-unit id="dbg009" resname="diagnostics.bucket.runtime">
+        <source>diagnostics.bucket.runtime</source>
+        <target>Runtime</target>
+      </trans-unit>
+      <trans-unit id="dbg010" resname="diagnostics.bucket.database">
+        <source>diagnostics.bucket.database</source>
+        <target>Database</target>
+      </trans-unit>
+      <trans-unit id="dbg011" resname="diagnostics.bucket.authentication">
+        <source>diagnostics.bucket.authentication</source>
+        <target>Authentication</target>
+      </trans-unit>
+      <trans-unit id="dbg012" resname="diagnostics.bucket.scheduling">
+        <source>diagnostics.bucket.scheduling</source>
+        <target>Scheduling and mail</target>
+      </trans-unit>
+      <trans-unit id="dbg013" resname="diagnostics.bucket.endpoints">
+        <source>diagnostics.bucket.endpoints</source>
+        <target>Endpoints</target>
+      </trans-unit>
+      <trans-unit id="dbg014" resname="diagnostics.value.not_set">
+        <source>diagnostics.value.not_set</source>
+        <target>Not set</target>
+      </trans-unit>
+      <trans-unit id="dbg015" resname="diagnostics.value.none">
+        <source>diagnostics.value.none</source>
+        <target>None</target>
+      </trans-unit>
+      <trans-unit id="dbg016" resname="diagnostics.versions">
+        <source>diagnostics.versions</source>
+        <target>Versions</target>
+      </trans-unit>
+      <trans-unit id="dbg017" resname="diagnostics.environment">
+        <source>diagnostics.environment</source>
+        <target>Environment</target>
+      </trans-unit>
+      <trans-unit id="dbg018" resname="diagnostics.environment.fix">
+        <source>diagnostics.environment.fix</source>
+        <target>Davis is not running in production mode. Set APP_ENV to prod, otherwise debugging tools run on every request and errors are shown to visitors.</target>
+      </trans-unit>
+      <trans-unit id="dbg019" resname="diagnostics.timezone">
+        <source>diagnostics.timezone</source>
+        <target>Server timezone</target>
+      </trans-unit>
+      <trans-unit id="dbg020" resname="diagnostics.timezone.fix.bad">
+        <source>diagnostics.timezone.fix.bad</source>
+        <target>This is not a valid timezone identifier, so the server default is used instead.</target>
+      </trans-unit>
+      <trans-unit id="dbg021" resname="diagnostics.timezone.fix.unset">
+        <source>diagnostics.timezone.fix.unset</source>
+        <target>No timezone is configured, so the one the server happens to use is applied to every event.</target>
+      </trans-unit>
+      <trans-unit id="dbg022" resname="diagnostics.log_file">
+        <source>diagnostics.log_file</source>
+        <target>Log file</target>
+      </trans-unit>
+      <trans-unit id="dbg023" resname="diagnostics.log_file.fix">
+        <source>diagnostics.log_file.fix</source>
+        <target>This directory is not writable, so nothing is being logged at all. Give it to the user the web server runs as.</target>
+      </trans-unit>
+      <trans-unit id="dbg024" resname="diagnostics.database">
+        <source>diagnostics.database</source>
+        <target>Database</target>
+      </trans-unit>
+      <trans-unit id="dbg025" resname="diagnostics.database.fix.sqlite">
+        <source>diagnostics.database.fix.sqlite</source>
+        <target>SQLite enforces neither foreign keys nor column lengths, so some errors that other engines refuse are stored silently. Fine for a small install, worth knowing when reporting a bug.</target>
+      </trans-unit>
+      <trans-unit id="dbg026" resname="diagnostics.database.fix.unreachable">
+        <source>diagnostics.database.fix.unreachable</source>
+        <target>The database could not be reached.</target>
+      </trans-unit>
+      <trans-unit id="dbg027" resname="diagnostics.migrations">
+        <source>diagnostics.migrations</source>
+        <target>Pending migrations</target>
+      </trans-unit>
+      <trans-unit id="dbg028" resname="diagnostics.migrations.fix">
+        <source>diagnostics.migrations.fix</source>
+        <target>Migrations have not been run. This shows up as unrelated errors: a property that cannot be stored, an address book that cannot be created, contacts that stop syncing.</target>
+      </trans-unit>
+      <trans-unit id="dbg029" resname="diagnostics.broken_subscriptions">
+        <source>diagnostics.broken_subscriptions</source>
+        <target>Subscriptions without a source</target>
+      </trans-unit>
+      <trans-unit id="dbg030" resname="diagnostics.broken_subscriptions.fix">
+        <source>diagnostics.broken_subscriptions.fix</source>
+        <target>A subscription with no source makes the whole calendar list of its owner fail. Only a direct database write can create one; delete it.</target>
+      </trans-unit>
+      <trans-unit id="dbg031" resname="diagnostics.auth">
+        <source>diagnostics.auth</source>
+        <target>Method</target>
+      </trans-unit>
+      <trans-unit id="dbg032" resname="diagnostics.auth.realm">
+        <source>diagnostics.auth.realm</source>
+        <target>Changing the realm invalidates every password stored with the legacy hashing scheme.</target>
+      </trans-unit>
+      <trans-unit id="dbg033" resname="diagnostics.auth_extension">
+        <source>diagnostics.auth_extension</source>
+        <target>Required PHP extension</target>
+      </trans-unit>
+      <trans-unit id="dbg034" resname="diagnostics.auth_extension.not_needed">
+        <source>diagnostics.auth_extension.not_needed</source>
+        <target>None needed</target>
+      </trans-unit>
+      <trans-unit id="dbg035" resname="diagnostics.auth_extension.fix">
+        <source>diagnostics.auth_extension.fix</source>
+        <target>The selected authentication method needs this extension, and it is not loaded: every login will be refused.</target>
+      </trans-unit>
+      <trans-unit id="dbg036" resname="diagnostics.invite_address">
+        <source>diagnostics.invite_address</source>
+        <target>Invitation sender address</target>
+      </trans-unit>
+      <trans-unit id="dbg037" resname="diagnostics.invite_address.fix">
+        <source>diagnostics.invite_address.fix</source>
+        <target>CalDAV is enabled but no sender address is configured, so Davis sends no invitation at all.</target>
+      </trans-unit>
+      <trans-unit id="dbg038" resname="diagnostics.mailer">
+        <source>diagnostics.mailer</source>
+        <target>Mail transport</target>
+      </trans-unit>
+      <trans-unit id="dbg039" resname="diagnostics.mailer.fix">
+        <source>diagnostics.mailer.fix</source>
+        <target>No mail transport is configured, so no invitation can be delivered.</target>
+      </trans-unit>
+      <trans-unit id="dbg040" resname="diagnostics.mailer.test">
+        <source>diagnostics.mailer.test</source>
+        <target>Only the scheme and host are shown, never the credentials. To check that it really works:</target>
+      </trans-unit>
+      <trans-unit id="dbg041" resname="diagnostics.accounts_without_email">
+        <source>diagnostics.accounts_without_email</source>
+        <target>Accounts without an email address</target>
+      </trans-unit>
+      <trans-unit id="dbg042" resname="diagnostics.accounts_without_email.fix">
+        <source>diagnostics.accounts_without_email.fix</source>
+        <target>These accounts never send an invitation. The address has to be the one their calendar client sends as the event organiser.</target>
+      </trans-unit>
+      <trans-unit id="dbg043" resname="diagnostics.dav_endpoint">
+        <source>diagnostics.dav_endpoint</source>
+        <target>DAV endpoint</target>
+      </trans-unit>
+      <trans-unit id="dbg044" resname="diagnostics.dav_endpoint.hint">
+        <source>diagnostics.dav_endpoint.hint</source>
+        <target>This is the address to give to calendar and contact clients.</target>
+      </trans-unit>
+      <trans-unit id="dbg045" resname="diagnostics.protocols">
+        <source>diagnostics.protocols</source>
+        <target>Enabled protocols</target>
+      </trans-unit>
+      <trans-unit id="dbg046" resname="diagnostics.protocols.fix">
+        <source>diagnostics.protocols.fix</source>
+        <target>No protocol is enabled, so the DAV endpoint serves nothing.</target>
+      </trans-unit>
+      <trans-unit id="dbg047" resname="dashboard.attention">
+        <source>dashboard.attention</source>
+        <target>{count, plural, one {# point needs your attention} other {# points need your attention}}</target>
+      </trans-unit>
+      <trans-unit id="dbg048" resname="dashboard.attention.none">
+        <source>dashboard.attention.none</source>
+        <target>Nothing needs your attention</target>
+      </trans-unit>
+      <trans-unit id="dbg049" resname="dashboard.attention.go">
+        <source>dashboard.attention.go</source>
+        <target>Diagnostics</target>
+      </trans-unit>
+      <trans-unit id="dbg050" resname="diagnostics.webdav_public_dir">
+        <source>diagnostics.webdav_public_dir</source>
+        <target>WebDAV public directory</target>
+      </trans-unit>
+      <trans-unit id="dbg051" resname="diagnostics.webdav_public_dir.admins">
+        <source>diagnostics.webdav_public_dir.admins</source>
+        <target>Readable by every user, writable by admins only</target>
+      </trans-unit>
+      <trans-unit id="dbg052" resname="diagnostics.webdav_public_dir.everyone">
+        <source>diagnostics.webdav_public_dir.everyone</source>
+        <target>Readable and writable by every user</target>
+      </trans-unit>
+      <trans-unit id="dbg053" resname="diagnostics.webdav_public_dir.admins.hint">
+        <source>diagnostics.webdav_public_dir.admins.hint</source>
+        <target>Regular users get a 403 when they save a file there. Set WEBDAV_PUBLIC_DIR_WRITABLE=true to let every authenticated user write to it.</target>
+      </trans-unit>
+      <trans-unit id="dbg054" resname="diagnostics.webdav_public_dir.everyone.hint">
+        <source>diagnostics.webdav_public_dir.everyone.hint</source>
+        <target>Every authenticated user can create, modify and delete files there. Set WEBDAV_PUBLIC_DIR_WRITABLE=false to reserve writing to admins.</target>
+      </trans-unit>
+      <trans-unit id="dbg055" resname="diagnostics.app_keys">
+        <source>diagnostics.app_keys</source>
+        <target>App keys</target>
+      </trans-unit>
+      <trans-unit id="dbg056" resname="diagnostics.app_keys.help">
+        <source>diagnostics.app_keys.help</source>
+        <target>Number of active keys. Each one acts as any user in its scope with that user's password never involved: keep the secrets server-side and revoke a key when the service that holds it goes away.</target>
+      </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.app_keys.disabled">
+        <source>diagnostics.app_keys.disabled</source>
+        <target>App keys are turned off. To use them, set APP_KEYS_ENABLED=true.</target>
+      </trans-unit>
+      <trans-unit id="dbg058" resname="diagnostics.value.disabled">
+        <source>diagnostics.value.disabled</source>
+        <target>disabled</target>
+      </trans-unit>
+      <trans-unit id="byp01" resname="auth_bypass.label">
+        <source>auth_bypass.label</source>
+        <target>Auth bypass</target>
+      </trans-unit>
+      <trans-unit id="dbg059" resname="diagnostics.admin_auth_bypass">
+        <source>diagnostics.admin_auth_bypass</source>
+        <target>Dashboard authentication bypass</target>
+      </trans-unit>
+      <trans-unit id="dbg060" resname="diagnostics.admin_auth_bypass.enabled">
+        <source>diagnostics.admin_auth_bypass.enabled</source>
+        <target>ADMIN_AUTH_BYPASS is on: the dashboard is open to anyone who can reach it. Only use this behind a proxy that authenticates first (Authelia, etc.). The DAV server is not affected.</target>
+      </trans-unit>
+      <trans-unit id="dbg061" resname="diagnostics.admin_auth_bypass.invalid">
+        <source>diagnostics.admin_auth_bypass.invalid</source>
+        <target>ADMIN_AUTH_BYPASS is only honoured when set to the exact string "true" (lowercase). This value is ignored and the dashboard still asks for a login.</target>
+      </trans-unit>
+      <trans-unit id="dbg062" resname="diagnostics.value.enabled">
+        <source>diagnostics.value.enabled</source>
+        <target>enabled</target>
+      </trans-unit>
+      <trans-unit id="apk01" resname="title.app_keys">
+        <source>title.app_keys</source>
+        <target>App keys</target>
+      </trans-unit>
+      <trans-unit id="apk02" resname="app_keys.new">
+        <source>app_keys.new</source>
+        <target>New app key</target>
+      </trans-unit>
+      <trans-unit id="apk03" resname="app_keys.back">
+        <source>app_keys.back</source>
+        <target>Back to app keys</target>
+      </trans-unit>
+      <trans-unit id="apk04" resname="app_keys.app_id">
+        <source>app_keys.app_id</source>
+        <target>App id</target>
+      </trans-unit>
+      <trans-unit id="apk05" resname="app_keys.scope">
+        <source>app_keys.scope</source>
+        <target>Scope</target>
+      </trans-unit>
+      <trans-unit id="apk06" resname="app_keys.scope.all">
+        <source>app_keys.scope.all</source>
+        <target>All users except admins</target>
+      </trans-unit>
+      <trans-unit id="apk07" resname="app_keys.created">
+        <source>app_keys.created</source>
+        <target>Created</target>
+      </trans-unit>
+      <trans-unit id="apk08" resname="app_keys.last_used">
+        <source>app_keys.last_used</source>
+        <target>Last used</target>
+      </trans-unit>
+      <trans-unit id="apk09" resname="app_keys.never">
+        <source>app_keys.never</source>
+        <target>never</target>
+      </trans-unit>
+      <trans-unit id="apk10" resname="app_keys.status.active">
+        <source>app_keys.status.active</source>
+        <target>Active</target>
+      </trans-unit>
+      <trans-unit id="apk11" resname="app_keys.status.expires">
+        <source>app_keys.status.expires</source>
+        <target>Expires on {date}</target>
+      </trans-unit>
+      <trans-unit id="apk12" resname="app_keys.status.revoked">
+        <source>app_keys.status.revoked</source>
+        <target>Revoked on {date}</target>
+      </trans-unit>
+      <trans-unit id="apk13" resname="app_keys.revoke">
+        <source>app_keys.revoke</source>
+        <target>Revoke</target>
+      </trans-unit>
+      <trans-unit id="apk14" resname="app_keys.saved">
+        <source>app_keys.saved</source>
+        <target>The app key has been created</target>
+      </trans-unit>
+      <trans-unit id="apk15" resname="app_keys.revoked">
+        <source>app_keys.revoked</source>
+        <target>The app key has been revoked</target>
+      </trans-unit>
+      <trans-unit id="apk16" resname="app_keys.secret.title">
+        <source>app_keys.secret.title</source>
+        <target>Secret for «{name}»</target>
+      </trans-unit>
+      <trans-unit id="apk17" resname="app_keys.secret.text">
+        <source>app_keys.secret.text</source>
+        <target>Copy it now: it is not stored and will not be shown again.</target>
+      </trans-unit>
+      <trans-unit id="apk18" resname="app_keys.secret.username">
+        <source>app_keys.secret.username</source>
+        <target>Clients log in over HTTP Basic with the username &lt;login&gt;*{appId} and this secret as the password.</target>
+      </trans-unit>
+      <trans-unit id="apk19" resname="app_keys.modal.title">
+        <source>app_keys.modal.title</source>
+        <target>Revoke this app key?</target>
+      </trans-unit>
+      <trans-unit id="apk20" resname="app_keys.modal.text">
+        <source>app_keys.modal.text</source>
+        <target>Every client using it will be refused from now on. This cannot be undone.</target>
+      </trans-unit>
+      <trans-unit id="apk21" resname="no.app_keys.yet">
+        <source>no.app_keys.yet</source>
+        <target>No app key yet</target>
+      </trans-unit>
+      <trans-unit id="apk28" resname="app_keys.used_as">
+        <source>app_keys.used_as</source>
+        <target>Used as</target>
+      </trans-unit>
+      <trans-unit id="apk29" resname="app_keys.used_as.more">
+        <source>app_keys.used_as.more</source>
+        <target>and {count} more</target>
+      </trans-unit>
+      <trans-unit id="apk22" resname="form.app_key.name">
+        <source>form.app_key.name</source>
+        <target>Name</target>
+      </trans-unit>
+      <trans-unit id="apk23" resname="form.app_key.scope">
+        <source>form.app_key.scope</source>
+        <target>Users</target>
+      </trans-unit>
+      <trans-unit id="apk24" resname="form.app_key.scope.help">
+        <source>form.app_key.scope.help</source>
+        <target>One username per line. Use * for all users except admins. To include an admin, add their username. The key can see everything the user can see, including calendars shared with them and calendars they are a delegate for.</target>
+      </trans-unit>
+      <trans-unit id="apk25" resname="form.app_key.expires_at">
+        <source>form.app_key.expires_at</source>
+        <target>Expires on</target>
+      </trans-unit>
+      <trans-unit id="apk26" resname="form.app_key.expires_at.help">
+        <source>form.app_key.expires_at.help</source>
+        <target>Optional. The key stops working from the start of that day; leave empty for a key that never expires. You can also revoke it at any moment.</target>
+      </trans-unit>
+      <trans-unit id="apk27" resname="form.app_key.expires_at.clear">
+        <source>form.app_key.expires_at.clear</source>
+        <target>No expiry</target>
+      </trans-unit>
+      <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
+        <source>diagnostics.broken_subscriptions.help</source>
+        <target>A calendar subscription with no source makes the entire calendar list of its owner fail to load. Only a direct database write can produce one, so this is normally zero.</target>
+      </trans-unit>
+      <trans-unit id="dbghlp1" resname="diagnostics.accounts_without_email.help">
+        <source>diagnostics.accounts_without_email.help</source>
+        <target>An account with no email address never sends an invitation, because the address is what Davis matches against the event organiser. Each account's address has to be the one its calendar client sends.</target>
       </trans-unit>
     </body>
   </file>

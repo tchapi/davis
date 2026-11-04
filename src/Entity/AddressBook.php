@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AddressBook
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
     private $id;
 
@@ -27,7 +27,8 @@ class AddressBook
     private $displayName;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\Regex("/[0-9a-z\-]+/")]
+    #[Assert\NotBlank]
+    #[Assert\Regex("/^[0-9a-zA-Z_\-]+$/")]
     #[Assert\Length(max: 255)]
     private $uri;
 
@@ -112,7 +113,7 @@ class AddressBook
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 

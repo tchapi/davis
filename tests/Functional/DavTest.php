@@ -11,33 +11,13 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 
 class DavTest extends WebTestCase
 {
+    use DavRequestTrait;
+
     private const SECRET_OBJECT_URI = 'secret.ics';
     private const SECRET_SUMMARY = 'Top secret meeting';
     private const SECRET_OBJECT_PATH = '/dav/calendars/test_user/default/'.self::SECRET_OBJECT_URI;
 
     private const SECRET_CALENDAR_DATA = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Davis//Test//EN\r\nBEGIN:VEVENT\r\nUID:secret-1\r\nDTSTAMP:20260101T100000Z\r\nDTSTART:20260101T100000Z\r\nDTEND:20260101T110000Z\r\nSUMMARY:".self::SECRET_SUMMARY."\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n";
-
-    /**
-     * The DAVController uses a sabre/dav that relies on REQUEST_URI and REQUEST_METHOD
-     * which are not set by default by PHPUnit (or to the wrong values).
-     * We thus force them here so that the request looks like a real one for PHPUnit.
-     *
-     * The Authorization header is read by sabre/dav from $_SERVER too, so we set (or unset)
-     * it the same way.
-     */
-    public static function requestDav(AbstractBrowser $client, string $method, string $path, ?string $basicAuthUserPass = null): void
-    {
-        $_SERVER['REQUEST_URI'] = $path;
-        $_SERVER['REQUEST_METHOD'] = $method;
-
-        if (null !== $basicAuthUserPass) {
-            $_SERVER['HTTP_AUTHORIZATION'] = 'Basic '.base64_encode($basicAuthUserPass);
-        } else {
-            unset($_SERVER['HTTP_AUTHORIZATION']);
-        }
-
-        $client->request($method, $path);
-    }
 
     public static function requestDavClient(string $method, string $path): AbstractBrowser
     {
@@ -114,7 +94,7 @@ class DavTest extends WebTestCase
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH, 'test_user:password');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     public function testAnonymousCannotReadCalendarObject(): void
@@ -125,7 +105,7 @@ class DavTest extends WebTestCase
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH);
 
         $this->assertResponseStatusCodeSame(401);
-        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     /**
@@ -140,7 +120,7 @@ class DavTest extends WebTestCase
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH.'?sabreAction=asset');
 
         $this->assertResponseStatusCodeSame(401);
-        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     /**
@@ -155,7 +135,7 @@ class DavTest extends WebTestCase
         static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH.'?sabreAction=asset', 'test_user2:password2');
 
         $this->assertResponseStatusCodeSame(403);
-        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getResponse()->getContent());
+        $this->assertStringNotContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
     }
 
     public function testAssetQueryParameterDoesNotBypassWriteAcl(): void
@@ -191,8 +171,61 @@ class DavTest extends WebTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertSame(
             file_get_contents(static::getContainer()->getParameter('kernel.project_dir').'/vendor/sabre/dav/lib/DAV/Browser/assets/favicon.ico'),
-            $client->getResponse()->getContent()
+            $client->getInternalResponse()->getContent()
         );
+    }
+
+    /**
+     * "Public" means everyone: being signed in as another account must not make a public calendar
+     * less readable than it is to a stranger.
+     */
+    public function testAPublicCalendarIsReadableByAnyoneIncludingSignedInUsers(): void
+    {
+        $client = static::createClient();
+        $this->createSecretCalendarObject();
+
+        /** @var EntityManagerInterface $em */
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $instance = $em->getRepository(CalendarInstance::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+        $instance->setPublic(true);
+        $em->flush();
+        $em->clear();
+
+        // Another account, signed in
+        static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH, 'test_user2:password2');
+        $this->assertResponseStatusCodeSame(200, 'A signed-in user must be able to read a public calendar');
+        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
+
+        // And anonymously, which already worked
+        static::requestDav($client, 'GET', self::SECRET_OBJECT_PATH);
+        $this->assertResponseStatusCodeSame(200, 'An anonymous visitor must be able to read a public calendar');
+        $this->assertStringContainsString(self::SECRET_SUMMARY, $client->getInternalResponse()->getContent());
+    }
+
+    /**
+     * Making a calendar public grants reading, never writing.
+     */
+    public function testAPublicCalendarIsNotWritableByOtherUsers(): void
+    {
+        $client = static::createClient();
+        $this->createSecretCalendarObject();
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $instance = $em->getRepository(CalendarInstance::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+        $instance->setPublic(true);
+        $em->flush();
+        $em->clear();
+
+        static::requestDav($client, 'DELETE', self::SECRET_OBJECT_PATH, 'test_user2:password2');
+
+        $this->assertResponseStatusCodeSame(403);
+        $this->assertSame(self::SECRET_CALENDAR_DATA, $this->getSecretCalendarData(), 'The object must still be there');
     }
 
     public function testWellKnownUrlsRedirectToTheDavEndpoint(): void
@@ -243,7 +276,7 @@ class DavTest extends WebTestCase
         $client = static::requestDavClient('GET', '/dav/');
 
         $this->assertResponseStatusCodeSame(401);
-        $this->assertStringNotContainsString('sabredav-version', $client->getResponse()->getContent());
+        $this->assertStringNotContainsString('sabredav-version', $client->getInternalResponse()->getContent());
         $this->assertFalse($client->getResponse()->headers->has('X-Sabre-Version'));
         $this->assertFalse(\Sabre\DAV\Server::$exposeVersion, 'The DAV server must be built with version exposure off');
     }

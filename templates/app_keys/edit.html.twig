@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'app_keys' %}
+
+{# Native date inputs have no good way to clear the value, so we add a button for it #}
+{% form_theme form _self %}
+{% block _app_key_expiresAt_widget %}
+    <div class="input-group">
+        {{- block('date_widget') -}}
+        <button type="button" class="btn btn-outline-secondary" data-clear-target="{{ id }}">{{ "form.app_key.expires_at.clear"|trans }}</button>
+    </div>
+{% endblock %}
+
+{% block body %}
+
+{% include '_partials/back_button.html.twig' with { url: path('app_key_index'), text: "app_keys.back"|trans } %}
+
+<h1 class="display-4 fw-lighter mb-5">{{ "app_keys.new"|trans }}</h1>
+
+{{ form(form) }}
+
+{% endblock %}

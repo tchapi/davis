@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,16 +22,16 @@ final class Version20260908210000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $engine = $this->connection->getDatabasePlatform()->getName();
+        $platform = $this->connection->getDatabasePlatform();
 
         // \Sabre\CalDAV\Backend\PDO::createSubscription() only lists `calendarorder` in its
         // INSERT when the client sent {http://apple.com/ns/ical/}calendar-order. Without a
         // default, subscribing to a feed then fails with a NOT NULL violation (HTTP 500).
-        if ('mysql' === $engine) {
+        if ($platform instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE calendarsubscriptions CHANGE calendarorder calendarorder INT DEFAULT 0 NOT NULL');
-        } elseif ('postgresql' === $engine) {
+        } elseif ($platform instanceof PostgreSQLPlatform) {
             $this->addSql('ALTER TABLE calendarsubscriptions ALTER COLUMN calendarorder SET DEFAULT 0');
-        } elseif ('sqlite' === $engine) {
+        } elseif ($platform instanceof SqlitePlatform) {
             // SQLite cannot alter a column in place: add the replacement, copy, swap, drop.
             $this->addSql('ALTER TABLE calendarsubscriptions ADD COLUMN new_calendarorder INTEGER DEFAULT 0 NOT NULL');
             $this->addSql('UPDATE calendarsubscriptions SET new_calendarorder = calendarorder');
@@ -40,13 +43,13 @@ final class Version20260908210000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $engine = $this->connection->getDatabasePlatform()->getName();
+        $platform = $this->connection->getDatabasePlatform();
 
-        if ('mysql' === $engine) {
+        if ($platform instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE calendarsubscriptions CHANGE calendarorder calendarorder INT NOT NULL');
-        } elseif ('postgresql' === $engine) {
+        } elseif ($platform instanceof PostgreSQLPlatform) {
             $this->addSql('ALTER TABLE calendarsubscriptions ALTER COLUMN calendarorder DROP DEFAULT');
-        } elseif ('sqlite' === $engine) {
+        } elseif ($platform instanceof SqlitePlatform) {
             // SQLite refuses to ADD a NOT NULL column without a default, so the only way back
             // is to rebuild the table with its original definition.
             $this->addSql('CREATE TABLE calendarsubscriptions_old (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, uri VARCHAR(255) NOT NULL, principaluri VARCHAR(255) NOT NULL, source CLOB DEFAULT NULL, displayname VARCHAR(255) DEFAULT NULL, refreshrate VARCHAR(10) DEFAULT NULL, calendarorder INTEGER NOT NULL, calendarcolor VARCHAR(10) DEFAULT NULL, striptodos SMALLINT DEFAULT NULL, stripalarms SMALLINT DEFAULT NULL, stripattachments SMALLINT DEFAULT NULL, lastmodified INTEGER DEFAULT NULL)');
