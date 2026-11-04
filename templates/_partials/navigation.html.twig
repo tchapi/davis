@@ -28,7 +28,6 @@
 	  	{% endif %}
       </ul>
       {# With the auth bypass, nobody is logged in: there is no username to show and nothing to log out of #}
-      {% set authBypassed = not app.user and adminAuthBypass == 'true' %}
       {% if app.user or authBypassed %}
       <ul class="navbar-nav">
         {% if app.user or appKeysEnabled %}
@@ -37,11 +36,11 @@
             {% if authBypassed %}🔓 {{ "auth_bypass.label"|trans }}{% else %}👤 {{ app.user.username }}{% endif %}
           </a>
           <div class="dropdown-menu" aria-labelledby="navUserMenu">
-            {% if appKeysEnabled %}
+            {% if admin_logged and appKeysEnabled %}
             <a class="dropdown-item" href="{{ path('app_key_index') }}">{{ "title.app_keys"|trans }}</a>
             {% endif %}
             {% if app.user %}
-            {% if appKeysEnabled %}<div class="dropdown-divider"></div>{% endif %}
+            {% if admin_logged and appKeysEnabled %}<div class="dropdown-divider"></div>{% endif %}
             <a class="dropdown-item" href="{{ path('app_logout', {_csrf_token: csrf_token('logout')}) }}">{{ "logout"|trans }}</a>
             {% endif %}
           </div>

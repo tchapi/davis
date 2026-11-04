@@ -27,7 +27,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UserController extends AbstractController
 {
     #[Route('/', name: 'index')]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('access')]
     public function users(ManagerRegistry $doctrine): Response
     {
         $results = $doctrine->getRepository(Principal::class)->findAllMainPrincipalsWithUserIds();
@@ -135,7 +135,7 @@ class UserController extends AbstractController
 
             $this->addFlash('success', $trans->trans('user.saved'));
 
-            if ($this->isGranted('ROLE_ADMIN')) {
+            if ($this->isGranted('access')) {
                 return $this->redirectToRoute('user_index');
             }
 
@@ -231,7 +231,7 @@ class UserController extends AbstractController
 
         $this->addFlash('success', $trans->trans('user.deleted'));
 
-        if ($this->isGranted('ROLE_ADMIN')) {
+        if ($this->isGranted('access')) {
             return $this->redirectToRoute('user_index');
         }
 
@@ -320,7 +320,7 @@ class UserController extends AbstractController
 
         $principalUri = $user->getPrincipalUri();
 
-        if ($this->isGranted('ROLE_ADMIN')) {
+        if ($this->isGranted('access')) {
             // in this case, this is the id of the principal to add
             if (!is_numeric($request->request->get('principalId'))) {
                 throw new BadRequestHttpException();

@@ -209,7 +209,7 @@ class CalendarController extends AbstractController
             throw $this->createNotFoundException('Calendar not found');
         }
 
-        if ($this->isGranted('ROLE_ADMIN')) {
+        if ($this->isGranted('access')) {
             // in this case, this is the id of the principal to add
             if (!is_numeric($request->request->get('principalId'))) {
                 throw new BadRequestHttpException();

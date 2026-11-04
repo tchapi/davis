@@ -7,16 +7,19 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class UserVoter extends Voter
 {
     public const ACCESS = 'access';
 
     private $doctrine;
+	private $params;
 
-    public function __construct(ManagerRegistry $doctrine)
+	public function __construct(ManagerRegistry $doctrine, ContainerBagInterface $params)
     {
         $this->doctrine = $doctrine;
+        $this->params = $params;
     }
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -33,7 +36,7 @@ class UserVoter extends Voter
     {
         $user = $token->getUser();
 
-        if ($user instanceof AdminUser) {
+        if ($user instanceof AdminUser || $this->params->get('admin_auth_bypass') == "true") {
             // admins can alway access everything
             return true;
         }
@@ -53,8 +56,17 @@ class UserVoter extends Voter
         };
     }
 
-    private function canAccess(NormalUser $logged_user, int $userId, ?Vote $vote): bool
+    private function canAccess(NormalUser $logged_user, ?int $userId, ?Vote $vote): bool
     {
+		// trying as a user to access a page with no "userId" specified, reject
+		if (is_null($userId)) {
+            $vote?->addReason(sprintf(
+                'Cannot access admin resource'
+            ));
+
+            return false;
+		}
+
         $user = $this->doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
             $vote?->addReason(sprintf(

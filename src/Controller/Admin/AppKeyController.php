@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 // When APP_KEYS_ENABLED is off, these routes don't match and return a 404
 #[Route('/app-keys', name: 'app_key_', condition: "service('app_keys').isEnabled()")]
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('access')]
 class AppKeyController extends AbstractController
 {
     #[Route('/', name: 'index')]

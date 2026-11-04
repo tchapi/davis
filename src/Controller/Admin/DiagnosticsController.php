@@ -11,7 +11,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DiagnosticsController extends AbstractController
 {
     #[Route('/dashboard/diagnostics', name: 'diagnostics')]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('access')]
     public function diagnostics(Diagnostics $diagnostics): Response
     {
         return $this->render('diagnostics.html.twig', [
