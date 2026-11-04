@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,15 +26,17 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     private $doctrine;
     private $urlGenerator;
     private $csrfTokenManager;
+    private $params;
 
     private $adminLogin;
     private $adminPassword;
 
-    public function __construct(ManagerRegistry $doctrine, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, string $adminLogin, string $adminPassword)
+    public function __construct(ManagerRegistry $doctrine, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, ContainerBagInterface $params, string $adminLogin, string $adminPassword)
     {
         $this->doctrine = $doctrine;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
+        $this->params = $params;
         $this->adminLogin = $adminLogin;
         $this->adminPassword = password_hash($adminPassword, PASSWORD_DEFAULT);
     }
@@ -60,7 +63,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $password = $request->request->getString('_password');
 
         $user = $this->doctrine->getRepository(User::class)->findOneByUsername($username);
-        if ($user) {
+        if ($user && $this->params->get('user_auth_enabled') == 'true') {
             $username_to_test = $user->getUsername();
             $password_to_test = $user->getPassword();
         } else {

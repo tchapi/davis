@@ -4,19 +4,19 @@ namespace App\Security;
 
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class UserVoter extends Voter
 {
     public const ACCESS = 'access';
 
     private $doctrine;
-	private $params;
+    private $params;
 
-	public function __construct(ManagerRegistry $doctrine, ContainerBagInterface $params)
+    public function __construct(ManagerRegistry $doctrine, ContainerBagInterface $params)
     {
         $this->doctrine = $doctrine;
         $this->params = $params;
@@ -36,9 +36,16 @@ class UserVoter extends Voter
     {
         $user = $token->getUser();
 
-        if ($user instanceof AdminUser || $this->params->get('admin_auth_bypass') == "true") {
+        if ($user instanceof AdminUser || $this->params->get('admin_auth_bypass') == 'true') {
             // admins can alway access everything
             return true;
+        }
+
+        if (!$this->params->get('user_auth_enabled') == 'true') {
+            // cannot log in as a user
+            $vote?->addReason('Only admins can log in');
+
+            return false;
         }
 
         if (!$user instanceof NormalUser) {
@@ -58,14 +65,14 @@ class UserVoter extends Voter
 
     private function canAccess(NormalUser $logged_user, ?int $userId, ?Vote $vote): bool
     {
-		// trying as a user to access a page with no "userId" specified, reject
-		if (is_null($userId)) {
+        // trying as a user to access a page with no "userId" specified, reject
+        if (is_null($userId)) {
             $vote?->addReason(sprintf(
                 'Cannot access admin resource'
             ));
 
             return false;
-		}
+        }
 
         $user = $this->doctrine->getRepository(User::class)->findOneById($userId);
         if (!$user) {
