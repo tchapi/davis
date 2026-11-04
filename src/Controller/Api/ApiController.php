@@ -171,10 +171,14 @@ class ApiController extends AbstractController
         $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUriWithCalendars($principalUri);
         $allSubscriptions = $doctrine->getRepository(CalendarSubscription::class)->findByPrincipalUri($principalUri);
 
+        $allObjectCounts = $doctrine->getRepository(CalendarInstance::class)->countObjectsByComponentType(
+            array_map(fn (CalendarInstance $instance) => $instance->getCalendar()->getId(), $allCalendars)
+        );
+
         $calendars = [];
         $sharedCalendars = [];
         foreach ($allCalendars as $calendar) {
-            $objectCounts = $doctrine->getRepository(CalendarInstance::class)->getObjectCountsByComponentType($calendar->getCalendar()->getId());
+            $objectCounts = $allObjectCounts[$calendar->getCalendar()->getId()];
             $eventsCount = $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_EVENTS) ? $objectCounts['events'] : null;
             $notesCount = $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_NOTES) ? $objectCounts['notes'] : null;
             $tasksCount = $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_TODOS) ? $objectCounts['tasks'] : null;
@@ -243,31 +247,32 @@ class ApiController extends AbstractController
             return $this->json(['status' => 'error', 'message' => 'Principal Not Found', 'timestamp' => $this->getTimestamp()], 404);
         }
 
-        $allCalendars = $doctrine->getRepository(CalendarInstance::class)->findByPrincipalUriWithCalendars($principalUri);
+        // A shared instance or an id belonging to someone else resolves to nothing, which is the
+        // empty payload this endpoint has always answered with
+        $calendar = $this->resolveOwnerInstance($doctrine, $calendar_id, $principalUri);
 
         $calendar_details = [];
-        foreach ($allCalendars as $calendar) {
-            if (!$calendar->isShared() && $calendar->getId() === $calendar_id) {
-                $objectCounts = $doctrine->getRepository(CalendarInstance::class)->getObjectCountsByComponentType($calendar->getCalendar()->getId());
-                $calendar_details = [
-                    'id' => $calendar->getId(),
-                    'uri' => $calendar->getUri(),
-                    'displayname' => $calendar->getDisplayName(),
-                    'description' => $calendar->getDescription(),
-                    'events' => [
-                        'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_EVENTS),
-                        'count' => $objectCounts['events'],
-                    ],
-                    'notes' => [
-                        'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_NOTES),
-                        'count' => $objectCounts['notes'],
-                    ],
-                    'tasks' => [
-                        'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_TODOS),
-                        'count' => $objectCounts['tasks'],
-                    ],
-                ];
-            }
+        if ($calendar) {
+            $calendarRowId = $calendar->getCalendar()->getId();
+            $objectCounts = $doctrine->getRepository(CalendarInstance::class)->countObjectsByComponentType([$calendarRowId])[$calendarRowId];
+            $calendar_details = [
+                'id' => $calendar->getId(),
+                'uri' => $calendar->getUri(),
+                'displayname' => $calendar->getDisplayName(),
+                'description' => $calendar->getDescription(),
+                'events' => [
+                    'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_EVENTS),
+                    'count' => $objectCounts['events'],
+                ],
+                'notes' => [
+                    'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_NOTES),
+                    'count' => $objectCounts['notes'],
+                ],
+                'tasks' => [
+                    'enabled' => $calendar->getCalendar()->isComponentEnabled(Calendar::COMPONENT_TODOS),
+                    'count' => $objectCounts['tasks'],
+                ],
+            ];
         }
 
         $response = [

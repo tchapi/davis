@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -21,24 +24,24 @@ final class Version20260909100000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $engine = $this->connection->getDatabasePlatform()->getName();
+        $platform = $this->connection->getDatabasePlatform();
 
         // sabre/dav compares and orders sync tokens numerically:
         //   WHERE synctoken >= ? AND synctoken < ? ... ORDER BY synctoken
         // Stored as text, '10' sorts before '9', so a client syncing across a decimal-width
         // boundary is told the collection advanced but is handed none of the changes.
-        if ('mysql' === $engine) {
+        if ($platform instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE addressbooks CHANGE synctoken synctoken INT DEFAULT 1 NOT NULL');
             $this->addSql('ALTER TABLE calendars CHANGE synctoken synctoken INT DEFAULT 1 NOT NULL');
             $this->addSql('ALTER TABLE addressbookchanges CHANGE synctoken synctoken INT DEFAULT 1 NOT NULL');
-        } elseif ('postgresql' === $engine) {
+        } elseif ($platform instanceof PostgreSQLPlatform) {
             // addressbooks and calendars were already converted by Version20230209142217;
             // only addressbookchanges is still text here.
             $this->addSql('ALTER TABLE addressbookchanges ALTER COLUMN synctoken TYPE INT USING synctoken::integer');
             foreach (['addressbooks', 'calendars', 'addressbookchanges'] as $table) {
                 $this->addSql(sprintf('ALTER TABLE %s ALTER COLUMN synctoken SET DEFAULT 1', $table));
             }
-        } elseif ('sqlite' === $engine) {
+        } elseif ($platform instanceof SqlitePlatform) {
             // A VARCHAR column has TEXT affinity in SQLite, so the comparison is textual there
             // too. SQLite cannot alter a column in place: add the replacement, copy, swap, drop.
             foreach (['addressbooks', 'calendars', 'addressbookchanges'] as $table) {
@@ -49,13 +52,13 @@ final class Version20260909100000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $engine = $this->connection->getDatabasePlatform()->getName();
+        $platform = $this->connection->getDatabasePlatform();
 
-        if ('mysql' === $engine) {
+        if ($platform instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE addressbooks CHANGE synctoken synctoken VARCHAR(255) NOT NULL');
             $this->addSql('ALTER TABLE calendars CHANGE synctoken synctoken VARCHAR(255) NOT NULL');
             $this->addSql('ALTER TABLE addressbookchanges CHANGE synctoken synctoken VARCHAR(255) NOT NULL');
-        } elseif ('postgresql' === $engine) {
+        } elseif ($platform instanceof PostgreSQLPlatform) {
             // Only addressbookchanges goes back to text: addressbooks and calendars were
             // already integers before this migration, and reverting them would reintroduce
             // the error Version20230209142217 fixed (synctoken + 1 on a text column).
@@ -63,7 +66,7 @@ final class Version20260909100000 extends AbstractMigration
                 $this->addSql(sprintf('ALTER TABLE %s ALTER COLUMN synctoken DROP DEFAULT', $table));
             }
             $this->addSql('ALTER TABLE addressbookchanges ALTER COLUMN synctoken TYPE VARCHAR(255) USING synctoken::varchar');
-        } elseif ('sqlite' === $engine) {
+        } elseif ($platform instanceof SqlitePlatform) {
             // NB: SQLite refuses to ADD a NOT NULL column without a default, so the restored
             // columns keep a harmless DEFAULT '1' that the original schema did not have.
             foreach (['addressbooks', 'calendars', 'addressbookchanges'] as $table) {

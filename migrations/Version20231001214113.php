@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,7 +20,9 @@ final class Version20231001214113 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->skipIf('sqlite' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'sqlite\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE calendarobjects ADD COLUMN new_calendardata TEXT DEFAULT NULL;');
         $this->addSql('UPDATE calendarobjects SET new_calendardata = CAST(calendardata as TEXT);');
@@ -42,7 +45,9 @@ final class Version20231001214113 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf('sqlite' !== $this->connection->getDatabasePlatform()->getName(), 'This migration is specific to \'sqlite\'. Skipping it is fine.');
+        if (!$this->connection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return;
+        }
 
         $this->addSql('ALTER TABLE calendarobjects ADD COLUMN new_calendardata BLOB DEFAULT NULL;');
         $this->addSql('UPDATE calendarobjects SET new_calendardata = CAST(calendardata as BLOB);');

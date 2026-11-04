@@ -84,6 +84,15 @@ Dependencies
 
    And set `APP_ENV=prod` in your `.env.local` file (see below)
 
+2. Generate a unique `APP_SECRET` and set it in your `.env.local` file (or as a real environment variable, see below):
+
+    ```
+    openssl rand -hex 16
+    ```
+
+    > [!CAUTION]
+    >
+    > The `.env` file committed in this repository ships a default `APP_SECRET`. It is the same for every installation, so you **must** override it. This value is not used to encrypt any data: you can change it at any time without losing anything.
 
 3. At least put the correct credentials to your database (driver and url) in your `.env.local` file so you can easily create the necessary tables.
 
@@ -109,7 +118,7 @@ Create your own `.env.local` file to change the necessary variables, if you plan
 
 > [!CAUTION]
 >
-> In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data.
+> In a production environnement, the `APP_ENV` variable MUST be set to `prod` to prevent leaking sensitive data, and `APP_SECRET` MUST be set to a unique value (see the installation steps above).
 
 **a. The database driver and url** (_you should already have it configured since you created the database previously_)
 
@@ -136,6 +145,51 @@ AUTH_REALM=SabreDAV
 AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 ```
 > See [the following paragraph](#specific-environment-variables-for-imap-and-ldap-authentication-methods) for more information if you choose either IMAP or LDAP.
+
+> [!WARNING]
+>
+> **Do not change `AUTH_REALM` on an existing installation.** Davis stored passwords as
+> `md5(username:AUTH_REALM:password)` until v1.10.0 (September 2021), and a database imported from
+> Baïkal uses the same scheme. The realm is part of those hashes, so changing it makes every one of
+> them stop working, with no error beyond a failed login — the accounts are still there, they simply
+> cannot authenticate any more.
+>
+> Passwords set since v1.10.0 use bcrypt and are unaffected. You can still be carrying legacy ones
+> without ever having used Baïkal, if the account predates that version. To find out:
+>
+> ```sql
+> SELECT username FROM users WHERE digesta1 NOT LIKE '$2y$%';
+> ```
+>
+> Any row returned is a legacy hash tied to the current realm.
+>
+> There is no password reset in Davis. If you must change the realm, the only way back is to open
+> each of those accounts in the dashboard and type a new password: the field is blank on the edit
+> page and leaving it blank keeps the current hash, so filling it in is what replaces it. The new
+> one is stored with bcrypt and no longer depends on the realm. Your own admin login is unaffected —
+> it comes from `ADMIN_LOGIN` / `ADMIN_PASSWORD`, not from the users table.
+
+**App keys**
+
+```shell
+APP_KEYS_ENABLED=false
+```
+
+App keys are off by default. To use them, set `APP_KEYS_ENABLED=true`. When they are off, the app keys page, the `davis:app-key:*` commands and the app key login are not available. Existing keys stay in the database and work again if you turn the setting back on.
+
+A service that already knows who the user is (a webmail behind SSO, a scheduling tool like cal.com) can read and write a user's calendars and address books without holding that user's password. An admin creates an app key from the dashboard (or with `bin/console davis:app-key:create`), scoped to some users or to all of them, and the service logs in over HTTP Basic as `<login>*<app_id>` with the key's secret as the password, Dovecot style. Davis then acts as `<login>`.
+
+You must say which users the key can act as. List their usernames (they must already exist in Davis), or use `*` for all users (`--all-users` on the command line). `*` does not include admins, because an admin can read every calendar and address book. To let a key act as an admin, add the admin's username to the list.
+
+When logged in as `alice`, the key has the same access as alice. This includes calendars that other users shared with her. If she is a delegate for another user, it also includes that user's calendars.
+
+When you delete a user from the dashboard, Davis removes them from the keys that list them. If a key was only for that user, the key is revoked. Keys with `*` are not changed. With IMAP or LDAP, removing someone from the directory does not delete their Davis account, so their keys keep working until you delete the account or revoke the keys.
+
+Davis records which users each key has acted as, with the first and last time. You can see this on the app keys page and with `davis:app-key:list`.
+
+It works with every `AUTH_METHOD` and never contacts the backend: a wrong secret is refused outright, and a username ending in `*<something that is not an app id>` is sent to the backend as is. The login must be an existing Davis account, with exactly the same username. An app key never creates an account, even with IMAP or LDAP and `*_AUTH_USER_AUTOCREATE`, because it never asks the IMAP or LDAP server if the user is real. The account must already exist.
+
+The secret is shown once at creation and stored hashed. Keep it on the server side, never in a browser, and revoke the key (dashboard, or `davis:app-key:revoke <app_id>`) when the service goes away; an expiry date can be set when the access is meant to be temporary. This is the use case of [#183](https://github.com/tchapi/davis/issues/183).
 
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
@@ -167,6 +221,21 @@ INVITE_FROM_ADDRESS=no-reply@example.org
 > If the username, password or host contain any character considered special in a URI (such as `: / ? # [ ] @ ! $ & ' ( ) * + , ; =`), you MUST encode them.
 > See [here](https://symfony.com/doc/current/mailer.html#transport-setup) for more details.
 
+If `INVITE_FROM_ADDRESS` is empty, Davis does not send scheduling emails at all and logs a warning when the DAV endpoint starts.
+
+Invitations are only produced for events whose `ORGANIZER` matches the organiser's own address, and that address is the `email` of their principal — the *Email* field of the account in the dashboard. If it is empty or different from what the calendar client sends, the server has nothing to send an invitation about and stays silent. To find accounts in that state:
+
+```sql
+SELECT uri, email FROM principals WHERE email IS NULL OR email = '';
+```
+
+To check the mailer itself without creating an event:
+
+```shell
+php bin/console davis:mail:test you@example.org
+```
+
+
 **f. The reminder offset for all birthdays**
 
 You must specify a relative duration, as specified in [the RFC 5545 spec](https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.6)
@@ -194,8 +263,21 @@ BIRTHDAY_REMINDER_OFFSET=false
 ```shell
 WEBDAV_TMP_DIR=/webdav/tmp
 WEBDAV_PUBLIC_DIR=/webdav/public
+WEBDAV_PUBLIC_DIR_WRITABLE=false
 WEBDAV_HOMES_DIR=
 ```
+
+> [!NOTE]
+>
+> The public directory (served at `/dav/public`) is readable by every authenticated user. By default only users flagged as admins in the dashboard can create, modify or delete files in it; set `WEBDAV_PUBLIC_DIR_WRITABLE=true` to let every authenticated user write to it. The Diagnostics page of the dashboard shows which of the two applies.
+
+> [!IMPORTANT]
+>
+> Up to Davis 5.4 included, every authenticated user could write to the public directory. If you relied on that (a shared drop folder), set `WEBDAV_PUBLIC_DIR_WRITABLE=true` when upgrading, otherwise your users will get a `403` when saving files there.
+
+> [!NOTE]
+>
+> The directories must be absolute paths and must not live inside the web root (Davis refuses to start the DAV server otherwise). The tmp dir and the homes dir must not be inside the public dir either, and vice versa.
 
 > [!NOTE]
 >
@@ -203,7 +285,7 @@ WEBDAV_HOMES_DIR=
 
 > [!NOTE]
 >
-> By default, home directories are disabled totally (the env var is set to an empty string). If needed, it is recommended to use a folder that is **NOT** a child of the public dir, such as `/webdav/homes` for instance, so that users cannot access other users' homes.
+> By default, home directories are disabled totally (the env var is set to an empty string). If needed, use a folder that is **NOT** a child of the public dir, such as `/webdav/homes` for instance, so that users cannot access other users' homes: Davis checks this and refuses to start the DAV server otherwise.
 
 **h. The log file path**
 
@@ -234,6 +316,24 @@ If you're behind one or several proxies, the TLS termination might be upstream a
 ```shell
 SYMFONY_TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
 ```
+
+> [!WARNING]
+>
+> **If your PHP was built without IPv6** (`--disable-ipv6`, as some source-based distributions do),
+> your proxy must connect to Davis over **IPv4**, or every request returns a 500 with
+> `RuntimeException: Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6"`.
+>
+> Symfony picks its IPv4/IPv6 comparison from the address the request *came from*, not from the
+> value you set here, so listing only IPv4 proxies does **not** avoid it. In practice this means
+> writing the proxy target as `127.0.0.1` rather than `localhost`, which usually resolves to `::1`
+> first:
+>
+> ```apache
+> ProxyPass / http://127.0.0.1:9000/
+> ```
+>
+> Unsetting `SYMFONY_TRUSTED_PROXIES` also avoids the error, but then Davis no longer sees the
+> `X-Forwarded-*` headers and generates URLs with the wrong scheme or host.
 
 #### Overriding the dotenv (`.env`) path
 
@@ -384,6 +484,10 @@ dav.domain.tld {
     <Directory /var/www/davis/public/bundles>
         FallbackResource disabled
     </Directory>
+
+    # If you proxy to Davis rather than serving it directly, target 127.0.0.1 and not localhost:
+    # on a PHP built without IPv6, a request arriving from ::1 returns a 500.
+    # ProxyPass / http://127.0.0.1:9000/
 
     # Env vars (if you did not use .env.local)
     SetEnv APP_ENV prod
@@ -583,6 +687,18 @@ Below are some issues that can bring more info / insight into custom setups that
 
 ## 🐛 Troubleshooting
 
+### Start with the diagnostics page
+
+The dashboard tells you how many points need your attention and links to **Diagnostics**(`/dashboard/diagnostics`), which is usually the fastest way to find out why something configured does not happen.
+
+![Diagnostics page](_screenshots/diagnostics.png)
+
+It groups the checks into Runtime, Database, Authentication, Scheduling and mail, and Endpoints, and each one that needs action says what to do about it and gives the command or query to run. Among other things it reports migrations that have not been run, the database engine actually in use, whether the log directory is writable, whether the selected authentication method has the PHP extension it needs, and how many accounts have no email address and therefore never send an invitation.
+
+Everything on it is read-only and passive — no connection is opened, so it stays usable when something is down. Credentials are never shown: the mail transport is displayed as scheme and host only. Use `bin/console davis:mail:test you@example.org` to actually exercise the mailer.
+
+### Logs
+
 Depending on how you run Davis, logs are either:
   - [dev] printed out directly in the console
   - [dev] available in the Symfony Debug Bar in the [Profiler](https://symfony.com/doc/current/profiler.html)
@@ -598,12 +714,9 @@ Depending on how you run Davis, logs are either:
 > docker exec -it davis tail /var/www/davis/var/log/prod.log
 > ```
 
-### I have a "Bad timezone configuration env var" error on the dashboard
+### I have a "Bad timezone configuration env var" error
 
-If you see this:
-
-![Bad timezone configuration env var error](_screenshots/bad_timezone_configuration_env_var.png)
-
+The **Server timezone** check on the [diagnostics page](#start-with-the-diagnostics-page) flags it.
 It means that the value you set for the `APP_TIMEZONE` env var is not a correct timezone, as per [the official list](https://www.php.net/manual/en/timezones.php). Your timezone has thus not been set and is the server's default (Here, UTC). Adjust the setting accordingly.
 
 ### I have a 500 and no tables have been created
@@ -660,6 +773,28 @@ An update event might have been missed. In this case, it's easy to resync all co
 
 ```
 bin/console dav:sync-birthday-calendar
+```
+
+> [!WARNING]
+> This is a repair command, don't put it on a schedule. It deletes and recreates every birthday
+> event, so each run tells your clients that all of them changed and they download the lot again.
+> Birthdays are kept up to date on their own whenever a contact is added, changed or removed.
+
+### macOS Calendar shows "There was a problem accessing the availability for this account"
+
+macOS Calendar reads the user's availability (the hours they can be invited, RFC 7953) from the `calendar-availability` property of their scheduling inbox (`/dav/calendars/<user>/inbox/`) when the account settings are opened. Like any sabre/dav server (Baïkal behaves the same), Davis only stores that property once a client has written it, so for a new user it does not exist. Calendar treats a missing value as an error, whatever the server answers (a `404`, or the empty `418` propstat sabre/dav returns because Calendar asks for a minimal response), and never writes a default itself.
+
+Davis therefore answers with a default availability, **weekdays from 09:00 to 17:00**, until the user saves their own in Calendar. A few things to know:
+
+- The default is only shown to clients: free-busy lookups (when someone checks whether the user is free before inviting them) keep treating a user who never saved an availability as **always available**, as before. Once the user saves their availability, it applies everywhere.
+- The times are "floating": every client reads 09:00 to 17:00 in its own time zone.
+- Calendar asks for the property under its old Apple name (`{http://calendarserver.org/ns/}calendar-availability`), which sabre/dav maps to the standard one (`{urn:ietf:params:xml:ns:caldav}calendar-availability`): both names read and write the same value.
+
+To check what a user has, run a PROPFIND on their inbox (it returns the default if nothing is stored):
+
+```shell
+curl -u <user>:<password> -X PROPFIND -H 'Depth: 0' https://dav.example.org/dav/calendars/<user>/inbox/ \
+  --data '<d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-availability/></d:prop></d:propfind>'
 ```
 
 # 📚 Libraries used

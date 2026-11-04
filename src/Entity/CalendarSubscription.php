@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CalendarSubscription
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
     private $id;
 

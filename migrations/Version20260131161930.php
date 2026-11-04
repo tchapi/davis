@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,18 +22,18 @@ final class Version20260131161930 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $engine = $this->connection->getDatabasePlatform()->getName();
+        $platform = $this->connection->getDatabasePlatform();
 
-        if ('mysql' === $engine) {
+        if ($platform instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE calendarinstances ADD public TINYINT(1) DEFAULT 0 NOT NULL');
-        } elseif ('postgresql' === $engine) {
+        } elseif ($platform instanceof PostgreSQLPlatform) {
             $this->addSql('ALTER TABLE calendarinstances ADD public BOOLEAN DEFAULT FALSE NOT NULL');
-        } elseif ('sqlite' === $engine) {
+        } elseif ($platform instanceof SqlitePlatform) {
             $this->addSql('ALTER TABLE calendarinstances ADD public BOOLEAN DEFAULT 0 NOT NULL');
         }
 
         // Migrate ACCESS_PUBLIC (10) to ACCESS_SHAREDOWNER (1) + public = true
-        if ('postgresql' === $engine) {
+        if ($platform instanceof PostgreSQLPlatform) {
             $this->addSql('UPDATE calendarinstances SET public = TRUE, access = 1 WHERE access = 10');
         } else {
             // MySQL and SQLite accept 1/0 for booleans
@@ -40,20 +43,20 @@ final class Version20260131161930 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $engine = $this->connection->getDatabasePlatform()->getName();
+        $platform = $this->connection->getDatabasePlatform();
 
         // Revert public = true back to ACCESS_PUBLIC (10)
-        if ('postgresql' === $engine) {
+        if ($platform instanceof PostgreSQLPlatform) {
             $this->addSql('UPDATE calendarinstances SET access = 10 WHERE public = TRUE');
         } else {
             $this->addSql('UPDATE calendarinstances SET access = 10 WHERE public = 1');
         }
 
-        if ('mysql' === $engine) {
+        if ($platform instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE calendarinstances DROP public');
-        } elseif ('postgresql' === $engine) {
+        } elseif ($platform instanceof PostgreSQLPlatform) {
             $this->addSql('ALTER TABLE calendarinstances DROP COLUMN public');
-        } elseif ('sqlite' === $engine) {
+        } elseif ($platform instanceof SqlitePlatform) {
             $this->addSql('ALTER TABLE calendarinstances DROP COLUMN public');
         }
     }

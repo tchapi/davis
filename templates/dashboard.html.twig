@@ -35,19 +35,12 @@
       {% endif %}
     </ul>
 
-    <h3 class="mb-3 mt-4 environment">{{ "dashboard.env"|trans }}</h3>
+    <h3 class="mb-3 mt-4 health">{{ "dashboard.health"|trans }}</h3>
 
     <ul class="list-group">
-      <li class="list-group-item list-group-item-primary d-flex justify-content-between">
-        <span>{{ "dashboard.version"|trans }} : <code>{{ version }}</code> (SabreDAV <code>{{ sabredav_version }}</code>)</span>
-        <a class="github-link" href="https://github.com/tchapi/davis" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Project Github page" data-bs-placement="bottom"></a>
-      </li>
-      <li class="list-group-item list-group-item-secondary">{{ "dashboard.auth"|trans }} : <code>{{ authMethod }}</code>{% if authMethod == 'Basic' %} ({{ "dashboard.auth_realm"|trans }}: <code>{{ authRealm }}</code>){% endif %}</li>
-      <li class="list-group-item list-group-item-secondary">{{ "dashboard.invite_from_address"|trans }} : <code>{{ invite_from_address|default('Not set') }}</code></li>
-      <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center ">
-        <span>{{ "dashboard.server_timezone"|trans }} : <code>{{ timezone.actual_default }}</code></span>
-        {% if timezone.not_set_in_app %}<span class="badge bg-secondary rounded-pill">{{ "dashboard.no_timezone_configuration"|trans }}</span>{% endif %}
-        {% if timezone.bad_value %}<span class="badge bg-danger rounded-pill">{{ "dashboard.bad_timezone_configuration"|trans }}</span>{% endif %}
+      <li class="list-group-item d-flex justify-content-between align-items-center{% if attentionCount > 0 %} list-group-item-warning{% endif %}">
+        <span>{% if attentionCount > 0 %}{{ "dashboard.attention"|trans({'%count%': attentionCount}) }}{% else %}{{ "dashboard.attention.none"|trans }}{% endif %}</span>
+        <a href="{{ path('diagnostics') }}" class="btn btn-sm btn-outline-secondary">{{ "dashboard.attention.go"|trans }}</a>
       </li>
     </ul>
   </div>

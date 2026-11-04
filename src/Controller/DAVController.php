@@ -6,17 +6,22 @@ use App\Entity\Principal;
 use App\Entity\User;
 use App\Plugins\BirthdayCalendarPlugin;
 use App\Plugins\DavisIMipPlugin;
+use App\Plugins\DavisTemporaryFileFilterPlugin;
+use App\Plugins\DefaultAvailabilityPlugin;
 use App\Plugins\PublicAwareDAVACLPlugin;
 use App\Services\BasicAuth;
 use App\Services\BirthdayService;
+use App\Services\CapturingSapi;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -93,6 +98,14 @@ class DAVController extends AbstractController
     protected $webdavTmpDir;
 
     /**
+     * Can every authenticated user write to the WebDAV public directory
+     * (otherwise only admins can, everybody can read).
+     *
+     * @var bool
+     */
+    protected $webdavPublicDirWritable;
+
+    /**
      * @var EntityManagerInterface
      */
     protected $em;
@@ -149,7 +162,7 @@ class DAVController extends AbstractController
      */
     protected $server;
 
-    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, BirthdayService $birthdayService, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, bool $publicCalendarsEnabled = true, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null)
+    public function __construct(MailerInterface $mailer, BasicAuth $basicAuthBackend, IMAPAuth $IMAPAuthBackend, LDAPAuth $LDAPAuthBackend, UrlGeneratorInterface $router, EntityManagerInterface $entityManager, LoggerInterface $logger, BirthdayService $birthdayService, string $publicDir, bool $calDAVEnabled = true, bool $cardDAVEnabled = true, bool $webDAVEnabled = false, bool $publicCalendarsEnabled = true, ?string $inviteAddress = null, ?string $authMethod = null, ?string $authRealm = null, ?string $webdavPublicDir = null, ?string $webdavHomesDir = null, ?string $webdavTmpDir = null, bool $webdavPublicDirWritable = false)
     {
         $this->publicDir = $publicDir;
 
@@ -162,6 +175,7 @@ class DAVController extends AbstractController
         $this->webdavPublicDir = $webdavPublicDir;
         $this->webdavHomesDir = $webdavHomesDir;
         $this->webdavTmpDir = $webdavTmpDir;
+        $this->webdavPublicDirWritable = $webdavPublicDirWritable;
 
         $this->em = $entityManager;
         $this->logger = $logger;
@@ -227,6 +241,7 @@ class DAVController extends AbstractController
         ];
 
         if ($this->webdavHomesDir) {
+            $this->assertWebdavDirectory($this->webdavHomesDir, 'WEBDAV_HOMES_DIR');
             $nodes[] = new \Sabre\DAVACL\FS\HomeCollection($principalBackend, $this->webdavHomesDir);
         }
 
@@ -239,11 +254,31 @@ class DAVController extends AbstractController
             $nodes[] = new \Sabre\CardDAV\AddressBookRoot($principalBackend, $carddavBackend);
         }
         if ($this->webDAVEnabled && $this->webdavTmpDir && $this->webdavPublicDir) {
-            $nodes[] = new \Sabre\DAV\FS\Directory($this->webdavPublicDir);
+            $this->assertWebdavDirectory($this->webdavTmpDir, 'WEBDAV_TMP_DIR');
+            $this->assertWebdavDirectory($this->webdavPublicDir, 'WEBDAV_PUBLIC_DIR');
+            // Temporary files and the locks database would be served as regular files if the tmp
+            // dir lived inside the public one, and users could browse other users' homes if the
+            // homes dir did.
+            $this->assertWebdavDirectoriesAreDisjoint($this->webdavPublicDir, 'WEBDAV_PUBLIC_DIR', $this->webdavTmpDir, 'WEBDAV_TMP_DIR');
+            if ($this->webdavHomesDir) {
+                $this->assertWebdavDirectoriesAreDisjoint($this->webdavPublicDir, 'WEBDAV_PUBLIC_DIR', $this->webdavHomesDir, 'WEBDAV_HOMES_DIR');
+            }
+
+            // Explicit ACL for the shared directory: every authenticated user can read it, and
+            // writing is reserved to admins (the ACL plugin grants them every privilege) unless
+            // WEBDAV_PUBLIC_DIR_WRITABLE opens it to everyone. Children inherit this ACL.
+            $publicDirAcl = [
+                ['principal' => '{DAV:}authenticated', 'privilege' => '{DAV:}read', 'protected' => true],
+            ];
+            if ($this->webdavPublicDirWritable) {
+                $publicDirAcl[] = ['principal' => '{DAV:}authenticated', 'privilege' => '{DAV:}write', 'protected' => true];
+            }
+            $nodes[] = new \Sabre\DAVACL\FS\Collection($this->webdavPublicDir, $publicDirAcl);
         }
 
-        // The object tree needs in turn to be passed to the server class
-        $this->server = new \Sabre\DAV\Server($nodes);
+        // The object tree needs in turn to be passed to the server class. The SAPI keeps
+        // sabre from writing to the output itself: dav() turns its response into a Symfony one.
+        $this->server = new \Sabre\DAV\Server($nodes, new CapturingSapi());
         $this->server->setBaseUri($this->baseUri);
 
         // Plugins
@@ -272,11 +307,17 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\DAV\Sharing\Plugin());
             $this->server->addPlugin(new \Sabre\CalDAV\Plugin());
             $this->server->addPlugin(new \Sabre\CalDAV\Schedule\Plugin());
+            // Issue #317: macOS Calendar needs calendar-availability to exist on the inbox
+            $this->server->addPlugin(new DefaultAvailabilityPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\Subscriptions\Plugin());
             if ($this->inviteAddress) {
-                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->publicDir));
+                $this->server->addPlugin(new DavisIMipPlugin($this->mailer, $this->inviteAddress, $this->publicDir, $this->logger));
+            } else {
+                // Without it the scheduling plugin above still answers, but no invitation ever
+                // leaves the server and nothing says so.
+                $this->logger->warning('CalDAV scheduling is enabled but INVITE_FROM_ADDRESS is not set: no invitation email will be sent.');
             }
         }
 
@@ -292,13 +333,50 @@ class DAVController extends AbstractController
 
         // WebDAV plugins
         if ($this->webDAVEnabled && $this->webdavTmpDir && $this->webdavPublicDir) {
-            if (!is_dir($this->webdavTmpDir) || !is_dir($this->webdavPublicDir)) {
-                throw new \Exception('The WebDAV temp dir and/or public dir are not available. Make sure they are created with the correct permissions.');
-            }
             $lockBackend = new \Sabre\DAV\Locks\Backend\File($this->webdavTmpDir.'/locksdb');
             $this->server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
             $this->server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());
-            $this->server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($this->webdavTmpDir));
+            // Temporary files must obey the ACL of their directory (see the plugin for the why)
+            $this->server->addPlugin(new DavisTemporaryFileFilterPlugin($this->webdavTmpDir));
+        }
+    }
+
+    /**
+     * A WebDAV directory must exist, be given as an absolute path (a relative one would be
+     * resolved against the PHP process' working directory, which is not predictable) and
+     * must not live inside the web root, where the web server would serve its content
+     * directly and bypass every DAV permission check.
+     */
+    private function assertWebdavDirectory(string $dir, string $envVar): string
+    {
+        if (!Path::isAbsolute($dir)) {
+            throw new \RuntimeException(sprintf('%s must be an absolute path, "%s" given.', $envVar, $dir));
+        }
+
+        $realDir = realpath($dir);
+        if (false === $realDir || !is_dir($realDir)) {
+            throw new \RuntimeException(sprintf('%s points to "%s", which does not exist or is not a directory. Make sure it is created with the correct permissions.', $envVar, $dir));
+        }
+
+        $webRoot = realpath($this->publicDir);
+        if (false !== $webRoot && Path::isBasePath($webRoot, $realDir)) {
+            throw new \RuntimeException(sprintf('%s ("%s") must not be inside the web root ("%s"): the web server would serve these files without any permission check.', $envVar, $dir, $webRoot));
+        }
+
+        return $realDir;
+    }
+
+    /**
+     * Neither directory may be the other one or live inside it. Both must already have
+     * passed assertWebdavDirectory(), so they exist and realpath() resolves them.
+     */
+    private function assertWebdavDirectoriesAreDisjoint(string $dirA, string $envVarA, string $dirB, string $envVarB): void
+    {
+        $realA = realpath($dirA);
+        $realB = realpath($dirB);
+
+        if (Path::isBasePath($realA, $realB) || Path::isBasePath($realB, $realA)) {
+            throw new \RuntimeException(sprintf('%s ("%s") and %s ("%s") must be separate directories, one must not be inside the other.', $envVarA, $dirA, $envVarB, $dirB));
         }
     }
 
@@ -370,36 +448,32 @@ class DAVController extends AbstractController
             return $response;
         }
 
-        // \Sabre\DAV\Server does not let us use a custom SAPI, and its behaviour
-        // is to directly output headers and content to php://output. Hence, we
-        // let the headers pass (we have not choice) and capture the output in a
-        // buffer.
-        // This allows us to use a Response, and not to break the events triggered
-        // by Symfony after the response is sent, like for instance the TERMINATE
-        // event from the Kernel, that is used to send emails...
-
-        ob_start(); // Does not capture headers!
+        // The server runs the request but, thanks to CapturingSapi, sends nothing: status,
+        // headers and body are all still in its response object, whether a method handler
+        // produced them, a plugin short-circuited the request from `beforeMethod` (the
+        // temporary file filter does) or the server caught an exception.
         $this->server->start();
+        $sabreResponse = $this->server->httpResponse;
+        $body = $sabreResponse->getBody();
 
-        $output = ob_get_contents();
-        ob_end_clean();
+        if (is_resource($body)) {
+            // Stream file contents instead of buffering them in memory. sabre honours
+            // Content-Length when it streams (range requests rely on it), so do the same.
+            $length = $sabreResponse->getHeader('Content-Length');
+            $response = new StreamedResponse(function () use ($body, $length): void {
+                $output = fopen('php://output', 'wb');
+                stream_copy_to_stream($body, $output, null === $length ? null : (int) $length);
+                fclose($body);
+            }, $sabreResponse->getStatus());
+        } elseif (is_callable($body)) {
+            // Some plugins hand over a closure that writes straight to php://output
+            $response = new StreamedResponse($body, $sabreResponse->getStatus());
+        } else {
+            $response = new Response($sabreResponse->getBodyAsString(), $sabreResponse->getStatus());
+        }
 
-        // As previously said, headers are already _prepared_ by the server,
-        // so we can't modify them or remove them. But they are not _sent_ yet,
-        // so headers_sent() is false, and Symfony will add its own headers above it.
-        //
-        // The Content-type header is the problem, since Symfony will
-        // output `text/html` for everything since it doesn't know any better.
-        // Thus, we have to get the _real_ Content-type header already prepared,
-        // and force it in the Symfony Response.
-        //
-        // That's what we do here.
-        $response = new Response($output, http_response_code(), []);
-        foreach (headers_list() as $header) {
-            if ('content-type:' === strtolower(substr($header, 0, 13))) {
-                $headerArray = explode(':', $header);
-                $response->headers->set('Content-type', $headerArray[1]);
-            }
+        foreach ($sabreResponse->getHeaders() as $name => $values) {
+            $response->headers->set($name, $values);
         }
 
         return $response;

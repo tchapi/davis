@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Card
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
     private $id;
 
@@ -26,7 +26,7 @@ class Card
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $uri;
 
-    #[ORM\Column(name: 'lastmodified', type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'lastmodified', type: 'bigint', nullable: true)]
     private $lastModified;
 
     #[ORM\Column(type: 'string', length: 32, nullable: true)]

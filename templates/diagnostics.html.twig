@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% set menu = 'dashboard' %}
+
+{% macro severity_badge(severity) %}
+  {% set map = {'danger': 'bg-danger', 'warning': 'bg-warning text-dark', 'ok': 'bg-success', 'info': 'bg-secondary'} %}
+  <span class="badge rounded-1 {{ map[severity] }}">{{ ("diagnostics.severity." ~ severity)|trans }}</span>
+{% endmacro %}
+
+{% block body %}
+
+<div class="diagnostics-page">
+
+{% include '_partials/back_button.html.twig' with { url: path('dashboard'), text: "diagnostics.back"|trans } %}
+
+<h1 class="display-4 fw-lighter">{{ "diagnostics.title"|trans }}</h1>
+
+{% if attentionCount > 0 %}
+  <div class="alert alert-warning mt-4">{{ "diagnostics.attention"|trans({'%count%': attentionCount}) }}</div>
+{% else %}
+  <div class="alert alert-success mt-4">{{ "diagnostics.all_good"|trans }}</div>
+{% endif %}
+
+{% for bucket in buckets %}
+  <h3 class="mb-3 mt-4">{{ bucket.title|trans }}</h3>
+
+  <ul class="list-group mb-4">
+    {% for check in bucket.checks %}
+      {% set tint = {'danger': ' list-group-item-danger', 'warning': ' list-group-item-warning', 'ok': ' list-group-item-success', 'info': ''} %}
+      <li class="list-group-item p-3{{ tint[check.severity] }}">
+        <div class="d-flex w-100 justify-content-between align-items-center gap-3">
+          <strong>{{ check.title|trans }}</strong>
+          {{ _self.severity_badge(check.severity) }}
+        </div>
+        <div class="mt-2"><code>{{ check.value starts with 'diagnostics.' ? check.value|trans : check.value }}</code></div>
+        {% if check.fix %}
+          <p class="mb-0 mt-2 small text-body-secondary">{{ check.fix|trans }}</p>
+        {% endif %}
+        {% if check.command %}
+          <pre class="mb-0 mt-2 p-2 small bg-body-tertiary rounded"><code>{{ check.command }}</code></pre>
+        {% endif %}
+        {% if check.link %}
+          <a class="small d-inline-block mt-2" href="{{ check.link }}">{{ "diagnostics.go_there"|trans }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endfor %}
+
+</div>
+
+{% endblock %}

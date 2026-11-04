@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\Entity\AddressBook;
+use App\Entity\Principal;
 use App\Entity\User;
 use App\Security\AdminUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -122,6 +123,134 @@ class AddressBookControllerTest extends WebTestCase
 
         $em = static::getContainer()->get('doctrine.orm.entity_manager');
         $this->assertNull($em->getRepository(AddressBook::class)->findOneBy(['uri' => str_repeat('a', 256)]));
+    }
+
+    /**
+     * The uri becomes a path segment under `/dav/addressbooks/<user>/`, so it has to be a single
+     * segment and nothing else.
+     */
+    public function testAddressBookNewRefusesAUriThatIsNotOneSegment(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        foreach (['../../evil', 'a/b', 'has space', 'dots.and.more', ''] as $uri) {
+            $crawler = $client->request('GET', '/addressbooks/'.$userId.'/new');
+            $form = $crawler->selectButton('address_book_save')->form();
+
+            $client->submit($form, [
+                'address_book[uri]' => $uri,
+                'address_book[displayName]' => 'Traversal',
+                'address_book[description]' => 'nope',
+            ]);
+
+            $this->assertResponseIsSuccessful('"'.$uri.'" should come back as a form error');
+            $this->assertSelectorExists('.invalid-feedback, .form-error-message');
+            $this->assertNull($em->getRepository(AddressBook::class)->findOneBy(['uri' => $uri]));
+        }
+    }
+
+    /**
+     * Issue #308: saving an address book with an empty description gave a 500. The field is
+     * optional, so an empty textarea arrives as null, but setDescription() only took a string.
+     */
+    public function testAnAddressBookCanBeSavedWithoutADescription(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $book = $em->getRepository(AddressBook::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+
+        $crawler = $client->request('GET', '/addressbooks/'.$userId.'/edit/'.$book->getId());
+        $form = $crawler->selectButton('address_book_save')->form();
+
+        $client->submit($form, [
+            'address_book[uri]' => 'default',
+            'address_book[displayName]' => 'Renamed, no description',
+            'address_book[description]' => '',
+        ]);
+
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $reloaded = $em->getRepository(AddressBook::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+        $this->assertSame('Renamed, no description', $reloaded->getDisplayName());
+        $this->assertNull($reloaded->getDescription());
+    }
+
+    /**
+     * Creating one never failed, because Symfony only calls the setter when the value changes and a
+     * new address book starts with no description. This checks the result instead: an empty
+     * description is saved as null, not as an empty string.
+     */
+    public function testAnAddressBookCanBeCreatedWithoutADescription(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+
+        $crawler = $client->request('GET', '/addressbooks/'.$userId.'/new');
+        $form = $crawler->selectButton('address_book_save')->form();
+
+        $client->submit($form, [
+            'address_book[uri]' => 'no_description',
+            'address_book[displayName]' => 'No description',
+            'address_book[description]' => '',
+        ]);
+
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
+
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $this->assertNull($em->getRepository(AddressBook::class)->findOneBy(['uri' => 'no_description'])->getDescription());
+    }
+
+    /**
+     * The field is mapped, so `handleRequest()` writes it onto the entity and the flush persists
+     * it, both ways round.
+     */
+    public function testTheBirthdayCalendarFlagIsSaved(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        foreach ([true, false] as $included) {
+            $book = $em->getRepository(AddressBook::class)->findOneBy([
+                'principalUri' => Principal::PREFIX.'test_user',
+                'uri' => 'default',
+            ]);
+
+            $crawler = $client->request('GET', '/addressbooks/'.$userId.'/edit/'.$book->getId());
+            $form = $crawler->selectButton('address_book_save')->form();
+
+            $client->submit($form, [
+                'address_book[uri]' => 'default',
+                'address_book[displayName]' => 'Default',
+                'address_book[includedInBirthdayCalendar]' => $included ? 1 : 0,
+            ]);
+            $this->assertResponseRedirects('/addressbooks/'.$userId);
+
+            $em = static::getContainer()->get('doctrine.orm.entity_manager');
+            $reloaded = $em->getRepository(AddressBook::class)->findOneBy([
+                'principalUri' => Principal::PREFIX.'test_user',
+                'uri' => 'default',
+            ]);
+            $this->assertSame($included, $reloaded->isIncludedInBirthdayCalendar());
+        }
     }
 
     public function testAddressBookDelete(): void
