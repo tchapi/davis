@@ -53,6 +53,43 @@ class AppKeyRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return AppKey[] the keys revoked (or expired) on or before the cutoff, oldest revocation first
+     */
+    public function findRevokedBefore(\DateTimeImmutable $cutoff): array
+    {
+        return $this->createQueryBuilder('k')
+            ->where('k.revokedAt IS NOT NULL')
+            ->andWhere('k.revokedAt <= :cutoff')
+            ->setParameter('cutoff', $cutoff, 'datetime_immutable')
+            ->orderBy('k.revokedAt', 'ASC')
+            ->addOrderBy('k.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Deletes a key and its usage history.
+     */
+    public function delete(AppKey $key): void
+    {
+        $em = $this->getEntityManager();
+
+        $em->wrapInTransaction(function () use ($em, $key): void {
+            // The usages are deleted by hand. Their FK has ON DELETE CASCADE, but SQLite only
+            // honours it with PRAGMA foreign_keys = ON, which DBAL 3 does not set.
+            $em->createQueryBuilder()
+                ->delete(AppKeyUsage::class, 'u')
+                ->where('u.appKey = :key')
+                ->setParameter('key', $key)
+                ->getQuery()
+                ->execute();
+
+            $em->remove($key);
+            $em->flush();
+        });
+    }
+
+    /**
      * @param string[] $scope
      *
      * @return string[] the usernames in the scope that have no account

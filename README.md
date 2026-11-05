@@ -191,6 +191,20 @@ It works with every `AUTH_METHOD` and never contacts the backend: a wrong secret
 
 The secret is shown once at creation and stored hashed. Keep it on the server side, never in a browser, and revoke the key (dashboard, or `davis:app-key:revoke <app_id>`) when the service goes away; an expiry date can be set when the access is meant to be temporary. This is the use case of [#183](https://github.com/tchapi/davis/issues/183).
 
+Revoked keys stay listed. To remove one for good, use `davis:app-key:delete <app_id>` (an active key must be revoked first). To clean up in bulk, `davis:app-key:prune <days>` deletes every key revoked at least `<days>` days ago; `--dry-run` shows what would go. A key with an expiry date still ahead is active and is never deleted by either command. Deleting a key also deletes its usage history, so pick `<days>` according to how long you want to keep it.
+
+Davis does not schedule the prune itself. If you want it, add a cron job, for example every night at 3am with a 90 days retention:
+
+```shell
+0 3 * * * cd /path/to/davis && bin/console davis:app-key:prune 90 -q
+```
+
+or, with the docker image:
+
+```shell
+0 3 * * * docker exec davis sh -c "APP_ENV=prod bin/console davis:app-key:prune 90 -q"
+```
+
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
 ```shell
