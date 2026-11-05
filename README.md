@@ -169,6 +169,14 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 > one is stored with bcrypt and no longer depends on the realm. Your own admin login is unaffected —
 > it comes from `ADMIN_LOGIN` / `ADMIN_PASSWORD`, not from the users table.
 
+**Update check**
+
+```shell
+UPDATE_CHECK_ENABLED=false
+```
+
+Davis does not phone home. Set `UPDATE_CHECK_ENABLED=true` to have the [diagnostics page](#start-with-the-diagnostics-page) ask GitHub whether a newer release exists, and link to its release notes when there is one. The dashboard then counts it among the points that need your attention. GitHub (`api.github.com`) is asked at most once a day, anonymously, and only when you open the dashboard; nothing about your install is sent. If GitHub cannot be reached, the check says so and is tried again an hour later.
+
 **App keys**
 
 ```shell
@@ -191,13 +199,19 @@ It works with every `AUTH_METHOD` and never contacts the backend: a wrong secret
 
 The secret is shown once at creation and stored hashed. Keep it on the server side, never in a browser, and revoke the key (dashboard, or `davis:app-key:revoke <app_id>`) when the service goes away; an expiry date can be set when the access is meant to be temporary. This is the use case of [#183](https://github.com/tchapi/davis/issues/183).
 
-**Update check**
+Revoked keys stay listed. To remove one for good, use `davis:app-key:delete <app_id>` (an active key must be revoked first). To clean up in bulk, `davis:app-key:prune <days>` deletes every key revoked at least `<days>` days ago; `--dry-run` shows what would go. A key with an expiry date still ahead is active and is never deleted by either command. Deleting a key also deletes its usage history, so pick `<days>` according to how long you want to keep it.
+
+Davis does not schedule the prune itself. If you want it, add a cron job, for example every night at 3am with a 90 days retention:
 
 ```shell
-UPDATE_CHECK_ENABLED=false
+0 3 * * * cd /path/to/davis && bin/console davis:app-key:prune 90 -q
 ```
 
-Davis does not phone home. Set `UPDATE_CHECK_ENABLED=true` to have the [diagnostics page](#start-with-the-diagnostics-page) ask GitHub whether a newer release exists, and link to its release notes when there is one. The dashboard then counts it among the points that need your attention. GitHub (`api.github.com`) is asked at most once a day, anonymously, and only when you open the dashboard; nothing about your install is sent. If GitHub cannot be reached, the check says so and is tried again an hour later.
+or, with the docker image:
+
+```shell
+0 3 * * * docker exec davis sh -c "APP_ENV=prod bin/console davis:app-key:prune 90 -q"
+```
 
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
