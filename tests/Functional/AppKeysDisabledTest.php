@@ -57,7 +57,7 @@ class AppKeysDisabledTest extends WebTestCase
         self::bootKernel();
         $application = new Application(self::$kernel);
 
-        foreach (['davis:app-key:create', 'davis:app-key:list', 'davis:app-key:revoke'] as $name) {
+        foreach (['davis:app-key:create', 'davis:app-key:list', 'davis:app-key:revoke', 'davis:app-key:delete', 'davis:app-key:prune'] as $name) {
             try {
                 $application->find($name);
                 $this->fail($name.' must not be available');
