@@ -79,7 +79,7 @@ Dependencies
     b. If you plan to run Davis on production
 
     ```
-    composer install --no-dev
+    composer install --no-dev --optimize-autoloader
     ```
 
    And set `APP_ENV=prod` in your `.env.local` file (see below)
@@ -190,6 +190,14 @@ Davis records which users each key has acted as, with the first and last time. Y
 It works with every `AUTH_METHOD` and never contacts the backend: a wrong secret is refused outright, and a username ending in `*<something that is not an app id>` is sent to the backend as is. The login must be an existing Davis account, with exactly the same username. An app key never creates an account, even with IMAP or LDAP and `*_AUTH_USER_AUTOCREATE`, because it never asks the IMAP or LDAP server if the user is real. The account must already exist.
 
 The secret is shown once at creation and stored hashed. Keep it on the server side, never in a browser, and revoke the key (dashboard, or `davis:app-key:revoke <app_id>`) when the service goes away; an expiry date can be set when the access is meant to be temporary. This is the use case of [#183](https://github.com/tchapi/davis/issues/183).
+
+**Update check**
+
+```shell
+UPDATE_CHECK_ENABLED=false
+```
+
+Davis does not phone home. Set `UPDATE_CHECK_ENABLED=true` to have the [diagnostics page](#start-with-the-diagnostics-page) ask GitHub whether a newer release exists, and link to its release notes when there is one. The dashboard then counts it among the points that need your attention. GitHub (`api.github.com`) is asked at most once a day, anonymously, and only when you open the dashboard; nothing about your install is sent. If GitHub cannot be reached, the check says so and is tried again an hour later.
 
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
@@ -417,6 +425,105 @@ If you're migrating from Baïkal, then you will likely want to do the following 
 > [!NOTE]
 > Some details / steps to resolve are also available in https://github.com/tchapi/davis/issues/226.
 
+## Updating (without Docker)
+
+Davis is not distributed as a bundled archive: the release assets are the plain source tree, without `vendor/`. Updating therefore means fetching the new code and re-running the same steps as the installation. The whole procedure takes a minute; **the part that matters is reading the release notes**.
+
+> [!CAUTION]
+> **Do not automate updates with cron.** Some releases need a human: v5.3.0 changed the `IMAP_AUTH_URL` format, v5.4.0 changed the dashboard URLs, and major versions (v3, v4, v5) each had their own migration notes. Every release has a *How to upgrade* section on [the releases page](https://github.com/tchapi/davis/releases) — read it first.
+
+### 0. Prerequisites
+
+- Run all commands below **as the user that owns the Davis directory** (ideally the same user PHP-FPM runs as). Running them as `root` leaves `var/cache` and `vendor/` unreadable or unwritable for the web server.
+- If you keep your configuration in the web server (`SetEnv`, `fastcgi_param`) or in another folder (`ENV_DIR`) rather than in `.env.local`, export the same values for the shell session, otherwise the CLI falls back to the `dev` defaults of `.env`:
+
+  ```shell
+  export APP_ENV=prod
+  export ENV_DIR=/var/lib/davis   # only if you use it
+  # export DATABASE_DRIVER=... DATABASE_URL=... if they are not in an env file either
+  ```
+
+- Check where you are: `git describe --tags` (git install).
+
+### 1. Back up the database
+
+Migrations can go wrong (even though they are generally reversible). Back up **before** touching anything:
+
+```shell
+# MySQL / MariaDB
+mysqldump -u davis -p davis > davis-$(date +%F).sql
+# PostgreSQL
+pg_dump -U davis davis > davis-$(date +%F).sql
+# SQLite (safe while the server is running)
+sqlite3 var/data.db ".backup davis-$(date +%F).db"
+```
+
+Also keep a copy of `.env.local` if you have one.
+
+### 2. Update the code
+
+**a. If you cloned the repository**
+
+```shell
+cd /var/www/davis
+git status                     # must be clean: local edits are not supported and may block the checkout
+git fetch --tags
+git checkout vX.Y.Z            # always a release tag — never `main`, which is the unstable edge branch
+```
+
+To see the newest tag: `git tag --sort=-v:refname | head -n 1`. `.env.local`, `var/` and `vendor/` are untracked and survive the checkout.
+
+**b. If you installed from a release archive**
+
+Unpack the new archive **next to** the current install, not over it, then move your state into it:
+
+```shell
+cd /var/www
+tar xzf vX.Y.Z.tar.gz                # creates davis-X.Y.Z/
+cp davis/.env.local davis-X.Y.Z/     # if you use one
+mv davis/var davis-X.Y.Z/var         # logs, cache, and the SQLite database if you use the default path
+mv davis davis-old && mv davis-X.Y.Z davis
+```
+
+### 3. Install the dependencies
+
+```shell
+composer install --no-dev --optimize-autoloader
+```
+
+This also clears the cache and installs the public assets (`cache:clear` and `assets:install` run automatically after install, see `composer.json`). Use plain `composer install` only for a development setup with `APP_ENV=dev`.
+
+### 4. Migrate the database
+
+```shell
+bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+```
+
+`--allow-no-migration` makes the command succeed when the release contains no migration, so the same command works for every update.
+
+> [!NOTE]
+> Coming from **before v3.0.0**? Follow the v3.0.0 release notes first: `doctrine:migrations:migrate` alone will not work.
+
+### 5. Reload PHP (OPcache)
+
+If `opcache.validate_timestamps=0` in your PHP configuration (a common production setting), the old code stays in memory until PHP-FPM is reloaded:
+
+```shell
+sudo systemctl reload php8.4-fpm   # adjust to your PHP version / service name
+```
+
+### 6. Check
+
+Open `/dashboard/diagnostics`. It reports pending migrations, the database engine in use and the state of each endpoint — if everything is green, you're done. The log, if any, is in `var/log/prod.log`.
+
+### Rolling back
+
+Code: `git checkout <previous tag>` (or swap the directories back for an archive install), then `composer install --no-dev --optimize-autoloader` again. Database: restore the backup from step 1.
+
+### Being notified of new releases
+
+On GitHub, use *Watch → Custom → Releases*, or subscribe to the feed at `https://github.com/tchapi/davis/releases.atom`. Alternatively, set `UPDATE_CHECK_ENABLED=true` (see [Configuration](#configuration)) and the diagnostics page tells you when a newer release exists. Davis never checks on its own unless you turn that on, and never installs anything.
+
 # 🌐 Access / Webserver
 
 A simple status page is available on the root `/` of the server.
@@ -514,7 +621,7 @@ server {
     }
 
     location ~ ^/index\.php(/|$) {
-        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock; # Change for your PHP version
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock; # Change for your PHP version
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
 
@@ -628,6 +735,9 @@ You can start the containers with :
 
 ### Updating from a previous version
 
+> [!TIP]
+> For installations without Docker, see [Updating (without Docker)](#updating-without-docker)
+
 If you update the code, you need to make sure the database structure is in sync.
 
 **Before v3.0.0**, you need to force the update:
@@ -636,7 +746,7 @@ If you update the code, you need to make sure the database structure is in sync.
 
 **For v3.0.0 and after**, you can just migrate again (_provided you correctly followed the migration notes in the v3.0.0 release_):
 
-    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction"
+    docker exec -it davis sh -c "APP_ENV=prod bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
 
 
 Then, head up to `http://<YOUR_DOCKER_IP>:9000` to see the status display :
@@ -695,7 +805,9 @@ The dashboard tells you how many points need your attention and links to **Diagn
 
 It groups the checks into Runtime, Database, Authentication, Scheduling and mail, and Endpoints, and each one that needs action says what to do about it and gives the command or query to run. Among other things it reports migrations that have not been run, the database engine actually in use, whether the log directory is writable, whether the selected authentication method has the PHP extension it needs, and how many accounts have no email address and therefore never send an invitation.
 
-Everything on it is read-only and passive — no connection is opened, so it stays usable when something is down. Credentials are never shown: the mail transport is displayed as scheme and host only. Use `bin/console davis:mail:test you@example.org` to actually exercise the mailer.
+Everything on it is read-only and passive — no connection is opened, so it stays usable when something is down. The only exception is the optional update check (`UPDATE_CHECK_ENABLED=true`), which asks GitHub at most once a day whether a newer release exists, and degrades to "unknown" when it cannot.
+
+Credentials are never shown: the mail transport is displayed as scheme and host only. Use `bin/console davis:mail:test you@example.org` to actually exercise the mailer.
 
 ### Logs
 

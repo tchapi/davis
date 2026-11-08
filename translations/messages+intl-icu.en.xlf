@@ -989,6 +989,30 @@
         <source>diagnostics.accounts_without_email.help</source>
         <target>An account with no email address never sends an invitation, because the address is what Davis matches against the event organiser. Each account's address has to be the one its calendar client sends.</target>
       </trans-unit>
+      <trans-unit id="dbgupd0" resname="diagnostics.update">
+        <source>diagnostics.update</source>
+        <target>Latest release</target>
+      </trans-unit>
+      <trans-unit id="dbgupd1" resname="diagnostics.update.disabled">
+        <source>diagnostics.update.disabled</source>
+        <target>Davis does not phone home. Set UPDATE_CHECK_ENABLED=true to have this page ask GitHub, at most once a day, whether a newer release exists.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd2" resname="diagnostics.update.available">
+        <source>diagnostics.update.available</source>
+        <target>A newer release is available. Read its release notes before updating: they list the migration to run and anything that changed behaviour.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd3" resname="diagnostics.update.current">
+        <source>diagnostics.update.current</source>
+        <target>This is the latest release. GitHub is asked at most once a day.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd4" resname="diagnostics.update.unreachable">
+        <source>diagnostics.update.unreachable</source>
+        <target>The latest release could not be looked up on GitHub (no network, or the API rate limit was hit). It is tried again in an hour.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd5" resname="diagnostics.value.unknown">
+        <source>diagnostics.value.unknown</source>
+        <target>Unknown</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -39,7 +39,7 @@
           <pre class="mb-0 mt-2 p-2 small bg-body-tertiary rounded"><code>{{ check.command }}</code></pre>
         {% endif %}
         {% if check.link %}
-          <a class="small d-inline-block mt-2" href="{{ check.link }}">{{ "diagnostics.go_there"|trans }}</a>
+          <a class="small d-inline-block mt-2" href="{{ check.link }}"{% if check.link starts with 'http' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ "diagnostics.go_there"|trans }}</a>
         {% endif %}
       </li>
     {% endfor %}
