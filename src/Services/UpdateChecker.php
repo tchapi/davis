@@ -65,7 +65,11 @@ final class UpdateChecker
             return $release;
         });
 
-        return isset($cached['version']) ? $cached : null;
+        if (!is_array($cached) || !isset($cached['version'], $cached['url'])) {
+            return null;
+        }
+
+        return ['version' => (string) $cached['version'], 'url' => (string) $cached['url']];
     }
 
     /**
@@ -93,7 +97,7 @@ final class UpdateChecker
                 'User-Agent' => 'Davis/'.$this->currentVersion,
             ],
             'timeout' => self::TIMEOUT,
-            'max_duration' => 2 * self::TIMEOUT,
+            'max_duration' => 2.0 * self::TIMEOUT,
         ]);
 
         $release = $response->toArray();

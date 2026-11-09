@@ -18,7 +18,7 @@ class UpdateCheckerTest extends TestCase
 {
     private static function release(string $tag, string $url = 'https://github.com/tchapi/davis/releases/tag/v99.0.0'): MockResponse
     {
-        return new MockResponse(json_encode(['tag_name' => $tag, 'html_url' => $url]), [
+        return new MockResponse(json_encode(['tag_name' => $tag, 'html_url' => $url], JSON_THROW_ON_ERROR), [
             'response_headers' => ['content-type' => 'application/json'],
         ]);
     }
@@ -40,8 +40,8 @@ class UpdateCheckerTest extends TestCase
         $http = new MockHttpClient([self::release('v99.0.0'), self::release('v100.0.0')]);
         $checker = new UpdateChecker($http, new ArrayAdapter(), true, '5.6.3');
 
-        $this->assertSame('99.0.0', $checker->latestRelease()['version']);
-        $this->assertSame('99.0.0', $checker->latestRelease()['version']);
+        $this->assertSame('99.0.0', $checker->latestRelease()['version'] ?? null);
+        $this->assertSame('99.0.0', $checker->latestRelease()['version'] ?? null);
         $this->assertSame(1, $http->getRequestsCount());
     }
 
@@ -69,7 +69,7 @@ class UpdateCheckerTest extends TestCase
     {
         $checker = new UpdateChecker(new MockHttpClient(self::release('v99.0.0', 'https://example.org/phishing')), new ArrayAdapter(), true, '5.6.3');
 
-        $this->assertSame(UpdateChecker::RELEASES_URL, $checker->latestRelease()['url']);
+        $this->assertSame(UpdateChecker::RELEASES_URL, $checker->latestRelease()['url'] ?? null);
     }
 
     public function testTheRequestIdentifiesItselfAndDoesNotWaitLong(): void

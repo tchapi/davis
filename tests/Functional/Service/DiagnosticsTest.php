@@ -64,7 +64,7 @@ class DiagnosticsTest extends KernelTestCase
     {
         $response = '' === $latestTag
             ? new MockResponse('', ['http_code' => 503])
-            : new MockResponse(json_encode(['tag_name' => $latestTag, 'html_url' => 'https://github.com/tchapi/davis/releases/tag/'.$latestTag]));
+            : new MockResponse(json_encode(['tag_name' => $latestTag, 'html_url' => 'https://github.com/tchapi/davis/releases/tag/'.$latestTag], JSON_THROW_ON_ERROR));
 
         return new UpdateChecker(new MockHttpClient($response), new ArrayAdapter(), null !== $latestTag);
     }
