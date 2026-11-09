@@ -169,14 +169,6 @@ AUTH_METHOD=Basic # can be "Basic", "IMAP" or "LDAP"
 > one is stored with bcrypt and no longer depends on the realm. Your own admin login is unaffected —
 > it comes from `ADMIN_LOGIN` / `ADMIN_PASSWORD`, not from the users table.
 
-**Update check**
-
-```shell
-UPDATE_CHECK_ENABLED=false
-```
-
-Davis does not phone home. Set `UPDATE_CHECK_ENABLED=true` to have the [diagnostics page](#start-with-the-diagnostics-page) ask GitHub whether a newer release exists, and link to its release notes when there is one. The dashboard then counts it among the points that need your attention. GitHub (`api.github.com`) is asked at most once a day, anonymously, and only when you open the dashboard; nothing about your install is sent. If GitHub cannot be reached, the check says so and is tried again an hour later.
-
 **App keys**
 
 ```shell
@@ -212,6 +204,14 @@ or, with the docker image:
 ```shell
 0 3 * * * docker exec davis sh -c "APP_ENV=prod bin/console davis:app-key:prune 90 -q"
 ```
+
+**Update check**
+
+```shell
+UPDATE_CHECK_ENABLED=false
+```
+
+Davis does not phone home. Set `UPDATE_CHECK_ENABLED=true` to have the [diagnostics page](#start-with-the-diagnostics-page) ask GitHub whether a newer release exists, and link to its release notes when there is one. The dashboard then counts it among the points that need your attention. GitHub (`api.github.com`) is asked at most once a day, anonymously, and only when you open the dashboard; nothing about your install is sent. If GitHub cannot be reached, the check says so and is tried again an hour later.
 
 **d. The global flags to enable CalDAV, CardDAV and WebDAV**. You can also disable the option to have calendars public
 
