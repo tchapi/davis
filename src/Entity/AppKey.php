@@ -191,7 +191,7 @@ class AppKey
         return $this;
     }
 
-    public function getAppId(): ?string
+    public function getAppId(): string
     {
         return $this->appId;
     }

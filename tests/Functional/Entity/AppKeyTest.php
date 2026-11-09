@@ -13,7 +13,7 @@ class AppKeyTest extends TestCase
     {
         $key = AppKey::create('cal.com', ['*']);
 
-        $this->assertMatchesRegularExpression('/^app_[0-9a-f]{24}$/', (string) $key->getAppId());
+        $this->assertMatchesRegularExpression('/^app_[0-9a-f]{24}$/', $key->getAppId());
         $this->assertNotNull($key->getCreatedAt());
         $this->assertSame(['*'], $key->getScope());
         $this->assertNull($key->getRevokedAt());

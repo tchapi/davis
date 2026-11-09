@@ -2,9 +2,8 @@
 
 namespace App\Command;
 
-use App\Entity\AppKey;
+use App\Repository\AppKeyRepository;
 use App\Services\AppKeysFeature;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,7 +21,7 @@ class AppKeyPruneCommand extends Command
     public const MAX_DAYS = 36500;
 
     public function __construct(
-        private ManagerRegistry $doctrine,
+        private AppKeyRepository $repository,
         private AppKeysFeature $appKeys,
     ) {
         parent::__construct();
@@ -73,8 +72,7 @@ class AppKeyPruneCommand extends Command
         $dryRun = $input->getOption('dry-run');
         $cutoff = (new \DateTimeImmutable())->sub(new \DateInterval(sprintf('P%dD', $days)));
 
-        $repository = $this->doctrine->getRepository(AppKey::class);
-        $keys = $repository->findRevokedBefore($cutoff);
+        $keys = $this->repository->findRevokedBefore($cutoff);
 
         if (!$keys) {
             $io->note(sprintf('No app key revoked before %s, nothing to delete.', $cutoff->format('Y-m-d H:i')));
@@ -83,7 +81,9 @@ class AppKeyPruneCommand extends Command
         }
 
         foreach ($keys as $key) {
-            $io->writeln(sprintf('%s%s %s revoked %s', $dryRun ? 'Would delete ' : '', $key->getAppId(), $key->getName(), $key->getRevokedAt()->format('Y-m-d H:i')));
+            // findRevokedBefore() only returns revoked keys, so the date is always set
+            $revokedAt = $key->getRevokedAt();
+            $io->writeln(sprintf('%s%s %s revoked %s', $dryRun ? 'Would delete ' : '', $key->getAppId(), (string) $key->getName(), null === $revokedAt ? '-' : $revokedAt->format('Y-m-d H:i')));
         }
 
         if ($dryRun) {
@@ -92,7 +92,7 @@ class AppKeyPruneCommand extends Command
             return self::SUCCESS;
         }
 
-        $repository->delete($keys);
+        $this->repository->delete($keys);
         $io->success(sprintf('Deleted %d app key(s).', count($keys)));
 
         return self::SUCCESS;

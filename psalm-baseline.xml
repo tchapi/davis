@@ -209,12 +209,6 @@
       <code><![CDATA[getStatusCode]]></code>
     </PossiblyNullReference>
   </file>
-  <file src="tests/Functional/Controllers/AppKeyControllerTest.php">
-    <PossiblyNullArgument>
-      <code><![CDATA[$onlyUser2->getAppId()]]></code>
-      <code><![CDATA[$user2AndBob->getAppId()]]></code>
-    </PossiblyNullArgument>
-  </file>
   <file src="tests/Functional/Controllers/CalendarControllerTest.php">
     <PossiblyNullReference>
       <code><![CDATA[getId]]></code>

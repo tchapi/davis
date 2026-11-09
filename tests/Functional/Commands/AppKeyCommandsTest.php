@@ -25,12 +25,17 @@ class AppKeyCommandsTest extends KernelTestCase
         return $tester;
     }
 
-    private static function keyByAppId(string $appId): AppKey
+    private static function findKeyByAppId(string $appId): ?AppKey
     {
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $em->clear();
 
-        $key = $em->getRepository(AppKey::class)->findOneByAppId($appId);
+        return $em->getRepository(AppKey::class)->findOneByAppId($appId);
+    }
+
+    private static function keyByAppId(string $appId): AppKey
+    {
+        $key = self::findKeyByAppId($appId);
         self::assertNotNull($key, "No app key with app id $appId");
 
         return $key;
@@ -197,7 +202,7 @@ class AppKeyCommandsTest extends KernelTestCase
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
         $this->assertStringContainsString($old->getAppId().' old revoked', $tester->getDisplay());
-        $this->assertNull(self::keyByAppId($old->getAppId()));
+        $this->assertNull(self::findKeyByAppId($old->getAppId()));
         $this->assertSame(0, self::countUsages($old));
         $this->assertNotNull(self::keyByAppId($recent->getAppId()));
         $this->assertSame(1, self::countUsages($recent));
@@ -215,9 +220,9 @@ class AppKeyCommandsTest extends KernelTestCase
         $tester = $this->runCommand('davis:app-key:prune', ['days' => '0']);
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertNull(self::keyByAppId($justRevoked->getAppId()));
+        $this->assertNull(self::findKeyByAppId($justRevoked->getAppId()));
         // app_revoked comes from the fixtures, revoked a day ago
-        $this->assertNull(self::keyByAppId('app_revoked'));
+        $this->assertNull(self::findKeyByAppId('app_revoked'));
         $this->assertNotNull(self::keyByAppId($active->getAppId()));
         $this->assertNotNull(self::keyByAppId($expiring->getAppId()));
         $this->assertNotNull(self::keyByAppId('app_test'));
@@ -289,7 +294,7 @@ class AppKeyCommandsTest extends KernelTestCase
         $tester = $this->runCommand('davis:app-key:delete', ['app-id' => $revoked->getAppId()]);
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertNull(self::keyByAppId($revoked->getAppId()));
+        $this->assertNull(self::findKeyByAppId($revoked->getAppId()));
         $this->assertSame(0, self::countUsages($revoked));
     }
 

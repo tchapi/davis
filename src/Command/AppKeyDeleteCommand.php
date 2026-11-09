@@ -2,9 +2,8 @@
 
 namespace App\Command;
 
-use App\Entity\AppKey;
+use App\Repository\AppKeyRepository;
 use App\Services\AppKeysFeature;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class AppKeyDeleteCommand extends Command
 {
     public function __construct(
-        private ManagerRegistry $doctrine,
+        private AppKeyRepository $repository,
         private AppKeysFeature $appKeys,
     ) {
         parent::__construct();
@@ -43,8 +42,7 @@ class AppKeyDeleteCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $appId = $input->getArgument('app-id');
 
-        $repository = $this->doctrine->getRepository(AppKey::class);
-        $key = $repository->findOneByAppId($appId);
+        $key = $this->repository->findOneByAppId($appId);
 
         if (null === $key) {
             $io->error(sprintf('No app key with the app id %s.', $appId));
@@ -58,7 +56,7 @@ class AppKeyDeleteCommand extends Command
             return self::FAILURE;
         }
 
-        $repository->delete([$key]);
+        $this->repository->delete([$key]);
 
         $io->success(sprintf('Deleted %s.', $appId));
 
