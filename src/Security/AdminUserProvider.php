@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -13,6 +14,10 @@ class AdminUserProvider implements UserProviderInterface
 {
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
+        if ('' === $identifier) {
+            throw new UserNotFoundException('The admin login cannot be empty.');
+        }
+
         return new AdminUser($identifier, bin2hex(random_bytes(64)));
     }
 

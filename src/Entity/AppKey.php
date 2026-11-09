@@ -79,7 +79,7 @@ class AppKey
      */
     public static function parseScope(string $text): array
     {
-        return self::normaliseScope(preg_split('/[\r\n,]+/', $text));
+        return self::normaliseScope(preg_split('/[\r\n,]+/', $text) ?: []);
     }
 
     /**

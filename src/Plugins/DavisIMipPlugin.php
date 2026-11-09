@@ -128,7 +128,11 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
             }
 
             foreach ($vevent->ATTENDEE as $attendee) {
-                if (isset($attendee['SCHEDULE-AGENT']) && 'CLIENT' === strtoupper((string) $attendee['SCHEDULE-AGENT'])) {
+                if (!$attendee instanceof VObject\Property) {
+                    continue;
+                }
+                $scheduleAgent = $attendee['SCHEDULE-AGENT'];
+                if ($scheduleAgent instanceof VObject\Parameter && 'CLIENT' === strtoupper((string) $scheduleAgent->getValue())) {
                     $this->logger->warning('Scheduling: an attendee is marked SCHEDULE-AGENT=CLIENT, so the client sends that invitation itself and Davis does not.', [
                         'attendee' => (string) $attendee,
                         'path' => $path,
@@ -167,6 +171,8 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 
     /**
      * Event handler for the 'schedule' event.
+     *
+     * @psalm-suppress RedundantCondition MESSAGE_ORIGIN_INDICATOR is a knob: the branches on it stay even though it is currently always set
      */
     public function schedule(ITip\Message $iTipMessage)
     {
@@ -272,7 +278,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
 
         $attendees = [];
         if (isset($iTipMessage->message->VEVENT->ATTENDEE)) {
-            $_attendees = &$iTipMessage->message->VEVENT->ATTENDEE;
+            $_attendees = $iTipMessage->message->VEVENT->ATTENDEE;
             for ($i = 0, $max = count($_attendees); $i < $max; ++$i) {
                 $attendee = $_attendees[$i];
                 $attendees[] = [

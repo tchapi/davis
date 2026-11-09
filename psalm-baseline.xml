@@ -89,9 +89,6 @@
     <PossiblyNullArgument>
       <code><![CDATA[$user->getPassword()]]></code>
     </PossiblyNullArgument>
-    <PossiblyUndefinedVariable>
-      <code><![CDATA[$oldHash]]></code>
-    </PossiblyUndefinedVariable>
     <UndefinedInterfaceMethod>
       <code><![CDATA[deletePathsAndTheirChildren]]></code>
       <code><![CDATA[findAllExceptPrincipal]]></code>
@@ -165,63 +162,20 @@
     </UndefinedInterfaceMethod>
   </file>
   <file src="src/Controller/DAVController.php">
-    <PossiblyFalseArgument>
-      <code><![CDATA[$output]]></code>
-      <code><![CDATA[$realA]]></code>
-      <code><![CDATA[$realA]]></code>
-      <code><![CDATA[$realB]]></code>
-      <code><![CDATA[$realB]]></code>
-    </PossiblyFalseArgument>
     <PossiblyNullArgument>
       <code><![CDATA[$authMethod]]></code>
       <code><![CDATA[$authRealm]]></code>
     </PossiblyNullArgument>
-    <PossiblyUndefinedVariable>
-      <code><![CDATA[$calendarBackend]]></code>
-    </PossiblyUndefinedVariable>
-    <TooManyArguments>
-      <code><![CDATA[new \Sabre\DAV\Auth\Plugin($authBackend, $authRealm)]]></code>
-    </TooManyArguments>
-  </file>
-  <file src="src/Entity/AppKey.php">
-    <PossiblyFalseArgument>
-      <code><![CDATA[preg_split('/[\r\n,]+/', $text)]]></code>
-    </PossiblyFalseArgument>
   </file>
   <file src="src/Entity/Principal.php">
     <PossiblyNullArgument>
       <code><![CDATA[$this->getUri()]]></code>
     </PossiblyNullArgument>
   </file>
-  <file src="src/Kernel.php">
-    <InvalidArgument>
-      <code><![CDATA[$timezone]]></code>
-    </InvalidArgument>
-  </file>
   <file src="src/Plugins/BirthdayCalendarPlugin.php">
     <UndefinedInterfaceMethod>
       <code><![CDATA[get]]></code>
     </UndefinedInterfaceMethod>
-  </file>
-  <file src="src/Plugins/DavisIMipPlugin.php">
-    <InvalidCast>
-      <code><![CDATA[$attendee]]></code>
-    </InvalidCast>
-    <RedundantCondition>
-      <code><![CDATA[static::MESSAGE_ORIGIN_INDICATOR]]></code>
-      <code><![CDATA[static::MESSAGE_ORIGIN_INDICATOR]]></code>
-    </RedundantCondition>
-    <UnsupportedPropertyReferenceUsage>
-      <code><![CDATA[$_attendees = &$iTipMessage->message->VEVENT->ATTENDEE]]></code>
-    </UnsupportedPropertyReferenceUsage>
-  </file>
-  <file src="src/Security/AdminUser.php">
-    <LessSpecificReturnStatement>
-      <code><![CDATA[$this->username]]></code>
-    </LessSpecificReturnStatement>
-    <MoreSpecificReturnType>
-      <code><![CDATA[string]]></code>
-    </MoreSpecificReturnType>
   </file>
   <file src="src/Services/BasicAuth.php">
     <UndefinedInterfaceMethod>

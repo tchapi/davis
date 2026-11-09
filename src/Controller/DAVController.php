@@ -246,6 +246,7 @@ class DAVController extends AbstractController
             $nodes[] = new \Sabre\DAVACL\FS\HomeCollection($principalBackend, $this->webdavHomesDir);
         }
 
+        $calendarBackend = null;
         if ($this->calDAVEnabled) {
             $calendarBackend = new \Sabre\CalDAV\Backend\PDO($pdo);
             $nodes[] = new \Sabre\CalDAV\CalendarRoot($principalBackend, $calendarBackend);
@@ -283,7 +284,7 @@ class DAVController extends AbstractController
         $this->server->setBaseUri($this->baseUri);
 
         // Plugins
-        $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, $authRealm));
+        $this->server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend));
         $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin(false)); // We disable the file creation / upload / sharing in the browser
         $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
 
@@ -328,7 +329,7 @@ class DAVController extends AbstractController
             $this->server->addPlugin(new \Sabre\CardDAV\VCFExportPlugin());
         }
 
-        if ($this->cardDAVEnabled && $this->calDAVEnabled) {
+        if ($this->cardDAVEnabled && null !== $calendarBackend) {
             $this->server->addPlugin(new BirthdayCalendarPlugin($this->birthdayService, $calendarBackend));
         }
 
@@ -375,6 +376,9 @@ class DAVController extends AbstractController
     {
         $realA = realpath($dirA);
         $realB = realpath($dirB);
+        if (false === $realA || false === $realB) {
+            throw new \RuntimeException(sprintf('%s ("%s") and %s ("%s") must both be existing directories.', $envVarA, $dirA, $envVarB, $dirB));
+        }
 
         if (Path::isBasePath($realA, $realB) || Path::isBasePath($realB, $realA)) {
             throw new \RuntimeException(sprintf('%s ("%s") and %s ("%s") must be separate directories, one must not be inside the other.', $envVarA, $dirA, $envVarB, $dirB));
@@ -463,6 +467,9 @@ class DAVController extends AbstractController
             $length = $sabreResponse->getHeader('Content-Length');
             $response = new StreamedResponse(function () use ($body, $length): void {
                 $output = fopen('php://output', 'wb');
+                if (false === $output) {
+                    throw new \RuntimeException('Could not open php://output to stream the response body.');
+                }
                 stream_copy_to_stream($body, $output, null === $length ? null : (int) $length);
                 fclose($body);
             }, $sabreResponse->getStatus());

@@ -13,7 +13,7 @@ class Kernel extends BaseKernel
     {
         parent::boot();
         $timezone = $this->getContainer()->getParameter('timezone');
-        if ('' === $timezone) {
+        if (!is_string($timezone) || '' === $timezone) {
             return;
         }
         try {

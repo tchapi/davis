@@ -7,9 +7,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class AdminUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    private $username;
-    private $password;
+    /** @var non-empty-string */
+    private string $username;
+    private string $password;
 
+    /**
+     * @param non-empty-string $username
+     */
     public function __construct(string $username, string $password)
     {
         $this->username = $username;

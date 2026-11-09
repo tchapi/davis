@@ -39,6 +39,7 @@ class UserController extends AbstractController
     #[Route('/edit/{userId}', name: 'edit')]
     public function userCreate(ManagerRegistry $doctrine, Utils $utils, Request $request, ?int $userId, TranslatorInterface $trans): Response
     {
+        $oldHash = null;
         if ($userId) {
             $user = $doctrine->getRepository(User::class)->findOneById($userId);
             if (!$user) {
