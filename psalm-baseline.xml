@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="7.2.0@7c1fcd8a86b7912663bffd385da323dd8dcce1c5">
+  <file src="src/Command/AppKeyCreateCommand.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[findUnknownUsers]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Command/AppKeyListCommand.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[findAllNewestFirst]]></code>
+      <code><![CDATA[findUsagesByKey]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Command/AppKeyRevokeCommand.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[findOneByAppId]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Command/SyncBirthdayCalendars.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$user->getUsername()]]></code>
+    </PossiblyNullArgument>
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[findOneByUsername]]></code>
+      <code><![CDATA[getConnection]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Controller/Admin/AddressBookController.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$username]]></code>
+      <code><![CDATA[$username]]></code>
+    </PossiblyNullArgument>
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[countCardsByAddressBook]]></code>
+      <code><![CDATA[deletePathsAndTheirChildren]]></code>
+      <code><![CDATA[findByPrincipalUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Controller/Admin/AppKeyController.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[findAllNewestFirst]]></code>
+      <code><![CDATA[findUsagesByKey]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Controller/Admin/CalendarController.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$calendarInstance->getCalendar()->getComponents()]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullReference>
+      <code><![CDATA[getComponents]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[setComponents]]></code>
+    </PossiblyNullReference>
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[countObjectsByCalendar]]></code>
+      <code><![CDATA[deletePathsAndTheirChildren]]></code>
+      <code><![CDATA[findAllExceptPrincipal]]></code>
+      <code><![CDATA[findAllSchedulingObjectsForCalendar]]></code>
+      <code><![CDATA[findByPrincipalUri]]></code>
+      <code><![CDATA[findByPrincipalUriWithCalendars]]></code>
+      <code><![CDATA[findOneById]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneForPrincipal]]></code>
+      <code><![CDATA[findOneForPrincipal]]></code>
+      <code><![CDATA[findOneForPrincipal]]></code>
+      <code><![CDATA[findOwnerInstanceOfCalendarForPrincipal]]></code>
+      <code><![CDATA[findOwnerInstanceOfCalendarForPrincipal]]></code>
+      <code><![CDATA[findSharedInstanceOfInstanceFor]]></code>
+      <code><![CDATA[findSharedInstancesOfInstance]]></code>
+      <code><![CDATA[findSharedInstancesOfInstance]]></code>
+      <code><![CDATA[findSharedInstancesOfInstance]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Controller/Admin/DashboardController.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[count]]></code>
+      <code><![CDATA[count]]></code>
+      <code><![CDATA[count]]></code>
+      <code><![CDATA[count]]></code>
+      <code><![CDATA[count]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Controller/Admin/UserController.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$user->getPassword()]]></code>
+    </PossiblyNullArgument>
+    <PossiblyUndefinedVariable>
+      <code><![CDATA[$oldHash]]></code>
+    </PossiblyUndefinedVariable>
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[deletePathsAndTheirChildren]]></code>
+      <code><![CDATA[findAllExceptPrincipal]]></code>
+      <code><![CDATA[findAllMainPrincipalsWithUserIds]]></code>
+      <code><![CDATA[findByPrincipalUri]]></code>
+      <code><![CDATA[findByPrincipalUri]]></code>
+      <code><![CDATA[findByPrincipalUri]]></code>
+      <code><![CDATA[findByPrincipalUriWithCalendars]]></code>
+      <code><![CDATA[findOneById]]></code>
+      <code><![CDATA[findOneById]]></code>
+      <code><![CDATA[findOneById]]></code>
+      <code><![CDATA[findOneById]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findWithDelegeesByUris]]></code>
+      <code><![CDATA[forgetUser]]></code>
+      <code><![CDATA[hasDifferentOwner]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Controller/Api/ApiController.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$shareeUsername]]></code>
+      <code><![CDATA[$shareeUsername]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullReference>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[isComponentEnabled]]></code>
+      <code><![CDATA[isComponentEnabled]]></code>
+      <code><![CDATA[isComponentEnabled]]></code>
+      <code><![CDATA[setComponents]]></code>
+    </PossiblyNullReference>
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[countObjectsByComponentType]]></code>
+      <code><![CDATA[countObjectsByComponentType]]></code>
+      <code><![CDATA[findAllMainPrincipalsWithUserIds]]></code>
+      <code><![CDATA[findAllSchedulingObjectsForCalendar]]></code>
+      <code><![CDATA[findByPrincipalUri]]></code>
+      <code><![CDATA[findByPrincipalUriWithCalendars]]></code>
+      <code><![CDATA[findOneById]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[findOneByUsername]]></code>
+      <code><![CDATA[findOneForPrincipal]]></code>
+      <code><![CDATA[findOneForPrincipal]]></code>
+      <code><![CDATA[findSharedInstanceOfInstanceFor]]></code>
+      <code><![CDATA[findSharedInstanceOfInstanceFor]]></code>
+      <code><![CDATA[findSharedInstancesOfInstance]]></code>
+      <code><![CDATA[findSharedInstancesOfInstance]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Controller/DAVController.php">
+    <PossiblyFalseArgument>
+      <code><![CDATA[$output]]></code>
+      <code><![CDATA[$realA]]></code>
+      <code><![CDATA[$realA]]></code>
+      <code><![CDATA[$realB]]></code>
+      <code><![CDATA[$realB]]></code>
+    </PossiblyFalseArgument>
+    <PossiblyNullArgument>
+      <code><![CDATA[$authMethod]]></code>
+      <code><![CDATA[$authRealm]]></code>
+    </PossiblyNullArgument>
+    <PossiblyUndefinedVariable>
+      <code><![CDATA[$calendarBackend]]></code>
+    </PossiblyUndefinedVariable>
+    <TooManyArguments>
+      <code><![CDATA[new \Sabre\DAV\Auth\Plugin($authBackend, $authRealm)]]></code>
+    </TooManyArguments>
+  </file>
+  <file src="src/Entity/AppKey.php">
+    <PossiblyFalseArgument>
+      <code><![CDATA[preg_split('/[\r\n,]+/', $text)]]></code>
+    </PossiblyFalseArgument>
+  </file>
+  <file src="src/Entity/Principal.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$this->getUri()]]></code>
+    </PossiblyNullArgument>
+  </file>
+  <file src="src/Kernel.php">
+    <InvalidArgument>
+      <code><![CDATA[$timezone]]></code>
+    </InvalidArgument>
+  </file>
+  <file src="src/Plugins/BirthdayCalendarPlugin.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[get]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Plugins/DavisIMipPlugin.php">
+    <InvalidCast>
+      <code><![CDATA[$attendee]]></code>
+    </InvalidCast>
+    <InvalidScalarArgument>
+      <code><![CDATA[$coordinates['latitude']]]></code>
+      <code><![CDATA[$coordinates['latitude']]]></code>
+      <code><![CDATA[$coordinates['longitude']]]></code>
+      <code><![CDATA[$coordinates['longitude']]]></code>
+    </InvalidScalarArgument>
+    <PossiblyUndefinedVariable>
+      <code><![CDATA[$mailSenderName]]></code>
+    </PossiblyUndefinedVariable>
+    <RedundantCondition>
+      <code><![CDATA[static::MESSAGE_ORIGIN_INDICATOR]]></code>
+      <code><![CDATA[static::MESSAGE_ORIGIN_INDICATOR]]></code>
+    </RedundantCondition>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$iTipMessage->message->VEVENT]]></code>
+    </UndefinedMagicPropertyFetch>
+    <UnsupportedPropertyReferenceUsage>
+      <code><![CDATA[$_attendees = &$iTipMessage->message->VEVENT->ATTENDEE]]></code>
+    </UnsupportedPropertyReferenceUsage>
+  </file>
+  <file src="src/Security/AdminUser.php">
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$this->username]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code><![CDATA[string]]></code>
+    </MoreSpecificReturnType>
+  </file>
+  <file src="src/Services/BasicAuth.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[findOneByUsername]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Services/BirthdayService.php">
+    <InvalidArgument>
+      <code><![CDATA[$birthday]]></code>
+    </InvalidArgument>
+    <PossiblyNullArgument>
+      <code><![CDATA[$existing->getCalendarData()]]></code>
+      <code><![CDATA[$instance->getCalendar()]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullReference>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+    </PossiblyNullReference>
+    <RedundantCondition>
+      <code><![CDATA[$birthday instanceof DateAndOrTime]]></code>
+    </RedundantCondition>
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[findByAddressBook]]></code>
+      <code><![CDATA[findByCalendar]]></code>
+      <code><![CDATA[findByPrincipalUri]]></code>
+      <code><![CDATA[findOneById]]></code>
+      <code><![CDATA[findOneById]]></code>
+    </UndefinedInterfaceMethod>
+    <UndefinedMagicPropertyAssignment>
+      <code><![CDATA[$vCal->PRODID]]></code>
+      <code><![CDATA[$vCal->VERSION]]></code>
+      <code><![CDATA[$vEvent->DTEND]]></code>
+      <code><![CDATA[$vEvent->DTSTART]]></code>
+    </UndefinedMagicPropertyAssignment>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$doc->UID]]></code>
+      <code><![CDATA[$existingBirthday->VEVENT]]></code>
+      <code><![CDATA[$newCalendarData->VEVENT]]></code>
+      <code><![CDATA[$vEvent->DTEND]]></code>
+      <code><![CDATA[$vEvent->DTSTART]]></code>
+      <code><![CDATA[$vEvent->{'SUMMARY'}]]></code>
+    </UndefinedMagicPropertyFetch>
+  </file>
+  <file src="src/Services/Diagnostics.php">
+    <InternalMethod>
+      <code><![CDATA[getParams]]></code>
+    </InternalMethod>
+    <PossiblyFalseOperand>
+      <code><![CDATA[$scheme]]></code>
+    </PossiblyFalseOperand>
+  </file>
+  <file src="src/Services/LDAPAuth.php">
+    <InvalidReturnStatement>
+      <code><![CDATA[$dn]]></code>
+    </InvalidReturnStatement>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidReturnType>
+    <PossiblyInvalidArgument>
+      <code><![CDATA[$read]]></code>
+      <code><![CDATA[$search_results]]></code>
+    </PossiblyInvalidArgument>
+    <RedundantCondition>
+      <code><![CDATA[$ldap]]></code>
+      <code><![CDATA[isset($ldap)]]></code>
+      <code><![CDATA[isset($ldap) && $ldap]]></code>
+    </RedundantCondition>
+  </file>
+  <file src="tests/Functional/AddressBookDavTest.php">
+    <InvalidArgument>
+      <code><![CDATA[$id]]></code>
+    </InvalidArgument>
+  </file>
+  <file src="tests/Functional/AdminPostTrait.php">
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+  </file>
+  <file src="tests/Functional/AppKeysDisabledTest.php">
+    <InternalMethod>
+      <code><![CDATA[addToAssertionCount]]></code>
+    </InternalMethod>
+    <PossiblyNullArgument>
+      <code><![CDATA[self::$kernel]]></code>
+    </PossiblyNullArgument>
+  </file>
+  <file src="tests/Functional/Commands/AppKeyCommandsTest.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[self::$kernel]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullReference>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getScope]]></code>
+      <code><![CDATA[getScope]]></code>
+    </PossiblyNullReference>
+  </file>
+  <file src="tests/Functional/Commands/MailTestCommandTest.php">
+    <NoInterfaceProperties>
+      <code><![CDATA[$mailer->sent]]></code>
+      <code><![CDATA[$mailer->sent]]></code>
+      <code><![CDATA[$mailer->sent]]></code>
+    </NoInterfaceProperties>
+  </file>
+  <file src="tests/Functional/Commands/SyncBirthdayCalendarTest.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$object->getCalendarData()]]></code>
+      <code><![CDATA[self::$kernel]]></code>
+    </PossiblyNullArgument>
+  </file>
+  <file src="tests/Functional/Controllers/ApiControllerTest.php">
+    <PossiblyFalseArgument>
+      <code><![CDATA[json_encode($payload)]]></code>
+      <code><![CDATA[json_encode($payload)]]></code>
+      <code><![CDATA[json_encode($payload)]]></code>
+      <code><![CDATA[json_encode($payload)]]></code>
+      <code><![CDATA[json_encode($payload)]]></code>
+      <code><![CDATA[json_encode($payload)]]></code>
+      <code><![CDATA[json_encode(['name' => 'Hijacked', 'events_support' => false, 'tasks_support' => true])]]></code>
+      <code><![CDATA[json_encode(['username' => 'test_user', 'write_access' => true])]]></code>
+      <code><![CDATA[json_encode(['username' => 'test_user2', 'write_access' => true])]]></code>
+      <code><![CDATA[json_encode(['username' => 'test_user2'])]]></code>
+    </PossiblyFalseArgument>
+    <PossiblyNullReference>
+      <code><![CDATA[getStatusCode]]></code>
+    </PossiblyNullReference>
+  </file>
+  <file src="tests/Functional/Controllers/AppKeyControllerTest.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$onlyUser2->getAppId()]]></code>
+      <code><![CDATA[$user2AndBob->getAppId()]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullReference>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getRevokedAt]]></code>
+      <code><![CDATA[getScope]]></code>
+    </PossiblyNullReference>
+  </file>
+  <file src="tests/Functional/Controllers/CalendarControllerTest.php">
+    <PossiblyInvalidArrayAccess>
+      <code><![CDATA[$shares[0]]]></code>
+      <code><![CDATA[$shares[0]]]></code>
+      <code><![CDATA[$shares[0]]]></code>
+    </PossiblyInvalidArrayAccess>
+    <PossiblyNullReference>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+      <code><![CDATA[getId]]></code>
+    </PossiblyNullReference>
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[$shares]]></code>
+      <code><![CDATA[$shares]]></code>
+      <code><![CDATA[$shares]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="tests/Functional/Controllers/DashboardTest.php">
+    <PossiblyInvalidMethodCall>
+      <code><![CDATA[setValue]]></code>
+      <code><![CDATA[setValue]]></code>
+      <code><![CDATA[setValue]]></code>
+      <code><![CDATA[setValue]]></code>
+      <code><![CDATA[setValue]]></code>
+      <code><![CDATA[setValue]]></code>
+    </PossiblyInvalidMethodCall>
+  </file>
+  <file src="tests/Functional/DavTest.php">
+    <InvalidOperand>
+      <code><![CDATA[static::getContainer()->getParameter('kernel.project_dir')]]></code>
+    </InvalidOperand>
+    <PossiblyFalseArgument>
+      <code><![CDATA[strtotime('2026-01-01T10:00:00Z')]]></code>
+      <code><![CDATA[strtotime('2026-01-01T11:00:00Z')]]></code>
+    </PossiblyFalseArgument>
+    <PossiblyNullReference>
+      <code><![CDATA[setPublic]]></code>
+    </PossiblyNullReference>
+  </file>
+  <file src="tests/Functional/DefaultAvailabilityTest.php">
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$vcalendar->VAVAILABILITY]]></code>
+    </UndefinedMagicPropertyFetch>
+  </file>
+  <file src="tests/Functional/Entity/AppKeyTest.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$key->getAppId()]]></code>
+      <code><![CDATA[$key->getSecretHash()]]></code>
+      <code><![CDATA[$key->getSecretHash()]]></code>
+      <code><![CDATA[$key->getSecretHash()]]></code>
+    </PossiblyNullArgument>
+  </file>
+  <file src="tests/Functional/Plugins/BirthdayCalendarPluginTest.php">
+    <InvalidNullableReturnType>
+      <code><![CDATA[AddressBook]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$this->em->getRepository(AddressBook::class)->findOneBy([
+            'principalUri' => self::PRINCIPAL,
+            'uri' => 'default',
+        ])]]></code>
+    </NullableReturnStatement>
+    <PossiblyNullArgument>
+      <code><![CDATA[$event->getCalendarData()]]></code>
+    </PossiblyNullArgument>
+  </file>
+  <file src="tests/Functional/Plugins/ImipPluginTest.php">
+    <InvalidOperand>
+      <code><![CDATA[static::getContainer()->getParameter('kernel.project_dir')]]></code>
+    </InvalidOperand>
+    <NoInterfaceProperties>
+      <code><![CDATA[$mailer->sent]]></code>
+      <code><![CDATA[$mailer->sent]]></code>
+      <code><![CDATA[$mailer->sent]]></code>
+      <code><![CDATA[$mailer->sent]]></code>
+    </NoInterfaceProperties>
+    <PropertyTypeCoercion>
+      <code><![CDATA[Reader::read(self::EVENT)]]></code>
+    </PropertyTypeCoercion>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$message->message->VEVENT]]></code>
+    </UndefinedMagicPropertyFetch>
+  </file>
+  <file src="tests/Functional/Plugins/ImipSchedulingDiagnosticsTest.php">
+    <PropertyTypeCoercion>
+      <code><![CDATA[new class extends AbstractLogger {
+            public array $records = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->records[] = ['level' => (string) $level, 'message' => (string) $message, 'context' => $context];
+            }
+        }]]></code>
+    </PropertyTypeCoercion>
+  </file>
+  <file src="tests/Functional/Service/AuthBackendTest.php">
+    <PossiblyNullReference>
+      <code><![CDATA[format]]></code>
+    </PossiblyNullReference>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+      <code><![CDATA[$backend->seen]]></code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="tests/Functional/Service/BirthdayServiceTest.php">
+    <InternalMethod>
+      <code><![CDATA[addToAssertionCount]]></code>
+    </InternalMethod>
+    <PossiblyNullArgument>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$addressBook->getId()]]></code>
+      <code><![CDATA[$cal]]></code>
+      <code><![CDATA[$cal2]]></code>
+      <code><![CDATA[$cal2]]></code>
+      <code><![CDATA[$object->getCalendarData()]]></code>
+      <code><![CDATA[$object->getCalendarData()]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullPropertyFetch>
+      <code><![CDATA[$result->VEVENT]]></code>
+      <code><![CDATA[$result->VEVENT->VALARM]]></code>
+    </PossiblyNullPropertyFetch>
+    <PossiblyNullReference>
+      <code><![CDATA[getCalendar]]></code>
+      <code><![CDATA[getCalendar]]></code>
+      <code><![CDATA[getSynctoken]]></code>
+      <code><![CDATA[getSynctoken]]></code>
+      <code><![CDATA[serialize]]></code>
+      <code><![CDATA[serialize]]></code>
+      <code><![CDATA[serialize]]></code>
+    </PossiblyNullReference>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$result->VEVENT]]></code>
+      <code><![CDATA[$result->VEVENT]]></code>
+      <code><![CDATA[$result->VEVENT]]></code>
+      <code><![CDATA[$result->VEVENT]]></code>
+    </UndefinedMagicPropertyFetch>
+  </file>
+  <file src="tests/Functional/Service/DiagnosticsTest.php">
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$checks[$title]['severity']]]></code>
+    </NullableReturnStatement>
+    <PossiblyFalseArgument>
+      <code><![CDATA[json_encode($check)]]></code>
+      <code><![CDATA[json_encode($check)]]></code>
+    </PossiblyFalseArgument>
+    <PossiblyNullArgument>
+      <code><![CDATA[$checks['diagnostics.mailer']['value']]]></code>
+      <code><![CDATA[$checks['diagnostics.mailer']['value']]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullArrayOffset>
+      <code><![CDATA[$checks]]></code>
+    </PossiblyNullArrayOffset>
+  </file>
+  <file src="tests/Functional/Service/IMAPAuthTest.php">
+    <PossiblyFalseArgument>
+      <code><![CDATA[$log]]></code>
+      <code><![CDATA[$log]]></code>
+      <code><![CDATA[$logged]]></code>
+    </PossiblyFalseArgument>
+  </file>
+  <file src="tests/Functional/SyncTokenTest.php">
+    <InvalidArgument>
+      <code><![CDATA[$addressBookId]]></code>
+      <code><![CDATA[$addressBookId]]></code>
+    </InvalidArgument>
+    <PossiblyNullArrayAccess>
+      <code><![CDATA[$changes['added']]]></code>
+      <code><![CDATA[$changes['added']]]></code>
+      <code><![CDATA[$changes['deleted']]]></code>
+      <code><![CDATA[$changes['modified']]]></code>
+      <code><![CDATA[$changes['modified']]]></code>
+      <code><![CDATA[$changes['syncToken']]]></code>
+    </PossiblyNullArrayAccess>
+  </file>
+  <file src="tests/Functional/WebDavTest.php">
+    <InvalidOperand>
+      <code><![CDATA[static::getContainer()->getParameter('kernel.project_dir')]]></code>
+    </InvalidOperand>
+    <PossiblyFalseArgument>
+      <code><![CDATA[glob($this->baseDir.'/tmp/sabredav_*')]]></code>
+      <code><![CDATA[glob($this->baseDir.'/tmp/sabredav_*')]]></code>
+      <code><![CDATA[glob($this->baseDir.'/tmp/sabredav_*')]]></code>
+    </PossiblyFalseArgument>
+  </file>
+  <file src="tests/bootstrap.php">
+    <PossiblyUndefinedArrayOffset>
+      <code><![CDATA[$_ENV['APP_ENV']]]></code>
+    </PossiblyUndefinedArrayOffset>
+  </file>
+</files>

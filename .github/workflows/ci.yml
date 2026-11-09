@@ -74,6 +74,36 @@ jobs:
       - name: Analyze
         run: vendor/bin/php-cs-fixer fix --ansi
 
+  psalm:
+    name: Psalm
+    runs-on: ubuntu-24.04
+    container:
+      image: php:8.4-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install GD / ZIP PHP extension
+        run: |
+          apk add $PHPIZE_DEPS libpng-dev libzip-dev
+          docker-php-ext-configure gd
+          docker-php-ext-configure zip
+          docker-php-ext-install gd zip
+
+      - name: Install Composer
+        run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+
+      - name: Install dependencies with Composer
+        run: composer install --no-interaction --no-progress --ansi
+
+      # Known issues live in psalm-baseline.xml: this fails on new ones, and on baseline entries
+      # that no longer match (findUnusedBaselineEntry), so the file can only shrink.
+      - name: Analyze with Psalm
+        run: vendor/bin/psalm --no-progress --output-format=github
+
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }}, ${{ matrix.database }})
     runs-on: ubuntu-24.04
