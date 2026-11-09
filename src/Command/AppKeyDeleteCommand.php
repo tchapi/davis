@@ -33,9 +33,9 @@ class AppKeyDeleteCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Delete a revoked app key')
+            ->setDescription('Delete a revoked (or expired) app key')
             ->addArgument('app-id', InputArgument::REQUIRED, 'The app id of the key, as shown by davis:app-key:list')
-            ->setHelp('This command deletes a revoked app key for good, with its usage history. An active key (including one with an expiry date still ahead) must be revoked first.');
+            ->setHelp('This command deletes a revoked (or expired) app key for good, with its usage history. An active key (including one with an expiry date still ahead) must be revoked first.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -58,7 +58,7 @@ class AppKeyDeleteCommand extends Command
             return self::FAILURE;
         }
 
-        $repository->delete($key);
+        $repository->delete([$key]);
 
         $io->success(sprintf('Deleted %s.', $appId));
 

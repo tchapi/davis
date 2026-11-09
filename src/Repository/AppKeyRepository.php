@@ -53,7 +53,8 @@ class AppKeyRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return AppKey[] the keys revoked (or expired) on or before the cutoff, oldest revocation first
+     * @return AppKey[] the keys whose revocation date (or expiry date, which is the same field) is on or
+     *                  before the cutoff, oldest first
      */
     public function findRevokedBefore(\DateTimeImmutable $cutoff): array
     {
@@ -68,25 +69,43 @@ class AppKeyRepository extends ServiceEntityRepository
     }
 
     /**
-     * Deletes a key and its usage history.
+     * Deletes keys and their usage history, all in one transaction. Like touch() and recordUse(),
+     * it does not flush(), so other pending changes are not saved along the way.
+     *
+     * @param AppKey[] $keys
      */
-    public function delete(AppKey $key): void
+    public function delete(array $keys): void
     {
-        $em = $this->getEntityManager();
+        if (!$keys) {
+            return;
+        }
 
-        $em->wrapInTransaction(function () use ($em, $key): void {
-            // The usages are deleted by hand. Their FK has ON DELETE CASCADE, but SQLite only
-            // honours it with PRAGMA foreign_keys = ON, which DBAL 3 does not set.
+        $em = $this->getEntityManager();
+        $ids = array_map(fn (AppKey $key) => $key->getId(), $keys);
+
+        $em->wrapInTransaction(function () use ($em, $ids): void {
+            // The usages are deleted by hand. Their FK has ON DELETE CASCADE, but SQLite only honours
+            // it with PRAGMA foreign_keys = ON, which DBAL 3 does not set by default (it is an opt-in
+            // middleware, not enabled here).
             $em->createQueryBuilder()
                 ->delete(AppKeyUsage::class, 'u')
-                ->where('u.appKey = :key')
-                ->setParameter('key', $key)
+                ->where('u.appKey IN (:ids)')
+                ->setParameter('ids', $ids)
                 ->getQuery()
                 ->execute();
 
-            $em->remove($key);
-            $em->flush();
+            $em->createQueryBuilder()
+                ->delete(AppKey::class, 'k')
+                ->where('k.id IN (:ids)')
+                ->setParameter('ids', $ids)
+                ->getQuery()
+                ->execute();
         });
+
+        // The entities are gone from the database, so they should not linger in the identity map
+        foreach ($keys as $key) {
+            $em->detach($key);
+        }
     }
 
     /**

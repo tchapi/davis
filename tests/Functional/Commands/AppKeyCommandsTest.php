@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Commands;
 
+use App\Command\AppKeyPruneCommand;
 use App\Entity\AppKey;
 use App\Services\BasicAuth;
 use Doctrine\ORM\EntityManagerInterface;
@@ -231,7 +232,7 @@ class AppKeyCommandsTest extends KernelTestCase
         $tester = $this->runCommand('davis:app-key:prune', ['days' => '7', '--dry-run' => true]);
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString($old->getAppId(), $tester->getDisplay());
+        $this->assertStringContainsString('Would delete '.$old->getAppId(), $tester->getDisplay());
         $this->assertSame($before, self::countKeys());
         $this->assertSame(1, self::countUsages($old));
     }
@@ -254,9 +255,11 @@ class AppKeyCommandsTest extends KernelTestCase
         self::bootKernel();
         $before = self::countKeys();
 
-        foreach (['-1', 'abc', '1.5', ''] as $days) {
+        // The last two used to pass ctype_digit() and then blow up in DateInterval (or saturate to PHP_INT_MAX)
+        foreach (['-1', 'abc', '1.5', '', '1e3', (string) (AppKeyPruneCommand::MAX_DAYS + 1), '99999999999999999999'] as $days) {
             $tester = $this->runCommand('davis:app-key:prune', ['days' => $days]);
             $this->assertSame(Command::INVALID, $tester->getStatusCode(), $days);
+            $this->assertStringContainsString('not a number of days', $tester->getDisplay(), $days);
         }
 
         $this->assertSame($before, self::countKeys());
