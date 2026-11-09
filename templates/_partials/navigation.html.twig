@@ -22,7 +22,7 @@
         {% if app.user or appKeysEnabled %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navUserMenu" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% if authBypassed %}🔓 {{ "auth_bypass.label"|trans }}{% else %}👤 {{ app.user.username }}{% endif %}
+            {% if authBypassed %}🔓 {{ "auth_bypass.label"|trans }}{% else %}👤 {{ app.user.userIdentifier }}{% endif %}
           </a>
           <div class="dropdown-menu" aria-labelledby="navUserMenu">
             {% if appKeysEnabled %}
