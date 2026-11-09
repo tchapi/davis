@@ -76,6 +76,7 @@ class PrincipalRepository extends ServiceEntityRepository
             ->andWhere('p.isMain = :isMain')
             ->setParameter('isMain', true)
             ->setParameter('prefix', Principal::PREFIX)
+            ->orderBy('p.id', 'ASC')
             ->getQuery()
             ->getResult();
     }

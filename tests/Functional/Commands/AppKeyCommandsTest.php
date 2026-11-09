@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Commands;
 
+use App\Command\AppKeyPruneCommand;
 use App\Entity\AppKey;
 use App\Services\BasicAuth;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,12 +25,17 @@ class AppKeyCommandsTest extends KernelTestCase
         return $tester;
     }
 
-    private static function keyByAppId(string $appId): AppKey
+    private static function findKeyByAppId(string $appId): ?AppKey
     {
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $em->clear();
 
-        $key = $em->getRepository(AppKey::class)->findOneByAppId($appId);
+        return $em->getRepository(AppKey::class)->findOneByAppId($appId);
+    }
+
+    private static function keyByAppId(string $appId): AppKey
+    {
+        $key = self::findKeyByAppId($appId);
         self::assertNotNull($key, "No app key with app id $appId");
 
         return $key;
@@ -38,6 +44,38 @@ class AppKeyCommandsTest extends KernelTestCase
     private static function countKeys(): int
     {
         return count(static::getContainer()->get(EntityManagerInterface::class)->getRepository(AppKey::class)->findAll());
+    }
+
+    /**
+     * Saves a key, with one usage row so that the tests can check the history goes away with it.
+     */
+    private static function persistKey(string $name, ?\DateTimeImmutable $revokedAt): AppKey
+    {
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        $key = AppKey::create($name, [AppKey::ALL_USERS], $revokedAt);
+        $key->issueSecret();
+        $em->persist($key);
+        $em->flush();
+
+        $connection = $em->getConnection();
+        $format = $connection->getDatabasePlatform()->getDateTimeFormatString();
+        $connection->insert('app_key_usages', [
+            'app_key_id' => $key->getId(),
+            'login' => 'test_user',
+            'first_used_at' => (new \DateTimeImmutable('-2 days'))->format($format),
+            'last_used_at' => (new \DateTimeImmutable('-1 hour'))->format($format),
+        ]);
+
+        return $key;
+    }
+
+    private static function countUsages(AppKey $key): int
+    {
+        return (int) static::getContainer()->get(EntityManagerInterface::class)->getConnection()->fetchOne(
+            'SELECT COUNT(*) FROM app_key_usages WHERE app_key_id = ?',
+            [$key->getId()]
+        );
     }
 
     /**
@@ -150,5 +188,124 @@ class AppKeyCommandsTest extends KernelTestCase
         $tester = $this->runCommand('davis:app-key:revoke', ['app-id' => 'app_revoked']);
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
         $this->assertEquals($before, self::keyByAppId('app_revoked')->getRevokedAt());
+    }
+
+    public function testPruneDeletesTheKeysRevokedLongEnoughAgo(): void
+    {
+        self::bootKernel();
+        $old = self::persistKey('old', new \DateTimeImmutable('-10 days'));
+        $recent = self::persistKey('recent', new \DateTimeImmutable('-3 days'));
+        $active = self::persistKey('active', null);
+        $expiring = self::persistKey('expiring', new \DateTimeImmutable('+10 days'));
+
+        $tester = $this->runCommand('davis:app-key:prune', ['days' => '7']);
+
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertStringContainsString($old->getAppId().' old revoked', $tester->getDisplay());
+        $this->assertNull(self::findKeyByAppId($old->getAppId()));
+        $this->assertSame(0, self::countUsages($old));
+        $this->assertNotNull(self::keyByAppId($recent->getAppId()));
+        $this->assertSame(1, self::countUsages($recent));
+        $this->assertNotNull(self::keyByAppId($active->getAppId()));
+        $this->assertNotNull(self::keyByAppId($expiring->getAppId()));
+    }
+
+    public function testPruneWithZeroDaysDeletesEveryRevokedKeyButNotAnExpiry(): void
+    {
+        self::bootKernel();
+        $justRevoked = self::persistKey('just revoked', new \DateTimeImmutable('-1 minute'));
+        $active = self::persistKey('active', null);
+        $expiring = self::persistKey('expiring', new \DateTimeImmutable('+1 hour'));
+
+        $tester = $this->runCommand('davis:app-key:prune', ['days' => '0']);
+
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertNull(self::findKeyByAppId($justRevoked->getAppId()));
+        // app_revoked comes from the fixtures, revoked a day ago
+        $this->assertNull(self::findKeyByAppId('app_revoked'));
+        $this->assertNotNull(self::keyByAppId($active->getAppId()));
+        $this->assertNotNull(self::keyByAppId($expiring->getAppId()));
+        $this->assertNotNull(self::keyByAppId('app_test'));
+    }
+
+    public function testPruneDryRunDeletesNothing(): void
+    {
+        self::bootKernel();
+        $old = self::persistKey('old', new \DateTimeImmutable('-10 days'));
+        $before = self::countKeys();
+
+        $tester = $this->runCommand('davis:app-key:prune', ['days' => '7', '--dry-run' => true]);
+
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertStringContainsString('Would delete '.$old->getAppId(), $tester->getDisplay());
+        $this->assertSame($before, self::countKeys());
+        $this->assertSame(1, self::countUsages($old));
+    }
+
+    public function testPruneWithNothingToDeleteSucceeds(): void
+    {
+        self::bootKernel();
+        $before = self::countKeys();
+
+        // the fixtures have one revoked key, a day old
+        $tester = $this->runCommand('davis:app-key:prune', ['days' => '365']);
+
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertStringContainsString('nothing to delete', $tester->getDisplay());
+        $this->assertSame($before, self::countKeys());
+    }
+
+    public function testPruneRejectsABadNumberOfDays(): void
+    {
+        self::bootKernel();
+        $before = self::countKeys();
+
+        // The last two used to pass ctype_digit() and then blow up in DateInterval (or saturate to PHP_INT_MAX)
+        foreach (['-1', 'abc', '1.5', '', '1e3', (string) (AppKeyPruneCommand::MAX_DAYS + 1), '99999999999999999999'] as $days) {
+            $tester = $this->runCommand('davis:app-key:prune', ['days' => $days]);
+            $this->assertSame(Command::INVALID, $tester->getStatusCode(), $days);
+            $this->assertStringContainsString('not a number of days', $tester->getDisplay(), $days);
+        }
+
+        $this->assertSame($before, self::countKeys());
+    }
+
+    public function testDeleteRefusesAnActiveKey(): void
+    {
+        self::bootKernel();
+        $active = self::persistKey('active', null);
+        $expiring = self::persistKey('expiring', new \DateTimeImmutable('+10 days'));
+
+        foreach ([$active, $expiring] as $key) {
+            $tester = $this->runCommand('davis:app-key:delete', ['app-id' => $key->getAppId()]);
+
+            $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+            $this->assertStringContainsString('davis:app-key:revoke', $tester->getDisplay());
+            $this->assertNotNull(self::keyByAppId($key->getAppId()));
+            $this->assertSame(1, self::countUsages($key));
+        }
+    }
+
+    public function testDeleteRemovesARevokedKeyAndItsUsages(): void
+    {
+        self::bootKernel();
+        $revoked = self::persistKey('revoked', new \DateTimeImmutable('-1 minute'));
+
+        $tester = $this->runCommand('davis:app-key:delete', ['app-id' => $revoked->getAppId()]);
+
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertNull(self::findKeyByAppId($revoked->getAppId()));
+        $this->assertSame(0, self::countUsages($revoked));
+    }
+
+    public function testDeleteFailsOnAnUnknownKey(): void
+    {
+        self::bootKernel();
+        $before = self::countKeys();
+
+        $tester = $this->runCommand('davis:app-key:delete', ['app-id' => 'app_nope']);
+
+        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $this->assertSame($before, self::countKeys());
     }
 }

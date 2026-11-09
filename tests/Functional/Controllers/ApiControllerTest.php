@@ -16,15 +16,17 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class ApiControllerTest extends WebTestCase
 {
-    /*
-     * Helper function to get an existing user ID from the user list
+    /**
+     * Fetches the user list and returns the entry of one of the fixture users. The entry is found
+     * by its username rather than its position: the list is ordered by id, but `test_user2` also
+     * contains `test_user`, so a positional lookup would silently pick the wrong user if the order
+     * ever changed.
      *
-     * @param int  $index   Index of the user in the list (0 - first user, 1 - second user)
-     * @param mixed $client
+     * @param int $index 0 for test_user, 1 for test_user2
      *
-     * @return int User ID
+     * @return array{user_id: int, principal_id: int, uri: string, username: string}
      */
-    private function getUserId($client, int $index): int
+    private function getUser($client, int $index): array
     {
         $client->request('GET', '/api/v1/users', [], [], [
             'HTTP_ACCEPT' => 'application/json',
@@ -37,35 +39,25 @@ class ApiControllerTest extends WebTestCase
         $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('data', $data);
-        $this->assertStringContainsString('test_user', $data['data'][$index]['username']);
 
-        return $data['data'][$index]['user_id'];
+        $username = ['test_user', 'test_user2'][$index];
+        foreach ($data['data'] as $user) {
+            if ($user['username'] === $username) {
+                return $user;
+            }
+        }
+
+        $this->fail($username.' is not in the user list');
     }
 
-    /*
-     * Helper function to get an existing username from the user list
-     *
-     * @param int  $index   Index of the user in the list (0 - first user, 1 - second user)
-     * @param mixed $client
-     *
-     * @return string Username
-     */
+    private function getUserId($client, int $index): int
+    {
+        return $this->getUser($client, $index)['user_id'];
+    }
+
     private function getUserUsername($client, int $index): string
     {
-        $client->request('GET', '/api/v1/users', [], [], [
-            'HTTP_ACCEPT' => 'application/json',
-            'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
-        ]);
-
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/json');
-
-        $data = json_decode((string) $client->getResponse()->getContent(), true);
-
-        $this->assertArrayHasKey('data', $data);
-        $this->assertStringContainsString('test_user', $data['data'][$index]['username']);
-
-        return $data['data'][$index]['username'];
+        return $this->getUser($client, $index)['username'];
     }
 
     /*
