@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Service;
 
 use App\Services\Diagnostics;
+use App\Services\UpdateChecker;
+use App\Version;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -26,6 +31,7 @@ class DiagnosticsTest extends KernelTestCase
             'connection' => $container->get('doctrine')->getConnection(),
             'migrations' => $container->get('doctrine.migrations.dependency_factory'),
             'router' => $container->get(UrlGeneratorInterface::class),
+            'updateChecker' => $this->updateChecker(null),
             'environment' => 'prod',
             'debug' => false,
             'logFilePath' => sys_get_temp_dir().'/davis-diagnostics/prod.log',
@@ -49,6 +55,18 @@ class DiagnosticsTest extends KernelTestCase
         }
 
         return new Diagnostics(...$arguments);
+    }
+
+    /**
+     * Off when null, otherwise on and GitHub answers with that tag (or a 503 for an empty tag).
+     */
+    private function updateChecker(?string $latestTag): UpdateChecker
+    {
+        $response = '' === $latestTag
+            ? new MockResponse('', ['http_code' => 503])
+            : new MockResponse(json_encode(['tag_name' => $latestTag, 'html_url' => 'https://github.com/tchapi/davis/releases/tag/'.$latestTag], JSON_THROW_ON_ERROR));
+
+        return new UpdateChecker(new MockHttpClient($response), new ArrayAdapter(), null !== $latestTag);
     }
 
     /**
@@ -239,5 +257,50 @@ class DiagnosticsTest extends KernelTestCase
             $this->assertSame(Diagnostics::WARNING, $check['severity'], $value);
             $this->assertSame($value, $check['value']);
         }
+    }
+
+    public function testTheUpdateCheckIsOffByDefaultAndSaysHowToTurnItOn(): void
+    {
+        $check = $this->checksOf($this->diagnosticsWith())['diagnostics.update'];
+
+        $this->assertSame(Diagnostics::INFO, $check['severity']);
+        $this->assertSame('diagnostics.value.disabled', $check['value']);
+        $this->assertSame('UPDATE_CHECK_ENABLED=true', $check['command']);
+        $this->assertSame(UpdateChecker::RELEASES_URL, $check['link'], 'Releases are discoverable even with the check off');
+    }
+
+    public function testANewerReleaseIsSomethingToLookAt(): void
+    {
+        $diagnostics = $this->diagnosticsWith(['updateChecker' => $this->updateChecker('v99.0.0')]);
+        $check = $this->checksOf($diagnostics)['diagnostics.update'];
+
+        $this->assertSame(Diagnostics::WARNING, $check['severity']);
+        $this->assertSame('v'.Version::VERSION.' → v99.0.0', $check['value']);
+        $this->assertSame('https://github.com/tchapi/davis/releases/tag/v99.0.0', $check['link'], 'The link goes to the release notes');
+        $this->assertSame($this->diagnosticsWith()->attentionCount() + 1, $diagnostics->attentionCount());
+    }
+
+    public function testTheCurrentReleaseIsFine(): void
+    {
+        $diagnostics = $this->diagnosticsWith(['updateChecker' => $this->updateChecker('v'.Version::VERSION)]);
+        $check = $this->checksOf($diagnostics)['diagnostics.update'];
+
+        $this->assertSame(Diagnostics::OK, $check['severity']);
+        $this->assertSame('v'.Version::VERSION, $check['value']);
+        $this->assertSame($this->diagnosticsWith()->attentionCount(), $diagnostics->attentionCount());
+    }
+
+    /**
+     * No network must not turn into a red line, nor take the page down.
+     */
+    public function testGithubBeingUnreachableIsOnlyInformation(): void
+    {
+        $diagnostics = $this->diagnosticsWith(['updateChecker' => $this->updateChecker('')]);
+        $check = $this->checksOf($diagnostics)['diagnostics.update'];
+
+        $this->assertSame(Diagnostics::INFO, $check['severity']);
+        $this->assertSame('diagnostics.value.unknown', $check['value']);
+        $this->assertSame(UpdateChecker::RELEASES_URL, $check['link']);
+        $this->assertSame($this->diagnosticsWith()->attentionCount(), $diagnostics->attentionCount());
     }
 }

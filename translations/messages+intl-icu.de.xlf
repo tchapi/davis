@@ -989,6 +989,30 @@
         <source>diagnostics.accounts_without_email.help</source>
         <target>Ein Konto ohne E-Mail-Adresse versendet nie eine Einladung, denn anhand dieser Adresse gleicht Davis den Termin-Organisator ab. Die Adresse jedes Kontos muss diejenige sein, die sein Kalenderprogramm sendet.</target>
       </trans-unit>
+      <trans-unit id="dbgupd0" resname="diagnostics.update">
+        <source>diagnostics.update</source>
+        <target>Neueste Version</target>
+      </trans-unit>
+      <trans-unit id="dbgupd1" resname="diagnostics.update.disabled">
+        <source>diagnostics.update.disabled</source>
+        <target>Davis sendet keine Daten nach Hause. Setzen Sie UPDATE_CHECK_ENABLED=true, damit diese Seite höchstens einmal am Tag bei GitHub nachfragt, ob eine neuere Version vorliegt.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd2" resname="diagnostics.update.available">
+        <source>diagnostics.update.available</source>
+        <target>Eine neuere Version ist verfügbar. Lesen Sie vor dem Aktualisieren die Versionshinweise: Dort stehen die auszuführende Migration und alle Verhaltensänderungen.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd3" resname="diagnostics.update.current">
+        <source>diagnostics.update.current</source>
+        <target>Dies ist die neueste Version. GitHub wird höchstens einmal am Tag abgefragt.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd4" resname="diagnostics.update.unreachable">
+        <source>diagnostics.update.unreachable</source>
+        <target>Die neueste Version konnte auf GitHub nicht ermittelt werden (kein Netzwerk oder API-Limit erreicht). In einer Stunde wird es erneut versucht.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd5" resname="diagnostics.value.unknown">
+        <source>diagnostics.value.unknown</source>
+        <target>Unbekannt</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

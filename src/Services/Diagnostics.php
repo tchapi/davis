@@ -12,6 +12,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * Every check is passive: the page has to stay usable precisely when something is down, so it
  * opens no socket and runs no migration. `davis:mail:test` is the active counterpart for mail.
+ *
+ * The one exception is the update check, which is opt-in and asks GitHub at most once a day
+ * (see UpdateChecker); the page stays usable when GitHub is not reachable.
  */
 final class Diagnostics
 {
@@ -26,6 +29,7 @@ final class Diagnostics
         private Connection $connection,
         private DependencyFactory $migrations,
         private UrlGeneratorInterface $router,
+        private UpdateChecker $updateChecker,
         private string $environment,
         private bool $debug,
         private string $logFilePath,
@@ -51,6 +55,7 @@ final class Diagnostics
         $buckets = [
             'diagnostics.bucket.runtime' => [
                 $this->versions(),
+                $this->update(),
                 $this->environment(),
                 $this->timezone(),
                 $this->logFile(),
@@ -116,6 +121,30 @@ final class Diagnostics
     private function versions(): array
     {
         return $this->check(self::INFO, 'diagnostics.versions', sprintf('Davis %s · sabre/dav %s · PHP %s', \App\Version::VERSION, \Sabre\DAV\Version::VERSION, PHP_VERSION));
+    }
+
+    /**
+     * Releases are easy to miss on a self-hosted install, and the release notes are where the
+     * migration to run and any change of behaviour are announced. Off by default: see UpdateChecker.
+     */
+    private function update(): array
+    {
+        if (!$this->updateChecker->isEnabled()) {
+            return $this->check(self::INFO, 'diagnostics.update', 'diagnostics.value.disabled', 'diagnostics.update.disabled', 'UPDATE_CHECK_ENABLED=true', UpdateChecker::RELEASES_URL);
+        }
+
+        $latest = $this->updateChecker->latestRelease();
+        if (null === $latest) {
+            return $this->check(self::INFO, 'diagnostics.update', 'diagnostics.value.unknown', 'diagnostics.update.unreachable', null, UpdateChecker::RELEASES_URL);
+        }
+
+        $current = 'v'.UpdateChecker::normalize($this->updateChecker->currentVersion());
+
+        if ($this->updateChecker->isOutdated($latest['version'])) {
+            return $this->check(self::WARNING, 'diagnostics.update', sprintf('%s → v%s', $current, $latest['version']), 'diagnostics.update.available', null, $latest['url']);
+        }
+
+        return $this->check(self::OK, 'diagnostics.update', $current, 'diagnostics.update.current', null, $latest['url']);
     }
 
     private function environment(): array

@@ -20,6 +20,8 @@ parameters:
     default_webdav_public_dir_writable: "false"
     app_keys_enabled: "%env(bool:default:default_app_keys_enabled:APP_KEYS_ENABLED)%"
     default_app_keys_enabled: "false"
+    update_check_enabled: "%env(bool:default:default_update_check_enabled:UPDATE_CHECK_ENABLED)%"
+    default_update_check_enabled: "false"
 
 services:
     # default configuration for services in *this* file
@@ -59,6 +61,10 @@ services:
             $mailerDsn: "%env(MAILER_DSN)%"
             $appKeysEnabled: "%app_keys_enabled%"
             $adminAuthBypass: "%admin_auth_bypass%"
+
+    App\Services\UpdateChecker:
+        arguments:
+            $enabled: "%update_check_enabled%"
 
     App\Command\MailTestCommand:
         arguments:
