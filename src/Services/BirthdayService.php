@@ -199,11 +199,7 @@ class BirthdayService
         }
 
         try {
-            if ($birthday instanceof DateAndOrTime) {
-                $date = $birthday->getDateTime();
-            } else {
-                $date = new \DateTimeImmutable($birthday);
-            }
+            $date = $birthday->getDateTime();
         } catch (\Exception $e) {
             return null;
         }

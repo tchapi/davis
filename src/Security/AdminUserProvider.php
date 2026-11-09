@@ -3,7 +3,6 @@
 namespace App\Security;
 
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -12,22 +11,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class AdminUserProvider implements UserProviderInterface
 {
-    /**
-     * Symfony calls this method if you use features like switch_user
-     * or remember_me.
-     *
-     * If you're not using these features, you do not need to implement
-     * this method.
-     *
-     * @throws UserNotFoundException if the user is not found
-     *
-     * @return UserInterface
-     */
-    public function loadUserByUsername($username)
-    {
-        throw new \Exception('Not implemented, because not needed');
-    }
-
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
         return new AdminUser($identifier, bin2hex(random_bytes(64)));

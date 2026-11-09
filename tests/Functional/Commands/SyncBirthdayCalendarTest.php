@@ -25,7 +25,7 @@ class SyncBirthdayCalendarTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        self::bootKernel();
+        $kernel = self::bootKernel();
 
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
 
@@ -34,7 +34,7 @@ class SyncBirthdayCalendarTest extends KernelTestCase
         $pdo = $this->em->getConnection()->getNativeConnection();
         $birthdayService->setBackend(new CalendarBackend($pdo));
 
-        $application = new Application(self::$kernel);
+        $application = new Application($kernel);
         $command = $application->find('dav:sync-birthday-calendar');
         $this->commandTester = new CommandTester($command);
 

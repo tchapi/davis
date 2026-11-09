@@ -326,7 +326,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                 $width = 500;
                 $height = 220;
 
-                $latLng = new LatLng($coordinates['latitude'], $coordinates['longitude']);
+                $latLng = new LatLng((float) $coordinates['latitude'], (float) $coordinates['longitude']);
 
                 // https://github.com/DantSu/php-osm-static-api
                 // This fetches map tiles over the network. The map is decoration on an invitation,
@@ -337,7 +337,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
                         ->addMarkers(
                             (new Markers($this->publicDir.'/images/marker.png'))
                                 ->setAnchor(Markers::ANCHOR_CENTER, Markers::ANCHOR_BOTTOM)
-                                ->addMarker(new LatLng($coordinates['latitude'], $coordinates['longitude']))
+                                ->addMarker(new LatLng((float) $coordinates['latitude'], (float) $coordinates['longitude']))
                         )
                         ->getImage()
                         ->getBase64PNG();
@@ -356,6 +356,7 @@ final class DavisIMipPlugin extends SabreBaseIMipPlugin
         }
 
         // For the mail headers, we don't automatically default to the email
+        $mailSenderName = '';
         if ($iTipMessage->senderName) {
             // If we have a proper name, we use it with the optional message origin indicator
             $mailSenderName = $iTipMessage->senderName;

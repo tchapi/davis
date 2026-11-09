@@ -27,7 +27,7 @@ $actions = [
 foreach ($actions as $action) {
     passthru(sprintf(
         'APP_ENV=%s php "%s/../bin/console" %s --quiet',
-        $_ENV['APP_ENV'],
+        $_ENV['APP_ENV'] ?? 'test',
         __DIR__,
         $action,
     ));

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Commands;
 
 use App\Command\MailTestCommand;
+use App\Tests\Functional\Double\RecordingMailer;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\Mime\Email;
 
 /**
  * This command is the only way to exercise the mail settings without creating an event, so it has
@@ -20,24 +20,9 @@ use Symfony\Component\Mime\RawMessage;
  */
 class MailTestCommandTest extends KernelTestCase
 {
-    private function mailer(?\Throwable $failure = null): MailerInterface
+    private function mailer(?\Throwable $failure = null): RecordingMailer
     {
-        return new class($failure) implements MailerInterface {
-            public array $sent = [];
-
-            public function __construct(private ?\Throwable $failure)
-            {
-            }
-
-            public function send(RawMessage $message, ?Envelope $envelope = null): void
-            {
-                if ($this->failure) {
-                    throw $this->failure;
-                }
-
-                $this->sent[] = $message;
-            }
-        };
+        return new RecordingMailer($failure);
     }
 
     private function tester(MailerInterface $mailer, ?string $inviteAddress = 'no-reply@example.org'): CommandTester
@@ -56,6 +41,7 @@ class MailTestCommandTest extends KernelTestCase
         $this->assertCount(1, $mailer->sent);
 
         $message = $mailer->sent[0];
+        $this->assertInstanceOf(Email::class, $message);
         $this->assertSame('no-reply@example.org', $message->getFrom()[0]->getAddress());
         $this->assertSame('someone@example.org', $message->getTo()[0]->getAddress());
     }

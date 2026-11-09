@@ -95,11 +95,12 @@ class IMAPAuthTest extends KernelTestCase
         $backend = $this->backendFor('');
 
         $log = tempnam(sys_get_temp_dir(), 'imap-auth-test');
+        $this->assertNotFalse($log);
         $previous = ini_set('error_log', $log);
 
         try {
             $denied = (new \ReflectionMethod($backend, 'imapOpen'))->invoke($backend, 'someone', 'password');
-            $logged = file_get_contents($log);
+            $logged = (string) file_get_contents($log);
         } finally {
             ini_set('error_log', $previous);
             unlink($log);

@@ -70,7 +70,7 @@ class AddressBookDavTest extends KernelTestCase
         $id = $this->backend->createAddressBook(self::PRINCIPAL, 'transient', ['{DAV:}displayname' => 'Temporary']);
 
         $propPatch = new PropPatch(['{DAV:}displayname' => null]);
-        $this->backend->updateAddressBook($id, $propPatch);
+        $this->backend->updateAddressBook((string) $id, $propPatch);
 
         $this->assertTrue($propPatch->commit(), 'The PROPPATCH should succeed');
         $this->assertNull($this->addressBookFor('transient')['{DAV:}displayname']);

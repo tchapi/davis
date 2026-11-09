@@ -32,6 +32,30 @@
         <pluginClass class="Weirdan\DoctrinePsalmPlugin\Plugin" />
     </plugins>
 
+    <issueHandlers>
+        <!-- sabre/vobject components expose their iCalendar/vCard properties through __get/__set,
+             by design for any property name, so there is nothing to declare on the classes. -->
+        <UndefinedMagicPropertyFetch>
+            <errorLevel type="suppress">
+                <referencedProperty name="Sabre\VObject\Component::$DTSTART" />
+                <referencedProperty name="Sabre\VObject\Component::$DTEND" />
+                <referencedProperty name="Sabre\VObject\Component::$SUMMARY" />
+                <referencedProperty name="Sabre\VObject\Component\VCalendar::$VEVENT" />
+                <referencedProperty name="Sabre\VObject\Component\VCard::$UID" />
+                <referencedProperty name="Sabre\VObject\Document::$VEVENT" />
+                <referencedProperty name="Sabre\VObject\Document::$VAVAILABILITY" />
+            </errorLevel>
+        </UndefinedMagicPropertyFetch>
+        <UndefinedMagicPropertyAssignment>
+            <errorLevel type="suppress">
+                <referencedProperty name="Sabre\VObject\Component::$DTSTART" />
+                <referencedProperty name="Sabre\VObject\Component::$DTEND" />
+                <referencedProperty name="Sabre\VObject\Component\VCalendar::$VERSION" />
+                <referencedProperty name="Sabre\VObject\Component\VCalendar::$PRODID" />
+            </errorLevel>
+        </UndefinedMagicPropertyAssignment>
+    </issueHandlers>
+
     <taintAnalysis>
         <ignoreFiles>
             <directory name="tests" />

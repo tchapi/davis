@@ -51,8 +51,8 @@ class DavTest extends WebTestCase
             ->setComponentType('VEVENT')
             ->setUid('secret-1')
             ->setLastModified(time())
-            ->setFirstOccurence(strtotime('2026-01-01T10:00:00Z'))
-            ->setLastOccurence(strtotime('2026-01-01T11:00:00Z'));
+            ->setFirstOccurence((int) strtotime('2026-01-01T10:00:00Z'))
+            ->setLastOccurence((int) strtotime('2026-01-01T11:00:00Z'));
 
         $em->persist($object);
         $em->flush();
@@ -170,7 +170,7 @@ class DavTest extends WebTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertSame(
-            file_get_contents(static::getContainer()->getParameter('kernel.project_dir').'/vendor/sabre/dav/lib/DAV/Browser/assets/favicon.ico'),
+            file_get_contents(\dirname(__DIR__, 2).'/vendor/sabre/dav/lib/DAV/Browser/assets/favicon.ico'),
             $client->getInternalResponse()->getContent()
         );
     }
@@ -190,6 +190,7 @@ class DavTest extends WebTestCase
             'principalUri' => Principal::PREFIX.'test_user',
             'uri' => 'default',
         ]);
+        $this->assertNotNull($instance);
         $instance->setPublic(true);
         $em->flush();
         $em->clear();
@@ -218,6 +219,7 @@ class DavTest extends WebTestCase
             'principalUri' => Principal::PREFIX.'test_user',
             'uri' => 'default',
         ]);
+        $this->assertNotNull($instance);
         $instance->setPublic(true);
         $em->flush();
         $em->clear();

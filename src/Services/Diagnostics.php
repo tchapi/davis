@@ -165,6 +165,7 @@ final class Diagnostics
      */
     private function database(): array
     {
+        /** @psalm-suppress InternalMethod doctrine/dbal has no public accessor for the configured driver name */
         $driver = $this->connection->getParams()['driver'] ?? 'unknown';
 
         try {
@@ -322,7 +323,7 @@ final class Diagnostics
         }
 
         // Only the scheme and host: the DSN carries the password.
-        return $this->check(self::OK, 'diagnostics.mailer', $scheme.'://'.$host, 'diagnostics.mailer.test', 'php bin/console davis:mail:test you@example.org');
+        return $this->check(self::OK, 'diagnostics.mailer', (string) $scheme.'://'.$host, 'diagnostics.mailer.test', 'php bin/console davis:mail:test you@example.org');
     }
 
     /**

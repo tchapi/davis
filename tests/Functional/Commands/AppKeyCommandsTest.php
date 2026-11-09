@@ -18,19 +18,21 @@ class AppKeyCommandsTest extends KernelTestCase
 {
     private function runCommand(string $name, array $input = []): CommandTester
     {
-        self::bootKernel();
-        $tester = new CommandTester((new Application(self::$kernel))->find($name));
+        $tester = new CommandTester((new Application(self::bootKernel()))->find($name));
         $tester->execute($input);
 
         return $tester;
     }
 
-    private static function keyByAppId(string $appId): ?AppKey
+    private static function keyByAppId(string $appId): AppKey
     {
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $em->clear();
 
-        return $em->getRepository(AppKey::class)->findOneByAppId($appId);
+        $key = $em->getRepository(AppKey::class)->findOneByAppId($appId);
+        self::assertNotNull($key, "No app key with app id $appId");
+
+        return $key;
     }
 
     private static function countKeys(): int
@@ -60,7 +62,6 @@ class AppKeyCommandsTest extends KernelTestCase
         $this->assertStringContainsString('<login>*'.$appId, $display);
 
         $key = self::keyByAppId($appId);
-        $this->assertNotNull($key);
         $this->assertSame('cal.com', $key->getName());
         $this->assertSame(['*'], $key->getScope());
 

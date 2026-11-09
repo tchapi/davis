@@ -59,7 +59,7 @@ class DiagnosticsTest extends KernelTestCase
         $checks = [];
         foreach ($diagnostics->buckets() as $bucket) {
             foreach ($bucket['checks'] as $check) {
-                $checks[$check['title']] = $check;
+                $checks[(string) $check['title']] = $check;
             }
         }
 
@@ -70,6 +70,7 @@ class DiagnosticsTest extends KernelTestCase
     {
         $checks = $this->checksOf($diagnostics);
         $this->assertArrayHasKey($title, $checks);
+        $this->assertNotNull($checks[$title]['severity']);
 
         return $checks[$title]['severity'];
     }
@@ -192,8 +193,8 @@ class DiagnosticsTest extends KernelTestCase
             'mailerDsn' => 'smtp://someone:hunter2@smtp.example.org:587',
         ]));
 
-        $this->assertStringNotContainsString('hunter2', $checks['diagnostics.mailer']['value']);
-        $this->assertStringNotContainsString('someone', $checks['diagnostics.mailer']['value']);
+        $this->assertStringNotContainsString('hunter2', (string) $checks['diagnostics.mailer']['value']);
+        $this->assertStringNotContainsString('someone', (string) $checks['diagnostics.mailer']['value']);
         $this->assertSame('smtp://smtp.example.org', $checks['diagnostics.mailer']['value']);
     }
 
@@ -205,8 +206,8 @@ class DiagnosticsTest extends KernelTestCase
         $this->assertSame('1', $check['value']);
         $this->assertSame(Diagnostics::INFO, $check['severity']);
         $this->assertSame('/app-keys/', $check['link']);
-        $this->assertStringNotContainsString('app-secret', json_encode($check));
-        $this->assertStringNotContainsString('$2y$', json_encode($check));
+        $this->assertStringNotContainsString('app-secret', json_encode($check, JSON_THROW_ON_ERROR));
+        $this->assertStringNotContainsString('$2y$', json_encode($check, JSON_THROW_ON_ERROR));
     }
 
     public function testAppKeysTurnedOff(): void

@@ -28,9 +28,8 @@ final class LDAPAuth extends AbstractAuth
      *        mail.example.org: %1 = org, %2 = example, %3 = mail
      *
      * A common pattern is "mail=%u"
-     * @var string
      */
-    private $LDAPDnPattern;
+    private string $LDAPDnPattern;
 
     /*
      * LDAP attribute used for mail
@@ -85,7 +84,7 @@ final class LDAPAuth extends AbstractAuth
     /**
      * Returns the username as the directory spells it, or null when it cannot be determined.
      */
-    private function canonicalUsernameFor($ldap, string $dn): ?string
+    private function canonicalUsernameFor(\LDAP\Connection $ldap, string $dn): ?string
     {
         try {
             $read = ldap_read($ldap, $dn, '(objectclass=*)', ['dn']);
@@ -93,7 +92,7 @@ final class LDAPAuth extends AbstractAuth
             $read = false;
         }
 
-        if (false === $read) {
+        if (!$read instanceof \LDAP\Result) {
             return null;
         }
 
@@ -244,7 +243,7 @@ final class LDAPAuth extends AbstractAuth
                     // Probably a "No such object" error, ignore and use available credentials (username)
                 }
 
-                if (false !== $search_results) {
+                if ($search_results instanceof \LDAP\Result) {
                     $entry = ldap_get_entries($ldap, $search_results);
 
                     if (false !== $entry) {
@@ -271,9 +270,7 @@ final class LDAPAuth extends AbstractAuth
             }
         }
 
-        if (isset($ldap) && $ldap) {
-            ldap_close($ldap);
-        }
+        ldap_close($ldap);
 
         return $success;
     }

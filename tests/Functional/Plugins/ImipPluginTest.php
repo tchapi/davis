@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Plugins;
 
 use App\Plugins\DavisIMipPlugin;
+use App\Tests\Functional\Double\RecordingMailer;
 use Psr\Log\AbstractLogger;
+use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\ITip;
 use Sabre\VObject\Reader;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\RawMessage;
 
 /**
  * Scheduling runs inside the PUT that stores the event. Anything thrown here reaches sabre and
@@ -33,7 +34,9 @@ class ImipPluginTest extends KernelTestCase
         $message->recipient = $recipient;
         $message->recipientName = 'Attendee';
         $message->significantChange = true;
-        $message->message = Reader::read(self::EVENT);
+        $document = Reader::read(self::EVENT);
+        self::assertInstanceOf(VCalendar::class, $document);
+        $message->message = $document;
 
         return $message;
     }
@@ -56,29 +59,14 @@ class ImipPluginTest extends KernelTestCase
         return new DavisIMipPlugin(
             $mailer,
             'no-reply@example.org',
-            static::getContainer()->getParameter('kernel.project_dir').'/public',
+            \dirname(__DIR__, 3).'/public',
             $logger
         );
     }
 
-    private function mailer(?\Throwable $failure): MailerInterface
+    private function mailer(?\Throwable $failure): RecordingMailer
     {
-        return new class($failure) implements MailerInterface {
-            public array $sent = [];
-
-            public function __construct(private ?\Throwable $failure)
-            {
-            }
-
-            public function send(RawMessage $message, ?Envelope $envelope = null): void
-            {
-                if ($this->failure) {
-                    throw $this->failure;
-                }
-
-                $this->sent[] = $message;
-            }
-        };
+        return new RecordingMailer($failure);
     }
 
     public function testAnUnreachableTransportDoesNotAbortTheSchedulingEvent(): void
@@ -147,6 +135,7 @@ class ImipPluginTest extends KernelTestCase
         $plugin->schedule($message);
 
         $this->assertCount(1, $mailer->sent);
+        $this->assertInstanceOf(TemplatedEmail::class, $mailer->sent[0]);
 
         // The templates render from this context, and both of them only emit a link when it is set
         $this->assertSame(

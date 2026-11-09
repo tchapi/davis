@@ -207,22 +207,10 @@
     <InvalidCast>
       <code><![CDATA[$attendee]]></code>
     </InvalidCast>
-    <InvalidScalarArgument>
-      <code><![CDATA[$coordinates['latitude']]]></code>
-      <code><![CDATA[$coordinates['latitude']]]></code>
-      <code><![CDATA[$coordinates['longitude']]]></code>
-      <code><![CDATA[$coordinates['longitude']]]></code>
-    </InvalidScalarArgument>
-    <PossiblyUndefinedVariable>
-      <code><![CDATA[$mailSenderName]]></code>
-    </PossiblyUndefinedVariable>
     <RedundantCondition>
       <code><![CDATA[static::MESSAGE_ORIGIN_INDICATOR]]></code>
       <code><![CDATA[static::MESSAGE_ORIGIN_INDICATOR]]></code>
     </RedundantCondition>
-    <UndefinedMagicPropertyFetch>
-      <code><![CDATA[$iTipMessage->message->VEVENT]]></code>
-    </UndefinedMagicPropertyFetch>
     <UnsupportedPropertyReferenceUsage>
       <code><![CDATA[$_attendees = &$iTipMessage->message->VEVENT->ATTENDEE]]></code>
     </UnsupportedPropertyReferenceUsage>
@@ -241,9 +229,6 @@
     </UndefinedInterfaceMethod>
   </file>
   <file src="src/Services/BirthdayService.php">
-    <InvalidArgument>
-      <code><![CDATA[$birthday]]></code>
-    </InvalidArgument>
     <PossiblyNullArgument>
       <code><![CDATA[$existing->getCalendarData()]]></code>
       <code><![CDATA[$instance->getCalendar()]]></code>
@@ -252,9 +237,6 @@
       <code><![CDATA[getId]]></code>
       <code><![CDATA[getId]]></code>
     </PossiblyNullReference>
-    <RedundantCondition>
-      <code><![CDATA[$birthday instanceof DateAndOrTime]]></code>
-    </RedundantCondition>
     <UndefinedInterfaceMethod>
       <code><![CDATA[findByAddressBook]]></code>
       <code><![CDATA[findByCalendar]]></code>
@@ -262,102 +244,13 @@
       <code><![CDATA[findOneById]]></code>
       <code><![CDATA[findOneById]]></code>
     </UndefinedInterfaceMethod>
-    <UndefinedMagicPropertyAssignment>
-      <code><![CDATA[$vCal->PRODID]]></code>
-      <code><![CDATA[$vCal->VERSION]]></code>
-      <code><![CDATA[$vEvent->DTEND]]></code>
-      <code><![CDATA[$vEvent->DTSTART]]></code>
-    </UndefinedMagicPropertyAssignment>
-    <UndefinedMagicPropertyFetch>
-      <code><![CDATA[$doc->UID]]></code>
-      <code><![CDATA[$existingBirthday->VEVENT]]></code>
-      <code><![CDATA[$newCalendarData->VEVENT]]></code>
-      <code><![CDATA[$vEvent->DTEND]]></code>
-      <code><![CDATA[$vEvent->DTSTART]]></code>
-      <code><![CDATA[$vEvent->{'SUMMARY'}]]></code>
-    </UndefinedMagicPropertyFetch>
-  </file>
-  <file src="src/Services/Diagnostics.php">
-    <InternalMethod>
-      <code><![CDATA[getParams]]></code>
-    </InternalMethod>
-    <PossiblyFalseOperand>
-      <code><![CDATA[$scheme]]></code>
-    </PossiblyFalseOperand>
-  </file>
-  <file src="src/Services/LDAPAuth.php">
-    <InvalidReturnStatement>
-      <code><![CDATA[$dn]]></code>
-    </InvalidReturnStatement>
-    <InvalidReturnType>
-      <code><![CDATA[string]]></code>
-    </InvalidReturnType>
-    <PossiblyInvalidArgument>
-      <code><![CDATA[$read]]></code>
-      <code><![CDATA[$search_results]]></code>
-    </PossiblyInvalidArgument>
-    <RedundantCondition>
-      <code><![CDATA[$ldap]]></code>
-      <code><![CDATA[isset($ldap)]]></code>
-      <code><![CDATA[isset($ldap) && $ldap]]></code>
-    </RedundantCondition>
-  </file>
-  <file src="tests/Functional/AddressBookDavTest.php">
-    <InvalidArgument>
-      <code><![CDATA[$id]]></code>
-    </InvalidArgument>
-  </file>
-  <file src="tests/Functional/AdminPostTrait.php">
-    <InvalidNullableReturnType>
-      <code><![CDATA[string]]></code>
-    </InvalidNullableReturnType>
-  </file>
-  <file src="tests/Functional/AppKeysDisabledTest.php">
-    <InternalMethod>
-      <code><![CDATA[addToAssertionCount]]></code>
-    </InternalMethod>
-    <PossiblyNullArgument>
-      <code><![CDATA[self::$kernel]]></code>
-    </PossiblyNullArgument>
-  </file>
-  <file src="tests/Functional/Commands/AppKeyCommandsTest.php">
-    <PossiblyNullArgument>
-      <code><![CDATA[self::$kernel]]></code>
-    </PossiblyNullArgument>
-    <PossiblyNullReference>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getScope]]></code>
-      <code><![CDATA[getScope]]></code>
-    </PossiblyNullReference>
-  </file>
-  <file src="tests/Functional/Commands/MailTestCommandTest.php">
-    <NoInterfaceProperties>
-      <code><![CDATA[$mailer->sent]]></code>
-      <code><![CDATA[$mailer->sent]]></code>
-      <code><![CDATA[$mailer->sent]]></code>
-    </NoInterfaceProperties>
   </file>
   <file src="tests/Functional/Commands/SyncBirthdayCalendarTest.php">
     <PossiblyNullArgument>
       <code><![CDATA[$object->getCalendarData()]]></code>
-      <code><![CDATA[self::$kernel]]></code>
     </PossiblyNullArgument>
   </file>
   <file src="tests/Functional/Controllers/ApiControllerTest.php">
-    <PossiblyFalseArgument>
-      <code><![CDATA[json_encode($payload)]]></code>
-      <code><![CDATA[json_encode($payload)]]></code>
-      <code><![CDATA[json_encode($payload)]]></code>
-      <code><![CDATA[json_encode($payload)]]></code>
-      <code><![CDATA[json_encode($payload)]]></code>
-      <code><![CDATA[json_encode($payload)]]></code>
-      <code><![CDATA[json_encode(['name' => 'Hijacked', 'events_support' => false, 'tasks_support' => true])]]></code>
-      <code><![CDATA[json_encode(['username' => 'test_user', 'write_access' => true])]]></code>
-      <code><![CDATA[json_encode(['username' => 'test_user2', 'write_access' => true])]]></code>
-      <code><![CDATA[json_encode(['username' => 'test_user2'])]]></code>
-    </PossiblyFalseArgument>
     <PossiblyNullReference>
       <code><![CDATA[getStatusCode]]></code>
     </PossiblyNullReference>
@@ -367,145 +260,25 @@
       <code><![CDATA[$onlyUser2->getAppId()]]></code>
       <code><![CDATA[$user2AndBob->getAppId()]]></code>
     </PossiblyNullArgument>
-    <PossiblyNullReference>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getRevokedAt]]></code>
-      <code><![CDATA[getScope]]></code>
-    </PossiblyNullReference>
   </file>
   <file src="tests/Functional/Controllers/CalendarControllerTest.php">
-    <PossiblyInvalidArrayAccess>
-      <code><![CDATA[$shares[0]]]></code>
-      <code><![CDATA[$shares[0]]]></code>
-      <code><![CDATA[$shares[0]]]></code>
-    </PossiblyInvalidArrayAccess>
     <PossiblyNullReference>
       <code><![CDATA[getId]]></code>
       <code><![CDATA[getId]]></code>
       <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
-      <code><![CDATA[getId]]></code>
     </PossiblyNullReference>
-    <UndefinedInterfaceMethod>
-      <code><![CDATA[$shares]]></code>
-      <code><![CDATA[$shares]]></code>
-      <code><![CDATA[$shares]]></code>
-    </UndefinedInterfaceMethod>
-  </file>
-  <file src="tests/Functional/Controllers/DashboardTest.php">
-    <PossiblyInvalidMethodCall>
-      <code><![CDATA[setValue]]></code>
-      <code><![CDATA[setValue]]></code>
-      <code><![CDATA[setValue]]></code>
-      <code><![CDATA[setValue]]></code>
-      <code><![CDATA[setValue]]></code>
-      <code><![CDATA[setValue]]></code>
-    </PossiblyInvalidMethodCall>
-  </file>
-  <file src="tests/Functional/DavTest.php">
-    <InvalidOperand>
-      <code><![CDATA[static::getContainer()->getParameter('kernel.project_dir')]]></code>
-    </InvalidOperand>
-    <PossiblyFalseArgument>
-      <code><![CDATA[strtotime('2026-01-01T10:00:00Z')]]></code>
-      <code><![CDATA[strtotime('2026-01-01T11:00:00Z')]]></code>
-    </PossiblyFalseArgument>
-    <PossiblyNullReference>
-      <code><![CDATA[setPublic]]></code>
-    </PossiblyNullReference>
-  </file>
-  <file src="tests/Functional/DefaultAvailabilityTest.php">
-    <UndefinedMagicPropertyFetch>
-      <code><![CDATA[$vcalendar->VAVAILABILITY]]></code>
-    </UndefinedMagicPropertyFetch>
-  </file>
-  <file src="tests/Functional/Entity/AppKeyTest.php">
-    <PossiblyNullArgument>
-      <code><![CDATA[$key->getAppId()]]></code>
-      <code><![CDATA[$key->getSecretHash()]]></code>
-      <code><![CDATA[$key->getSecretHash()]]></code>
-      <code><![CDATA[$key->getSecretHash()]]></code>
-    </PossiblyNullArgument>
   </file>
   <file src="tests/Functional/Plugins/BirthdayCalendarPluginTest.php">
-    <InvalidNullableReturnType>
-      <code><![CDATA[AddressBook]]></code>
-    </InvalidNullableReturnType>
-    <NullableReturnStatement>
-      <code><![CDATA[$this->em->getRepository(AddressBook::class)->findOneBy([
-            'principalUri' => self::PRINCIPAL,
-            'uri' => 'default',
-        ])]]></code>
-    </NullableReturnStatement>
     <PossiblyNullArgument>
       <code><![CDATA[$event->getCalendarData()]]></code>
     </PossiblyNullArgument>
-  </file>
-  <file src="tests/Functional/Plugins/ImipPluginTest.php">
-    <InvalidOperand>
-      <code><![CDATA[static::getContainer()->getParameter('kernel.project_dir')]]></code>
-    </InvalidOperand>
-    <NoInterfaceProperties>
-      <code><![CDATA[$mailer->sent]]></code>
-      <code><![CDATA[$mailer->sent]]></code>
-      <code><![CDATA[$mailer->sent]]></code>
-      <code><![CDATA[$mailer->sent]]></code>
-    </NoInterfaceProperties>
-    <PropertyTypeCoercion>
-      <code><![CDATA[Reader::read(self::EVENT)]]></code>
-    </PropertyTypeCoercion>
-    <UndefinedMagicPropertyFetch>
-      <code><![CDATA[$message->message->VEVENT]]></code>
-    </UndefinedMagicPropertyFetch>
-  </file>
-  <file src="tests/Functional/Plugins/ImipSchedulingDiagnosticsTest.php">
-    <PropertyTypeCoercion>
-      <code><![CDATA[new class extends AbstractLogger {
-            public array $records = [];
-
-            public function log($level, $message, array $context = []): void
-            {
-                $this->records[] = ['level' => (string) $level, 'message' => (string) $message, 'context' => $context];
-            }
-        }]]></code>
-    </PropertyTypeCoercion>
   </file>
   <file src="tests/Functional/Service/AuthBackendTest.php">
     <PossiblyNullReference>
       <code><![CDATA[format]]></code>
     </PossiblyNullReference>
-    <UndefinedPropertyFetch>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-      <code><![CDATA[$backend->seen]]></code>
-    </UndefinedPropertyFetch>
   </file>
   <file src="tests/Functional/Service/BirthdayServiceTest.php">
-    <InternalMethod>
-      <code><![CDATA[addToAssertionCount]]></code>
-    </InternalMethod>
     <PossiblyNullArgument>
       <code><![CDATA[$addressBook->getId()]]></code>
       <code><![CDATA[$addressBook->getId()]]></code>
@@ -516,85 +289,12 @@
       <code><![CDATA[$addressBook->getId()]]></code>
       <code><![CDATA[$addressBook->getId()]]></code>
       <code><![CDATA[$addressBook->getId()]]></code>
-      <code><![CDATA[$cal]]></code>
-      <code><![CDATA[$cal2]]></code>
-      <code><![CDATA[$cal2]]></code>
       <code><![CDATA[$object->getCalendarData()]]></code>
       <code><![CDATA[$object->getCalendarData()]]></code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch>
-      <code><![CDATA[$result->VEVENT]]></code>
-      <code><![CDATA[$result->VEVENT->VALARM]]></code>
-    </PossiblyNullPropertyFetch>
     <PossiblyNullReference>
-      <code><![CDATA[getCalendar]]></code>
-      <code><![CDATA[getCalendar]]></code>
       <code><![CDATA[getSynctoken]]></code>
       <code><![CDATA[getSynctoken]]></code>
-      <code><![CDATA[serialize]]></code>
-      <code><![CDATA[serialize]]></code>
-      <code><![CDATA[serialize]]></code>
     </PossiblyNullReference>
-    <UndefinedMagicPropertyFetch>
-      <code><![CDATA[$result->VEVENT]]></code>
-      <code><![CDATA[$result->VEVENT]]></code>
-      <code><![CDATA[$result->VEVENT]]></code>
-      <code><![CDATA[$result->VEVENT]]></code>
-    </UndefinedMagicPropertyFetch>
-  </file>
-  <file src="tests/Functional/Service/DiagnosticsTest.php">
-    <InvalidNullableReturnType>
-      <code><![CDATA[string]]></code>
-    </InvalidNullableReturnType>
-    <NullableReturnStatement>
-      <code><![CDATA[$checks[$title]['severity']]]></code>
-    </NullableReturnStatement>
-    <PossiblyFalseArgument>
-      <code><![CDATA[json_encode($check)]]></code>
-      <code><![CDATA[json_encode($check)]]></code>
-    </PossiblyFalseArgument>
-    <PossiblyNullArgument>
-      <code><![CDATA[$checks['diagnostics.mailer']['value']]]></code>
-      <code><![CDATA[$checks['diagnostics.mailer']['value']]]></code>
-    </PossiblyNullArgument>
-    <PossiblyNullArrayOffset>
-      <code><![CDATA[$checks]]></code>
-    </PossiblyNullArrayOffset>
-  </file>
-  <file src="tests/Functional/Service/IMAPAuthTest.php">
-    <PossiblyFalseArgument>
-      <code><![CDATA[$log]]></code>
-      <code><![CDATA[$log]]></code>
-      <code><![CDATA[$logged]]></code>
-    </PossiblyFalseArgument>
-  </file>
-  <file src="tests/Functional/SyncTokenTest.php">
-    <InvalidArgument>
-      <code><![CDATA[$addressBookId]]></code>
-      <code><![CDATA[$addressBookId]]></code>
-    </InvalidArgument>
-    <PossiblyNullArrayAccess>
-      <code><![CDATA[$changes['added']]]></code>
-      <code><![CDATA[$changes['added']]]></code>
-      <code><![CDATA[$changes['deleted']]]></code>
-      <code><![CDATA[$changes['modified']]]></code>
-      <code><![CDATA[$changes['modified']]]></code>
-      <code><![CDATA[$changes['syncToken']]]></code>
-    </PossiblyNullArrayAccess>
-  </file>
-  <file src="tests/Functional/WebDavTest.php">
-    <InvalidOperand>
-      <code><![CDATA[static::getContainer()->getParameter('kernel.project_dir')]]></code>
-    </InvalidOperand>
-    <PossiblyFalseArgument>
-      <code><![CDATA[glob($this->baseDir.'/tmp/sabredav_*')]]></code>
-      <code><![CDATA[glob($this->baseDir.'/tmp/sabredav_*')]]></code>
-      <code><![CDATA[glob($this->baseDir.'/tmp/sabredav_*')]]></code>
-    </PossiblyFalseArgument>
-  </file>
-  <file src="tests/bootstrap.php">
-    <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$_ENV['APP_ENV']]]></code>
-    </PossiblyUndefinedArrayOffset>
   </file>
 </files>

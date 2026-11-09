@@ -60,7 +60,8 @@ class SyncTokenTest extends KernelTestCase
     {
         $addressBookId = $this->createAddressBookAtTokenEleven();
 
-        $changes = $this->backend->getChangesForAddressBook($addressBookId, '9', 1);
+        $changes = $this->backend->getChangesForAddressBook((string) $addressBookId, '9', 1);
+        $this->assertNotNull($changes);
 
         $this->assertSame(11, (int) $changes['syncToken']);
         $this->assertSame(['added.vcf'], $changes['added']);
@@ -73,7 +74,8 @@ class SyncTokenTest extends KernelTestCase
         $addressBookId = $this->createAddressBookAtTokenEleven();
 
         // From token 10 the earlier change at 9 must be out of range, the one at 10 in range
-        $changes = $this->backend->getChangesForAddressBook($addressBookId, '10', 1);
+        $changes = $this->backend->getChangesForAddressBook((string) $addressBookId, '10', 1);
+        $this->assertNotNull($changes);
 
         $this->assertSame([], $changes['added']);
         $this->assertSame(['changed.vcf'], $changes['modified']);

@@ -53,10 +53,13 @@ class BirthdayCalendarPluginTest extends KernelTestCase
 
     private function addressBook(): AddressBook
     {
-        return $this->em->getRepository(AddressBook::class)->findOneBy([
+        $addressBook = $this->em->getRepository(AddressBook::class)->findOneBy([
             'principalUri' => self::PRINCIPAL,
             'uri' => 'default',
         ]);
+        $this->assertNotNull($addressBook, 'The fixtures provide a default address book');
+
+        return $addressBook;
     }
 
     private function includeInBirthdayCalendar(bool $included): void

@@ -31,12 +31,15 @@ class AppKeyControllerTest extends WebTestCase
         return static::getContainer()->get(BasicAuth::class)->check($request, new Response());
     }
 
-    private static function keyByAppId(string $appId): ?AppKey
+    private static function keyByAppId(string $appId): AppKey
     {
         $em = static::getContainer()->get('doctrine.orm.entity_manager');
         $em->clear();
 
-        return $em->getRepository(AppKey::class)->findOneByAppId($appId);
+        $key = $em->getRepository(AppKey::class)->findOneByAppId($appId);
+        self::assertNotNull($key, "No app key with app id $appId");
+
+        return $key;
     }
 
     public function testIndexIsNotReachableAnonymously(): void

@@ -16,6 +16,19 @@ class CalendarControllerTest extends WebTestCase
 {
     use AdminPostTrait;
 
+    private function calendarRepository(): CalendarInstanceRepository
+    {
+        return static::getContainer()->get(CalendarInstanceRepository::class);
+    }
+
+    private function defaultCalendar(): CalendarInstance
+    {
+        $calendar = $this->calendarRepository()->findOneByDisplayName('default.calendar.title');
+        $this->assertNotNull($calendar, 'The fixtures provide a default calendar');
+
+        return $calendar;
+    }
+
     private function getUserId($client, string $username): int
     {
         $userRepository = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
@@ -52,8 +65,7 @@ class CalendarControllerTest extends WebTestCase
 
         $userId = $this->getUserId($client, 'test_user');
 
-        $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
-        $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
+        $calendar = $this->defaultCalendar();
 
         $client->request('GET', '/calendars/'.$userId.'/edit/'.$calendar->getId());
 
@@ -113,8 +125,7 @@ class CalendarControllerTest extends WebTestCase
 
         $userId = $this->getUserId($client, 'test_user');
 
-        $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
-        $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
+        $calendar = $this->defaultCalendar();
 
         $this->postAdmin($client, '/calendars/'.$userId.'/delete/'.$calendar->getId());
 
@@ -133,9 +144,9 @@ class CalendarControllerTest extends WebTestCase
 
         $userId = $this->getUserId($client, 'test_user');
 
-        $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
-        $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
+        $calendar = $this->defaultCalendar();
         $sharee = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.'test_user2');
+        $this->assertNotNull($sharee);
 
         $this->postAdmin($client, '/calendars/'.$userId.'/share/'.$calendar->getId(), ['principalId' => $sharee->getId(), 'write' => 'true']);
         $this->assertResponseRedirects('/calendars/'.$userId);
@@ -143,6 +154,7 @@ class CalendarControllerTest extends WebTestCase
         $client->request('GET', '/calendars/'.$userId.'/shares/'.$calendar->getCalendar()->getId());
         $this->assertResponseIsSuccessful();
         $shares = json_decode((string) $client->getResponse()->getContent(), true);
+        $this->assertIsArray($shares);
         $this->assertCount(1, $shares);
         $this->assertSame(Principal::PREFIX.'test_user2', $shares[0]['principalUri']);
         $this->assertTrue($shares[0]['isWriteAccess']);
@@ -162,8 +174,7 @@ class CalendarControllerTest extends WebTestCase
         $client->loginUser($user);
 
         $userId = $this->getUserId($client, 'test_user');
-        $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
-        $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
+        $calendar = $this->defaultCalendar();
 
         foreach ([
             '/calendars/'.$userId.'/delete/'.$calendar->getId(),
@@ -174,7 +185,7 @@ class CalendarControllerTest extends WebTestCase
             $this->assertResponseStatusCodeSame(405, 'GET '.$url.' must not be allowed');
         }
 
-        $this->assertNotNull($calendarRepository->find($calendar->getId()));
+        $this->assertNotNull($this->calendarRepository()->find($calendar->getId()));
     }
 
     public function testCalendarDeleteRejectsInvalidCsrfToken(): void
@@ -185,13 +196,12 @@ class CalendarControllerTest extends WebTestCase
         $client->loginUser($user);
 
         $userId = $this->getUserId($client, 'test_user');
-        $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
-        $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
+        $calendar = $this->defaultCalendar();
 
         $client->request('POST', '/calendars/'.$userId.'/delete/'.$calendar->getId(), ['_token' => 'not-the-token']);
         $this->assertResponseStatusCodeSame(403);
 
-        $this->assertNotNull($calendarRepository->find($calendar->getId()));
+        $this->assertNotNull($this->calendarRepository()->find($calendar->getId()));
     }
 
     private function loggedInClient(): \Symfony\Bundle\FrameworkBundle\KernelBrowser
@@ -208,8 +218,7 @@ class CalendarControllerTest extends WebTestCase
 
         $ownerId = $this->getUserId($client, 'test_user');
         $otherId = $this->getUserId($client, 'test_user2');
-        $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
-        $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
+        $calendar = $this->defaultCalendar();
         $sharee = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.'test_user');
 
         $client->request('GET', '/calendars/'.$otherId.'/edit/'.$calendar->getId());
@@ -227,8 +236,8 @@ class CalendarControllerTest extends WebTestCase
         $this->postAdmin($client, '/calendars/'.$otherId.'/delete/'.$calendar->getId());
         $this->assertResponseStatusCodeSame(404);
 
-        $this->assertNotNull($calendarRepository->find($calendar->getId()), 'The owner\'s calendar must be untouched');
-        $this->assertSame(0, $calendarRepository->count(['principalUri' => Principal::PREFIX.'test_user2', 'calendar' => $calendar->getCalendar()]));
+        $this->assertNotNull($this->calendarRepository()->find($calendar->getId()), 'The owner\'s calendar must be untouched');
+        $this->assertSame(0, $this->calendarRepository()->count(['principalUri' => Principal::PREFIX.'test_user2', 'calendar' => $calendar->getCalendar()]));
         unset($ownerId);
     }
 
@@ -237,14 +246,13 @@ class CalendarControllerTest extends WebTestCase
         $client = $this->loggedInClient();
 
         $userId = $this->getUserId($client, 'test_user');
-        $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
-        $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
+        $calendar = $this->defaultCalendar();
         $owner = static::getContainer()->get('doctrine.orm.entity_manager')->getRepository(Principal::class)->findOneByUri(Principal::PREFIX.'test_user');
 
         $this->postAdmin($client, '/calendars/'.$userId.'/share/'.$calendar->getId(), ['principalId' => $owner->getId(), 'write' => 'true']);
         $this->assertResponseStatusCodeSame(400);
 
-        $this->assertSame(1, $calendarRepository->count(['calendar' => $calendar->getCalendar()]));
+        $this->assertSame(1, $this->calendarRepository()->count(['calendar' => $calendar->getCalendar()]));
     }
 
     public function testDeletingASharedInstanceOnlyRevokesTheShare(): void
@@ -283,13 +291,12 @@ class CalendarControllerTest extends WebTestCase
         $client = $this->loggedInClient();
 
         $userId = $this->getUserId($client, 'test_user');
-        $calendarRepository = static::getContainer()->get(CalendarInstanceRepository::class);
-        $calendar = $calendarRepository->findOneByDisplayName('default.calendar.title');
+        $calendar = $this->defaultCalendar();
 
         $this->postAdmin($client, '/calendars/'.$userId.'/revoke/'.$calendar->getId());
         $this->assertResponseStatusCodeSame(400);
 
-        $this->assertNotNull($calendarRepository->find($calendar->getId()));
+        $this->assertNotNull($this->calendarRepository()->find($calendar->getId()));
     }
 
     /**

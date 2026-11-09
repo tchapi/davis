@@ -54,15 +54,16 @@ class AppKeysDisabledTest extends WebTestCase
 
     public function testTheCommandsAreNotAvailable(): void
     {
-        self::bootKernel();
-        $application = new Application(self::$kernel);
+        $this->expectNotToPerformAssertions();
+
+        $application = new Application(self::bootKernel());
 
         foreach (['davis:app-key:create', 'davis:app-key:list', 'davis:app-key:revoke'] as $name) {
             try {
                 $application->find($name);
                 $this->fail($name.' must not be available');
             } catch (CommandNotFoundException) {
-                $this->addToAssertionCount(1);
+                // Expected: the command is not registered
             }
         }
     }

@@ -13,6 +13,7 @@ use App\Services\AbstractAuth;
 use App\Services\BasicAuth;
 use App\Services\IMAPAuth;
 use App\Services\LDAPAuth;
+use App\Tests\Functional\Double\AcceptAllAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use Sabre\HTTP\Request;
 use Sabre\HTTP\Response;
@@ -31,22 +32,9 @@ class AuthBackendTest extends KernelTestCase
         return $backend->check($request, new Response());
     }
 
-    /**
-     * A backend that accepts everything, to prove the guard in AbstractAuth never lets
-     * an empty username or password reach the concrete backend.
-     */
-    private static function acceptAllBackend(): AbstractAuth
+    private static function acceptAllBackend(): AcceptAllAuth
     {
-        return new class extends AbstractAuth {
-            public array $seen = [];
-
-            protected function checkCredentials(string $username, string $password): bool
-            {
-                $this->seen[] = [$username, $password];
-
-                return true;
-            }
-        };
+        return new AcceptAllAuth();
     }
 
     /**
@@ -89,7 +77,7 @@ class AuthBackendTest extends KernelTestCase
         return $key;
     }
 
-    private function guardedBackend(): AbstractAuth
+    private function guardedBackend(): AcceptAllAuth
     {
         $backend = self::acceptAllBackend();
         $backend->setAppKeyRepository(static::getContainer()->get(AppKeyRepository::class));

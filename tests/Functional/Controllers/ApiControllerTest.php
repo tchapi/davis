@@ -333,7 +333,7 @@ class ApiControllerTest extends WebTestCase
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
-        ], json_encode($payload));
+        ], json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
@@ -386,7 +386,7 @@ class ApiControllerTest extends WebTestCase
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
-        ], json_encode($payload));
+        ], json_encode($payload, JSON_THROW_ON_ERROR));
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
@@ -458,7 +458,7 @@ class ApiControllerTest extends WebTestCase
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
-        ], json_encode($payload));
+        ], json_encode($payload, JSON_THROW_ON_ERROR));
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
@@ -501,7 +501,7 @@ class ApiControllerTest extends WebTestCase
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
-        ], json_encode($payload));
+        ], json_encode($payload, JSON_THROW_ON_ERROR));
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
@@ -544,7 +544,7 @@ class ApiControllerTest extends WebTestCase
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
-        ], json_encode($payload));
+        ], json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertResponseStatusCodeSame(400);
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
@@ -576,7 +576,7 @@ class ApiControllerTest extends WebTestCase
             'HTTP_ACCEPT' => 'application/json',
             'HTTP_X_DAVIS_API_TOKEN' => $_ENV['API_KEY'],
             'CONTENT_TYPE' => 'application/json',
-        ], json_encode($payload));
+        ], json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertResponseStatusCodeSame(400);
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
@@ -707,16 +707,16 @@ class ApiControllerTest extends WebTestCase
 
         $shareeUserId = $this->getUserId($client, 1);
 
-        $client->request('PUT', '/api/v1/calendars/'.$shareeUserId.'/'.$sharedId, [], [], $this->apiHeaders(), json_encode(['name' => 'Hijacked', 'events_support' => false, 'tasks_support' => true]));
+        $client->request('PUT', '/api/v1/calendars/'.$shareeUserId.'/'.$sharedId, [], [], $this->apiHeaders(), json_encode(['name' => 'Hijacked', 'events_support' => false, 'tasks_support' => true], JSON_THROW_ON_ERROR));
         $this->assertResponseStatusCodeSame(400);
 
         $client->request('GET', '/api/v1/calendars/'.$shareeUserId.'/shares/'.$sharedId, [], [], $this->apiHeaders());
         $this->assertResponseStatusCodeSame(400);
 
-        $client->request('POST', '/api/v1/calendars/'.$shareeUserId.'/share/'.$sharedId.'/add', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user2', 'write_access' => true]));
+        $client->request('POST', '/api/v1/calendars/'.$shareeUserId.'/share/'.$sharedId.'/add', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user2', 'write_access' => true], JSON_THROW_ON_ERROR));
         $this->assertResponseStatusCodeSame(400);
 
-        $client->request('POST', '/api/v1/calendars/'.$shareeUserId.'/share/'.$sharedId.'/remove', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user2']));
+        $client->request('POST', '/api/v1/calendars/'.$shareeUserId.'/share/'.$sharedId.'/remove', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user2'], JSON_THROW_ON_ERROR));
         $this->assertResponseStatusCodeSame(400);
 
         $em->clear();
@@ -730,7 +730,7 @@ class ApiControllerTest extends WebTestCase
         $userId = $this->getUserId($client, 0);
         $calendarId = $this->getCalendarId($client, $userId, true);
 
-        $client->request('POST', '/api/v1/calendars/'.$userId.'/share/'.$calendarId.'/add', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user', 'write_access' => true]));
+        $client->request('POST', '/api/v1/calendars/'.$userId.'/share/'.$calendarId.'/add', [], [], $this->apiHeaders(), json_encode(['username' => 'test_user', 'write_access' => true], JSON_THROW_ON_ERROR));
         $this->assertResponseStatusCodeSame(400);
 
         $client->request('GET', '/api/v1/calendars/'.$userId.'/shares/'.$calendarId, [], [], $this->apiHeaders());

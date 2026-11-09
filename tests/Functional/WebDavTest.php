@@ -71,14 +71,14 @@ class WebDavTest extends WebTestCase
         $client = static::createClient();
         static::requestDav($client, 'PUT', '/dav/public/.DS_Store', 'test_user:password');
         $this->assertResponseStatusCodeSame(201);
-        $this->assertCount(1, glob($this->baseDir.'/tmp/sabredav_*'));
+        $this->assertCount(1, glob($this->baseDir.'/tmp/sabredav_*') ?: []);
 
         static::requestDav($client, 'GET', '/dav/public/.DS_Store');
         $this->assertResponseStatusCodeSame(401);
 
         static::requestDav($client, 'DELETE', '/dav/public/.DS_Store');
         $this->assertResponseStatusCodeSame(401);
-        $this->assertCount(1, glob($this->baseDir.'/tmp/sabredav_*'), 'The temporary file must still be there');
+        $this->assertCount(1, glob($this->baseDir.'/tmp/sabredav_*') ?: [], 'The temporary file must still be there');
     }
 
     public function testAuthenticatedUserCanUseTemporaryFiles(): void
@@ -100,7 +100,7 @@ class WebDavTest extends WebTestCase
     public function testWebdavDirectoryInsideTheWebRootIsRefused(): void
     {
         $client = static::createClient();
-        $webRootDir = static::getContainer()->getParameter('kernel.project_dir').'/public/webdav-test-'.bin2hex(random_bytes(4));
+        $webRootDir = \dirname(__DIR__, 2).'/public/webdav-test-'.bin2hex(random_bytes(4));
         mkdir($webRootDir);
         $this->setEnv('WEBDAV_PUBLIC_DIR', $webRootDir);
 
@@ -231,6 +231,6 @@ class WebDavTest extends WebTestCase
         $this->setEnv('WEBDAV_PUBLIC_DIR_WRITABLE', 'true');
         static::requestDav($client, 'PUT', '/dav/public/.DS_Store', 'test_user2:password2');
         $this->assertResponseStatusCodeSame(201);
-        $this->assertCount(1, glob($this->baseDir.'/tmp/sabredav_*'));
+        $this->assertCount(1, glob($this->baseDir.'/tmp/sabredav_*') ?: []);
     }
 }

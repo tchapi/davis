@@ -13,7 +13,7 @@ class AppKeyTest extends TestCase
     {
         $key = AppKey::create('cal.com', ['*']);
 
-        $this->assertMatchesRegularExpression('/^app_[0-9a-f]{24}$/', $key->getAppId());
+        $this->assertMatchesRegularExpression('/^app_[0-9a-f]{24}$/', (string) $key->getAppId());
         $this->assertNotNull($key->getCreatedAt());
         $this->assertSame(['*'], $key->getScope());
         $this->assertNull($key->getRevokedAt());
@@ -25,9 +25,11 @@ class AppKeyTest extends TestCase
         $secret = $key->issueSecret();
 
         $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $secret);
-        $this->assertStringStartsWith('$2y$', $key->getSecretHash());
-        $this->assertStringNotContainsString($secret, $key->getSecretHash());
-        $this->assertTrue(password_verify($secret, $key->getSecretHash()));
+        $hash = $key->getSecretHash();
+        $this->assertNotNull($hash);
+        $this->assertStringStartsWith('$2y$', $hash);
+        $this->assertStringNotContainsString($secret, $hash);
+        $this->assertTrue(password_verify($secret, $hash));
     }
 
     public function testParseScope(): void

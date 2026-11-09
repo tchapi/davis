@@ -16,7 +16,7 @@ trait AdminPostTrait
         $crawler = $client->request('GET', '/dashboard');
         $this->assertResponseIsSuccessful();
 
-        return $crawler->filter('meta[name="csrf-token"]')->attr('content');
+        return (string) $crawler->filter('meta[name="csrf-token"]')->attr('content');
     }
 
     /**

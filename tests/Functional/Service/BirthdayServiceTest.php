@@ -119,6 +119,7 @@ class BirthdayServiceTest extends KernelTestCase
         $vcard = "BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nUID:1234\r\nBDAY:19900615\r\nEND:VCARD\r\n";
         $result = $this->service->buildDataFromContact($vcard);
 
+        $this->assertInstanceOf(VCalendar::class, $result);
         $this->assertNotNull($result->VEVENT->VALARM);
     }
 
@@ -129,6 +130,7 @@ class BirthdayServiceTest extends KernelTestCase
     public function testBirthdayEventChangedReturnsFalseWhenSame(): void
     {
         $cal = $this->service->buildDataFromContact("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nUID:1234\r\nBDAY:19900615\r\nEND:VCARD\r\n");
+        $this->assertNotNull($cal);
 
         $this->assertFalse($this->service->birthdayEventChanged($cal->serialize(), $cal));
     }
@@ -137,6 +139,8 @@ class BirthdayServiceTest extends KernelTestCase
     {
         $cal1 = $this->service->buildDataFromContact("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nUID:1234\r\nBDAY:19900615\r\nEND:VCARD\r\n");
         $cal2 = $this->service->buildDataFromContact("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nUID:1234\r\nBDAY:19900616\r\nEND:VCARD\r\n");
+        $this->assertNotNull($cal1);
+        $this->assertNotNull($cal2);
 
         $this->assertTrue($this->service->birthdayEventChanged($cal1->serialize(), $cal2));
     }
@@ -145,6 +149,8 @@ class BirthdayServiceTest extends KernelTestCase
     {
         $cal1 = $this->service->buildDataFromContact("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nUID:1234\r\nBDAY:19900615\r\nEND:VCARD\r\n");
         $cal2 = $this->service->buildDataFromContact("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:Jane Doe\r\nUID:1234\r\nBDAY:19900615\r\nEND:VCARD\r\n");
+        $this->assertNotNull($cal1);
+        $this->assertNotNull($cal2);
 
         $this->assertTrue($this->service->birthdayEventChanged($cal1->serialize(), $cal2));
     }
@@ -152,6 +158,7 @@ class BirthdayServiceTest extends KernelTestCase
     public function testBirthdayEventChangedReturnsTrueOnInvalidExistingData(): void
     {
         $cal = $this->service->buildDataFromContact("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nUID:1234\r\nBDAY:19900615\r\nEND:VCARD\r\n");
+        $this->assertNotNull($cal);
 
         $this->assertTrue($this->service->birthdayEventChanged('invalid-data', $cal));
     }
@@ -244,6 +251,7 @@ class BirthdayServiceTest extends KernelTestCase
             'principalUri' => 'principals/testuser',
             'uri' => Constants::BIRTHDAY_CALENDAR_URI,
         ]);
+        $this->assertNotNull($instanceBefore);
         $syncTokenBefore = $instanceBefore->getCalendar()->getSynctoken();
 
         $this->service->onCardChanged(
@@ -258,6 +266,7 @@ class BirthdayServiceTest extends KernelTestCase
             'principalUri' => 'principals/testuser',
             'uri' => Constants::BIRTHDAY_CALENDAR_URI,
         ]);
+        $this->assertNotNull($instanceAfter);
         $this->assertGreaterThan($syncTokenBefore, $instanceAfter->getCalendar()->getSynctoken());
     }
 
@@ -301,12 +310,11 @@ class BirthdayServiceTest extends KernelTestCase
 
     public function testOnCardDeletedIsNoopIfNoCalendarObject(): void
     {
+        $this->expectNotToPerformAssertions();
         $addressBook = $this->createAddressBook();
 
         // Should not throw even if no calendar object exists
         $this->service->onCardDeleted($addressBook->getId(), 'nonexistent.vcf');
-
-        $this->addToAssertionCount(1);
     }
 
     // -------------------------------------------------------------------------
