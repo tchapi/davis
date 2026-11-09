@@ -72,6 +72,7 @@ class PublicAwareDAVACLPlugin extends \Sabre\DAVACL\Plugin
             if ($node instanceof \Sabre\CalDAV\Calendar || $node instanceof \Sabre\CalDAV\CalendarObject) {
                 // The property is private in \Sabre\CalDAV\CalendarObject and we don't want to create
                 // a new class just to access it, so we use a closure.
+                /** @psalm-suppress UndefinedThisPropertyFetch $this is rebound to the node by call() */
                 $calendarInfo = (fn () => $this->calendarInfo)->call($node);
                 // [0] is the calendarId, [1] is the calendarInstanceId
                 $calendarInstanceId = $calendarInfo['id'][1];

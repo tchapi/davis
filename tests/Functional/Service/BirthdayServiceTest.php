@@ -27,6 +27,7 @@ class BirthdayServiceTest extends KernelTestCase
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         $this->service = static::getContainer()->get(BirthdayService::class);
 
+        /** @var \PDO $pdo */
         $pdo = $this->em->getConnection()->getNativeConnection();
         $this->service->setBackend(new CalendarBackend($pdo));
 

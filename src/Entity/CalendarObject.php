@@ -22,7 +22,7 @@ class CalendarObject
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $uri;
 
-    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", inversedBy: 'objects')]
+    #[ORM\ManyToOne(targetEntity: Calendar::class, inversedBy: 'objects')]
     #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 

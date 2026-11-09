@@ -64,7 +64,7 @@ class DAVController extends AbstractController
     /**
      * Mail address to send mails from.
      *
-     * @var string
+     * @var string|null
      */
     protected $inviteAddress;
 
@@ -79,7 +79,7 @@ class DAVController extends AbstractController
     /**
      * WebDAV Public directory.
      *
-     * @var string
+     * @var string|null
      */
     protected $webdavPublicDir;
 
@@ -93,7 +93,7 @@ class DAVController extends AbstractController
     /**
      * WebDAV Temporary directory.
      *
-     * @var string
+     * @var string|null
      */
     protected $webdavTmpDir;
 
@@ -151,7 +151,7 @@ class DAVController extends AbstractController
     /**
      * Logger for exceptions.
      *
-     * @var Psr\Log\LoggerInterface;
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -207,6 +207,7 @@ class DAVController extends AbstractController
         \Sabre\DAV\Server::$exposeVersion = false;
 
         // Get the PDO Connection of type PDO
+        /** @var \PDO $pdo */
         $pdo = $this->em->getConnection()->getNativeConnection();
 
         /*

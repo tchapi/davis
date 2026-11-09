@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @method Principal|null find($id, $lockMode = null, $lockVersion = null)
  * @method Principal|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Principal|null findOneByUri(string $uri)
  * @method Principal[]    findAll()
  * @method Principal[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

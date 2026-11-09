@@ -20,7 +20,9 @@ class SyncTokenTest extends KernelTestCase
         self::bootKernel();
 
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
-        $this->backend = new CardDavBackend($this->em->getConnection()->getNativeConnection());
+        /** @var \PDO $pdo */
+        $pdo = $this->em->getConnection()->getNativeConnection();
+        $this->backend = new CardDavBackend($pdo);
 
         $this->em->getConnection()->beginTransaction();
     }
@@ -37,6 +39,7 @@ class SyncTokenTest extends KernelTestCase
      */
     private function createAddressBookAtTokenEleven(): int
     {
+        /** @var \PDO $pdo */
         $pdo = $this->em->getConnection()->getNativeConnection();
 
         $id = $this->backend->createAddressBook(self::PRINCIPAL, 'sync-token-test', ['{DAV:}displayname' => 'Sync token test']);

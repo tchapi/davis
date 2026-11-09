@@ -21,7 +21,7 @@ class CalendarChange
     #[ORM\Column(type: 'integer')]
     private $synctoken;
 
-    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", inversedBy: 'changes')]
+    #[ORM\ManyToOne(targetEntity: Calendar::class, inversedBy: 'changes')]
     #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 

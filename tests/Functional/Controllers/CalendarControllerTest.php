@@ -142,7 +142,7 @@ class CalendarControllerTest extends WebTestCase
 
         $client->request('GET', '/calendars/'.$userId.'/shares/'.$calendar->getCalendar()->getId());
         $this->assertResponseIsSuccessful();
-        $shares = json_decode($client->getResponse()->getContent(), true);
+        $shares = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertCount(1, $shares);
         $this->assertSame(Principal::PREFIX.'test_user2', $shares[0]['principalUri']);
         $this->assertTrue($shares[0]['isWriteAccess']);
@@ -151,7 +151,7 @@ class CalendarControllerTest extends WebTestCase
         $this->assertResponseRedirects('/calendars/'.$userId);
 
         $client->request('GET', '/calendars/'.$userId.'/shares/'.$calendar->getCalendar()->getId());
-        $this->assertSame([], json_decode($client->getResponse()->getContent(), true));
+        $this->assertSame([], json_decode((string) $client->getResponse()->getContent(), true));
     }
 
     public function testStateChangingRoutesRejectGet(): void
@@ -418,8 +418,8 @@ class CalendarControllerTest extends WebTestCase
             $client->request('GET', '/calendars/'.$userId);
 
             $this->assertResponseIsSuccessful();
-            $this->assertStringContainsString('background-color: transparent', $client->getResponse()->getContent(), $payload.' should not be rendered');
-            $this->assertStringNotContainsString('background-color: '.$payload, $client->getResponse()->getContent());
+            $this->assertStringContainsString('background-color: transparent', (string) $client->getResponse()->getContent(), $payload.' should not be rendered');
+            $this->assertStringNotContainsString('background-color: '.$payload, (string) $client->getResponse()->getContent());
         }
 
         // A real colour still gets through, in every form the clients write
@@ -428,7 +428,7 @@ class CalendarControllerTest extends WebTestCase
 
             $client->request('GET', '/calendars/'.$userId);
 
-            $this->assertStringContainsString('background-color: '.$colour, $client->getResponse()->getContent(), $colour.' should be rendered');
+            $this->assertStringContainsString('background-color: '.$colour, (string) $client->getResponse()->getContent(), $colour.' should be rendered');
         }
     }
 
@@ -445,7 +445,7 @@ class CalendarControllerTest extends WebTestCase
         $client->request('GET', '/calendars/'.$userId);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringNotContainsString('data-bs-html', $client->getResponse()->getContent());
+        $this->assertStringNotContainsString('data-bs-html', (string) $client->getResponse()->getContent());
         $this->assertSelectorExists('a[data-bs-toggle="popover"][data-uri]');
     }
 

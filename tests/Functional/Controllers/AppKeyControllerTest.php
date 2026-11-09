@@ -63,7 +63,7 @@ class AppKeyControllerTest extends WebTestCase
         $this->assertAnySelectorTextContains('.badge', 'Revoked on');
         $this->assertSelectorNotExists('#app-key-secret');
 
-        $content = $client->getResponse()->getContent();
+        $content = (string) $client->getResponse()->getContent();
         $this->assertStringNotContainsString('app-secret', $content);
         $this->assertStringNotContainsString('$2y$', $content);
     }
@@ -112,7 +112,7 @@ class AppKeyControllerTest extends WebTestCase
         $client->request('GET', '/app-keys/');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorNotExists('#app-key-secret');
-        $this->assertStringNotContainsString($secret, $client->getResponse()->getContent());
+        $this->assertStringNotContainsString($secret, (string) $client->getResponse()->getContent());
     }
 
     public function testCreateRequiresAName(): void

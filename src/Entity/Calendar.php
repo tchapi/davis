@@ -25,13 +25,13 @@ class Calendar
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $components;
 
-    #[ORM\OneToMany(targetEntity: "App\Entity\CalendarObject", mappedBy: 'calendar')]
+    #[ORM\OneToMany(targetEntity: CalendarObject::class, mappedBy: 'calendar')]
     private $objects;
 
-    #[ORM\OneToMany(targetEntity: "App\Entity\CalendarChange", mappedBy: 'calendar')]
+    #[ORM\OneToMany(targetEntity: CalendarChange::class, mappedBy: 'calendar')]
     private $changes;
 
-    #[ORM\OneToMany(targetEntity: "App\Entity\CalendarInstance", mappedBy: 'calendar')]
+    #[ORM\OneToMany(targetEntity: CalendarInstance::class, mappedBy: 'calendar')]
     private $instances;
 
     public function __construct()
@@ -72,7 +72,7 @@ class Calendar
     }
 
     /**
-     * @return Collection|CalendarObject[]
+     * @return Collection<int, CalendarObject>
      */
     public function getObjects(): Collection
     {
@@ -103,7 +103,7 @@ class Calendar
     }
 
     /**
-     * @return Collection|CalendarChange[]
+     * @return Collection<int, CalendarChange>
      */
     public function getChanges(): Collection
     {
@@ -134,7 +134,7 @@ class Calendar
     }
 
     /**
-     * @return Collection|CalendarInstance[]
+     * @return Collection<int, CalendarInstance>
      */
     public function getInstances(): Collection
     {

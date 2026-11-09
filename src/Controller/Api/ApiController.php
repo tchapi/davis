@@ -599,7 +599,7 @@ class ApiController extends AbstractController
      *
      * @param Request $request     The HTTP POST request
      * @param int     $userId      The ID of the user whose calendar share is to be set or updated
-     * @param string  $calendar_id The ID of the calendar whose share is to be set or updated
+     * @param int     $calendar_id The ID of the calendar whose share is to be set or updated
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */
@@ -677,7 +677,7 @@ class ApiController extends AbstractController
      *
      * @param Request $request     The HTTP POST request
      * @param int     $userId      The ID of the user whose calendar share is to be removed
-     * @param string  $calendar_id The ID of the calendar whose share is to be removed
+     * @param int     $calendar_id The ID of the calendar whose share is to be removed
      *
      * @return JsonResponse A JSON response indicating the success or failure of the operation
      */

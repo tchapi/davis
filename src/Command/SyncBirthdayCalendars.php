@@ -21,6 +21,7 @@ class SyncBirthdayCalendars extends Command
         parent::__construct();
 
         $em = $doctrine->getManager();
+        /** @var \PDO $pdo */
         $pdo = $em->getConnection()->getNativeConnection();
         $this->birthdayService->setBackend(new CalendarBackend($pdo));
     }

@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use App\Constants;
+use App\Repository\CalendarInstanceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Sabre\DAV\Sharing\Plugin as SharingPlugin;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: "App\Repository\CalendarInstanceRepository")]
+#[ORM\Entity(repositoryClass: CalendarInstanceRepository::class)]
 #[ORM\Table(name: 'calendarinstances')]
 #[UniqueEntity(fields: ['principalUri', 'uri'], errorPath: 'uri', message: 'form.uri.unique')]
 class CalendarInstance
@@ -26,7 +27,7 @@ class CalendarInstance
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: "App\Entity\Calendar", cascade: ['persist'], inversedBy: 'instances')]
+    #[ORM\ManyToOne(targetEntity: Calendar::class, cascade: ['persist'], inversedBy: 'instances')]
     #[ORM\JoinColumn(name: 'calendarid', nullable: false)]
     private $calendar;
 

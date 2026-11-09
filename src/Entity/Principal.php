@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
+use App\Repository\PrincipalRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: "App\Repository\PrincipalRepository")]
+#[ORM\Entity(repositoryClass: PrincipalRepository::class)]
 #[ORM\Table(name: 'principals')]
 #[UniqueEntity('uri')]
 class Principal
@@ -44,7 +45,7 @@ class Principal
     #[ORM\Column(type: 'boolean')]
     private $isAdmin;
 
-    #[ORM\ManyToMany(targetEntity: 'Principal')]
+    #[ORM\ManyToMany(targetEntity: Principal::class)]
     #[ORM\JoinTable(name: 'groupmembers')]
     #[ORM\JoinColumn(name: 'principal_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'member_id', referencedColumnName: 'id')]
@@ -104,7 +105,7 @@ class Principal
     }
 
     /**
-     * @return Collection|Principal[]
+     * @return Collection<int, Principal>
      */
     public function getDelegees(): Collection
     {

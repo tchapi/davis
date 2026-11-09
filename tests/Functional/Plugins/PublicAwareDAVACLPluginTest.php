@@ -31,6 +31,7 @@ class PublicAwareDAVACLPluginTest extends KernelTestCase
     {
         self::bootKernel();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
+        /** @var \PDO $pdo */
         $pdo = $this->em->getConnection()->getNativeConnection();
 
         $this->server = new DAV\Server([

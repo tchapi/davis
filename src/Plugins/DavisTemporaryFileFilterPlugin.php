@@ -24,6 +24,8 @@ final class DavisTemporaryFileFilterPlugin extends TemporaryFileFilterPlugin
      * Same contract as the parent: false stops the request (the plugin answered it), null
      * lets the regular handlers run.
      *
+     * @psalm-suppress ImplementedReturnTypeMismatch sabre documents bool but returns null itself
+     *
      * @return bool|null
      */
     public function beforeMethod(RequestInterface $request, ResponseInterface $response)

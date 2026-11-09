@@ -41,10 +41,10 @@ class AddressBook
     #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => false])]
     private $includedInBirthdayCalendar;
 
-    #[ORM\OneToMany(targetEntity: "App\Entity\Card", mappedBy: 'addressBook')]
+    #[ORM\OneToMany(targetEntity: Card::class, mappedBy: 'addressBook')]
     private $cards;
 
-    #[ORM\OneToMany(targetEntity: "App\Entity\AddressBookChange", mappedBy: 'addressBook')]
+    #[ORM\OneToMany(targetEntity: AddressBookChange::class, mappedBy: 'addressBook')]
     private $changes;
 
     public function __construct()
@@ -133,7 +133,7 @@ class AddressBook
     }
 
     /**
-     * @return Collection|Card[]
+     * @return Collection<int, Card>
      */
     public function getCards(): Collection
     {
@@ -164,7 +164,7 @@ class AddressBook
     }
 
     /**
-     * @return Collection|AddressBookChange[]
+     * @return Collection<int, AddressBookChange>
      */
     public function getChanges(): Collection
     {
@@ -175,7 +175,7 @@ class AddressBook
     {
         if (!$this->changes->contains($change)) {
             $this->changes[] = $change;
-            $change->setCalendar($this);
+            $change->setAddressBook($this);
         }
 
         return $this;
@@ -186,8 +186,8 @@ class AddressBook
         if ($this->changes->contains($change)) {
             $this->changes->removeElement($change);
             // set the owning side to null (unless already changed)
-            if ($change->getCalendar() === $this) {
-                $change->setCalendar(null);
+            if ($change->getAddressBook() === $this) {
+                $change->setAddressBook(null);
             }
         }
 

@@ -22,7 +22,9 @@ class CalendarSubscriptionTest extends KernelTestCase
         self::bootKernel();
 
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
-        $this->backend = new CalendarBackend($this->em->getConnection()->getNativeConnection());
+        /** @var \PDO $pdo */
+        $pdo = $this->em->getConnection()->getNativeConnection();
+        $this->backend = new CalendarBackend($pdo);
 
         $this->em->getConnection()->beginTransaction();
     }

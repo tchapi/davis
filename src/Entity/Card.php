@@ -13,7 +13,7 @@ class Card
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: "App\Entity\AddressBook", inversedBy: 'cards')]
+    #[ORM\ManyToOne(targetEntity: AddressBook::class, inversedBy: 'cards')]
     #[ORM\JoinColumn(name: 'addressbookid', nullable: false)]
     private $addressBook;
 

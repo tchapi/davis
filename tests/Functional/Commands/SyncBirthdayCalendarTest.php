@@ -30,6 +30,7 @@ class SyncBirthdayCalendarTest extends KernelTestCase
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
 
         $birthdayService = static::getContainer()->get(BirthdayService::class);
+        /** @var \PDO $pdo */
         $pdo = $this->em->getConnection()->getNativeConnection();
         $birthdayService->setBackend(new CalendarBackend($pdo));
 

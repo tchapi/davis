@@ -21,7 +21,7 @@ class AddressBookChange
     #[ORM\Column(type: 'integer', options: ['default' => 1])]
     private $synctoken = 1;
 
-    #[ORM\ManyToOne(targetEntity: "App\Entity\AddressBook", inversedBy: 'changes')]
+    #[ORM\ManyToOne(targetEntity: AddressBook::class, inversedBy: 'changes')]
     #[ORM\JoinColumn(name: 'addressbookid', nullable: false)]
     private $addressBook;
 

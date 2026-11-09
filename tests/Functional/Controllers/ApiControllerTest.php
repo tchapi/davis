@@ -34,7 +34,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('data', $data);
         $this->assertStringContainsString('test_user', $data['data'][$index]['username']);
@@ -60,7 +60,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('data', $data);
         $this->assertStringContainsString('test_user', $data['data'][$index]['username']);
@@ -86,7 +86,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         if ($default) {
             $this->assertMatchesRegularExpression('/^\d+$/', $data['data']['user_calendars'][0]['id']);
@@ -109,7 +109,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('OK', $data['status']);
     }
 
@@ -153,7 +153,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(401);
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('error', $data['status']);
         $this->assertEquals('Invalid X-Davis-API-Token header', $data['message']);
     }
@@ -170,7 +170,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(401);
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('error', $data['status']);
         $this->assertEquals('Missing X-Davis-API-Token header', $data['message']);
     }
@@ -189,7 +189,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         // Check if user1 is present in db
         $this->assertArrayHasKey('user_id', $data['data'][0]);
@@ -228,7 +228,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         // Check if user details are correct
         $this->assertArrayHasKey('user_id', $data['data']);
@@ -255,7 +255,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         // Check if calendar list is correct
         $this->assertArrayHasKey('status', $data);
@@ -283,7 +283,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $calendar_id = $data['data']['user_calendars'][0]['id'];
 
         // Check calendar details endpoint
@@ -294,7 +294,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         // Check if calendar details are correct
         $this->assertArrayHasKey('id', $data['data']);
@@ -338,7 +338,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('status', $data);
         $this->assertEquals('success', $data['status']);
@@ -355,7 +355,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('events', $data['data']);
         $this->assertTrue($data['data']['events']['enabled']);
@@ -390,7 +390,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('status', $data);
         $this->assertEquals('success', $data['status']);
 
@@ -402,7 +402,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('data', $data);
         $this->assertStringContainsString($payload['name'], $data['data']['displayname']);
         $this->assertStringContainsString($payload['description'], $data['data']['description']);
@@ -432,7 +432,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('status', $data);
         $this->assertEquals('success', $data['status']);
         $this->assertArrayHasKey('data', $data);
@@ -462,7 +462,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('status', $data);
         $this->assertEquals('success', $data['status']);
 
@@ -474,7 +474,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('success', $data['status']);
         $this->assertArrayHasKey('data', $data);
         $this->assertStringContainsString($shareeUsername, $data['data'][0]['username']);
@@ -505,7 +505,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('success', $data['status']);
 
         // Check if unshare was applied
@@ -516,7 +516,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('success', $data['status']);
         $this->assertArrayHasKey('data', $data);
         $this->assertEmpty($data['data']);
@@ -549,7 +549,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(400);
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('error', $data['status']);
         $this->assertStringContainsString('At least one calendar component must be enabled', $data['message']);
     }
@@ -581,7 +581,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(400);
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('error', $data['status']);
         $this->assertStringContainsString('At least one calendar component must be enabled', $data['message']);
     }
@@ -605,7 +605,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('success', $data['status']);
 
         // Check if calendar is deleted
@@ -616,7 +616,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertEquals('success', $data['status']);
         $this->assertEmpty($data['data']);
     }
@@ -690,7 +690,7 @@ class ApiControllerTest extends WebTestCase
 
         $client->request('DELETE', '/api/v1/calendars/'.$shareeUserId.'/'.$sharedId, [], [], $this->apiHeaders());
         $this->assertResponseIsSuccessful();
-        $this->assertEquals('success', json_decode($client->getResponse()->getContent(), true)['status']);
+        $this->assertEquals('success', json_decode((string) $client->getResponse()->getContent(), true)['status']);
 
         $em->clear();
         $this->assertNull($em->getRepository(CalendarInstance::class)->find($sharedId), 'The share is gone');
@@ -735,7 +735,7 @@ class ApiControllerTest extends WebTestCase
 
         $client->request('GET', '/api/v1/calendars/'.$userId.'/shares/'.$calendarId, [], [], $this->apiHeaders());
         $this->assertResponseIsSuccessful();
-        $this->assertSame([], json_decode($client->getResponse()->getContent(), true)['data']);
+        $this->assertSame([], json_decode((string) $client->getResponse()->getContent(), true)['data']);
     }
 
     /**
@@ -774,7 +774,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $byUri = [];
-        foreach (json_decode($client->getResponse()->getContent(), true)['data']['user_calendars'] as $calendar) {
+        foreach (json_decode((string) $client->getResponse()->getContent(), true)['data']['user_calendars'] as $calendar) {
             $byUri[$calendar['uri']] = $calendar;
         }
 
@@ -789,7 +789,7 @@ class ApiControllerTest extends WebTestCase
         $client->request('GET', '/api/v1/calendars/'.$userId.'/'.$byUri['counts_b']['id'], [], [], $this->apiHeaders());
         $this->assertResponseIsSuccessful();
 
-        $details = json_decode($client->getResponse()->getContent(), true)['data'];
+        $details = json_decode((string) $client->getResponse()->getContent(), true)['data'];
         $this->assertSame(0, $details['events']['count']);
         $this->assertSame(2, $details['tasks']['count']);
         $this->assertSame(4, $details['notes']['count']);
@@ -819,17 +819,17 @@ class ApiControllerTest extends WebTestCase
         // test_user2 asking about the instance shared *with* them
         $client->request('GET', '/api/v1/calendars/'.$otherUserId.'/'.$sharedId, [], [], $this->apiHeaders());
         $this->assertResponseIsSuccessful();
-        $this->assertSame([], json_decode($client->getResponse()->getContent(), true)['data']);
+        $this->assertSame([], json_decode((string) $client->getResponse()->getContent(), true)['data']);
 
         // test_user2 asking about a calendar that is not theirs at all
         $client->request('GET', '/api/v1/calendars/'.$otherUserId.'/'.$ownerId, [], [], $this->apiHeaders());
         $this->assertResponseIsSuccessful();
-        $this->assertSame([], json_decode($client->getResponse()->getContent(), true)['data']);
+        $this->assertSame([], json_decode((string) $client->getResponse()->getContent(), true)['data']);
 
         // the owner still gets theirs
         $client->request('GET', '/api/v1/calendars/'.$userId.'/'.$ownerId, [], [], $this->apiHeaders());
         $this->assertResponseIsSuccessful();
-        $this->assertSame($ownerId, json_decode($client->getResponse()->getContent(), true)['data']['id']);
+        $this->assertSame($ownerId, json_decode((string) $client->getResponse()->getContent(), true)['data']['id']);
     }
 
     public function testSharesListToleratesAPrincipalWithoutUser(): void
@@ -852,7 +852,7 @@ class ApiControllerTest extends WebTestCase
         $client->request('GET', '/api/v1/calendars/'.$userId.'/shares/'.$ownerInstanceId, [], [], $this->apiHeaders());
         $this->assertResponseIsSuccessful();
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $data = json_decode((string) $client->getResponse()->getContent(), true);
         $this->assertCount(1, $data['data']);
         $this->assertSame('ghost', $data['data'][0]['username']);
         $this->assertNull($data['data'][0]['user_id']);

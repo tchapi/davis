@@ -23,7 +23,9 @@ class PropertyStorageTest extends KernelTestCase
         self::bootKernel();
 
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
-        $this->backend = new PropertyStorageBackend($this->em->getConnection()->getNativeConnection());
+        /** @var \PDO $pdo */
+        $pdo = $this->em->getConnection()->getNativeConnection();
+        $this->backend = new PropertyStorageBackend($pdo);
 
         $this->em->getConnection()->beginTransaction();
     }

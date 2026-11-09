@@ -6,8 +6,8 @@ use App\Entity\CalendarInstance;
 use App\Entity\CalendarObject;
 use App\Entity\Principal;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\AbstractBrowser;
 
 class DavTest extends WebTestCase
 {
@@ -19,7 +19,7 @@ class DavTest extends WebTestCase
 
     private const SECRET_CALENDAR_DATA = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Davis//Test//EN\r\nBEGIN:VEVENT\r\nUID:secret-1\r\nDTSTAMP:20260101T100000Z\r\nDTSTART:20260101T100000Z\r\nDTEND:20260101T110000Z\r\nSUMMARY:".self::SECRET_SUMMARY."\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n";
 
-    public static function requestDavClient(string $method, string $path): AbstractBrowser
+    public static function requestDavClient(string $method, string $path): KernelBrowser
     {
         $client = static::createClient();
         static::requestDav($client, $method, $path);

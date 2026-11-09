@@ -21,7 +21,9 @@ class AddressBookDavTest extends KernelTestCase
         self::bootKernel();
 
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
-        $this->backend = new CardDavBackend($this->em->getConnection()->getNativeConnection());
+        /** @var \PDO $pdo */
+        $pdo = $this->em->getConnection()->getNativeConnection();
+        $this->backend = new CardDavBackend($pdo);
 
         $this->em->getConnection()->beginTransaction();
     }

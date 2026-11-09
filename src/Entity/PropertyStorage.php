@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
+use App\Repository\PropertyStorageRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: "App\Repository\PropertyStorageRepository")]
+#[ORM\Entity(repositoryClass: PropertyStorageRepository::class)]
 #[ORM\Table(name: 'propertystorage')]
 // sabre/dav upserts dead properties on (path, name); without this key it cannot replace them
 #[ORM\UniqueConstraint(name: 'propertystorage_path_name', columns: ['path', 'name'])]

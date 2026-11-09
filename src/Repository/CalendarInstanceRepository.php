@@ -13,6 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @method CalendarInstance|null find($id, $lockMode = null, $lockVersion = null)
  * @method CalendarInstance|null findOneBy(array $criteria, array $orderBy = null)
+ * @method CalendarInstance|null findOneByDisplayName(string $displayName)
  * @method CalendarInstance[]    findAll()
  * @method CalendarInstance[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

@@ -34,6 +34,7 @@ class BirthdayCalendarPluginTest extends KernelTestCase
         $container = static::getContainer();
 
         $this->em = $container->get(EntityManagerInterface::class);
+        /** @var \PDO $pdo */
         $pdo = $this->em->getConnection()->getNativeConnection();
 
         $principalBackend = new PrincipalBackend($pdo);

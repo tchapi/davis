@@ -34,7 +34,7 @@ final class IMAPAuth extends AbstractAuth
     /**
      * IMAP server host.
      *
-     * @var string
+     * @var string|null
      */
     private $IMAPHost;
 

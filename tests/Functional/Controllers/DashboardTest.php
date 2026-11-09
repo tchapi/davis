@@ -198,7 +198,7 @@ class DashboardTest extends WebTestCase
         }
 
         // Nothing on this page may disclose the mailer credentials or the application secret
-        $content = $client->getResponse()->getContent();
+        $content = (string) $client->getResponse()->getContent();
         $this->assertStringNotContainsString($_ENV['APP_SECRET'], $content);
         $this->assertStringNotContainsString('MAILER_DSN', $content);
     }

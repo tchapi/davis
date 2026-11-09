@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional;
 
-use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * The DAVController uses a sabre/dav that relies on REQUEST_URI and REQUEST_METHOD
@@ -14,7 +14,7 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
  */
 trait DavRequestTrait
 {
-    protected static function requestDav(AbstractBrowser $client, string $method, string $path, ?string $basicAuthUserPass = null): void
+    protected static function requestDav(KernelBrowser $client, string $method, string $path, ?string $basicAuthUserPass = null): void
     {
         $_SERVER['REQUEST_URI'] = $path;
         $_SERVER['REQUEST_METHOD'] = $method;
