@@ -86,12 +86,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install GD / ZIP PHP extension
+      # ext-ldap is needed too: Psalm learns the LDAP_* constants from the loaded extension
+      # (it ships no stub for it), and LDAPAuth uses them.
+      - name: Install GD / ZIP / LDAP PHP extensions
         run: |
-          apk add $PHPIZE_DEPS libpng-dev libzip-dev
+          apk add $PHPIZE_DEPS libpng-dev libzip-dev openldap-dev
           docker-php-ext-configure gd
           docker-php-ext-configure zip
-          docker-php-ext-install gd zip
+          docker-php-ext-install gd zip ldap
 
       - name: Install Composer
         run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
