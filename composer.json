@@ -52,7 +52,9 @@
         "symfony/maker-bundle": "^1.54",
         "symfony/phpunit-bridge": "^7.4",
         "symfony/stopwatch": "^7.4",
-        "symfony/web-profiler-bundle": "^7.4"
+        "symfony/web-profiler-bundle": "^7.4",
+        "vimeo/psalm": "^7.2",
+        "weirdan/doctrine-psalm-plugin": "^2.11"
     },
     "config": {
         "preferred-install": {
@@ -60,7 +62,7 @@
         },
         "sort-packages": true,
         "platform": {
-            "php": "8.2.15"
+            "php": "8.2.27"
         },
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
@@ -88,7 +90,8 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "psalm": "psalm"
     },
     "conflict": {
         "symfony/symfony": "*"
