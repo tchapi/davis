@@ -113,10 +113,14 @@ RUN mkdir /var/run/php-fpm && chown -R www-data:www-data /var/run/php-fpm \
 
 RUN mkdir -p ./var/log ./var/cache && chown -R www-data:www-data ./var
 
+COPY ./docker/configurations/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Cleanup (only useful when using --squash)
 RUN docker-php-source delete && \
     rm -rf /var/www/davis/docker
 
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 HEALTHCHECK --interval=120s --timeout=10s --start-period=60s --retries=3 \
