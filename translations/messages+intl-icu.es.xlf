@@ -1,0 +1,1018 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="es" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="poqANwU" resname="davis">
+        <source>davis</source>
+        <target>Davis</target>
+      </trans-unit>
+      <trans-unit id="IRk0vUS" resname="enabled">
+        <source>enabled</source>
+        <target>activado</target>
+      </trans-unit>
+      <trans-unit id="iYiRxKz" resname="disabled">
+        <source>disabled</source>
+        <target>desactivado</target>
+      </trans-unit>
+      <trans-unit id="04zDTq_" resname="label.success">
+        <source>label.success</source>
+        <target>Éxito</target>
+      </trans-unit>
+      <trans-unit id="WcOat7C" resname="label.warning">
+        <source>label.warning</source>
+        <target>Aviso</target>
+      </trans-unit>
+      <trans-unit id="v4zFdy0" resname="label.error">
+        <source>label.error</source>
+        <target>Error</target>
+      </trans-unit>
+      <trans-unit id="gyZcKbE" resname="admin.interface">
+        <source>admin.interface</source>
+        <target>Interfaz de administración</target>
+      </trans-unit>
+      <trans-unit id="CAiOZVb" resname="close">
+        <source>close</source>
+        <target>Cerrar</target>
+      </trans-unit>
+      <trans-unit id="2E3W_Ux" resname="save">
+        <source>save</source>
+        <target>Guardar</target>
+      </trans-unit>
+      <trans-unit id="4IcFUoR" resname="toggle.navigation">
+        <source>toggle.navigation</source>
+        <target>Mostrar/ocultar navegación</target>
+      </trans-unit>
+      <trans-unit id="IY9tLQj" resname="toggle.theme">
+        <source>toggle.theme</source>
+        <target>Cambiar tema</target>
+      </trans-unit>
+      <trans-unit id="8z17OnR" resname="theme.light">
+        <source>theme.light</source>
+        <target>Claro</target>
+      </trans-unit>
+      <trans-unit id="5ZYx62e" resname="theme.dark">
+        <source>theme.dark</source>
+        <target>Oscuro</target>
+      </trans-unit>
+      <trans-unit id="suizpO6" resname="theme.auto">
+        <source>theme.auto</source>
+        <target>Automático</target>
+      </trans-unit>
+      <trans-unit id="YE7XVBb" resname="title.dashboard">
+        <source>title.dashboard</source>
+        <target>Panel</target>
+      </trans-unit>
+      <trans-unit id="G3gS3bJ" resname="title.users_and_resources">
+        <source>title.users_and_resources</source>
+        <target>Usuarios y recursos</target>
+      </trans-unit>
+      <trans-unit id="Ga1B1H3" resname="users.back">
+        <source>users.back</source>
+        <target>Volver a Usuarios</target>
+      </trans-unit>
+      <trans-unit id="2Mx633A" resname="addressbooks.new">
+        <source>addressbooks.new</source>
+        <target>Nueva libreta de direcciones</target>
+      </trans-unit>
+      <trans-unit id="ddUyfGF" resname="calendars.new">
+        <source>calendars.new</source>
+        <target>Nuevo calendario</target>
+      </trans-unit>
+      <trans-unit id="aCxiLZi" resname="calendars.uri">
+        <source>calendars.uri</source>
+        <target>URI</target>
+      </trans-unit>
+      <trans-unit id="JPI5wA3" resname="users.new">
+        <source>users.new</source>
+        <target>Nuevo usuario</target>
+      </trans-unit>
+      <trans-unit id="weOCfT2" resname="dashboard.health">
+        <source>dashboard.health</source>
+        <target>Estado</target>
+      </trans-unit>
+      <trans-unit id="wx8fUKV" resname="dashboard.capabilities">
+        <source>dashboard.capabilities</source>
+        <target>Funciones</target>
+      </trans-unit>
+      <trans-unit id="zJSQAI8" resname="dashboard.objects">
+        <source>dashboard.objects</source>
+        <target>Objetos</target>
+      </trans-unit>
+      <trans-unit id="mgKUnX3" resname="dashboard.version">
+        <source>dashboard.version</source>
+        <target>Versión</target>
+      </trans-unit>
+      <trans-unit id="MpsZ_kY" resname="dashboard.auth">
+        <source>dashboard.auth</source>
+        <target>Autenticación</target>
+      </trans-unit>
+      <trans-unit id="jNecvkm" resname="dashboard.auth_realm">
+        <source>dashboard.auth_realm</source>
+        <target>Dominio (realm)</target>
+      </trans-unit>
+      <trans-unit id="Utr1VRG" resname="dashboard.invite_from_address">
+        <source>dashboard.invite_from_address</source>
+        <target>Remitente de las invitaciones</target>
+      </trans-unit>
+      <trans-unit id="6A.HMvX" resname="dashboard.server_timezone">
+        <source>dashboard.server_timezone</source>
+        <target>Zona horaria de la aplicación (PHP)</target>
+      </trans-unit>
+      <trans-unit id="mD_kv2n" resname="dashboard.bad_timezone_configuration">
+        <source>dashboard.bad_timezone_configuration</source>
+        <target>Variable de entorno de zona horaria incorrecta</target>
+      </trans-unit>
+      <trans-unit id="3jV45P0" resname="dashboard.no_timezone_configuration">
+        <source>dashboard.no_timezone_configuration</source>
+        <target>La aplicación no fija la zona horaria</target>
+      </trans-unit>
+      <trans-unit id="BDynkV_" resname="dashboard.users">
+        <source>dashboard.users</source>
+        <target>Usuarios</target>
+      </trans-unit>
+      <trans-unit id="oAGwPD5" resname="dashboard.calendars">
+        <source>dashboard.calendars</source>
+        <target>Calendarios</target>
+      </trans-unit>
+      <trans-unit id="79cIq7y" resname="dashboard.calendars.help">
+        <source>dashboard.calendars.help</source>
+        <target>(incl. listas de recordatorios)</target>
+      </trans-unit>
+      <trans-unit id="5SShPEM" resname="dashboard.events">
+        <source>dashboard.events</source>
+        <target>Eventos</target>
+      </trans-unit>
+      <trans-unit id="kl9QvVx" resname="dashboard.address_books">
+        <source>dashboard.address_books</source>
+        <target>Libretas de direcciones</target>
+      </trans-unit>
+      <trans-unit id="OfamhPy" resname="dashboard.contacts">
+        <source>dashboard.contacts</source>
+        <target>Contactos</target>
+      </trans-unit>
+      <trans-unit id="iQm_wg0" resname="addressbooks.edit">
+        <source>addressbooks.edit</source>
+        <target>Editar libreta de direcciones «{name}»</target>
+      </trans-unit>
+      <trans-unit id="BVAU8Tv" resname="edit">
+        <source>edit</source>
+        <target>Editar</target>
+      </trans-unit>
+      <trans-unit id="JmmK.9X" resname="add">
+        <source>add</source>
+        <target>Añadir</target>
+      </trans-unit>
+      <trans-unit id="u1x_1qs" resname="delete">
+        <source>delete</source>
+        <target>Eliminar</target>
+      </trans-unit>
+      <trans-unit id="lsvVz5G" resname="calendars.edit">
+        <source>calendars.edit</source>
+        <target>Editar calendario «{name}»</target>
+      </trans-unit>
+      <trans-unit id="1kNwhhb" resname="calendars.entries">
+        <source>calendars.entries</source>
+        <target>{count, plural, =0 {Ninguna entrada} one {Una entrada} other {# entradas}}</target>
+      </trans-unit>
+      <trans-unit id="inLkptW" resname="calendars.component.events">
+        <source>calendars.component.events</source>
+        <target>Eventos</target>
+      </trans-unit>
+      <trans-unit id="m1s.bXE" resname="calendars.component.todos">
+        <source>calendars.component.todos</source>
+        <target>Tareas</target>
+      </trans-unit>
+      <trans-unit id="Mx8PqQR" resname="calendars.setup.title">
+        <source>calendars.setup.title</source>
+        <target>Información de configuración</target>
+      </trans-unit>
+      <trans-unit id="jA5BLYc" resname="calendars.component.notes">
+        <source>calendars.component.notes</source>
+        <target>Notas</target>
+      </trans-unit>
+      <trans-unit id="O2IyoII" resname="users.edit">
+        <source>users.edit</source>
+        <target>Editar usuario «{username}»</target>
+      </trans-unit>
+      <trans-unit id="NPrwvQ_" resname="addressbooks.for">
+        <source>addressbooks.for</source>
+        <target>Libretas de direcciones de {who}</target>
+      </trans-unit>
+      <trans-unit id=".ri3V4T" resname="addressbooks.uri">
+        <source>addressbooks.uri</source>
+        <target>URI de la libreta de direcciones</target>
+      </trans-unit>
+      <trans-unit id="miq7_xK" resname="addressbooks.contacts">
+        <source>addressbooks.contacts</source>
+        <target>{count, plural, =0 {Ningún contacto} one {Un contacto} other {# contactos}}</target>
+      </trans-unit>
+      <trans-unit id="CqvStpa" resname="calendars.for">
+        <source>calendars.for</source>
+        <target>Calendarios de {who}</target>
+      </trans-unit>
+      <trans-unit id="ybqHGGr" resname="calendars.shared.with">
+        <source>calendars.shared.with</source>
+        <target>Calendarios compartidos con {who}</target>
+      </trans-unit>
+      <trans-unit id="caEhjpg" resname="users.username">
+        <source>users.username</source>
+        <target>Nombre de usuario</target>
+      </trans-unit>
+      <trans-unit id="kWHR7Qt" resname="users.uri">
+        <source>users.uri</source>
+        <target>URI del principal</target>
+      </trans-unit>
+      <trans-unit id="rD9wqzu" resname="users.administrator">
+        <source>users.administrator</source>
+        <target>Administrador</target>
+      </trans-unit>
+      <trans-unit id="tDUC2FT" resname="users.calendars">
+        <source>users.calendars</source>
+        <target>Calendarios</target>
+      </trans-unit>
+      <trans-unit id="vrTk17r" resname="users.addressbooks">
+        <source>users.addressbooks</source>
+        <target>Libretas de direcciones</target>
+      </trans-unit>
+      <trans-unit id="KB__Nh8" resname="default.calendar.title">
+        <source>default.calendar.title</source>
+        <target>Calendario predeterminado</target>
+      </trans-unit>
+      <trans-unit id="ORuYu1p" resname="default.calendar.description">
+        <source>default.calendar.description</source>
+        <target>Calendario predeterminado de {user}</target>
+      </trans-unit>
+      <trans-unit id="BV0O97e" resname="default.addressbook.title">
+        <source>default.addressbook.title</source>
+        <target>Libreta de direcciones predeterminada</target>
+      </trans-unit>
+      <trans-unit id="UKZXrbn" resname="default.addressbook.description">
+        <source>default.addressbook.description</source>
+        <target>Libreta de direcciones predeterminada de {user}</target>
+      </trans-unit>
+      <trans-unit id="4jEMVVj" resname="user.saved">
+        <source>user.saved</source>
+        <target>Usuario guardado correctamente</target>
+      </trans-unit>
+      <trans-unit id="j1XlCAb" resname="user.deleted">
+        <source>user.deleted</source>
+        <target>Usuario eliminado correctamente</target>
+      </trans-unit>
+      <trans-unit id="rey4Kec" resname="calendar.saved">
+        <source>calendar.saved</source>
+        <target>Calendario guardado correctamente</target>
+      </trans-unit>
+      <trans-unit id="UkuOpBs" resname="calendar.deleted">
+        <source>calendar.deleted</source>
+        <target>Calendario eliminado correctamente</target>
+      </trans-unit>
+      <trans-unit id="nLmfYXY" resname="calendar.shared">
+        <source>calendar.shared</source>
+        <target>Uso compartido del calendario actualizado correctamente</target>
+      </trans-unit>
+      <trans-unit id="a7D0zuw" resname="calendar.revoked">
+        <source>calendar.revoked</source>
+        <target>Acceso al calendario revocado correctamente</target>
+      </trans-unit>
+      <trans-unit id="pL5FhyS" resname="calendars.delegates.member.add">
+        <source>calendars.delegates.member.add</source>
+        <target>Compartir este calendario con otro usuario:</target>
+      </trans-unit>
+      <trans-unit id="gdXa6Lc" resname="calendars.delegates.member.help">
+        <source>calendars.delegates.member.help</source>
+        <target>Si añades un usuario que ya tiene acceso compartido a este calendario, solo cambiarán sus permisos de acceso</target>
+      </trans-unit>
+      <trans-unit id="zWt8oG0" resname="calendars.delegates.member.none">
+        <source>calendars.delegates.member.none</source>
+        <target>No hay otros usuarios con los que compartir este calendario</target>
+      </trans-unit>
+      <trans-unit id="ghe05Yl" resname="addressbooks.saved">
+        <source>addressbooks.saved</source>
+        <target>Libreta de direcciones guardada correctamente</target>
+      </trans-unit>
+      <trans-unit id="SQckZXJ" resname="addressbooks.deleted">
+        <source>addressbooks.deleted</source>
+        <target>Libreta de direcciones eliminada correctamente</target>
+      </trans-unit>
+      <trans-unit id="YcMyNwC" resname="addressbooks.back">
+        <source>addressbooks.back</source>
+        <target>Volver a las libretas de direcciones de {user}</target>
+      </trans-unit>
+      <trans-unit id="VgrgSjx" resname="calendars.back">
+        <source>calendars.back</source>
+        <target>Volver a los calendarios de {user}</target>
+      </trans-unit>
+      <trans-unit id="xNkdpFb" resname="form.password.empty">
+        <source>form.password.empty</source>
+        <target>Déjalo vacío si no quieres cambiarla</target>
+      </trans-unit>
+      <trans-unit id="2wU1UVt" resname="form.password.match">
+        <source>form.password.match</source>
+        <target>Las contraseñas deben coincidir.</target>
+      </trans-unit>
+      <trans-unit id="r2fjRrB" resname="form.password">
+        <source>form.password</source>
+        <target>Contraseña</target>
+      </trans-unit>
+      <trans-unit id=".EvZY.m" resname="form.password.repeat">
+        <source>form.password.repeat</source>
+        <target>Repetir contraseña</target>
+      </trans-unit>
+      <trans-unit id="vXLetA0" resname="form.email">
+        <source>form.email</source>
+        <target>Correo electrónico</target>
+      </trans-unit>
+      <trans-unit id="frmEmlHlp" resname="form.email.help">
+        <source>form.email.help</source>
+        <target>Se usa como dirección de calendario para las invitaciones: tiene que coincidir con la dirección que el cliente del usuario envía como organizador; si no, nunca se envían invitaciones.</target>
+      </trans-unit>
+      <trans-unit id="RQWeqAY" resname="form.admin">
+        <source>form.admin</source>
+        <target>¿Este usuario es administrador?</target>
+      </trans-unit>
+      <trans-unit id="sLIuuSU" resname="form.admin.help">
+        <source>form.admin.help</source>
+        <target>Si se marca, este usuario (es decir, su principal) se añadirá a todas las reglas ACL con los privilegios '{DAV:}all'.</target>
+      </trans-unit>
+      <trans-unit id="nXCRwB3" resname="form.displayName">
+        <source>form.displayName</source>
+        <target>Nombre visible</target>
+      </trans-unit>
+      <trans-unit id="2_y0ttv" resname="form.username">
+        <source>form.username</source>
+        <target>Nombre de usuario</target>
+      </trans-unit>
+      <trans-unit id="iicAzGB" resname="form.username.help">
+        <source>form.username.help</source>
+        <target>Puede ser un correo electrónico, pero no es obligatorio.</target>
+      </trans-unit>
+      <trans-unit id="IHOaweC" resname="form.events">
+        <source>form.events</source>
+        <target>Eventos</target>
+      </trans-unit>
+      <trans-unit id="4pbkJcC" resname="form.notes">
+        <source>form.notes</source>
+        <target>Notas</target>
+      </trans-unit>
+      <trans-unit id="dhJC0.u" resname="form.todos">
+        <source>form.todos</source>
+        <target>Tareas</target>
+      </trans-unit>
+      <trans-unit id="ku2Vzal" resname="form.uri">
+        <source>form.uri</source>
+        <target>URI</target>
+      </trans-unit>
+      <trans-unit id="PHZs.1x" resname="form.includedInBirthdayCalendar">
+        <source>form.includedInBirthdayCalendar</source>
+        <target>¿Incluir en el calendario de cumpleaños?</target>
+      </trans-unit>
+      <trans-unit id="GBcNXE." resname="form.description">
+        <source>form.description</source>
+        <target>Descripción</target>
+      </trans-unit>
+      <trans-unit id="r_YZYfq" resname="form.color">
+        <source>form.color</source>
+        <target>Color del calendario</target>
+      </trans-unit>
+      <trans-unit id="IPhqrmQ" resname="form.public">
+        <source>form.public</source>
+        <target>Público</target>
+      </trans-unit>
+      <trans-unit id="e02Cnv6" resname="form.name.help.carddav">
+        <source>form.name.help.carddav</source>
+        <target>Este nombre se mostrará en tu cliente CardDAV</target>
+      </trans-unit>
+      <trans-unit id="coqCyJL" resname="form.includedInBirthdayCalendar.help">
+        <source>form.includedInBirthdayCalendar.help</source>
+        <target>Si se marca, todas las tarjetas con una fecha de cumpleaños válida se incluirán en el calendario de cumpleaños del principal, que estará disponible como calendario compartido en tu cuenta</target>
+      </trans-unit>
+      <trans-unit id="rqpkW3X" resname="form.name.help.caldav">
+        <source>form.name.help.caldav</source>
+        <target>Este nombre se mostrará en tu cliente CalDAV</target>
+      </trans-unit>
+      <trans-unit id="XcmEaP5" resname="form.uri.help.carddav">
+        <source>form.uri.help.carddav</source>
+        <target>Es el identificador único de esta libreta de direcciones. Se permiten dígitos, letras minúsculas y el guion '-'.</target>
+      </trans-unit>
+      <trans-unit id="reeyEAg" resname="form.uri.help.caldav">
+        <source>form.uri.help.caldav</source>
+        <target>Es el identificador único de este calendario. Se permiten dígitos, letras minúsculas y el guion '-'.</target>
+      </trans-unit>
+      <trans-unit id="xAoSnrW" resname="form.public.help.caldav">
+        <source>form.public.help.caldav</source>
+        <target>Si el calendario es público, cualquiera que tenga el enlace podrá acceder a él</target>
+      </trans-unit>
+      <trans-unit id="OqHbbck" resname="form.color.help">
+        <source>form.color.help</source>
+        <target>Es el color que se mostrará en tu cliente CalDAV. Debe indicarse en formato '#RRGGBBAA' (el canal alfa es opcional) con valores hexadecimales. Este valor es opcional.</target>
+      </trans-unit>
+      <trans-unit id="ie6kT2V" resname="form.events.help">
+        <source>form.events.help</source>
+        <target>Si se marca, se activarán los eventos en este calendario. Aparecerá en los clientes de calendario.</target>
+      </trans-unit>
+      <trans-unit id="m2d03h7" resname="form.todos.help">
+        <source>form.todos.help</source>
+        <target>Si se marca, se activarán las tareas en este calendario. Aparecerá en los clientes de recordatorios (como la app Recordatorios de macOS)</target>
+      </trans-unit>
+      <trans-unit id="DZBm7go" resname="form.notes.help">
+        <source>form.notes.help</source>
+        <target>Si se marca, se activarán las notas en este calendario.</target>
+      </trans-unit>
+      <trans-unit id="nmAIJpy" resname="addressbooks.modal.title">
+        <source>addressbooks.modal.title</source>
+        <target>¿Eliminar esta libreta de direcciones?</target>
+      </trans-unit>
+      <trans-unit id="3mPrY9E" resname="addressbooks.modal.text">
+        <source>addressbooks.modal.text</source>
+        <target>¿Seguro que quieres eliminar esta libreta de direcciones? También se eliminarán todos sus contactos.</target>
+      </trans-unit>
+      <trans-unit id="YmO7Wcu" resname="calendars.modal.title">
+        <source>calendars.modal.title</source>
+        <target>¿Eliminar este calendario?</target>
+      </trans-unit>
+      <trans-unit id="XM0TWcI" resname="calendars.modal.text">
+        <source>calendars.modal.text</source>
+        <target>¿Seguro que quieres eliminar este calendario? También se eliminarán todos sus eventos, tareas y notas.</target>
+      </trans-unit>
+      <trans-unit id="3Own8oC" resname="revoke.modal.title">
+        <source>revoke.modal.title</source>
+        <target>¿Revocar el acceso a este calendario?</target>
+      </trans-unit>
+      <trans-unit id="N57f0XR" resname="revoke.modal.text">
+        <source>revoke.modal.text</source>
+        <target>¿Seguro que quieres revocar el acceso a este calendario? El usuario perderá el acceso a todos los eventos, tareas y notas. El calendario original no se eliminará.</target>
+      </trans-unit>
+      <trans-unit id="YVgPRJT" resname="users.modal.title">
+        <source>users.modal.title</source>
+        <target>¿Eliminar este usuario?</target>
+      </trans-unit>
+      <trans-unit id="TBZP8bg" resname="users.modal.text">
+        <source>users.modal.text</source>
+        <target>¿Seguro que quieres eliminar este usuario? También se eliminarán todos sus calendarios y libretas de direcciones.</target>
+      </trans-unit>
+      <trans-unit id="lyTSshw" resname="delegates.modal.title">
+        <source>delegates.modal.title</source>
+        <target>¿Quitar este delegado?</target>
+      </trans-unit>
+      <trans-unit id="MT5Ijud" resname="delegates.modal.text">
+        <source>delegates.modal.text</source>
+        <target>¿Seguro que quieres quitar este delegado? Este usuario ya no tendrá acceso a los calendarios, contactos, etc.</target>
+      </trans-unit>
+      <trans-unit id="0BNEzcg" resname="delegates.member.help">
+        <source>delegates.member.help</source>
+        <target>Si añades un usuario que ya es delegado, solo cambiarán sus permisos de acceso</target>
+      </trans-unit>
+      <trans-unit id="WmbkJDd" resname="cancel">
+        <source>cancel</source>
+        <target>Cancelar</target>
+      </trans-unit>
+      <trans-unit id="KoqKM6m" resname="yes">
+        <source>yes</source>
+        <target>Sí</target>
+      </trans-unit>
+      <trans-unit id="e3XmWtO" resname="no">
+        <source>no</source>
+        <target>No</target>
+      </trans-unit>
+      <trans-unit id="d7yLLjA" resname="login.signin">
+        <source>login.signin</source>
+        <target>Inicia sesión</target>
+      </trans-unit>
+      <trans-unit id="4TTdn8M" resname="login.username">
+        <source>login.username</source>
+        <target>Nombre de usuario</target>
+      </trans-unit>
+      <trans-unit id="sp0KUC6" resname="login.password">
+        <source>login.password</source>
+        <target>Contraseña</target>
+      </trans-unit>
+      <trans-unit id="8jf9lcX" resname="login.submit">
+        <source>login.submit</source>
+        <target>Entrar</target>
+      </trans-unit>
+      <trans-unit id="F55nsy3" resname="logout">
+        <source>logout</source>
+        <target>Cerrar sesión</target>
+      </trans-unit>
+      <trans-unit id="GPvgh0L" resname="login.already">
+        <source>login.already</source>
+        <target>Ya has iniciado sesión como {username}</target>
+      </trans-unit>
+      <trans-unit id="RcIhyKp" resname="no.users.yet">
+        <source>no.users.yet</source>
+        <target>Aún no hay usuarios.</target>
+      </trans-unit>
+      <trans-unit id="P5zs.4x" resname="remove">
+        <source>remove</source>
+        <target>Quitar</target>
+      </trans-unit>
+      <trans-unit id="4HlJBp8" resname="revoke">
+        <source>revoke</source>
+        <target>Revocar</target>
+      </trans-unit>
+      <trans-unit id="SXq.3tZ" resname="sharing">
+        <source>sharing</source>
+        <target>Compartir</target>
+      </trans-unit>
+      <trans-unit id="elrbasT" resname="calendars.sharing">
+        <source>calendars.sharing</source>
+        <target>Compartir calendario</target>
+      </trans-unit>
+      <trans-unit id="HG_zUPj" resname="calendars.delegates.add">
+        <source>calendars.delegates.add</source>
+        <target>Añadir un delegado</target>
+      </trans-unit>
+      <trans-unit id="CIm3U7z" resname="calendars.delegates.for">
+        <source>calendars.delegates.for</source>
+        <target>Delegados de {what}</target>
+      </trans-unit>
+      <trans-unit id="0MBan0c" resname="calendars.delegates.new">
+        <source>calendars.delegates.new</source>
+        <target>Nuevo delegado</target>
+      </trans-unit>
+      <trans-unit id="P0vGXfx" resname="calendars.delegates.existing">
+        <source>calendars.delegates.existing</source>
+        <target>Este calendario se comparte con:</target>
+      </trans-unit>
+      <trans-unit id="0qEUvpG" resname="calendars.delegates.none">
+        <source>calendars.delegates.none</source>
+        <target>nadie</target>
+      </trans-unit>
+      <trans-unit id="p6swGey" resname="calendars.delegates.member">
+        <source>calendars.delegates.member</source>
+        <target>Miembro:</target>
+      </trans-unit>
+      <trans-unit id="sIayt9k" resname="calendars.delegates.write.give">
+        <source>calendars.delegates.write.give</source>
+        <target>¿Dar acceso de escritura?</target>
+      </trans-unit>
+      <trans-unit id="oxkIwfV" resname="users.delegates">
+        <source>users.delegates</source>
+        <target>Delegados</target>
+      </trans-unit>
+      <trans-unit id="q.VJSGh" resname="delegates.enabled.text">
+        <source>delegates.enabled.text</source>
+        <target>La delegación está activada para esta cuenta.</target>
+      </trans-unit>
+      <trans-unit id="42j2tRB" resname="delegates.disable.warning">
+        <source>delegates.disable.warning</source>
+        <target>⚠ Si la desactivas, todos tus delegados perderán el acceso a este calendario</target>
+      </trans-unit>
+      <trans-unit id="HRSK3Wi" resname="delegates.disable">
+        <source>delegates.disable</source>
+        <target>Desactivarla</target>
+      </trans-unit>
+      <trans-unit id="KHtTcdj" resname="delegates.disabled.text">
+        <source>delegates.disabled.text</source>
+        <target>La delegación no está activada para esta cuenta.</target>
+      </trans-unit>
+      <trans-unit id="bVvwuc_" resname="delegates.enable">
+        <source>delegates.enable</source>
+        <target>Activarla</target>
+      </trans-unit>
+      <trans-unit id="Au1oBii" resname="delegates.write">
+        <source>delegates.write</source>
+        <target>tiene acceso de escritura</target>
+      </trans-unit>
+      <trans-unit id="R7lqMDG" resname="delegates.readonly">
+        <source>delegates.readonly</source>
+        <target>tiene acceso de solo lectura</target>
+      </trans-unit>
+      <trans-unit id="TD5.lT1" resname="calendar.share_access.2">
+        <source>calendar.share_access.2</source>
+        <target>solo lectura</target>
+      </trans-unit>
+      <trans-unit id="wZOPHI8" resname="calendar.share_access.3">
+        <source>calendar.share_access.3</source>
+        <target>lectura / escritura</target>
+      </trans-unit>
+      <trans-unit id="F8h2YaT" resname="calendar.public">
+        <source>calendar.public</source>
+        <target>público</target>
+      </trans-unit>
+      <trans-unit id="mYDsetM" resname="calendar.auto">
+        <source>calendar.auto</source>
+        <target>automático</target>
+      </trans-unit>
+      <trans-unit id="FSDg5q6" resname="calendar.subscription">
+        <source>calendar.subscription</source>
+        <target>suscripción</target>
+      </trans-unit>
+      <trans-unit id="mJ_hMaA" resname="calendars.subscriptions">
+        <source>calendars.subscriptions</source>
+        <target>Suscripciones</target>
+      </trans-unit>
+      <trans-unit id="ZnEWE47" resname="calendars.auto">
+        <source>calendars.auto</source>
+        <target>Generados automáticamente</target>
+      </trans-unit>
+      <trans-unit id="dbg000" resname="diagnostics.title">
+        <source>diagnostics.title</source>
+        <target>Diagnóstico</target>
+      </trans-unit>
+      <trans-unit id="dbg001" resname="diagnostics.back">
+        <source>diagnostics.back</source>
+        <target>Volver al panel</target>
+      </trans-unit>
+      <trans-unit id="dbg002" resname="diagnostics.go_there">
+        <source>diagnostics.go_there</source>
+        <target>Ir allí →</target>
+      </trans-unit>
+      <trans-unit id="dbg003" resname="diagnostics.all_good">
+        <source>diagnostics.all_good</source>
+        <target>No hay nada que requiera tu atención.</target>
+      </trans-unit>
+      <trans-unit id="dbg004" resname="diagnostics.attention">
+        <source>diagnostics.attention</source>
+        <target>{count, plural, one {# punto requiere tu atención} other {# puntos requieren tu atención}}</target>
+      </trans-unit>
+      <trans-unit id="dbg005" resname="diagnostics.severity.danger">
+        <source>diagnostics.severity.danger</source>
+        <target>Hay que corregirlo</target>
+      </trans-unit>
+      <trans-unit id="dbg006" resname="diagnostics.severity.warning">
+        <source>diagnostics.severity.warning</source>
+        <target>Revísalo</target>
+      </trans-unit>
+      <trans-unit id="dbg007" resname="diagnostics.severity.ok">
+        <source>diagnostics.severity.ok</source>
+        <target>OK</target>
+      </trans-unit>
+      <trans-unit id="dbg008" resname="diagnostics.severity.info">
+        <source>diagnostics.severity.info</source>
+        <target>Info</target>
+      </trans-unit>
+      <trans-unit id="dbg009" resname="diagnostics.bucket.runtime">
+        <source>diagnostics.bucket.runtime</source>
+        <target>Entorno de ejecución</target>
+      </trans-unit>
+      <trans-unit id="dbg010" resname="diagnostics.bucket.database">
+        <source>diagnostics.bucket.database</source>
+        <target>Base de datos</target>
+      </trans-unit>
+      <trans-unit id="dbg011" resname="diagnostics.bucket.authentication">
+        <source>diagnostics.bucket.authentication</source>
+        <target>Autenticación</target>
+      </trans-unit>
+      <trans-unit id="dbg012" resname="diagnostics.bucket.scheduling">
+        <source>diagnostics.bucket.scheduling</source>
+        <target>Invitaciones y correo</target>
+      </trans-unit>
+      <trans-unit id="dbg013" resname="diagnostics.bucket.endpoints">
+        <source>diagnostics.bucket.endpoints</source>
+        <target>Puntos de conexión</target>
+      </trans-unit>
+      <trans-unit id="dbg014" resname="diagnostics.value.not_set">
+        <source>diagnostics.value.not_set</source>
+        <target>Sin definir</target>
+      </trans-unit>
+      <trans-unit id="dbg015" resname="diagnostics.value.none">
+        <source>diagnostics.value.none</source>
+        <target>Ninguno</target>
+      </trans-unit>
+      <trans-unit id="dbg016" resname="diagnostics.versions">
+        <source>diagnostics.versions</source>
+        <target>Versiones</target>
+      </trans-unit>
+      <trans-unit id="dbg017" resname="diagnostics.environment">
+        <source>diagnostics.environment</source>
+        <target>Entorno</target>
+      </trans-unit>
+      <trans-unit id="dbg018" resname="diagnostics.environment.fix">
+        <source>diagnostics.environment.fix</source>
+        <target>Davis no se está ejecutando en modo de producción. Define APP_ENV como prod; si no, las herramientas de depuración se ejecutan en cada petición y los errores se muestran a los visitantes.</target>
+      </trans-unit>
+      <trans-unit id="dbg019" resname="diagnostics.timezone">
+        <source>diagnostics.timezone</source>
+        <target>Zona horaria del servidor</target>
+      </trans-unit>
+      <trans-unit id="dbg020" resname="diagnostics.timezone.fix.bad">
+        <source>diagnostics.timezone.fix.bad</source>
+        <target>No es un identificador de zona horaria válido, así que se usa la zona predeterminada del servidor.</target>
+      </trans-unit>
+      <trans-unit id="dbg021" resname="diagnostics.timezone.fix.unset">
+        <source>diagnostics.timezone.fix.unset</source>
+        <target>No hay ninguna zona horaria configurada, así que a todos los eventos se les aplica la que use el servidor en ese momento.</target>
+      </trans-unit>
+      <trans-unit id="dbg022" resname="diagnostics.log_file">
+        <source>diagnostics.log_file</source>
+        <target>Archivo de registro</target>
+      </trans-unit>
+      <trans-unit id="dbg023" resname="diagnostics.log_file.fix">
+        <source>diagnostics.log_file.fix</source>
+        <target>No se puede escribir en este directorio, así que no se está registrando nada. Asígnalo al usuario con el que se ejecuta el servidor web.</target>
+      </trans-unit>
+      <trans-unit id="dbg024" resname="diagnostics.database">
+        <source>diagnostics.database</source>
+        <target>Base de datos</target>
+      </trans-unit>
+      <trans-unit id="dbg025" resname="diagnostics.database.fix.sqlite">
+        <source>diagnostics.database.fix.sqlite</source>
+        <target>SQLite no aplica ni las claves foráneas ni la longitud de las columnas, así que algunos errores que otros motores rechazan se guardan sin avisar. Está bien para una instalación pequeña, pero conviene saberlo al informar de un error.</target>
+      </trans-unit>
+      <trans-unit id="dbg026" resname="diagnostics.database.fix.unreachable">
+        <source>diagnostics.database.fix.unreachable</source>
+        <target>No se ha podido conectar con la base de datos.</target>
+      </trans-unit>
+      <trans-unit id="dbg027" resname="diagnostics.migrations">
+        <source>diagnostics.migrations</source>
+        <target>Migraciones pendientes</target>
+      </trans-unit>
+      <trans-unit id="dbg028" resname="diagnostics.migrations.fix">
+        <source>diagnostics.migrations.fix</source>
+        <target>No se han ejecutado las migraciones. Esto se manifiesta como errores sin relación aparente: una propiedad que no se puede guardar, una libreta de direcciones que no se puede crear, contactos que dejan de sincronizarse.</target>
+      </trans-unit>
+      <trans-unit id="dbg029" resname="diagnostics.broken_subscriptions">
+        <source>diagnostics.broken_subscriptions</source>
+        <target>Suscripciones sin origen</target>
+      </trans-unit>
+      <trans-unit id="dbg030" resname="diagnostics.broken_subscriptions.fix">
+        <source>diagnostics.broken_subscriptions.fix</source>
+        <target>Una suscripción sin origen hace que falle toda la lista de calendarios de su propietario. Solo puede crearse escribiendo directamente en la base de datos; elimínala.</target>
+      </trans-unit>
+      <trans-unit id="dbg031" resname="diagnostics.auth">
+        <source>diagnostics.auth</source>
+        <target>Método</target>
+      </trans-unit>
+      <trans-unit id="dbg032" resname="diagnostics.auth.realm">
+        <source>diagnostics.auth.realm</source>
+        <target>Cambiar el dominio (realm) invalida todas las contraseñas guardadas con el antiguo esquema de hash.</target>
+      </trans-unit>
+      <trans-unit id="dbg033" resname="diagnostics.auth_extension">
+        <source>diagnostics.auth_extension</source>
+        <target>Extensión de PHP necesaria</target>
+      </trans-unit>
+      <trans-unit id="dbg034" resname="diagnostics.auth_extension.not_needed">
+        <source>diagnostics.auth_extension.not_needed</source>
+        <target>No se necesita ninguna</target>
+      </trans-unit>
+      <trans-unit id="dbg035" resname="diagnostics.auth_extension.fix">
+        <source>diagnostics.auth_extension.fix</source>
+        <target>El método de autenticación seleccionado necesita esta extensión y no está cargada: se rechazarán todos los inicios de sesión.</target>
+      </trans-unit>
+      <trans-unit id="dbg036" resname="diagnostics.invite_address">
+        <source>diagnostics.invite_address</source>
+        <target>Dirección del remitente de las invitaciones</target>
+      </trans-unit>
+      <trans-unit id="dbg037" resname="diagnostics.invite_address.fix">
+        <source>diagnostics.invite_address.fix</source>
+        <target>CalDAV está activado, pero no hay ninguna dirección de remitente configurada, así que Davis no envía ninguna invitación.</target>
+      </trans-unit>
+      <trans-unit id="dbg038" resname="diagnostics.mailer">
+        <source>diagnostics.mailer</source>
+        <target>Transporte de correo</target>
+      </trans-unit>
+      <trans-unit id="dbg039" resname="diagnostics.mailer.fix">
+        <source>diagnostics.mailer.fix</source>
+        <target>No hay ningún transporte de correo configurado, así que no se puede entregar ninguna invitación.</target>
+      </trans-unit>
+      <trans-unit id="dbg040" resname="diagnostics.mailer.test">
+        <source>diagnostics.mailer.test</source>
+        <target>Solo se muestran el esquema y el host, nunca las credenciales. Para comprobar que funciona de verdad:</target>
+      </trans-unit>
+      <trans-unit id="dbg041" resname="diagnostics.accounts_without_email">
+        <source>diagnostics.accounts_without_email</source>
+        <target>Cuentas sin dirección de correo</target>
+      </trans-unit>
+      <trans-unit id="dbg042" resname="diagnostics.accounts_without_email.fix">
+        <source>diagnostics.accounts_without_email.fix</source>
+        <target>Estas cuentas nunca envían invitaciones. La dirección tiene que ser la que su cliente de calendario envía como organizador del evento.</target>
+      </trans-unit>
+      <trans-unit id="dbg043" resname="diagnostics.dav_endpoint">
+        <source>diagnostics.dav_endpoint</source>
+        <target>Punto de conexión DAV</target>
+      </trans-unit>
+      <trans-unit id="dbg044" resname="diagnostics.dav_endpoint.hint">
+        <source>diagnostics.dav_endpoint.hint</source>
+        <target>Es la dirección que hay que indicar en los clientes de calendario y de contactos.</target>
+      </trans-unit>
+      <trans-unit id="dbg045" resname="diagnostics.protocols">
+        <source>diagnostics.protocols</source>
+        <target>Protocolos activados</target>
+      </trans-unit>
+      <trans-unit id="dbg046" resname="diagnostics.protocols.fix">
+        <source>diagnostics.protocols.fix</source>
+        <target>No hay ningún protocolo activado, así que el punto de conexión DAV no ofrece nada.</target>
+      </trans-unit>
+      <trans-unit id="dbg047" resname="dashboard.attention">
+        <source>dashboard.attention</source>
+        <target>{count, plural, one {# punto requiere tu atención} other {# puntos requieren tu atención}}</target>
+      </trans-unit>
+      <trans-unit id="dbg048" resname="dashboard.attention.none">
+        <source>dashboard.attention.none</source>
+        <target>No hay nada que requiera tu atención</target>
+      </trans-unit>
+      <trans-unit id="dbg049" resname="dashboard.attention.go">
+        <source>dashboard.attention.go</source>
+        <target>Diagnóstico</target>
+      </trans-unit>
+      <trans-unit id="dbg050" resname="diagnostics.webdav_public_dir">
+        <source>diagnostics.webdav_public_dir</source>
+        <target>Directorio público de WebDAV</target>
+      </trans-unit>
+      <trans-unit id="dbg051" resname="diagnostics.webdav_public_dir.admins">
+        <source>diagnostics.webdav_public_dir.admins</source>
+        <target>Todos los usuarios pueden leerlo; solo los administradores pueden escribir en él</target>
+      </trans-unit>
+      <trans-unit id="dbg052" resname="diagnostics.webdav_public_dir.everyone">
+        <source>diagnostics.webdav_public_dir.everyone</source>
+        <target>Todos los usuarios pueden leerlo y escribir en él</target>
+      </trans-unit>
+      <trans-unit id="dbg053" resname="diagnostics.webdav_public_dir.admins.hint">
+        <source>diagnostics.webdav_public_dir.admins.hint</source>
+        <target>Los usuarios normales reciben un error 403 al guardar un archivo ahí. Define WEBDAV_PUBLIC_DIR_WRITABLE=true para que cualquier usuario autenticado pueda escribir en él.</target>
+      </trans-unit>
+      <trans-unit id="dbg054" resname="diagnostics.webdav_public_dir.everyone.hint">
+        <source>diagnostics.webdav_public_dir.everyone.hint</source>
+        <target>Cualquier usuario autenticado puede crear, modificar y eliminar archivos ahí. Define WEBDAV_PUBLIC_DIR_WRITABLE=false para reservar la escritura a los administradores.</target>
+      </trans-unit>
+      <trans-unit id="dbg055" resname="diagnostics.app_keys">
+        <source>diagnostics.app_keys</source>
+        <target>Claves de aplicación</target>
+      </trans-unit>
+      <trans-unit id="dbg056" resname="diagnostics.app_keys.help">
+        <source>diagnostics.app_keys.help</source>
+        <target>Número de claves activas. Cada una actúa como cualquier usuario de su ámbito sin que intervenga nunca la contraseña de ese usuario: guarda los secretos en el servidor y revoca la clave cuando desaparezca el servicio que la tiene.</target>
+      </trans-unit>
+      <trans-unit id="dbg057" resname="diagnostics.app_keys.disabled">
+        <source>diagnostics.app_keys.disabled</source>
+        <target>Las claves de aplicación están desactivadas. Para usarlas, define APP_KEYS_ENABLED=true.</target>
+      </trans-unit>
+      <trans-unit id="dbg058" resname="diagnostics.value.disabled">
+        <source>diagnostics.value.disabled</source>
+        <target>desactivado</target>
+      </trans-unit>
+      <trans-unit id="byp01" resname="auth_bypass.label">
+        <source>auth_bypass.label</source>
+        <target>Sin autenticación</target>
+      </trans-unit>
+      <trans-unit id="dbg059" resname="diagnostics.admin_auth_bypass">
+        <source>diagnostics.admin_auth_bypass</source>
+        <target>Acceso al panel sin autenticación</target>
+      </trans-unit>
+      <trans-unit id="dbg060" resname="diagnostics.admin_auth_bypass.enabled">
+        <source>diagnostics.admin_auth_bypass.enabled</source>
+        <target>ADMIN_AUTH_BYPASS está activado: el panel está abierto a cualquiera que pueda llegar a él. Úsalo solo detrás de un proxy que autentique antes (Authelia, etc.). El servidor DAV no se ve afectado.</target>
+      </trans-unit>
+      <trans-unit id="dbg061" resname="diagnostics.admin_auth_bypass.invalid">
+        <source>diagnostics.admin_auth_bypass.invalid</source>
+        <target>ADMIN_AUTH_BYPASS solo se tiene en cuenta si se define exactamente como la cadena "true" (en minúsculas). Este valor se ignora y el panel sigue pidiendo iniciar sesión.</target>
+      </trans-unit>
+      <trans-unit id="dbg062" resname="diagnostics.value.enabled">
+        <source>diagnostics.value.enabled</source>
+        <target>activado</target>
+      </trans-unit>
+      <trans-unit id="apk01" resname="title.app_keys">
+        <source>title.app_keys</source>
+        <target>Claves de aplicación</target>
+      </trans-unit>
+      <trans-unit id="apk02" resname="app_keys.new">
+        <source>app_keys.new</source>
+        <target>Nueva clave de aplicación</target>
+      </trans-unit>
+      <trans-unit id="apk03" resname="app_keys.back">
+        <source>app_keys.back</source>
+        <target>Volver a las claves de aplicación</target>
+      </trans-unit>
+      <trans-unit id="apk04" resname="app_keys.app_id">
+        <source>app_keys.app_id</source>
+        <target>ID de aplicación</target>
+      </trans-unit>
+      <trans-unit id="apk05" resname="app_keys.scope">
+        <source>app_keys.scope</source>
+        <target>Ámbito</target>
+      </trans-unit>
+      <trans-unit id="apk06" resname="app_keys.scope.all">
+        <source>app_keys.scope.all</source>
+        <target>Todos los usuarios excepto los administradores</target>
+      </trans-unit>
+      <trans-unit id="apk07" resname="app_keys.created">
+        <source>app_keys.created</source>
+        <target>Creada</target>
+      </trans-unit>
+      <trans-unit id="apk08" resname="app_keys.last_used">
+        <source>app_keys.last_used</source>
+        <target>Último uso</target>
+      </trans-unit>
+      <trans-unit id="apk09" resname="app_keys.never">
+        <source>app_keys.never</source>
+        <target>nunca</target>
+      </trans-unit>
+      <trans-unit id="apk10" resname="app_keys.status.active">
+        <source>app_keys.status.active</source>
+        <target>Activa</target>
+      </trans-unit>
+      <trans-unit id="apk11" resname="app_keys.status.expires">
+        <source>app_keys.status.expires</source>
+        <target>Caduca el {date}</target>
+      </trans-unit>
+      <trans-unit id="apk12" resname="app_keys.status.revoked">
+        <source>app_keys.status.revoked</source>
+        <target>Revocada el {date}</target>
+      </trans-unit>
+      <trans-unit id="apk13" resname="app_keys.revoke">
+        <source>app_keys.revoke</source>
+        <target>Revocar</target>
+      </trans-unit>
+      <trans-unit id="apk14" resname="app_keys.saved">
+        <source>app_keys.saved</source>
+        <target>Se ha creado la clave de aplicación</target>
+      </trans-unit>
+      <trans-unit id="apk15" resname="app_keys.revoked">
+        <source>app_keys.revoked</source>
+        <target>Se ha revocado la clave de aplicación</target>
+      </trans-unit>
+      <trans-unit id="apk16" resname="app_keys.secret.title">
+        <source>app_keys.secret.title</source>
+        <target>Secreto de «{name}»</target>
+      </trans-unit>
+      <trans-unit id="apk17" resname="app_keys.secret.text">
+        <source>app_keys.secret.text</source>
+        <target>Cópialo ahora: no se guarda y no se volverá a mostrar.</target>
+      </trans-unit>
+      <trans-unit id="apk18" resname="app_keys.secret.username">
+        <source>app_keys.secret.username</source>
+        <target>Los clientes inician sesión por HTTP Basic con el nombre de usuario &lt;login&gt;*{appId} y este secreto como contraseña.</target>
+      </trans-unit>
+      <trans-unit id="apk19" resname="app_keys.modal.title">
+        <source>app_keys.modal.title</source>
+        <target>¿Revocar esta clave de aplicación?</target>
+      </trans-unit>
+      <trans-unit id="apk20" resname="app_keys.modal.text">
+        <source>app_keys.modal.text</source>
+        <target>A partir de ahora se rechazará a todos los clientes que la usen. No se puede deshacer.</target>
+      </trans-unit>
+      <trans-unit id="apk21" resname="no.app_keys.yet">
+        <source>no.app_keys.yet</source>
+        <target>Aún no hay claves de aplicación</target>
+      </trans-unit>
+      <trans-unit id="apk28" resname="app_keys.used_as">
+        <source>app_keys.used_as</source>
+        <target>Usada como</target>
+      </trans-unit>
+      <trans-unit id="apk29" resname="app_keys.used_as.more">
+        <source>app_keys.used_as.more</source>
+        <target>y {count} más</target>
+      </trans-unit>
+      <trans-unit id="apk22" resname="form.app_key.name">
+        <source>form.app_key.name</source>
+        <target>Nombre</target>
+      </trans-unit>
+      <trans-unit id="apk23" resname="form.app_key.scope">
+        <source>form.app_key.scope</source>
+        <target>Usuarios</target>
+      </trans-unit>
+      <trans-unit id="apk24" resname="form.app_key.scope.help">
+        <source>form.app_key.scope.help</source>
+        <target>Un nombre de usuario por línea. Usa * para todos los usuarios excepto los administradores. Para incluir a un administrador, añade su nombre de usuario. La clave puede ver todo lo que ve el usuario, incluidos los calendarios compartidos con él y los calendarios de los que es delegado.</target>
+      </trans-unit>
+      <trans-unit id="apk25" resname="form.app_key.expires_at">
+        <source>form.app_key.expires_at</source>
+        <target>Caduca el</target>
+      </trans-unit>
+      <trans-unit id="apk26" resname="form.app_key.expires_at.help">
+        <source>form.app_key.expires_at.help</source>
+        <target>Opcional. La clave deja de funcionar desde el comienzo de ese día; déjalo vacío para una clave que no caduque nunca. También puedes revocarla en cualquier momento.</target>
+      </trans-unit>
+      <trans-unit id="apk27" resname="form.app_key.expires_at.clear">
+        <source>form.app_key.expires_at.clear</source>
+        <target>Sin caducidad</target>
+      </trans-unit>
+      <trans-unit id="dbghlp0" resname="diagnostics.broken_subscriptions.help">
+        <source>diagnostics.broken_subscriptions.help</source>
+        <target>Una suscripción de calendario sin origen hace que no se pueda cargar toda la lista de calendarios de su propietario. Solo puede generarse escribiendo directamente en la base de datos, así que normalmente es cero.</target>
+      </trans-unit>
+      <trans-unit id="dbghlp1" resname="diagnostics.accounts_without_email.help">
+        <source>diagnostics.accounts_without_email.help</source>
+        <target>Una cuenta sin dirección de correo nunca envía invitaciones, porque Davis compara esa dirección con el organizador del evento. La dirección de cada cuenta tiene que ser la que envía su cliente de calendario.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd0" resname="diagnostics.update">
+        <source>diagnostics.update</source>
+        <target>Última versión</target>
+      </trans-unit>
+      <trans-unit id="dbgupd1" resname="diagnostics.update.disabled">
+        <source>diagnostics.update.disabled</source>
+        <target>Davis no se conecta a internet por su cuenta. Define UPDATE_CHECK_ENABLED=true para que esta página consulte a GitHub, como mucho una vez al día, si hay una versión más reciente.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd2" resname="diagnostics.update.available">
+        <source>diagnostics.update.available</source>
+        <target>Hay una versión más reciente disponible. Lee sus notas de la versión antes de actualizar: indican la migración que hay que ejecutar y cualquier cambio de comportamiento.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd3" resname="diagnostics.update.current">
+        <source>diagnostics.update.current</source>
+        <target>Es la última versión. Se consulta a GitHub como mucho una vez al día.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd4" resname="diagnostics.update.unreachable">
+        <source>diagnostics.update.unreachable</source>
+        <target>No se ha podido consultar la última versión en GitHub (no hay red o se ha alcanzado el límite de peticiones de la API). Se volverá a intentar dentro de una hora.</target>
+      </trans-unit>
+      <trans-unit id="dbgupd5" resname="diagnostics.value.unknown">
+        <source>diagnostics.value.unknown</source>
+        <target>Desconocido</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
