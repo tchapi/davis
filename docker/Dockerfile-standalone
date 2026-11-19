@@ -72,7 +72,8 @@ FROM base-image
 ENV APP_ENV=prod
 
 ENV PHP_OPCACHE_MEMORY_CONSUMPTION="256" \
-    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
+    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10" \
+    LOG_FILE_PATH="/dev/stdout"
 
 LABEL org.opencontainers.image.authors="tchap@tchap.me"
 LABEL org.opencontainers.image.url="https://github.com/tchapi/davis/pkgs/container/davis-standalone"
@@ -96,11 +97,9 @@ RUN APP_ENV=prod COMPOSER_ALLOW_SUPERUSER=1 composer install --no-ansi --no-dev 
     && php ./vendor/symfony/intl/Resources/bin/compress
 
 # Caddy: web server
-RUN mkdir -p /var/log/caddy
 COPY ./docker/configurations/Caddyfile /etc/caddy/Caddyfile
 
 # Supervisor: Process manager
-RUN mkdir -p /var/log/supervisor && mkdir -p /var/log/php-fpm
 COPY ./docker/configurations/supervisord.conf /etc/supervisord.conf
 
 # We want to use sockets inside the container between Caddy and PHP-fpm

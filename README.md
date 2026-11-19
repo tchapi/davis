@@ -311,7 +311,7 @@ WEBDAV_HOMES_DIR=
 
 **h. The log file path**
 
-You can use an absolute file path here, and you can use Symfony's `%kernel.logs_dir%` and `%kernel.environment%` placeholders if needed (as in the default value). Setting it to `/dev/null` will disable logging altogether.
+You can use an absolute file path here, and you can use Symfony's `%kernel.logs_dir%` and `%kernel.environment%` placeholders if needed (as in the default value). Setting it to `/dev/null` will disable logging altogether. Docker installations use `/dev/stdout` by default.
 
 ```shell
 LOG_FILE_PATH="%kernel.logs_dir%/%kernel.environment%.log"
