@@ -2,7 +2,11 @@
 
 namespace App\Tests\Functional;
 
+use App\Constants;
 use App\Entity\AddressBook;
+use App\Entity\CalendarInstance;
+use App\Entity\CalendarObject;
+use App\Entity\Card;
 use App\Entity\Principal;
 use App\Entity\User;
 use App\Security\AdminUser;
@@ -251,6 +255,95 @@ class AddressBookControllerTest extends WebTestCase
             ]);
             $this->assertSame($included, $reloaded->isIncludedInBirthdayCalendar());
         }
+    }
+
+    private function addBirthdayCard(AddressBook $book): void
+    {
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $cardData = "BEGIN:VCARD\r\nVERSION:3.0\r\nFN:Birthday Contact\r\nUID:birthday-1\r\nBDAY:19900615\r\nEND:VCARD\r\n";
+        $card = (new Card())
+            ->setAddressBook($book)
+            ->setUri('birthday-contact.vcf')
+            ->setCarddata($cardData)
+            ->setLastmodified(time())
+            ->setSize(strlen($cardData))
+            ->setEtag(md5($cardData));
+        $em->persist($card);
+        $em->flush();
+    }
+
+    private function assertBirthdayEventExists(): void
+    {
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $instance = $em->getRepository(CalendarInstance::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => Constants::BIRTHDAY_CALENDAR_URI,
+        ]);
+        $this->assertNotNull($instance, 'Birthday calendar instance not found');
+        $this->assertNotNull($em->getRepository(CalendarObject::class)->findOneBy([
+            'calendar' => $instance->getCalendar(),
+            'uri' => 'default-birthday-contact.vcf.ics',
+        ]), 'Birthday event not found');
+    }
+
+    /**
+     * Issue #328: with a contact that has a birthday, saving the address book with the flag on
+     * gave a 500, because the birthday service had no calendar backend to write the event with.
+     */
+    public function testSavingAnAddressBookWithABirthdayAddsItToTheBirthdayCalendar(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $book = $em->getRepository(AddressBook::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+        $this->addBirthdayCard($book);
+
+        $crawler = $client->request('GET', '/addressbooks/'.$userId.'/edit/'.$book->getId());
+        $form = $crawler->selectButton('address_book_save')->form();
+
+        $client->submit($form, [
+            'address_book[uri]' => 'default',
+            'address_book[displayName]' => 'Default',
+            'address_book[includedInBirthdayCalendar]' => 1,
+        ]);
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
+
+        $this->assertBirthdayEventExists();
+    }
+
+    /**
+     * Deleting an address book syncs the birthday calendar the same way, so it needs the backend too.
+     */
+    public function testDeletingAnAddressBookKeepsTheOtherBirthdays(): void
+    {
+        $client = static::createClient();
+        $client->loginUser(new AdminUser('admin', 'test'));
+
+        $userId = $this->getUserId($client, 'test_user');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+        $book = $em->getRepository(AddressBook::class)->findOneBy([
+            'principalUri' => Principal::PREFIX.'test_user',
+            'uri' => 'default',
+        ]);
+        $book->setIncludedInBirthdayCalendar(true);
+        $this->addBirthdayCard($book);
+
+        $other = (new AddressBook())
+            ->setPrincipalUri(Principal::PREFIX.'test_user')
+            ->setUri('other')
+            ->setDisplayName('Other');
+        $em->persist($other);
+        $em->flush();
+
+        $this->postAdmin($client, '/addressbooks/'.$userId.'/delete/'.$other->getId());
+        $this->assertResponseRedirects('/addressbooks/'.$userId);
+
+        $this->assertBirthdayEventExists();
     }
 
     public function testAddressBookDelete(): void
