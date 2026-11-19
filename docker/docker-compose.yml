@@ -27,6 +27,11 @@ services:
       - MYSQL_PASSWORD=${DB_PASSWORD}
     volumes:
       - database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   davis:
     build:
@@ -44,7 +49,8 @@ services:
       - DATABASE_URL=mysql://${DB_USER}:${DB_PASSWORD}@mysql:3306/${DB_DATABASE}?serverVersion=mariadb-10.6.10&charset=utf8mb4
       - MAILER_DSN=smtp://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
       - davis_www:/var/www/davis
 

@@ -26,6 +26,11 @@ services:
       - POSTGRES_USER=${DB_USER}
     volumes:
       - database_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   davis:
     build:
@@ -41,7 +46,8 @@ services:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgresql:5432/${DB_DATABASE}?serverVersion=15&charset=UTF-8
       - MAILER_DSN=smtp://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     volumes:
       - davis_www:/var/www/davis
 
