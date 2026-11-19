@@ -36,6 +36,7 @@
       <code><![CDATA[findByPrincipalUri]]></code>
       <code><![CDATA[findOneByUri]]></code>
       <code><![CDATA[findOneByUri]]></code>
+      <code><![CDATA[getConnection]]></code>
     </UndefinedInterfaceMethod>
   </file>
   <file src="src/Controller/Admin/AppKeyController.php">

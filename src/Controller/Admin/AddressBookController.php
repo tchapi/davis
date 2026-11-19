@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Form\AddressBookType;
 use App\Services\BirthdayService;
 use Doctrine\Persistence\ManagerRegistry;
+use Sabre\CalDAV\Backend\PDO as CalendarBackend;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,6 +80,7 @@ class AddressBookController extends AbstractController
 
             if ($isBirthdayCalendarEnabled) {
                 // Let's sync the user birthday calendar if needed
+                $this->setBirthdayCalendarBackend($doctrine, $birthdayService);
                 $birthdayService->syncUser($username);
             }
 
@@ -131,9 +133,21 @@ class AddressBookController extends AbstractController
         $isBirthdayCalendarEnabled = $this->getParameter('caldav_enabled') && $this->getParameter('carddav_enabled');
         if ($isBirthdayCalendarEnabled) {
             // Let's sync the user birthday calendar if needed
+            $this->setBirthdayCalendarBackend($doctrine, $birthdayService);
             $birthdayService->syncUser($username);
         }
 
         return $this->redirectToRoute('addressbook_index', ['userId' => $userId]);
+    }
+
+    /**
+     * The birthday service writes the events through the CalDAV backend, which is only set by the
+     * DAV server and the sync command, so it has to be set here too.
+     */
+    private function setBirthdayCalendarBackend(ManagerRegistry $doctrine, BirthdayService $birthdayService): void
+    {
+        /** @var \PDO $pdo */
+        $pdo = $doctrine->getManager()->getConnection()->getNativeConnection();
+        $birthdayService->setBackend(new CalendarBackend($pdo));
     }
 }
